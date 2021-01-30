@@ -1,0 +1,34 @@
+import * as React from 'react';
+import { library } from '@fortawesome/fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartPie, faEdit, faExclamationCircle, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPlayCircle, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTint, faUser } from '@fortawesome/fontawesome-free-solid';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+
+library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartPie, faEdit, faExclamationCircle, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPlayCircle, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTint, faUser);
+
+const Icon = (icon: IconProp) => () => <span className='icon'><FontAwesomeIcon icon={icon} /></span>;
+export const AddressCardIcon = Icon('address-card');
+export const AngleDownIcon = Icon('angle-down');
+export const AngleUpIcon = Icon('angle-up');
+export const BoltIcon = Icon('bolt');
+export const BoxesIcon = Icon('boxes');
+export const ChartPieIcon = Icon('chart-pie');
+export const ExclamationCircleIcon = Icon('exclamation-circle');
+export const ImagesIcon = Icon('images');
+export const InfoCircle = Icon('info-circle');
+export const LightbulbIcon = Icon('lightbulb');
+export const LinkIcon = Icon('link');
+export const ListUlIcon = Icon('list-ul');
+export const LockIcon = Icon('lock');
+export const MagicIcon = Icon('magic');
+export const MoonIcon = Icon('moon');
+export const PlayCircleIcon = Icon('play-circle');
+export const SignInAltIcon = Icon('sign-in-alt');
+export const SignOutAltIcon = Icon('sign-out-alt');
+export const SkullIcon = Icon('skull');
+export const StarIcon = Icon('star');
+export const TableIcon = Icon('table');
+export const TachometerAltIcon = Icon('tachometer-alt');
+export const TextHeightIcon = Icon('text-height');
+export const TintIcon = Icon('tint');
+export const UserIcon = Icon('user');

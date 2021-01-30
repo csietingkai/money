@@ -1,0 +1,80 @@
+version: "3"
+
+# port for this project used: 1150 ~ 1199
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    container_name: ${CONTAINER_NAME_PREFIX}-${POSTGRES_SERVICE}
+    restart: always
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_INTERNEL_PORT}
+    volumes:
+      - ${POSTGRES_DIR}:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+  mongo:
+    image: mongo:${MONGO_VERSION}
+    container_name: ${CONTAINER_NAME_PREFIX}-${MONGO_SERVICE}
+    restart: always
+    ports:
+      - ${MONGO_PORT}:${MONGO_INTERNEL_PORT}
+    volumes:
+      - ${MONGO_DIR}:/data/db
+      - ${MONGO_CONFIG}:/etc/mongod.conf
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+  redis:
+    image: redis:${REDIS_VERSION}
+    container_name: ${CONTAINER_NAME_PREFIX}-${REDIS_SERVICE}
+    restart: always
+    command: --requirepass ${REDIS_ROOT_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:${REDIS_INTERNEL_PORT}
+    volumes:
+      - ${REDIS_DIR}:/data
+  python:
+    image: tingkai/money-python:${PYTHON_VERSION}
+    container_name: ${CONTAINER_NAME_PREFIX}-${PYTHON_SERVICE}
+    restart: always
+    ports:
+      - ${PYTHON_PORT}:${PYTHON_INTERNEL_PORT}
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+  backend:
+    image: tingkai/money-backend:${BACKEND_VERSION}
+    container_name: ${CONTAINER_NAME_PREFIX}-${BACKEND_SERVICE}
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_INTERNEL_PORT}
+    depends_on:
+      - python
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_SERVICE}:${POSTGRES_INTERNEL_PORT}/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_ROOT_PASSWORD}
+      - SPRING_DATA_MONGODB_HOST=${MONGO_SERVICE}
+      - SPRING_DATA_MONGODB_PORT=${MONGO_INTERNEL_PORT}
+      - SPRING_DATA_MONGODB_AUTHENTICATION-database=admin
+      - SPRING_DATA_MONGODB_DATABASE=money
+      - SPRING_DATA_MONGODB_GRID_FS_DATABASE=money
+      - SPRING_DATA_MONGODB_USERNAME=${MONGO_ROOT_USERNAME}
+      - SPRING_DATA_MONGODB_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - SPRING_REDIS_HOST=${REDIS_SERVICE}
+      - SPRING_REDIS_PORT=${REDIS_INTERNEL_PORT}
+      - SPRING_REDIS_PASSWORD=${REDIS_ROOT_PASSWORD}
+      - SPRING_REDIS_DATABASE=${REDIS_DATABASE}
+  frontend:
+    image: tingkai/money-frontend:${FRONTEND_VERSION}
+    container_name: ${CONTAINER_NAME_PREFIX}-${FRONTEND_SERVICE}
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_INTERNEL_PORT}
+    volumes:
+      - ${FRONTEND_API_CONF}:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://${BACKEND_SERVICE}:${BACKEND_INTERNEL_PORT}/api

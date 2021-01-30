@@ -1,0 +1,7 @@
+!mongodb/conf/mongod.conf
+!redis/conf/redis.conf
+mysql/
+mongodb/
+postgres/
+redis/
+backup/
