@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import io.tingkai.money.dao.StockRecordDao;
 import io.tingkai.money.entity.StockRecord;
+import io.tingkai.money.util.TimeUtil;
 
 /**
  * provide method for upload, download, find, delete database table 'stock'
@@ -25,6 +26,20 @@ public class StockRecordService {
 	public List<StockRecord> getAll() {
 		List<StockRecord> records = new ArrayList<StockRecord>();
 		Iterable<StockRecord> recordIterable = this.stockRecordDao.findAll();
+		recordIterable.forEach(records::add);
+		return records;
+	}
+
+	public List<StockRecord> get(String code) {
+		List<StockRecord> records = new ArrayList<StockRecord>();
+		Iterable<StockRecord> recordIterable = this.stockRecordDao.findAllByCodeOrderByDealDate(code);
+		recordIterable.forEach(records::add);
+		return records;
+	}
+
+	public List<StockRecord> get(String code, long start, long end) {
+		List<StockRecord> records = new ArrayList<StockRecord>();
+		Iterable<StockRecord> recordIterable = this.stockRecordDao.findAllByCodeAndDealDateAfterAndDealDateBeforeOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		recordIterable.forEach(records::add);
 		return records;
 	}
