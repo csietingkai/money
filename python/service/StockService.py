@@ -3,6 +3,7 @@ import pandas
 import math
 import json
 import csv
+import time
 
 MarketTypes = {
     'LSE': '2',
@@ -37,6 +38,7 @@ def fetchAllStockRecord(code, start, end):
     urlFormat = 'https://query1.finance.yahoo.com/v7/finance/download/{code}?period1={start}&period2={end}&interval=1d&events=history&includeAdjustedClose=true'
     url = urlFormat.format(code = code, start = start, end = end)
     with requests.Session() as s:
+        noDataDates = []
         try:
             download = s.get(url)
 
@@ -50,16 +52,71 @@ def fetchAllStockRecord(code, start, end):
                     firstRow = False
                     continue
                 dealDate = row[0].replace('-', '/')
-                returnData[dealDate] = [
-                    toNumber(row[1]), # openPrice
-                    toNumber(row[2]), # highPrice
-                    toNumber(row[3]), # lowPrice
-                    toNumber(row[4]), # closePrice
-                    toNumber(row[6])  # dealShare
-                ]
+                openPrice = toNumber(row[1])
+                highPrice = toNumber(row[2])
+                lowPrice = toNumber(row[3])
+                closePrice = toNumber(row[4])
+                dealShare = toNumber(row[6])
+                if openPrice == '0.00' or highPrice == '0.00' or lowPrice == '0.00' or closePrice == '0.00':
+                    print('{date} has openPrice: {openPrice}, highPrice: {highPrice}, lowPrice: {lowPrice}, closePrice: {closePrice}, fetch data from TWSE'.format(date=dealDate, openPrice=openPrice, highPrice=highPrice, lowPrice=lowPrice, closePrice=closePrice))
+                    noDataDates.append(dealDate)
+                else:
+                    returnData[dealDate] = [openPrice, highPrice, lowPrice, closePrice, dealShare]
+            for dealDate in noDataDates:
+                print('fetching {dealDate} date from TWSE'.format(dealDate=dealDate))
+                data = fetchSingleStockRecord(code.split('.')[0], dealDate.replace('/', ''), 'TWSE')
+                if len(data) > 0:
+                    returnData[dealDate] = data
+                else:
+                    data = fetchSingleStockRecord(code.split('.')[0], dealDate, 'TPEX')
+                time.sleep(3)
         except Exception as e:
             print(str(e))
+        s.close()
     return returnData
+
+def fetchSingleStockRecord(code, date, source):
+    print(date)
+    urlFormat = ''
+    if source == 'TWSE':
+        urlFormat = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={date}&stockNo={code}'
+    elif source == 'TPEX':
+        urlFormat = 'https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?d={date}&stkno={code}'
+    else:
+        return []
+    url = urlFormat.format(code = code, date = date)
+    response = requests.get(url)
+    jsonResponse = response.json()
+    response.close()
+    if source == 'TWSE':
+        if 'data' in jsonResponse and isinstance(jsonResponse['data'], list):
+            data = jsonResponse['data']
+            for item in data:
+                year = int(item[0].split('/')[0]) + 1911
+                jsonDate = str(year) + item[0].split('/')[1] + item[0].split('/')[2]
+                if jsonDate == date:
+                    openPrice = toNumber(item[3])
+                    highPrice = toNumber(item[4])
+                    lowPrice = toNumber(item[5])
+                    closePrice = toNumber(item[6])
+                    dealShare = toNumber(item[1])
+                    if openPrice == '0.00' and highPrice == '0.00' and lowPrice == '0.00' and closePrice == '0.00':
+                        return [ openPrice, highPrice, lowPrice, closePrice, dealShare ]
+    elif source == 'TPEX':
+        if 'aaData' in jsonResponse and isinstance(jsonResponse['data'], list):
+            data = jsonResponse['aaData']
+            for item in data:
+                year = int(item[0].split('/')[0]) + 1911
+                jsonDate = str(year) + item[0].split('/')[1] + item[0].split('/')[2]
+                if jsonDate == date.replace('/', ''):
+                    openPrice = toNumber(item[3])
+                    highPrice = toNumber(item[4])
+                    lowPrice = toNumber(item[5])
+                    closePrice = toNumber(item[6])
+                    dealShare = toNumber(item[1])
+                    if openPrice == '0.00' and highPrice == '0.00' and lowPrice == '0.00' and closePrice == '0.00':
+                        return [ openPrice, highPrice, lowPrice, closePrice, dealShare ]
+    return []
 
 def toEmptyString(s):
     if (not isinstance(s, str)) and math.isnan(s):
