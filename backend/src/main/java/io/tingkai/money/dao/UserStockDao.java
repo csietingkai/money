@@ -2,7 +2,7 @@ package io.tingkai.money.dao;
 
 import java.util.UUID;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.tingkai.money.entity.UserStock;
@@ -13,5 +13,7 @@ import io.tingkai.money.entity.UserStock;
  * @author tingkai
  */
 @Repository
-public interface UserStockDao extends CrudRepository<UserStock, UUID> {
+public interface UserStockDao extends JpaRepository<UserStock, UUID> {
+
+	public Iterable<UserStock> findByUserName(String username);
 }
