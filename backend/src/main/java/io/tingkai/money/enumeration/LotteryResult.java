@@ -6,5 +6,5 @@ package io.tingkai.money.enumeration;
  * @author tingkai
  */
 public enum LotteryResult {
-	WIN, HALF_WIN, HALF_LOSE, LOSE
+	WIN, HALF_WIN, TIE, HALF_LOSE, LOSE
 }
