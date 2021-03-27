@@ -66,6 +66,8 @@ services:
       - SPRING_REDIS_PORT=${REDIS_INTERNEL_PORT}
       - SPRING_REDIS_PASSWORD=${REDIS_ROOT_PASSWORD}
       - SPRING_REDIS_DATABASE=${REDIS_DATABASE}
+      - PYTHON_BASE_URL=http://python:${PYTHON_INTERNEL_PORT}
+      - PYTHON_FETCH_PATH=/fetch
   frontend:
     image: tingkai/money-frontend:${FRONTEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${FRONTEND_SERVICE}

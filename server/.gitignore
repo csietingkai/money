@@ -1,7 +1,4 @@
-!mongodb/conf/mongod.conf
-!redis/conf/redis.conf
-mysql/
-mongodb/
-postgres/
-redis/
-backup/
+postgres/data
+mongodb/data
+redis/data
+redis/log/redis-server.log
