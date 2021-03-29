@@ -1,4 +1,5 @@
 import { AuthToken } from 'api/auth';
+import { ExchangeRate } from 'api/exchangeRate';
 
 // common
 export interface Record<K, V> {
@@ -7,10 +8,6 @@ export interface Record<K, V> {
 }
 
 // redux
-export interface SystemState {
-    authToken: AuthToken;
-}
-
 export interface Action<T> {
     type: string;
     payload: T;
@@ -22,6 +19,11 @@ export interface ApiResponse<T> {
     data: T;
     message: string;
 }
+export interface SimpleResponse {
+    success: boolean;
+    data: null;
+    message: string;
+}
 
 // component/layout
 export interface SidebarItem {
@@ -31,4 +33,5 @@ export interface SidebarItem {
     icon?: JSX.Element;
     children?: SidebarItem[];
     component?: React.ComponentType<any>;
+    needAuth: boolean;
 }

@@ -1,35 +1,14 @@
 import { ToastOptions, ToastPosition } from 'react-toastify';
 
-import { AddressCardIcon, BoxesIcon, ChartPieIcon, ImagesIcon, PlayCircleIcon, TableIcon, TachometerAltIcon, TextHeightIcon, TintIcon } from 'component/common/Icons';
+import { CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon, VolleyBallIcon } from 'component/common/Icons';
 
-import ButtonExample from 'view/ButtonExample';
-import CardsExample from 'view/CardExample';
-import ChartExample from 'view/ChartExample';
-import ColorExample from 'view/ColorExample';
+import AccountManagementPage from 'view/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
-import FormExample from 'view/FormExample';
-import ImageExample from 'view/ImageExample';
-import TableExample from 'view/TableExample';
+import SportLotteryPage from 'view/SportLotteryPage';
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { Record, SidebarItem } from 'util/Interface';
 
-// general
-export const API_URL: string = process.env.API_URL;
-
-// api auth
-export const AUTH_LOGIN_PATH: string = '/login';
-export const AUTH_REGISTER_PATH: string = '/register';
-export const AUTH_VALIDATE_PATH: string = '/validate';
-
-// api file
-const FILE_API_PREFIX: string = '/file';
-export const FILE_UPLOAD_PATH: string = FILE_API_PREFIX + '/upload';
-export const FILE_DOWNLOAD_PATH: string = FILE_API_PREFIX + '/download';
-
-// api item
-const ITEM_API_PREFIX: string = '/item';
-export const ITEM_GET_ALL_PATH: string = ITEM_API_PREFIX + '/getAll';
 
 // localStorage
 export const AUTH_TOKEN_KEY: string = 'AUTH_TOKEN';
@@ -53,66 +32,41 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         name: 'Dashboard',
         url: '/dashboard',
         icon: TachometerAltIcon(),
-        component: DashBoard
+        component: DashBoard,
+        needAuth: false
     },
     {
-        name: 'Theme',
-        type: 'wrapper'
-    },
-    {
-        name: 'Colors',
-        url: '/color',
-        icon: TintIcon(),
-        component: ColorExample
-    },
-    {
-        name: 'Component',
-        type: 'wrapper'
-    },
-    {
-        name: 'Base',
+        name: 'Investment',
+        url: '/investment',
         type: 'dropdown',
-        url: '/base',
-        icon: BoxesIcon(),
+        icon: HandHoldingUsdIcon(),
+        needAuth: true,
         children: [
             {
-                name: 'Buttons',
-                url: '/button',
-                icon: PlayCircleIcon(),
-                component: ButtonExample
-            },
-            {
-                name: 'Cards',
-                url: '/card',
-                icon: AddressCardIcon(),
-                component: CardsExample
-            },
-            {
-                name: 'Forms',
-                url: '/form',
-                icon: TextHeightIcon(),
-                component: FormExample
-            },
-            {
-                name: 'Image',
-                url: '/image',
-                icon: ImagesIcon(),
-                component: ImageExample
-            },
-            {
-                name: 'Tables',
-                url: '/table',
-                icon: TableIcon(),
-                component: TableExample
+                name: 'Sport Lottery',
+                url: '/sportLottery',
+                icon: VolleyBallIcon(),
+                component: SportLotteryPage,
+                needAuth: true
             }
         ]
     },
     {
-        name: 'Charts',
-        url: '/chart',
-        icon: ChartPieIcon(),
-        component: ChartExample
-    },
+        name: 'Settings',
+        url: '/setting',
+        type: 'dropdown',
+        icon: CogsIcon(),
+        needAuth: true,
+        children: [
+            {
+                name: 'Account Management',
+                url: '/account',
+                icon: UserIcon(),
+                component: AccountManagementPage,
+                needAuth: true
+            }
+        ]
+    }
 ];
 
 // breadcrumbs

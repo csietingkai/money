@@ -14,9 +14,7 @@ export interface ModalProps {
     verticalCentered?: boolean;
 }
 
-export interface ModalState {
-    isShow: boolean;
-}
+export interface ModalState { }
 
 export default class Modal extends React.Component<ModalProps, ModalState> {
 
@@ -28,25 +26,13 @@ export default class Modal extends React.Component<ModalProps, ModalState> {
 
     constructor(props: ModalProps) {
         super(props);
-        this.state = {
-            isShow: this.props.isShow
-        };
+        this.state = {};
     }
-
-    componentDidUpdate(previousProps: ModalProps) {
-        if (previousProps.isShow !== this.props.isShow) {
-            this.setState({ isShow: this.props.isShow });
-        }
-    }
-
-    private toggle = () => {
-        this.setState({ isShow: !this.state.isShow });
-    };
 
     render() {
         const { headerText, okBtnText, cancelBtnText } = this.props;
         return (
-            <RbModal show={this.state.isShow} size={this.props.size} onHide={this.toggle} centered={this.props.verticalCentered}>
+            <RbModal show={this.props.isShow} size={this.props.size} onHide={() => { }} centered={this.props.verticalCentered}>
                 <RbModal.Header>{headerText}</RbModal.Header>
                 <RbModal.Body>
                     {this.props.children}

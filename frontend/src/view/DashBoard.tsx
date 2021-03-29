@@ -2,11 +2,15 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Row, Col } from 'react-bootstrap';
 
-import { getAuthToken } from 'reducer/Selector';
+import { getAuthToken, getStockTrackingList } from 'reducer/Selector';
 
 import { AuthToken } from 'api/auth';
+import ExchangeRateApi from 'api/exchangeRate';
+import StockApi from 'api/stock';
 
 import Card from 'component/common/Card';
+import Button from 'component/common/Button';
+import axios from 'axios';
 
 export interface DashBoardProps {
     authToken?: AuthToken;
@@ -23,10 +27,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         this.state = {
             trackingList: []
         };
-        this.fetchTrackingList();
     }
-
-
 
     render() {
         const { authToken } = this.props;
@@ -34,7 +35,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         if (!authToken) {
             return (
                 <Card
-                    title='  '
+                    title='INFO'
                     textCenter
                 >
                     <Row>
@@ -45,14 +46,17 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
                 </Card>
             );
         }
-        return <></>;
+        return <><Button onClick={
+            async () => {
+
+            }}>RRR</Button></>;
     }
 }
 
 const mapStateToProps = (state: any) => {
     return {
         authToken: getAuthToken(state),
-        userStockTrackingList: getTrackingList(state)
+        // userStockTrackingList: getStockTrackingList(state)
     };
 };
 

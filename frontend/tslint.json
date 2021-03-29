@@ -11,6 +11,9 @@
             "severity": "warning",
             "options": ["debug", "info", "log", "time", "timeEnd", "trace"]
         },
+        "no-empty": {
+            "severity": "warning"
+        },
         "no-empty-interface": {
             "severity": "warning"
         },

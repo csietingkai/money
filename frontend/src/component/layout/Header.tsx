@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Nav, NavbarBrand, NavItem, NavLink, Navbar } from 'react-bootstrap';
 import { RouteChildrenProps } from 'react-router-dom';
 
-import { SignInAltIcon, SignOutAltIcon } from 'component/common/Icons';
+import { SignInAltIcon, SignOutAltIcon, UserPlusIcon } from 'component/common/Icons';
 
 import { AuthToken } from 'api/auth';
 
@@ -12,6 +12,7 @@ export interface HeaderProps extends RouteChildrenProps<any> {
     authToken?: AuthToken;
     onLogoutClick: () => void;
     toggleLoginModal: () => void;
+    toggleRegisterModal: () => void;
 }
 
 export interface HeaderState { }
@@ -43,6 +44,10 @@ export default class Header extends React.Component<HeaderProps, HeaderState> {
         Notify.success('Lougout Success');
     };
 
+    private register = () => {
+        this.props.toggleRegisterModal();
+    };
+
     render() {
         const { authToken } = this.props;
         return (
@@ -69,6 +74,17 @@ export default class Header extends React.Component<HeaderProps, HeaderState> {
                                 </>}
                         </NavLink>
                     </NavItem>
+                    {
+                        !authToken &&
+                        <NavItem className='d-md-down-none' onClick={this.register}>
+                            <NavLink href='#'>
+                                <>
+                                    <UserPlusIcon />
+                                    {' Register'}
+                                </>
+                            </NavLink>
+                        </NavItem>
+                    }
                 </Nav>
             </header>
         );

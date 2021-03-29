@@ -1,17 +1,17 @@
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout } from 'reducer/Action';
-import { getAuthToken, getAuthTokenString } from 'reducer/Selector';
+import { Login, Logout, SetExchangeRateList } from 'reducer/Action';
+import { getAuthToken, getAuthTokenString, getExchangeRateList } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
+import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exchangeRate';
 
-import { SystemState } from 'util/Interface';
+import { isArrayEmpty } from 'util/AppUtil';
 
-export const validateToken = (dispatch: any, getState: () => SystemState) => {
-    const authToken: AuthToken = getAuthToken(getState());
-    const tokenString: string = authToken ? authToken.tokenString : '';
+export const validateToken = (dispatch: any, getState: () => any) => {
+    const tokenString: string = getAuthTokenString(getState());
     if (tokenString) {
         AuthApi.validate(tokenString).then((response: AuthResponse) => {
             const { success, data } = response;
@@ -26,6 +26,21 @@ export const validateToken = (dispatch: any, getState: () => SystemState) => {
         });
     } else {
         dispatch(Logout());
+    }
+};
+
+export const fetchExchangeRateList = (dispatch: any, getState: () => ExchangeRate[]) => {
+    const tokenString: string = getAuthTokenString(getState());
+    const exchangeRateList: ExchangeRate[] = getExchangeRateList(getState());
+    if (tokenString && isArrayEmpty(exchangeRateList)) {
+        ExchangeRateApi.getAll().then((response: ExchangeRateListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetExchangeRateList(data));
+            } else {
+                dispatch(SetExchangeRateList([]));
+            }
+        });
     }
 };
 

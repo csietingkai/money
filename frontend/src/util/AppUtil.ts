@@ -54,10 +54,31 @@ export const firstDigitUppercase = (str: string): string => {
     return substr(str, 0, 1).toUpperCase() + substr(str, 1);
 };
 
+export const toNumber = (obj: any, defaultVal: number = 0): number => {
+    return parseFloat(obj) || defaultVal;
+};
+
 export const find = <K, V>(records: Record<K, V>[], key: K): boolean => {
     const record = records.find(x => x.key === key);
     return !!record;
 };
+
+export const toDate = (str: string, defaultVal: Date | null = null): Date | null => {
+    const d: Date = new Date(str);
+    if (isValidDate(d)) {
+        return d;
+    }
+    return defaultVal;
+};
+
+export const toDateStr = (date: Date): string => {
+    return new Intl.DateTimeFormat('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(date);
+};
+
 export const convert = <K, V>(records: Record<K, V>[], key: K): K | V => {
     const record = records.find(x => x.key === key);
     return record ? record.value : key;

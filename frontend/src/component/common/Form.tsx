@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Col, Form as RbForm, Row } from 'react-bootstrap';
 
-import { getValueByKeys } from 'util/AppUtil';
+import { getValueByKeys, isNumber, toNumber } from 'util/AppUtil';
 import { DivWidth, InputType } from 'util/Enum';
 import { Record } from 'util/Interface';
 
@@ -18,6 +18,14 @@ export interface TextInput extends BaseInput {
     value: string;
     placeholder?: string;
     helpText?: string;
+}
+
+export interface NumericInput extends BaseInput {
+    type: InputType.numeric;
+    value: number;
+    step?: number;
+    max?: number;
+    min?: number;
 }
 
 export interface TextareaInput extends BaseInput {
@@ -52,7 +60,7 @@ export interface FileInput extends BaseInput {
     value: any;
 }
 
-export type Input = TextInput | TextareaInput | SelectInput | RadioInput | CheckboxInput | FileInput;
+export type Input = TextInput | NumericInput | TextareaInput | SelectInput | RadioInput | CheckboxInput | FileInput;
 
 export interface FormProps {
     singleRow?: boolean;
@@ -88,6 +96,18 @@ export default class Form extends React.Component<FormProps, FormState> {
         const input = formRef.current.querySelector(`#form-${key}`);
         if (input) {
             form[key] = getValueByKeys(event, 'target', 'value');
+            this.props.onChange(form);
+        }
+    };
+
+    private onFormNumericChange = (key: string) => (event: any) => {
+        console.log('aaa');
+        const { formRef } = this;
+        const { values: form } = this.state;
+        const input = formRef.current.querySelector(`#form-${key}`);
+        if (input) {
+            const value = toNumber(getValueByKeys(event, 'target', 'value'));
+            form[key] = value;
             this.props.onChange(form);
         }
     };
@@ -141,11 +161,29 @@ export default class Form extends React.Component<FormProps, FormState> {
             // const rowSize = input.rowSize || 10;
             // const options = input.options || [];
             const onFormChange = this.onFormChange(key);
+            const onFormNumericChange = this.onFormNumericChange(key);
             const onFormRadioChange = this.onFormRadioChange(key);
             const onFormCheckChange = this.onFormCheckChange(key);
             const onFileChange = this.onFileChange(key);
             let inputElement: JSX.Element = null;
-            if (type === InputType.textarea) {
+            if (type === InputType.numeric) {
+                const numericInput: NumericInput = input as NumericInput;
+                const step = numericInput.step || 1;
+                const max = numericInput.max || 1000000;
+                const min = numericInput.min || -1000000;
+                inputElement = (
+                    <RbForm.Control
+                        id={`form-${key}`}
+                        type='number'
+                        step={step}
+                        max={max}
+                        min={min}
+                        value={value}
+                        disabled={disabled}
+                        onChange={onFormNumericChange}
+                    />
+                );
+            } else if (type === InputType.textarea) {
                 const textareaInput: TextareaInput = input as TextareaInput;
                 const placeholder = textareaInput.placeholder || '';
                 const rowSize = textareaInput.lineCnt || 10;

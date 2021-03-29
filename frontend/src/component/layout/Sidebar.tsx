@@ -5,11 +5,15 @@ import classNames from 'classnames';
 
 import SidebarMinimizer from 'component/layout/SidebarMinimizer';
 
+import { AuthToken } from 'api/auth';
+
 import { SIDEBAR_ITEMS } from 'util/Constant';
 import { SidebarItem } from 'util/Interface';
 import { isArray, isArrayEmpty, isExternalUrl } from 'util/AppUtil';
 
-export interface SidebarProps extends RouteChildrenProps<any> { }
+export interface SidebarProps extends RouteChildrenProps<any> {
+    authToken?: AuthToken;
+}
 
 export interface SidebarState { }
 
@@ -40,6 +44,9 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
             const key: React.Key = `sidebar-item-${idx}`;
             if (type === 'dropdown') {
                 if (isArray(item.children)) {
+                    if (item.needAuth && !this.props.authToken) {
+                        return null;
+                    }
                     return (
                         <li key={key} className={this.activeRoute(item.url)}>
                             <a className='nav-link nav-dropdown-toggle' href='#' onClick={this.handleClick}>
@@ -63,6 +70,11 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
 
     private navLink = (item: SidebarItem, key: React.Key, classes: any) => {
         const url = item.url ? item.url : '';
+        const { authToken } = this.props;
+        const { needAuth } = item;
+        if (needAuth && !authToken) {
+            return null;
+        }
         return (
             <NavItem key={key}>
                 { isExternalUrl(url) ?

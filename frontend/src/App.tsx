@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Route, Redirect, Switch, RouteChildrenProps } from 'react-router-dom';
 
 import { LoginDispatcher, LogoutDispatcher } from 'reducer/PropsMapper';
-import { getAuthToken } from 'reducer/Selector';
+import { getAuthToken, getAuthTokenString } from 'reducer/Selector';
 import { removeAuthToken } from 'reducer/StateHolder';
 
 import Form from 'component/common/Form';
@@ -16,22 +16,27 @@ import Header from 'component/layout/Header';
 import Sidebar from 'component/layout/Sidebar';
 
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
+import { API_URL } from 'api/Constant';
 
 import { getAuthHeader } from 'util/AppUtil';
 import Notify from 'util/Notify';
 import { InputType } from 'util/Enum';
-import { API_URL, APP_ROUTES } from 'util/Constant';
+import { APP_ROUTES } from 'util/Constant';
 
 export interface AppProps extends RouteChildrenProps<any> {
     authToken?: AuthToken;
+    authTokenString?: string;
     login: (authToken: AuthToken) => void;
     logout: () => void;
 }
 
 export interface AppState {
     loginModalOpen: boolean;
+    registerModalOpen: boolean;
     username: string;
     password: string;
+    confirmPassword: string;
+    email: string;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -40,30 +45,15 @@ class App extends React.Component<AppProps, AppState> {
         super(props);
         this.state = {
             loginModalOpen: false,
+            registerModalOpen: false,
             username: '',
-            password: ''
+            password: '',
+            confirmPassword: '',
+            email: ''
         };
-        this.setAxios();
     }
 
-    private setAxios = () => {
-        axios.defaults.baseURL = API_URL;
-        axios.defaults.headers = getAuthHeader();
-        axios.interceptors.response.use((response) => response, (error) => {
-            const { status } = error.response.data;
-            if (status === 403) {
-                Notify.warning('Maybe You Need to Login First.');
-            } else if (status === 404) {
-                this.props.history.push('/404');
-            } else if (status === 500) {
-                this.props.history.push('/500');
-            }
-            throw error;
-        });
-    };
-
-
-    private togglLoginModal = () => {
+    private toggleLoginModal = () => {
         this.setState({ loginModalOpen: !this.state.loginModalOpen });
     };
 
@@ -74,7 +64,7 @@ class App extends React.Component<AppProps, AppState> {
         if (success) {
             this.props.login(data);
             Notify.success(message);
-            this.setState({ username: '', password: '' }, this.togglLoginModal);
+            this.setState({ username: '', password: '' }, this.toggleLoginModal);
         } else {
             removeAuthToken();
             Notify.error(message);
@@ -85,8 +75,37 @@ class App extends React.Component<AppProps, AppState> {
         this.props.logout();
     };
 
+    private toggleRegisterModal = () => {
+        this.setState({ registerModalOpen: !this.state.registerModalOpen });
+    };
+
+    private onRegisterClick = async () => {
+        const { username, password, confirmPassword, email } = this.state;
+        if (password !== confirmPassword) {
+            Notify.warning('Passwords are NOT same.');
+            return;
+        }
+        let response: AuthResponse = await AuthApi.register(username, email, password, false);
+        const { message } = response;
+        if (response.success) {
+            response = await AuthApi.login(username, password);
+            const { success, data } = response;
+            if (success) {
+                this.props.login(data);
+                Notify.success(message);
+            } else {
+                removeAuthToken();
+                Notify.error(message);
+            }
+            this.setState({ username: '', password: '', confirmPassword: '', email: '' }, this.toggleRegisterModal);
+        } else {
+            removeAuthToken();
+            Notify.error(message);
+        }
+    };
+
     render() {
-        const { loginModalOpen, username, password } = this.state;
+        const { loginModalOpen, registerModalOpen, username, password, confirmPassword, email } = this.state;
 
         const loginModal = (
             <Modal
@@ -94,7 +113,7 @@ class App extends React.Component<AppProps, AppState> {
                 isShow={loginModalOpen}
                 okBtnText='Submit'
                 onOkClick={this.onLoginClick}
-                onCancelClick={this.togglLoginModal}
+                onCancelClick={this.toggleLoginModal}
                 verticalCentered={true}
             >
                 <Form
@@ -108,11 +127,33 @@ class App extends React.Component<AppProps, AppState> {
             </Modal>
         );
 
+        const registerModal = (
+            <Modal
+                headerText='Register'
+                isShow={registerModalOpen}
+                okBtnText='Submit'
+                onOkClick={this.onRegisterClick}
+                onCancelClick={this.toggleRegisterModal}
+                verticalCentered={true}
+            >
+                <Form
+                    singleRow
+                    inputs={[
+                        { key: 'username', title: 'Username', value: username },
+                        { key: 'password', title: 'Password', type: InputType.password, value: password },
+                        { key: 'confirmPassword', title: 'Comfirm Password', type: InputType.password, value: confirmPassword },
+                        { key: 'email', title: 'Email', type: InputType.email, value: email }
+                    ]}
+                    onChange={(formState: any) => { this.setState({ ...formState }); }}
+                />
+            </Modal>
+        );
+
         const app = (
             <div className='app'>
-                <Header {...this.props} authToken={this.props.authToken} onLogoutClick={this.onLogoutClick} toggleLoginModal={this.togglLoginModal} />
+                <Header {...this.props} authToken={this.props.authToken} onLogoutClick={this.onLogoutClick} toggleLoginModal={this.toggleLoginModal} toggleRegisterModal={this.toggleRegisterModal} />
                 <div className='app-body'>
-                    <Sidebar {...this.props} />
+                    <Sidebar {...this.props} authToken={this.props.authToken} />
                     <main className='main'>
                         <Breadcrumb {...this.props} />
                         <Container fluid>
@@ -134,6 +175,7 @@ class App extends React.Component<AppProps, AppState> {
             <>
                 {app}
                 {loginModal}
+                {registerModal}
             </>
         );
     }
@@ -141,7 +183,8 @@ class App extends React.Component<AppProps, AppState> {
 
 const mapStateToProps = (state: any) => {
     return {
-        authToken: getAuthToken(state)
+        authToken: getAuthToken(state),
+        authTokenString: getAuthTokenString(state)
     };
 };
 

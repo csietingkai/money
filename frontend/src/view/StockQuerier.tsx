@@ -10,16 +10,35 @@ import PieChart from 'component/common/chart/PieChart';
 import RadarChart from 'component/common/chart/RadarChart';
 import ScatterChart from 'component/common/chart/ScatterChart';
 
-export interface ChartExampleProps { }
+import StockRecordApi, { StockRecord } from 'api/stock';
+import { toDateStr } from 'util/AppUtil';
 
-export interface ChartExampleState { }
+export interface StockQuerierProps { }
 
-class ChartExample extends React.Component<ChartExampleProps, ChartExampleState> {
+export interface StockQuerierState {
+    xAxis: any[];
+    data: StockRecord[];
+}
 
-    constructor(props: ChartExampleProps) {
+class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState> {
+
+    constructor(props: StockQuerierProps) {
         super(props);
-        this.state = {};
+        this.state = {
+            xAxis: [],
+            data: []
+        };
+        this.init();
     }
+
+    private init = async () => {
+        const duration: number = 180;
+        const records: StockRecord[] = await StockRecordApi.get('2610');
+        const sliceEnd = records.length - 1;
+        const sliceStart = sliceEnd - duration;
+        const dealDates: string[] = records.map(x => toDateStr(x.dealDate)).slice(sliceStart, sliceEnd);
+        this.setState({ xAxis: dealDates, data: records });
+    };
 
     render() {
         return (
@@ -30,10 +49,9 @@ class ChartExample extends React.Component<ChartExampleProps, ChartExampleState>
                             title='Line Chart'
                         >
                             <LineChart
-                                xAxisLabels={['January', 'February', 'March', 'April', 'May', 'June', 'July']}
+                                xAxisLabels={this.state.xAxis}
                                 datasets={[
-                                    { label: 'Line-1', color: { red: 57, green: 197, blue: 187 }, data: [65, 59, 80, 81, 56, 55, -72] },
-                                    { label: 'Line-2', color: { red: 255, green: 215, blue: 0 }, data: [34, 23, 12, 54, 77, -24, 29] }
+                                    { label: 'Line-1', color: { red: 57, green: 197, blue: 187 }, data: this.state.data.map(x => x.closePrice) }
                                 ]}
                             />
                         </Card>
@@ -148,4 +166,4 @@ const mapStateToProps = () => {
     return {};
 };
 
-export default connect(mapStateToProps)(ChartExample);
+export default connect(mapStateToProps)(StockQuerier);

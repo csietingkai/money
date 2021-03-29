@@ -14,6 +14,7 @@ export type DivWidth = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export enum InputType {
     text = 'text',
+    numeric = 'numeric',
     email = 'email',
     password = 'password',
     textarea = 'textarea',

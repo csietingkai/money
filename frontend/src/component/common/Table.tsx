@@ -12,11 +12,13 @@ export interface TableProps {
     header: string[];
     data: any[];
     countPerPage?: number;
-    columnConverter?: (header: string) => (originValue: any) => JSX.Element; // TODO
+    onRowClick?: (selectedRow: number) => void;
+    columnConverter?: (header: string, rowData: any) => JSX.Element; // TODO
 }
 
 export interface TableState {
     current: number; // data start to show at which index
+    selectedRow: number;
 }
 
 export default class Table extends React.Component<TableProps, TableState> {
@@ -31,7 +33,8 @@ export default class Table extends React.Component<TableProps, TableState> {
     constructor(props: TableProps) {
         super(props);
         this.state = {
-            current: 0
+            current: 0,
+            selectedRow: -1
         };
     }
 
@@ -69,10 +72,18 @@ export default class Table extends React.Component<TableProps, TableState> {
         return page * dataCountPerPage;
     };
 
-    render() {
-        const { id, striped, condensed, bordered, header, data, countPerPage, columnConverter } = this.props;
+    private onRowClick = (selectedRow: number) => (event: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+        const { onRowClick } = this.props;
+        this.setState({ selectedRow });
+        if (onRowClick) {
+            onRowClick(selectedRow);
+        }
+    };
 
-        const { current } = this.state;
+    render() {
+        const { id, striped, condensed, bordered, header, data, countPerPage, onRowClick, columnConverter } = this.props;
+
+        const { current, selectedRow } = this.state;
 
         const showData: any[] = data.slice(current, current + countPerPage);
 
@@ -130,27 +141,27 @@ export default class Table extends React.Component<TableProps, TableState> {
                     </thead>
                     <tbody>
                         {
-                            showData.map((d, trIdx) => {
-                                return (
-                                    <tr key={`table-${id}-tr-${trIdx}`}>
-                                        {
-                                            header.map((h, tdIdx) => {
-                                                return (
-                                                    <td key={`table-${id}-tr-${trIdx}-td-${tdIdx}`}>
-                                                        {
-                                                            d.hasOwnProperty(h) ?
+                            showData.length ?
+                                showData.map((d, trIdx) => {
+                                    return (
+                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(trIdx)}>
+                                            {
+                                                header.map((h, tdIdx) => {
+                                                    return (
+                                                        <td key={`table-${id}-tr-${trIdx}-td-${tdIdx}`}>
+                                                            {
                                                                 columnConverter ?
-                                                                    columnConverter(d)(d[h])
+                                                                    columnConverter(h, d)
                                                                     : d[h]
-                                                                : ''
-                                                        }
-                                                    </td>
-                                                );
-                                            })
-                                        }
-                                    </tr>
-                                );
-                            })
+                                                            }
+                                                        </td>
+                                                    );
+                                                })
+                                            }
+                                        </tr>
+                                    );
+                                })
+                                : <tr><td style={{ textAlign: 'center' }} colSpan={header.length}><b>No Data</b></td></tr>
                         }
                     </tbody>
                 </RbTable>

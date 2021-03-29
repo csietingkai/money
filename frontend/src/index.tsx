@@ -1,4 +1,5 @@
-// react
+// node-modules
+import axios from 'axios';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -11,11 +12,14 @@ import Page404 from 'view/Page404';
 import Page500 from 'view/Page500';
 
 // reducer
-import store, { validateToken } from 'reducer/Store';
+import store, { fetchExchangeRateList, validateToken } from 'reducer/Store';
 
 // apis
+import { API_URL } from 'api/Constant';
 
 // utils
+import { getAuthHeader } from 'util/AppUtil';
+import Notify from 'util/Notify';
 
 // css
 import 'bootstrap/dist/css/bootstrap.css';
@@ -25,8 +29,25 @@ import 'assets/scss/style.scss';
 
 // images
 
+axios.defaults.baseURL = API_URL;
+axios.defaults.headers = getAuthHeader();
+axios.interceptors.request.use((response) => response, (error) => {
+    const { status } = error.response.data;
+    if (status === 403) {
+        Notify.warning('Maybe You Need to Login First.');
+        window.location.replace('/#/dashboard');
+    } else if (status === 404) {
+        window.location.replace('/#/404');
+    } else if (status === 500) {
+        window.location.replace('/#/500');
+    }
+    throw error;
+});
+
 // validate token on refresh
 store.dispatch(validateToken);
+// get exchange rate list on refresh
+store.dispatch(fetchExchangeRateList);
 
 const ROOT = document.querySelector('#root');
 const app = (
