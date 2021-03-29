@@ -1,6 +1,8 @@
 package io.tingkai.money;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
+import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.service.PythonFetcherService;
 import io.tingkai.money.service.UserService;
 import io.tingkai.money.util.AppUtil;
@@ -32,6 +37,10 @@ public class AppInitializer {
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, Long> pythonCache;
 
+	@Autowired
+	@Qualifier(CodeConstants.PYTHON_CACHE)
+	private RedisTemplate<String, Set<String>> skipStockCache;
+
 	@EventListener(ApplicationReadyEvent.class)
 	public void onStarted() {
 		this.addRoot();
@@ -51,21 +60,29 @@ public class AppInitializer {
 	}
 
 	private void fetchExchangeRate() {
-		Long lastUpdateTime = this.pythonCache.opsForValue().get(CodeConstants.CURRENCY_UPDATE_TIME_KEY);
-		if (AppUtil.isEmpty(lastUpdateTime) || (!TimeUtil.isInOneDay(LocalDateTime.now(), TimeUtil.convertToDateTime(lastUpdateTime)) && LocalDateTime.now().isAfter(TimeUtil.convertToDateTime(lastUpdateTime)))) {
-			this.pythonFetcher.fetchExchangeRate();
-			this.pythonFetcher.fetechExchangeRateRecord();
+		Long lastUpdateTime = this.pythonCache.opsForValue().get(CodeConstants.EXCHANGE_RATE_UPDATE_TIME_KEY);
+		if (AppUtil.isEmpty(lastUpdateTime) || TimeUtil.diff(LocalDateTime.now(), TimeUtil.convertToDateTime(lastUpdateTime)) > CodeConstants.UPDATE_FREQUENCY_HOURS * TimeUtil.HOUR_MILISECS) {
+			try {
+				this.pythonFetcher.fetchExchangeRate();
+			} catch (AlreadyExistException | FieldMissingException | QueryNotResultException e) {
+				log.warn(e.getMessage());
+			}
 			lastUpdateTime = TimeUtil.getCurrentDateTime();
-			this.pythonCache.opsForValue().set(CodeConstants.CURRENCY_UPDATE_TIME_KEY, lastUpdateTime);
+			this.pythonCache.opsForValue().set(CodeConstants.EXCHANGE_RATE_UPDATE_TIME_KEY, lastUpdateTime);
 		}
 		log.info("Fetch Exchange Rate Completed.");
 	}
 
 	private void fetchStock() {
+		Set<String> skipList = this.skipStockCache.opsForValue().get(CodeConstants.STOCK_SKIP_FETCH_LIST_KEY);
+		if (AppUtil.isEmpty(skipList)) {
+			skipList = new HashSet<String>();
+			this.skipStockCache.opsForValue().set(CodeConstants.STOCK_SKIP_FETCH_LIST_KEY, skipList);
+		}
+
 		Long lastUpdateTime = this.pythonCache.opsForValue().get(CodeConstants.STOCK_UPDATE_TIME_KEY);
-		if (AppUtil.isEmpty(lastUpdateTime) || (!TimeUtil.isInOneDay(LocalDateTime.now(), TimeUtil.convertToDateTime(lastUpdateTime)) && LocalDateTime.now().isAfter(TimeUtil.convertToDateTime(lastUpdateTime)))) {
+		if (AppUtil.isEmpty(lastUpdateTime) || TimeUtil.diff(LocalDateTime.now(), TimeUtil.convertToDateTime(lastUpdateTime)) > CodeConstants.UPDATE_FREQUENCY_HOURS * TimeUtil.HOUR_MILISECS) {
 			this.pythonFetcher.fetchStock();
-			this.pythonFetcher.fetchStockRecord();
 			lastUpdateTime = TimeUtil.getCurrentDateTime();
 			this.pythonCache.opsForValue().set(CodeConstants.STOCK_UPDATE_TIME_KEY, lastUpdateTime);
 		}

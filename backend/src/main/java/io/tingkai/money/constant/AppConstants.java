@@ -26,7 +26,6 @@ public class AppConstants {
 	public static String FRONTEND_URL;
 
 	public static String PYTHON_BASE_URL;
-	public static String PYTHON_REFRESH_PATH;
 	public static String PYTHON_FETCH_PATH;
 
 	@Value("${init-root-username}")
@@ -82,11 +81,6 @@ public class AppConstants {
 	@Value("${python-base-url}")
 	public void setPythonUrl(String pythonBaseUrl) {
 		AppConstants.PYTHON_BASE_URL = pythonBaseUrl;
-	}
-
-	@Value("${python-refresh-path}")
-	public void setRefreshPath(String pythonRefreshPath) {
-		AppConstants.PYTHON_REFRESH_PATH = pythonRefreshPath;
 	}
 
 	@Value("${python-fetch-path}")

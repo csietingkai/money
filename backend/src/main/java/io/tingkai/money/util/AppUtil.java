@@ -84,7 +84,25 @@ public class AppUtil {
 		return Optional.ofNullable(obj).isPresent();
 	}
 
+	public static boolean isAllPresent(Object... objs) {
+		for (Object obj : objs) {
+			if (!isPresent(obj)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static boolean isEmpty(Object obj) {
 		return Optional.ofNullable(obj).isEmpty();
+	}
+
+	public static boolean isAllEmpty(Object... objs) {
+		for (Object obj : objs) {
+			if (!isEmpty(obj)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

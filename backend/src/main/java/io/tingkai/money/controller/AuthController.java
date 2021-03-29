@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.User;
-import io.tingkai.money.enumeration.Role;
+import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.model.exception.IllegalRoleException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
@@ -51,12 +51,7 @@ public class AuthController {
 
 	@RequestMapping(value = AuthController.REGISTER_PATH, method = RequestMethod.POST)
 	public AuthResponse register(@RequestBody User user, @RequestParam(required = false, defaultValue = "true") boolean sendMail) throws IllegalRoleException {
-		if (user.getRole() == Role.USER) {
-			this.userService.create(user);
-		} else {
-			throw new IllegalRoleException(user.getRole().name());
-		}
-
+		this.userService.create(user);
 		if (sendMail) {
 			this.mailService.sendConfirmEmail(user.getEmail());
 		}
@@ -72,7 +67,7 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = AuthController.VALIDATE_PATH, method = RequestMethod.GET)
-	public AuthResponse validate(@RequestParam String tokenString) {
+	public AuthResponse validate(@RequestParam String tokenString) throws AuthTokenExpireException {
 		AuthToken token = this.authTokenService.validate(tokenString);
 		if (AppUtil.isPresent(token)) {
 			return new AuthResponse(true, token, MessageConstant.LOGIN_SUCCESS, token.getName());

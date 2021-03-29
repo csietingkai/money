@@ -104,8 +104,14 @@ public class TimeUtil {
 		return compare(convertToDateTime(dateStrA), convertToDateTime(dateStrB));
 	}
 
-	public static boolean isInOneDay(LocalDateTime a, LocalDateTime b) {
-		return Math.abs((convertToTimeStamp(a) - convertToTimeStamp(b))) < DAY_MILISECS;
+	/**
+	 * return a minus b, <br/>
+	 * if result < 0 -> a is before b <br/>
+	 * else if result > 0 -> a is after b <br/>
+	 * else -> a is same as b <br/>
+	 */
+	public static long diff(LocalDateTime a, LocalDateTime b) {
+		return Math.abs((convertToTimeStamp(a) - convertToTimeStamp(b)));
 	}
 
 	public static boolean isLeap(int year) {

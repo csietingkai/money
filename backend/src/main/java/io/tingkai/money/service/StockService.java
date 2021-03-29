@@ -8,9 +8,16 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.netty.util.internal.StringUtil;
+import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.dao.StockDao;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.enumeration.MarketType;
+import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
+import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.exception.QueryNotResultException;
+import io.tingkai.money.util.AppUtil;
 
 /**
  * provide method for upload, download, find, delete database table 'stock'
@@ -23,49 +30,52 @@ public class StockService {
 	@Autowired
 	private StockDao stockDao;
 
-	public List<Stock> getAll() {
-		List<Stock> stocks = new ArrayList<Stock>();
-		Iterable<Stock> stockIterable = this.stockDao.findAll();
-		stockIterable.forEach(stocks::add);
-		return stocks;
-	}
-
-	public Stock get(UUID id) {
-		Optional<Stock> stockOptional = this.stockDao.findById(id);
-		if (stockOptional.isPresent()) {
-			return stockOptional.get();
-		} else {
-			return null;
+	public List<Stock> getAll() throws QueryNotResultException {
+		List<Stock> entities = new ArrayList<Stock>();
+		Iterable<Stock> iterable = this.stockDao.findAll();
+		iterable.forEach(entities::add);
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);
 		}
+		return entities;
 	}
 
-	public Stock get(String code) {
-		Optional<Stock> stockOptional = this.stockDao.findByCode(code);
-		if (stockOptional.isPresent()) {
-			return stockOptional.get();
-		} else {
-			return null;
+	public Stock get(String code) throws QueryNotResultException {
+		Optional<Stock> optional = this.stockDao.findByCode(code);
+		if (optional.isEmpty()) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
 		}
+		return optional.get();
 	}
 
-	public boolean save(Stock entity) {
-		this.stockDao.save(entity);
-		return true;
+	public Stock insert(Stock entity) throws AlreadyExistException, FieldMissingException {
+		if (!AppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate(), entity.getCfiCode())) {
+			throw new FieldMissingException();
+		}
+		Optional<Stock> optional = this.stockDao.findByCode(entity.getCode());
+		if (optional.isPresent()) {
+			throw new AlreadyExistException();
+		}
+		return this.stockDao.save(entity);
 	}
 
-	public boolean saveAll(List<Stock> entities) {
-		this.stockDao.saveAll(entities);
-		return true;
+	public List<Stock> insertAll(List<Stock> entities) throws AlreadyExistException, FieldMissingException {
+		List<Stock> inserted = new ArrayList<Stock>();
+		for (Stock entity : entities) {
+			inserted.add(this.insert(entity));
+		}
+		return inserted;
 	}
 
-	public boolean delete(UUID id) {
+	public void delete(UUID id) throws NotExistException {
+		if (AppUtil.isEmpty(id) || StringUtil.isNullOrEmpty(id.toString())) {
+			throw new NotExistException();
+		}
+		Optional<Stock> optional = this.stockDao.findById(id);
+		if (optional.isEmpty()) {
+			throw new NotExistException();
+		}
 		this.stockDao.deleteById(id);
-		return true;
-	}
-
-	public boolean delete(Stock entity) {
-		this.stockDao.delete(entity);
-		return true;
 	}
 
 	public long count() {

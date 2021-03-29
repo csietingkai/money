@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.entity.User;
+import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
 
@@ -55,10 +56,10 @@ public final class AuthTokenService {
 		this.authTokenRedisTemplate.delete(CodeConstants.AUTH_TOKEN_KEY + authToken.getTokenString());
 	}
 
-	public AuthToken validate(String tokenString) {
+	public AuthToken validate(String tokenString) throws AuthTokenExpireException {
 		AuthToken token = this.authTokenRedisTemplate.opsForValue().get(CodeConstants.AUTH_TOKEN_KEY + tokenString);
 		if (AppUtil.isEmpty(token) || token.getExpiryDate().before(new Date())) {
-			token = null;
+			throw new AuthTokenExpireException();
 		}
 		return token;
 	}

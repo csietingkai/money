@@ -8,8 +8,10 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.dao.StockRecordDao;
 import io.tingkai.money.entity.StockRecord;
+import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.TimeUtil;
 
 /**
@@ -23,34 +25,32 @@ public class StockRecordService {
 	@Autowired
 	private StockRecordDao stockRecordDao;
 
-	public List<StockRecord> getAll() {
-		List<StockRecord> records = new ArrayList<StockRecord>();
-		Iterable<StockRecord> recordIterable = this.stockRecordDao.findAll();
-		recordIterable.forEach(records::add);
-		return records;
-	}
-
-	public List<StockRecord> get(String code) {
-		List<StockRecord> records = new ArrayList<StockRecord>();
-		Iterable<StockRecord> recordIterable = this.stockRecordDao.findAllByCodeOrderByDealDate(code);
-		recordIterable.forEach(records::add);
-		return records;
-	}
-
-	public List<StockRecord> get(String code, long start, long end) {
-		List<StockRecord> records = new ArrayList<StockRecord>();
-		Iterable<StockRecord> recordIterable = this.stockRecordDao.findAllByCodeAndDealDateAfterAndDealDateBeforeOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
-		recordIterable.forEach(records::add);
-		return records;
-	}
-
-	public StockRecord get(UUID id) {
-		Optional<StockRecord> recordOptional = this.stockRecordDao.findById(id);
-		if (recordOptional.isPresent()) {
-			return recordOptional.get();
-		} else {
-			return null;
+	public List<StockRecord> getAll(String code) throws QueryNotResultException {
+		List<StockRecord> entities = new ArrayList<StockRecord>();
+		Iterable<StockRecord> iterable = this.stockRecordDao.findByCodeOrderByDealDate(code);
+		iterable.forEach(entities::add);
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
 		}
+		return entities;
+	}
+
+	public List<StockRecord> get(String code, long start, long end) throws QueryNotResultException {
+		List<StockRecord> entities = new ArrayList<StockRecord>();
+		Iterable<StockRecord> iterable = this.stockRecordDao.findByCodeAndDealDateAfterAndDealDateBeforeOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
+		iterable.forEach(entities::add);
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+		}
+		return entities;
+	}
+
+	public StockRecord get(UUID id) throws QueryNotResultException {
+		Optional<StockRecord> optional = this.stockRecordDao.findById(id);
+		if (optional.isEmpty()) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+		}
+		return optional.get();
 	}
 
 	public boolean save(StockRecord entity) {
@@ -78,9 +78,9 @@ public class StockRecordService {
 	}
 
 	public StockRecord lastestRecord(String code) {
-		Optional<StockRecord> record = this.stockRecordDao.findFirstByCodeOrderByDealDateDesc(code);
-		if (record.isPresent()) {
-			return record.get();
+		Optional<StockRecord> optional = this.stockRecordDao.findFirstByCodeOrderByDealDateDesc(code);
+		if (optional.isPresent()) {
+			return optional.get();
 		} else {
 			return null;
 		}

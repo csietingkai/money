@@ -10,6 +10,7 @@ import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.dao.UserDao;
 import io.tingkai.money.entity.User;
 import io.tingkai.money.enumeration.Role;
+import io.tingkai.money.model.exception.IllegalRoleException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.util.ContextUtil;
@@ -46,7 +47,10 @@ public class UserService {
 		}
 	}
 
-	public void create(User user) {
+	public void create(User user) throws IllegalRoleException {
+		if (user.getRole() != Role.USER) {
+			throw new IllegalRoleException(user.getRole().name());
+		}
 		user.setPwd(this.bCryptPasswordEncoder.encode(user.getPwd()));
 		user.setRole(Role.USER);
 		this.userDao.save(user);

@@ -7,8 +7,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +27,9 @@ import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.enumeration.MarketType;
+import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
+import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -46,13 +51,23 @@ public class PythonFetcherService {
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> exchangeRateCache;
 
+	/**
+	 * save each currency update time
+	 */
 	@Autowired
 	@Qualifier(CodeConstants.PYTHON_CACHE)
-	private RedisTemplate<String, List<Stock>> stockCache;
+	private RedisTemplate<String, Map<String, Long>> exchangeRateRecordCache;
 
 	@Autowired
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, Set<String>> skipStockCache;
+
+	/**
+	 * save each stock update time
+	 */
+	@Autowired
+	@Qualifier(CodeConstants.PYTHON_CACHE)
+	private RedisTemplate<String, Map<String, Long>> stockRecordCache;
 
 	@Autowired
 	private ExchangeRateService exchangeRateService;
@@ -66,9 +81,13 @@ public class PythonFetcherService {
 	@Autowired
 	private StockRecordService stockRecordService;
 
-	public void fetchExchangeRate() {
+	public void fetchExchangeRate() throws AlreadyExistException, FieldMissingException, QueryNotResultException {
 		if (this.exchangeRateService.count() == 0L) {
 			List<ExchangeRate> data = new ArrayList<ExchangeRate>();
+			ExchangeRate twd = new ExchangeRate();
+			twd.setCurrency("TWD");
+			twd.setName("新台幣");
+			data.add(twd);
 			JSONObject response = this.pythonServer.getForObject(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX, JSONObject.class);
 			response.keySet().forEach(currency -> {
 				ExchangeRate entity = new ExchangeRate();
@@ -76,46 +95,50 @@ public class PythonFetcherService {
 				entity.setName(response.getAsString(currency));
 				data.add(entity);
 			});
-			this.exchangeRateService.saveAll(data);
+			this.exchangeRateService.insertAll(data);
 		}
 
 		// sync cache
-		List<ExchangeRate> cache = this.exchangeRateCache.opsForValue().get(CodeConstants.CURRENCY_LIST_KEY);
+		List<ExchangeRate> cache = this.exchangeRateCache.opsForValue().get(CodeConstants.EXCHANGE_RATE_LIST_KEY);
 		if (AppUtil.isEmpty(cache) || cache.size() != this.exchangeRateService.count()) {
 			cache = this.exchangeRateService.getAll();
-			this.exchangeRateCache.opsForValue().set(CodeConstants.CURRENCY_LIST_KEY, cache);
+			this.exchangeRateCache.opsForValue().set(CodeConstants.EXCHANGE_RATE_LIST_KEY, cache);
 		}
 	}
 
-	public void fetechExchangeRateRecord() {
-		List<ExchangeRate> cache = this.exchangeRateCache.opsForValue().get(CodeConstants.CURRENCY_LIST_KEY);
-		cache.forEach(exchangeRate -> {
-			LocalDateTime target = CodeConstants.CURRENCY_FETCH_START_DATETIME;
-			ExchangeRateRecord lastestRecord = this.exchangeRateRecordService.lastestRecord(exchangeRate.getCurrency());
-			if (AppUtil.isPresent(lastestRecord)) {
-				target = lastestRecord.getDate();
-				target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
+	public void fetechExchangeRateRecord(String currency) throws AlreadyExistException, FieldMissingException {
+		LocalDateTime target = CodeConstants.EXCHANGE_RATE_FETCH_START_DATETIME;
+		ExchangeRateRecord lastestRecord = null;
+		try {
+			lastestRecord = this.exchangeRateRecordService.lastestRecord(currency);
+		} catch (QueryNotResultException e) {
+			log.debug(e.getMessage());
+		}
+		if (AppUtil.isPresent(lastestRecord)) {
+			target = lastestRecord.getDate();
+			target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
+		}
+		List<ExchangeRateRecord> records = new ArrayList<ExchangeRateRecord>();
+		while (TimeUtil.diff(LocalDateTime.now(), target) > CodeConstants.UPDATE_FREQUENCY_HOURS * TimeUtil.HOUR_MILISECS) {
+			// @formatter:off
+			UriComponentsBuilder builder = UriComponentsBuilder
+					.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + "/exchangeRateRecord")
+					.queryParam("currency", currency)
+					.queryParam("year", target.getYear())
+					.queryParam("month", target.getMonthValue())
+					.queryParam("day", target.getDayOfMonth());
+			// @formatter:on
+			JSONObject datas = pythonServer.getForObject(builder.toUriString(), JSONObject.class);
+			for (String dateStr : datas.keySet()) {
+				records.add(this.toExchangeRateRecord(currency, dateStr, datas.get(dateStr)));
 			}
-			List<ExchangeRateRecord> records = new ArrayList<ExchangeRateRecord>();
-			while (!TimeUtil.isInOneDay(LocalDateTime.now(), target) && LocalDateTime.now().isAfter(target)) {
-				// @formatter:off
-				UriComponentsBuilder builder = UriComponentsBuilder
-						.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + "/exchangeRateRecord")
-						.queryParam("currency", exchangeRate.getCurrency())
-						.queryParam("year", target.getYear())
-						.queryParam("month", target.getMonthValue())
-						.queryParam("day", target.getDayOfMonth());
-				// @formatter:on
-				JSONObject datas = pythonServer.getForObject(builder.toUriString(), JSONObject.class);
-				for (String dateStr : datas.keySet()) {
-					records.add(this.toExchangeRateRecord(exchangeRate.getCurrency(), dateStr, datas.get(dateStr)));
-				}
-				target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
-			}
-			if (records.size() > 0) {
-				this.exchangeRateRecordService.saveAll(records);
-			}
-		});
+			target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
+		}
+		if (records.size() > 0) {
+			this.exchangeRateRecordService.insertAll(records);
+		}
+
+		saveUpdateTime(exchangeRateRecordCache, CodeConstants.EXCHANGE_RATE_RECORD_UPDATE_TIME_KEY, currency);
 	}
 
 	private ExchangeRateRecord toExchangeRateRecord(String currency, String dateStr, Object obj) {
@@ -164,21 +187,23 @@ public class PythonFetcherService {
 			}
 		}
 
-		this.stockService.saveAll(data);
+		try {
+			this.stockService.insertAll(data);
+		} catch (AlreadyExistException | FieldMissingException e) {
+			log.warn(e.getMessage());
+		}
 	}
 
-	public void fetchStockRecord() {
-		List<Stock> list = this.stockService.getAll();
-		Set<String> skipList = this.skipStockCache.opsForValue().get(CodeConstants.STOCK_SKIP_FETCH_LIST_KEY);
-		if (AppUtil.isEmpty(skipList)) {
-			skipList = new TreeSet<String>();
-			this.skipStockCache.opsForValue().set(CodeConstants.STOCK_SKIP_FETCH_LIST_KEY, skipList);
+	public boolean fetchStockRecord(String code) {
+		List<Stock> list = new ArrayList<Stock>();
+		try {
+			list = this.stockService.getAll();
+		} catch (QueryNotResultException e) {
+			log.warn(e.getMessage());
 		}
-		for (Stock stock : list) {
-			if (skipList.contains(stock.getCode())) {
-				continue;
-			}
-
+		Optional<Stock> stockOptional = list.stream().filter(x -> x.getCode().equals(code)).findFirst();
+		if (stockOptional.isPresent()) {
+			Stock stock = stockOptional.get();
 			LocalDateTime target = stock.getOfferingDate();
 			StockRecord lastestRecord = this.stockRecordService.lastestRecord(stock.getCode());
 			if (AppUtil.isPresent(lastestRecord)) {
@@ -186,27 +211,32 @@ public class PythonFetcherService {
 				target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
 			}
 			List<StockRecord> records = new ArrayList<StockRecord>();
-			if (!TimeUtil.isInOneDay(LocalDateTime.now(), target) && LocalDateTime.now().isAfter(target) && !skipList.contains(stock.getCode())) {
-				String code = stock.getCode() + (stock.getMarketType() == MarketType.LES ? ".TWO" : ".TW");
+			if (TimeUtil.diff(LocalDateTime.now(), target) > CodeConstants.UPDATE_FREQUENCY_HOURS * TimeUtil.HOUR_MILISECS) {
+				String yahooStockCode = stock.getCode() + (stock.getMarketType() == MarketType.LSE ? ".TW" : ".TWO");
 				long startTime = TimeUtil.convertToTimeStamp(target) / 1000L;
 				long endTime = TimeUtil.getCurrentDateTime() / 1000L;
-				log.debug("Fetching Stock<" + code + "> Data, from " + startTime + " to " + endTime);
+				log.debug("Fetching Stock<{}> Data, from {} to {}", yahooStockCode, startTime, endTime);
 				// @formatter:off
 				UriComponentsBuilder builder = UriComponentsBuilder
 						.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + "/allStockRecord")
-						.queryParam("code", code)
+						.queryParam("code", yahooStockCode)
 						.queryParam("start", startTime)
 						.queryParam("end", endTime);
 				// @formatter:on
 				JSONObject data = pythonServer.getForObject(builder.toUriString(), JSONObject.class);
 				if (!data.isEmpty()) {
 					for (String dateStr : data.keySet()) {
-						records.add(this.toStockRecord(stock.getCode(), dateStr, data.get(dateStr)));
+						StockRecord newRecord = this.toStockRecord(code, dateStr, data.get(dateStr));
+						// if last deal date is not in python return data
+						if (!AppUtil.isPresent(lastestRecord) || TimeUtil.diff(lastestRecord.getDealDate(), newRecord.getDealDate()) != 0L) {
+							records.add(this.toStockRecord(code, dateStr, data.get(dateStr)));
+						}
 					}
 				} else {
+					log.warn("Stock: <{}: {}> range: <{} ~ {}> Get No Data", stock.getCode(), stock.getName(), startTime, endTime);
+					Set<String> skipList = this.skipStockCache.opsForValue().get(CodeConstants.STOCK_SKIP_FETCH_LIST_KEY);
 					skipList.add(stock.getCode());
 					this.skipStockCache.opsForValue().set(CodeConstants.STOCK_SKIP_FETCH_LIST_KEY, skipList);
-					log.warn("Stock: <{}: {}> Get No Data, Next Time Will Skip.", stock.getCode(), stock.getName());
 				}
 				target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
 				try {
@@ -218,11 +248,16 @@ public class PythonFetcherService {
 			if (records.size() > 0) {
 				try {
 					this.stockRecordService.saveAll(records);
+					saveUpdateTime(stockRecordCache, CodeConstants.STOCK_RECORD_UPDATE_TIME_KEY, code);
 				} catch (Exception e) {
 					log.warn(e.getMessage());
-					skipList.add(stock.getCode());
 				}
+				log.info("Fetching Stock<{}:{}> Complete, Data Count: {}", code, stock.getName(), records.size());
 			}
+			return true;
+		} else {
+			log.warn("Stock code: <{}> Not Found", code);
+			return false;
 		}
 	}
 
@@ -240,5 +275,14 @@ public class PythonFetcherService {
 			record.setDealShare(AppUtil.toBigDecimal(list.get(4), null));
 		}
 		return record;
+	}
+
+	private void saveUpdateTime(RedisTemplate<String, Map<String, Long>> cache, String cacheKey, String mapKey) {
+		Map<String, Long> updateTime = cache.opsForValue().get(cacheKey);
+		if (AppUtil.isEmpty(updateTime)) {
+			updateTime = new TreeMap<String, Long>();
+		}
+		updateTime.put(mapKey, TimeUtil.getCurrentDateTime());
+		cache.opsForValue().set(cacheKey, updateTime);
 	}
 }

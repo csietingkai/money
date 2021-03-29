@@ -1,6 +1,4 @@
-package io.tingkai.money.helper;
-
-import javax.servlet.http.HttpServletResponse;
+package io.tingkai.money.model.exception.helper;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +12,14 @@ import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.model.response.AuthResponse;
 import io.tingkai.money.model.response.BaseResponse;
-import io.tingkai.money.model.response.SimpleResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
-public class ExceptionHelper {
+public class AuthExceptionHelper {
 
 	@ExceptionHandler(AuthTokenExpireException.class)
-	public ResponseEntity<BaseResponse<?>> handleAuthTokenExpireException(Exception e, HttpServletResponse resp) {
+	public ResponseEntity<BaseResponse<?>> handleAuthTokenExpireException(Exception e) {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}
@@ -30,7 +27,7 @@ public class ExceptionHelper {
 	}
 
 	@ExceptionHandler(IllegalRoleException.class)
-	public ResponseEntity<BaseResponse<?>> handleIllegalRoleException(Exception e, HttpServletResponse resp) {
+	public ResponseEntity<BaseResponse<?>> handleIllegalRoleException(Exception e) {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}
@@ -38,7 +35,7 @@ public class ExceptionHelper {
 	}
 
 	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<BaseResponse<?>> handleUserNotFoundException(Exception e, HttpServletResponse resp) {
+	public ResponseEntity<BaseResponse<?>> handleUserNotFoundException(Exception e) {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}
@@ -46,18 +43,10 @@ public class ExceptionHelper {
 	}
 
 	@ExceptionHandler(WrongPasswordException.class)
-	public ResponseEntity<BaseResponse<?>> handleWrongPasswordException(Exception e, HttpServletResponse resp) {
+	public ResponseEntity<BaseResponse<?>> handleWrongPasswordException(Exception e) {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(e));
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<BaseResponse<?>> handleException(Exception e, HttpServletResponse resp) {
-		if (AppConstants.DEBUG_MODE) {
-			log.debug(e.getMessage(), e);
-		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new SimpleResponse(e));
 	}
 }

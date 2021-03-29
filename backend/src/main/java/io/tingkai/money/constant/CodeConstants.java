@@ -1,5 +1,6 @@
 package io.tingkai.money.constant;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
@@ -40,15 +41,22 @@ public class CodeConstants {
 	public static final String CONFIRM_EMAIL_CONTENT = "Click the following link to verify email:\n";
 
 	// === python === //
+	public static final int UPDATE_FREQUENCY_HOURS = 8;
 	/// === exchange rate === //
-	public static final String CURRENCY_UPDATE_TIME_KEY = "currency-update-time";
-	public static final String CURRENCY_LIST_KEY = "currency-list";
-	public static final LocalDateTime CURRENCY_FETCH_START_DATETIME = LocalDateTime.of(LocalDateTime.now().getYear() - 1, Month.JANUARY, 1, 0, 0);
+	public static final String EXCHANGE_RATE_LIST_KEY = "exchange-rate-list";
+	public static final String EXCHANGE_RATE_UPDATE_TIME_KEY = "exchange-rate-update-time";
+	public static final String EXCHANGE_RATE_RECORD_UPDATE_TIME_KEY = "exchange-rate-record-update-time";
+	public static final LocalDateTime EXCHANGE_RATE_FETCH_START_DATETIME = LocalDateTime.of(LocalDateTime.now().getYear() - 1, Month.JANUARY, 1, 0, 0);
 
 	/// === stock list === //
 	public static final String STOCK_UPDATE_TIME_KEY = "stock-update-time";
 	public static final String STOCK_LIST_KEY = "stock-list";
 	public static final String STOCK_SKIP_FETCH_LIST_KEY = "stock-skip-fetch-list";
+	public static final String STOCK_RECORD_UPDATE_TIME_KEY = "stock-record-update-time";
+	public static final String STOCK_FETCHING_CODE = "fetching-stock-record";
+	public static final BigDecimal FEE_RATE = new BigDecimal(0.001425d);
+	public static final BigDecimal MIN_FEE = new BigDecimal(20);
+	public static final BigDecimal TAX_RATE = new BigDecimal(0.003d);
 
 	// === user tracking stock === //
 	public static final String USER_TRACKING_STOCK_KEY = "user:";

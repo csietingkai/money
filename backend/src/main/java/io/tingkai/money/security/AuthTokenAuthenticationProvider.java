@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import io.tingkai.money.constant.MessageConstant;
+import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.util.AppUtil;
 
 /**
@@ -24,7 +25,12 @@ public class AuthTokenAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication) {
 		if (authentication.getCredentials() != null) {
-			AuthToken authToken = this.authTokenService.validate(authentication.getCredentials().toString());
+			AuthToken authToken = null;
+			try {
+				authToken = this.authTokenService.validate(authentication.getCredentials().toString());
+			} catch (AuthTokenExpireException e) {
+				e.printStackTrace();
+			}
 			if (AppUtil.isPresent(authToken)) {
 				return new AuthTokenAuthentication(authToken);
 			}

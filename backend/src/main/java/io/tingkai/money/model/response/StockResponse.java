@@ -9,12 +9,12 @@ import io.tingkai.money.controller.StockController;
  */
 public class StockResponse<T> extends BaseResponse<T> {
 
-	public StockResponse(boolean success, T authToken, String pattern) {
-		super(success, authToken, pattern);
+	public StockResponse(boolean success, T t, String pattern) {
+		super(success, t, pattern);
 	}
 
-	public StockResponse(boolean success, T authToken, String pattern, String... params) {
-		super(success, authToken, pattern, params);
+	public StockResponse(boolean success, T t, String pattern, String... params) {
+		super(success, t, pattern, params);
 	}
 
 	public StockResponse(Exception e) {
