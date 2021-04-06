@@ -21,5 +21,6 @@ export enum InputType {
     select = 'select',
     radio = 'radio',
     checkbox = 'checkbox',
-    file = 'file'
+    file = 'file',
+    date = 'date'
 }

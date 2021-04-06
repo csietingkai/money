@@ -21,7 +21,7 @@ import io.tingkai.money.service.StockService;
 import io.tingkai.money.service.UserTrackingStockService;
 
 /**
- * Simple controller for CRUD methods to postgresql
+ * Simple controller for stocks info and their records
  * 
  * @author tingkai
  */

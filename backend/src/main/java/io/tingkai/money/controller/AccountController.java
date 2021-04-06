@@ -23,7 +23,7 @@ import io.tingkai.money.service.AccountRecordService;
 import io.tingkai.money.service.AccountService;
 
 /**
- * Controller for enumerations
+ * Controller for account
  * 
  * @author tingkai
  */

@@ -47,9 +47,11 @@ public class AccountRecordService {
 	}
 
 	public AccountRecord insert(AccountRecord entity) throws AlreadyExistException {
-		Optional<AccountRecord> optional = this.accountRecordDao.findById(entity.getId());
-		if (optional.isPresent()) {
-			throw new AlreadyExistException();
+		if (AppUtil.isAllPresent(entity, entity.getId())) {
+			Optional<AccountRecord> optional = this.accountRecordDao.findById(entity.getId());
+			if (optional.isPresent()) {
+				throw new AlreadyExistException();
+			}
 		}
 		return this.accountRecordDao.save(entity);
 	}

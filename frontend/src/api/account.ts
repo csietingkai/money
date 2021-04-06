@@ -63,15 +63,8 @@ const getRecords = async (accountId: string) => {
     return data;
 };
 
-const addRecord = async (transAmount: number, transFrom: string, transTo: string, description: string | null = null) => {
-    const entity: AccountRecord = {
-        id: '',
-        transDate: new Date(),
-        transAmount,
-        transFrom,
-        transTo,
-        description
-    };
+const addRecord = async (entity: AccountRecord) => {
+    entity.transDate = new Date();
     const response = await axios.post(ACCOUNT_CREATE_RECORD_PATH, entity);
     const data: SimpleResponse = response.data;
     return data;

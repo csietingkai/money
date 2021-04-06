@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-import { API_URL, EXCHANGE_RATE_GET_ALL_PATH } from 'api/Constant';
+import { EXCHANGE_RATE_GET_ALL_PATH } from 'api/Constant';
 
-import { getAuthHeader } from 'util/AppUtil';
 import { ApiResponse } from 'util/Interface';
 
 export interface ExchangeRate {

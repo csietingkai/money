@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-import { API_URL } from 'api/Constant';
-
-import { getAuthHeader, toDate } from 'util/AppUtil';
+import { toDate } from 'util/AppUtil';
 import { ApiResponse } from 'util/Interface';
 
 export interface SportLotteryRecord {

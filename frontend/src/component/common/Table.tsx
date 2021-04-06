@@ -12,6 +12,7 @@ export interface TableProps {
     header: string[];
     data: any[];
     countPerPage?: number;
+    selectedRow?: number;
     onRowClick?: (selectedRow: number) => void;
     columnConverter?: (header: string, rowData: any) => JSX.Element; // TODO
 }
@@ -34,7 +35,7 @@ export default class Table extends React.Component<TableProps, TableState> {
         super(props);
         this.state = {
             current: 0,
-            selectedRow: -1
+            selectedRow: props.selectedRow || -1
         };
     }
 
@@ -144,7 +145,7 @@ export default class Table extends React.Component<TableProps, TableState> {
                             showData.length ?
                                 showData.map((d, trIdx) => {
                                     return (
-                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(trIdx)}>
+                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(trIdx)} className={trIdx === this.state.selectedRow ? 'select-row' : ''}>
                                             {
                                                 header.map((h, tdIdx) => {
                                                     return (

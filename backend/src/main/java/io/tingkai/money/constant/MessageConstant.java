@@ -61,7 +61,7 @@ public class MessageConstant {
 	public static final String ACCOUNT_UPDATE_FAIL = "Update Account<{0}, {1}> Fail";
 	public static final String ACCOUNT_GET_RECORDS_SUCCESS = "Get Account<{0}> Records Success";
 	public static final String ACCOUNT_GET_RECORDS_FAIL = "Get Account<{0}> Records Fail";
-	public static final String ACCOUNT_INSERT_RECORDS_SUCCESS = "Create Account<{0}> Records Success";
+	public static final String ACCOUNT_INSERT_RECORDS_SUCCESS = "Create Account <{0}> Records Success";
 	public static final String ACCOUNT_INSERT_RECORDS_FAIL = "Create Account<{0}> Records Fail";
 	public static final String ACCOUNT_BALANCE_NOT_ENOUGH = "Account: {0} doesn't have enough balance";
 

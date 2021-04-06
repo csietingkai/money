@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { library } from '@fortawesome/fontawesome';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartPie, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/fontawesome-free-solid';
+import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/fontawesome-free-solid';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartPie, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
+library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
 
 const Icon = (icon: IconProp) => () => <span className='icon'><FontAwesomeIcon icon={icon} /></span>;
 export const AddressCardIcon = Icon('address-card');
@@ -13,6 +13,7 @@ export const AngleUpIcon = Icon('angle-up');
 export const BoltIcon = Icon('bolt');
 export const BoxesIcon = Icon('boxes');
 export const ChartPieIcon = Icon('chart-pie');
+export const CheckIcon = Icon('check');
 export const CogsIcon = Icon('cogs');
 export const ExclamationCircleIcon = Icon('exclamation-circle');
 export const HandHoldingUsdIcon = Icon('hand-holding-usd');
@@ -34,6 +35,7 @@ export const StarIcon = Icon('star');
 export const TableIcon = Icon('table');
 export const TachometerAltIcon = Icon('tachometer-alt');
 export const TextHeightIcon = Icon('text-height');
+export const TimesIcon = Icon('times');
 export const TintIcon = Icon('tint');
 export const TrashAltIcon = Icon('trash-alt');
 export const UserIcon = Icon('user');

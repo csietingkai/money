@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Col, Form as RbForm, Row } from 'react-bootstrap';
+import * as moment from 'moment';
 
 import { getValueByKeys, isNumber, toNumber } from 'util/AppUtil';
 import { DivWidth, InputType } from 'util/Enum';
@@ -60,7 +61,12 @@ export interface FileInput extends BaseInput {
     value: any;
 }
 
-export type Input = TextInput | NumericInput | TextareaInput | SelectInput | RadioInput | CheckboxInput | FileInput;
+export interface DateInput extends BaseInput {
+    type: InputType.date;
+    value: Date;
+}
+
+export type Input = TextInput | NumericInput | TextareaInput | SelectInput | RadioInput | CheckboxInput | FileInput | DateInput;
 
 export interface FormProps {
     singleRow?: boolean;
@@ -101,7 +107,6 @@ export default class Form extends React.Component<FormProps, FormState> {
     };
 
     private onFormNumericChange = (key: string) => (event: any) => {
-        console.log('aaa');
         const { formRef } = this;
         const { values: form } = this.state;
         const input = formRef.current.querySelector(`#form-${key}`);
@@ -148,6 +153,35 @@ export default class Form extends React.Component<FormProps, FormState> {
         }
     };
 
+    private onDateChange = (key: string) => (event: any) => {
+        const { formRef } = this;
+        const { values: form } = this.state;
+        const input = formRef.current.querySelector(`#form-${key}-date`);
+        if (input) {
+            const dateStr = getValueByKeys(event, 'target', 'value');
+            const selectDate = new Date(dateStr);
+            const date: Date = form[key];
+            date.setFullYear(selectDate.getFullYear());
+            date.setMonth(selectDate.getMonth());
+            date.setDate(selectDate.getDate());
+            form[key] = date;
+            this.props.onChange(form);
+        }
+    };
+
+    private onTimeChange = (key: string) => (event: any) => {
+        const { formRef } = this;
+        const { values: form } = this.state;
+        const input = formRef.current.querySelector(`#form-${key}-time`);
+        if (input) {
+            const timeStrs: string[] = getValueByKeys(event, 'target', 'value').split(':');
+            const date: Date = form[key];
+            date.setHours(toNumber(timeStrs[0]), toNumber(timeStrs[1]), toNumber(timeStrs[2]));
+            form[key] = date;
+            this.props.onChange(form);
+        }
+    };
+
     render() {
         const { singleRow, inputs } = this.props;
 
@@ -165,6 +199,8 @@ export default class Form extends React.Component<FormProps, FormState> {
             const onFormRadioChange = this.onFormRadioChange(key);
             const onFormCheckChange = this.onFormCheckChange(key);
             const onFileChange = this.onFileChange(key);
+            const onDateChange = this.onDateChange(key);
+            const onTimeChange = this.onTimeChange(key);
             let inputElement: JSX.Element = null;
             if (type === InputType.numeric) {
                 const numericInput: NumericInput = input as NumericInput;
@@ -278,11 +314,34 @@ export default class Form extends React.Component<FormProps, FormState> {
                 inputElement = (
                     <RbForm.File
                         id={`form-${key}`}
-                        label={value ? value.name : "Select Your File"}
+                        label={value ? value.name : 'Select Your File'}
                         onChange={onFileChange}
                         disabled={disabled}
                         custom
                     />
+                );
+            } else if (type === InputType.date) {
+                inputElement = (
+                    <Row>
+                        <Col>
+                            <RbForm.Control
+                                id={`form-${key}-date`}
+                                type='date'
+                                value={moment(value).format('YYYY-MM-DD')}
+                                disabled={disabled}
+                                onChange={onDateChange}
+                            />
+                        </Col>
+                        <Col>
+                            <RbForm.Control
+                                id={`form-${key}-time`}
+                                type='time'
+                                value={moment(value).format('HH:mm:ss')}
+                                disabled={disabled}
+                                onChange={onTimeChange}
+                            />
+                        </Col>
+                    </Row>
                 );
             } else {
                 const textInput: TextInput = input as TextInput;

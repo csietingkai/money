@@ -8,17 +8,19 @@ import { ToastContainer } from 'react-toastify';
 
 // components
 import App from 'App';
+import LoginPage from 'view/LoginPage';
 import Page404 from 'view/Page404';
 import Page500 from 'view/Page500';
+import RegisterPage from 'view/RegisterPage';
 
 // reducer
+import { getAuthToken } from 'reducer/StateHolder';
 import store, { fetchExchangeRateList, validateToken } from 'reducer/Store';
 
 // apis
 import { API_URL } from 'api/Constant';
 
 // utils
-import { getAuthHeader } from 'util/AppUtil';
 import Notify from 'util/Notify';
 
 // css
@@ -30,12 +32,12 @@ import 'assets/scss/style.scss';
 // images
 
 axios.defaults.baseURL = API_URL;
-axios.defaults.headers = getAuthHeader();
+axios.defaults.headers = { 'X-Auth-Token': getAuthToken()?.tokenString };
 axios.interceptors.request.use((response) => response, (error) => {
     const { status } = error.response.data;
     if (status === 403) {
         Notify.warning('Maybe You Need to Login First.');
-        window.location.replace('/#/dashboard');
+        window.location.replace('/#/login');
     } else if (status === 404) {
         window.location.replace('/#/404');
     } else if (status === 500) {
@@ -54,6 +56,8 @@ const app = (
     <Provider store={store}>
         <Router>
             <Switch>
+                <Route exact path='/login' name='Login Page' component={LoginPage} />
+                <Route exact path='/register' name='Register Page' component={RegisterPage} />
                 <Route exact path='/404' name='Page 404' component={Page404} />
                 <Route exact path='/500' name='Page 500' component={Page500} />
                 <Route path='/' name='Home' component={App} />

@@ -12,18 +12,19 @@ import ScatterChart from 'component/common/chart/ScatterChart';
 
 import { getAuthTokenName, getExchangeRateList } from 'reducer/Selector';
 
-import AccountApi, { Account, AccountRecord, AccountsResponse } from 'api/account';
+import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountResponse, AccountsResponse } from 'api/account';
 import { ExchangeRate } from 'api/exchangeRate';
 
-import { find, toDateStr } from 'util/AppUtil';
+import { find, isArrayEmpty, toDateStr } from 'util/AppUtil';
 import Notify from 'util/Notify';
 import Table from 'component/common/Table';
 import Button from 'component/common/Button';
-import { PencilAltIcon, PlusIcon, TrashAltIcon } from 'component/common/Icons';
+import { CheckIcon, PencilAltIcon, PlusIcon, TimesIcon, TrashAltIcon } from 'component/common/Icons';
 import Modal from 'component/common/Modal';
 import Form, { Input } from 'component/common/Form';
 import { InputType } from 'util/Enum';
 import { SimpleResponse } from 'util/Interface';
+import account from 'api/account';
 
 export interface AccountManagementProps {
     username: string;
@@ -35,8 +36,8 @@ export interface AccountManagementState {
     currentAccount: Account;
     accountRecords: AccountRecord[];
     currentAccountRecord: AccountRecord;
-    accountModalOpen: boolean;
     deleteAccountModalOpen: boolean;
+    page?: 'account-create' | 'account-edit' | 'record-income' | 'record-expend';
 }
 
 class AccountManagement extends React.Component<AccountManagementProps, AccountManagementState> {
@@ -48,7 +49,6 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             currentAccount: undefined,
             accountRecords: [],
             currentAccountRecord: undefined,
-            accountModalOpen: false,
             deleteAccountModalOpen: false
         };
         this.init();
@@ -68,56 +68,66 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         }
     };
 
-    private toggleAccountModal = (rowData?: Account) => (event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-        if (event) {
-            event.stopPropagation();
-        }
-        this.setState({ accountModalOpen: !this.state.accountModalOpen, currentAccount: rowData ? { ...rowData } : undefined });
+    private onAccountTableRowClick = async (selectedRow: number) => {
+        const { accounts } = this.state;
+        const currentAccount: Account = accounts[selectedRow];
+        const { id } = currentAccount;
+        const resposne: AccountRecordsResponse = await AccountApi.getRecords(id);
+        const accountRecords: AccountRecord[] = resposne.data || [];
+        this.setState({ currentAccount, accountRecords });
+    };
+
+    private toPage = (page?: 'account-create' | 'account-edit' | 'record-income' | 'record-expend') => {
+        this.setState({ page });
+    };
+
+    private createAccount = () => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const currentAccount: Account = {
+            id: '',
+            name: '',
+            ownerName: this.props.username,
+            currency: this.props.exchangeRateList[0].currency,
+            balance: 0
+        };
+        this.setState({ currentAccount }, () => this.toPage('account-create'));
+    };
+
+    private editAccount = (rowData: Account) => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        this.setState({ currentAccount: rowData }, () => this.toPage('account-edit'));
     };
 
     private toggleDeleteAccountModal = (rowData?: Account) => (event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-        if (event) {
-            event.stopPropagation();
-        }
-        this.setState({ deleteAccountModalOpen: !this.state.deleteAccountModalOpen, currentAccount: { ...rowData } });
+        this.setState({ deleteAccountModalOpen: !this.state.deleteAccountModalOpen, currentAccount: rowData });
     };
 
     private onAccountCreateClick = async () => {
-        const { accounts, currentAccount: entity } = this.state;
-        const resposne: SimpleResponse = await AccountApi.createAccount(entity);
+        const { currentAccount } = this.state;
+        const resposne: SimpleResponse = await AccountApi.createAccount(currentAccount);
         const { success, message } = resposne;
         if (success) {
             Notify.success(message);
-            this.setState({ accounts });
+            await this.fetchAccounts();
+            this.toPage();
         } else {
             Notify.error(message);
         }
-        await this.fetchAccounts();
-        this.toggleAccountModal()();
     };
 
     private onAccountEditClick = async () => {
-        const { accounts, currentAccount } = this.state;
+        const { currentAccount } = this.state;
         if (currentAccount.balance !== 0) {
             Notify.warning('Balance is not ZERO, can not change currency');
             return;
         }
-        const idx = accounts.findIndex(x => x.id === currentAccount.id);
-        if (idx >= 0) {
-            const entity: Account = { ...accounts[idx] };
-            entity.currency = currentAccount.currency;
-            entity.name = currentAccount.name;
-            const resposne: SimpleResponse = await AccountApi.updateAccount(entity);
-            const { success, message } = resposne;
-            if (success) {
-                Notify.success(message);
-                this.setState({ accounts });
-            } else {
-                Notify.error(message);
-            }
+        const resposne: SimpleResponse = await AccountApi.updateAccount(currentAccount);
+        const { success, message } = resposne;
+        if (success) {
+            Notify.success(message);
+            await this.fetchAccounts();
+            this.toPage();
+        } else {
+            Notify.error(message);
         }
-        await this.fetchAccounts();
-        this.toggleAccountModal()();
     };
 
     private onAccountDeleteClick = async () => {
@@ -126,7 +136,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             Notify.warning('Balance is not ZERO, can not change currency');
             return;
         }
-        const idx = accounts.findIndex(x => x.id === currentAccount.id);
+        const idx: number = accounts.findIndex(x => x.id === currentAccount.id);
         if (idx >= 0) {
             const resposne: SimpleResponse = await AccountApi.deleteAccount(accounts[idx].id);
             const { success, message } = resposne;
@@ -140,55 +150,40 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         this.toggleDeleteAccountModal()();
     };
 
-    private onAccountTableRowClick = async (selectedRow: number) => {
-        const { accounts } = this.state;
-        const { id } = accounts[selectedRow];
-        const resposne = await AccountApi.getRecords(id);
-        console.log(resposne);
-    };
-
-    private toggleAccountRecordModal = (rowData?: AccountRecord) => (event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-        if (event) {
-            event.stopPropagation();
+    private onAccountRecordCreateClick = async () => {
+        const { accounts, currentAccount, currentAccountRecord } = this.state;
+        const resposne: SimpleResponse = await AccountApi.addRecord(currentAccountRecord);
+        const { success, message } = resposne;
+        if (success) {
+            Notify.success(message);
+            await this.onAccountTableRowClick(accounts.findIndex(x => x.id === currentAccount.id));
+            this.toPage();
+        } else {
+            Notify.error(message);
         }
-        this.setState({ accountModalOpen: !this.state.accountModalOpen, currentAccountRecord: rowData ? { ...rowData } : undefined });
     };
 
-    render() {
-        const { username, exchangeRateList } = this.props;
-        const { accounts, currentAccount, accountRecords, currentAccountRecord, accountModalOpen, deleteAccountModalOpen } = this.state;
+    private createAccountRecordIncome = () => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const { currentAccount } = this.state;
+        const currentAccountRecord: AccountRecord = {
+            id: '',
+            transDate: new Date(),
+            transAmount: 0,
+            transFrom: currentAccount.id,
+            transTo: currentAccount.id,
+            description: ''
+        };
+        this.setState({ currentAccountRecord }, () => this.toPage('record-income'));
+    };
 
-        const accountModal = (
-            <Modal
-                headerText='Edit Account'
-                isShow={accountModalOpen}
-                okBtnText='Submit'
-                onOkClick={(currentAccount && currentAccount.id) ? this.onAccountEditClick : this.onAccountCreateClick}
-                onCancelClick={this.toggleAccountModal()}
-                verticalCentered={true}
-            >
-                <Form
-                    singleRow
-                    inputs={[
-                        { key: 'ownerName', title: 'Owner Name', type: InputType.text, disabled: true, value: username, width: 3 },
-                        { key: 'currency', title: 'Currency', type: InputType.select, options: exchangeRateList.map(x => ({ key: x.currency, value: x.currency })), value: currentAccount?.currency, width: 3 },
-                        { key: 'name', title: 'Alias Name', type: InputType.text, value: currentAccount ? currentAccount.name : '', width: 3 },
-                        { key: 'balance', title: 'Balance', type: InputType.numeric, disabled: true, value: currentAccount ? currentAccount.balance : 0, width: 3 }
-                    ]}
-                    onChange={(formState: any) => {
-                        currentAccount.currency = formState.currency;
-                        currentAccount.name = formState.name;
-                        this.setState({ currentAccount });
-                    }}
-                />
-            </Modal>
-        );
+    private renderMainPage = (): JSX.Element => {
+        const { accounts, currentAccount, accountRecords, currentAccountRecord, deleteAccountModalOpen } = this.state;
         const deleteAccountModal = (
             <Modal
                 headerText='Dedete Account'
                 isShow={deleteAccountModalOpen}
                 onOkClick={this.onAccountDeleteClick}
-                onCancelClick={this.toggleDeleteAccountModal()}
+                onCancelClick={this.toggleDeleteAccountModal(currentAccount)}
                 verticalCentered={true}
             >
                 Are you sure to <span style={{ color: 'red' }}>DELETE</span> this Account?
@@ -205,7 +200,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 <Button
                                     variant='primary'
                                     outline
-                                    onClick={this.toggleAccountModal({ id: '', ownerName: this.props.username, currency: exchangeRateList[0]?.currency, name: '', balance: 0 })}
+                                    onClick={this.createAccount()}
                                 >
                                     <PlusIcon />
                                     {' Create'}
@@ -215,12 +210,13 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 id='account'
                                 header={['name', 'ownerName', 'currency', 'balance', 'functions']}
                                 data={accounts}
+                                selectedRow={accounts.findIndex(x => x.id === currentAccount?.id)}
                                 onRowClick={this.onAccountTableRowClick}
                                 columnConverter={(header: string, rowData: any) => {
                                     if (header === 'functions') {
                                         return (
                                             <>
-                                                <Button size='sm' variant='info' outline onClick={this.toggleAccountModal(rowData)}><PencilAltIcon /></Button>
+                                                <Button size='sm' variant='info' outline onClick={this.editAccount(rowData)}><PencilAltIcon /></Button>
                                                 <Button size='sm' variant='danger' outline onClick={this.toggleDeleteAccountModal(rowData)}><TrashAltIcon /></Button>
                                             </>
                                         );
@@ -232,33 +228,158 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                         </Card>
                     </Col>
                 </Row>
-                <Row>
-                    <Col>
-                        <Card
-                            title='Account Records'
-                        >
-                            <div style={{ textAlign: 'right', marginBottom: '5px' }}>
-                                <Button
-                                    variant='primary'
-                                    outline
-                                    onClick={this.toggleAccountRecordModal({ id: '', transDate: new Date(), transAmount: 0, transFrom: '', transTo: '', description: '' })}
-                                >
-                                    <PlusIcon />
-                                    {' Create'}
-                                </Button>
-                            </div>
-                            <Table
-                                id='account-record'
-                                header={['ownerName', 'currency', 'balance', 'functions']}
-                                data={accountRecords}
-                            />
-                        </Card>
-                    </Col>
-                </Row>
-                {accountModal}
+                {
+                    currentAccount &&
+                    <Row>
+                        <Col>
+                            <Card
+                                title='Account Records'
+                            >
+                                <div style={{ textAlign: 'right', marginBottom: '5px' }}>
+                                    <Button
+                                        variant='success'
+                                        outline
+                                        onClick={this.createAccountRecordIncome()}
+                                    >
+                                        <PlusIcon />
+                                        {' Income'}
+                                    </Button>
+                                    <Button
+                                        variant='danger'
+                                        outline
+                                    // onClick={this.toPage('record-income')}
+                                    >
+                                        <PlusIcon />
+                                        {' Expend'}
+                                    </Button>
+                                </div>
+                                <Table
+                                    id='account-record'
+                                    header={['ownerName', 'currency', 'balance', 'functions']}
+                                    data={accountRecords}
+                                />
+                            </Card>
+                        </Col>
+                    </Row>
+                }
                 {deleteAccountModal}
             </div>
         );
+    };
+
+    private renderAccountFormPage = (): JSX.Element => {
+        const { username, exchangeRateList } = this.props;
+        const { currentAccount, page } = this.state;
+        return (
+            <div className='animated fadeIn'>
+                <Row>
+                    <Col>
+                        <Card
+                            title={`${page === 'account-create' ? 'Create' : 'Edit'} Account`}
+                        >
+                            <Form
+                                singleRow
+                                inputs={[
+                                    { key: 'ownerName', title: 'Owner Name', type: InputType.text, disabled: true, value: username, width: 3 },
+                                    { key: 'currency', title: 'Currency', type: InputType.select, options: exchangeRateList.map(x => ({ key: x.currency, value: x.currency })), value: currentAccount?.currency, width: 3 },
+                                    { key: 'name', title: 'Alias Name', type: InputType.text, value: currentAccount ? currentAccount.name : '', width: 3 },
+                                    { key: 'balance', title: 'Balance', type: InputType.numeric, disabled: true, value: currentAccount ? currentAccount.balance : 0, width: 3 }
+                                ]}
+                                onChange={(formState: any) => {
+                                    currentAccount.currency = formState.currency;
+                                    currentAccount.name = formState.name;
+                                    this.setState({ currentAccount });
+                                }}
+                            />
+                            <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
+                                <Button
+                                    variant='success'
+                                    outline
+                                    onClick={page === 'account-create' ? this.onAccountCreateClick : this.onAccountEditClick}
+                                >
+                                    <CheckIcon />
+                                    {' Confirm'}
+                                </Button>
+                                <span style={{ marginRight: '5px' }}></span>
+                                <Button
+                                    variant='secondary'
+                                    outline
+                                    onClick={() => this.toPage()}
+                                >
+                                    <TimesIcon />
+                                    {' Cancel'}
+                                </Button>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+        );
+    };
+
+    private renderAccountRecordFormPage = (): JSX.Element => {
+        const { username, exchangeRateList } = this.props;
+        const { currentAccountRecord, page } = this.state;
+        return (
+            <div className='animated fadeIn'>
+                <Row>
+                    <Col>
+                        <Card
+                            title='Income'
+                        >
+                            <Form
+                                singleRow
+                                inputs={[
+                                    { key: 'transDate', title: 'Transaction Date', type: InputType.date, value: currentAccountRecord?.transDate, width: 3 },
+                                    { key: 'transAmount', title: 'Transaction Amount', type: InputType.numeric, value: currentAccountRecord?.transAmount, width: 3 },
+                                    { key: 'description', title: 'Description', type: InputType.text, value: currentAccountRecord?.description, width: 3 }
+                                ]}
+                                onChange={(formState: any) => {
+                                    currentAccountRecord.transDate = formState.transDate;
+                                    currentAccountRecord.transAmount = formState.transAmount;
+                                    currentAccountRecord.description = formState.description;
+                                    this.setState({ currentAccountRecord });
+                                }}
+                            />
+                            <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
+                                <Button
+                                    variant='success'
+                                    outline
+                                    onClick={this.onAccountRecordCreateClick}
+                                >
+                                    <CheckIcon />
+                                    {' Confirm'}
+                                </Button>
+                                <span style={{ marginRight: '5px' }}></span>
+                                <Button
+                                    variant='secondary'
+                                    outline
+                                    onClick={() => this.toPage()}
+                                >
+                                    <TimesIcon />
+                                    {' Cancel'}
+                                </Button>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+        );
+    };
+
+    render() {
+        const { username, exchangeRateList } = this.props;
+        const { accounts, accountRecords, deleteAccountModalOpen, page } = this.state;
+
+        let element = null;
+        if (page === 'account-create' || page === 'account-edit') {
+            element = this.renderAccountFormPage();
+        } else if (page === 'record-income') {
+            element = this.renderAccountRecordFormPage();
+        } else {
+            element = this.renderMainPage();
+        }
+        return element;
     }
 }
 

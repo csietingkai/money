@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.BaseResponse;
@@ -35,6 +36,14 @@ public class ExceptionHelper {
 
 	@ExceptionHandler(NotExistException.class)
 	public ResponseEntity<BaseResponse<?>> handleNotExistException(Exception e) {
+		if (AppConstants.DEBUG_MODE) {
+			log.debug(e.getMessage(), e);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(new SimpleResponse(e));
+	}
+
+	@ExceptionHandler(FieldMissingException.class)
+	public ResponseEntity<BaseResponse<?>> handleFieldMissingException(Exception e) {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}

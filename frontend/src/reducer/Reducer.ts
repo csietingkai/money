@@ -7,7 +7,6 @@ import { getAuthToken, setAuthToken, removeAuthToken } from 'reducer/StateHolder
 import { AuthToken } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
 
-import { getAuthHeader } from 'util/AppUtil';
 import { Action } from 'util/Interface';
 
 const authReducer = (state: any = { authToken: getAuthToken() }, action: Action<AuthToken>): any => {
@@ -16,11 +15,15 @@ const authReducer = (state: any = { authToken: getAuthToken() }, action: Action<
     if (type === LOGIN) {
         setAuthToken(payload);
         newState.authToken = getAuthToken();
-        axios.defaults.headers = getAuthHeader();
+        axios.defaults.headers = { 'X-Auth-Token': getAuthToken()?.tokenString };
+        const { href } = window.location;
+        if (href.indexOf('login') >= 0 || href.indexOf('register') >= 0) {
+            window.location.replace('/#/dashboard');
+        }
     } else if (type === LOGOUT) {
         removeAuthToken();
         newState.authToken = undefined;
-        window.location.replace('/#/dashboard');
+        window.location.replace('/#/login');
     }
     return newState;
 };

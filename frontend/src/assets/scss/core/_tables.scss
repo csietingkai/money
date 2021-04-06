@@ -16,3 +16,7 @@
         border: 0;
     }
 }
+
+tr.select-row {
+    background-color: $table-selected-bg;
+}

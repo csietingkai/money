@@ -1,4 +1,3 @@
-import { getAuthToken } from 'reducer/StateHolder';
 import { SortType } from 'util/Enum';
 import { Record } from 'util/Interface';
 
@@ -133,10 +132,4 @@ export const sort = <T extends {}>(list: T[], sortType: SortType = SortType.ASC)
 
 export const sortByKey = (list: any[], key: string, sortType: SortType = SortType.ASC): any[] => {
     return sort(list.map(x => x[key], sortType));
-};
-
-export const getAuthHeader = () => {
-    return {
-        'X-Auth-Token': getAuthToken()?.tokenString
-    };
 };

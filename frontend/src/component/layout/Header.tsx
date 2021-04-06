@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Nav, NavbarBrand, NavItem, NavLink, Navbar } from 'react-bootstrap';
 import { RouteChildrenProps } from 'react-router-dom';
 
-import { SignInAltIcon, SignOutAltIcon, UserPlusIcon } from 'component/common/Icons';
+import { SignOutAltIcon } from 'component/common/Icons';
 
 import { AuthToken } from 'api/auth';
 
@@ -11,8 +11,6 @@ import Notify from 'util/Notify';
 export interface HeaderProps extends RouteChildrenProps<any> {
     authToken?: AuthToken;
     onLogoutClick: () => void;
-    toggleLoginModal: () => void;
-    toggleRegisterModal: () => void;
 }
 
 export interface HeaderState { }
@@ -35,21 +33,12 @@ export default class Header extends React.Component<HeaderProps, HeaderState> {
         document.body.classList.toggle('sidebar-mobile-show');
     };
 
-    private login = () => {
-        this.props.toggleLoginModal();
-    };
-
     private logout = () => {
         this.props.onLogoutClick();
         Notify.success('Lougout Success');
     };
 
-    private register = () => {
-        this.props.toggleRegisterModal();
-    };
-
     render() {
-        const { authToken } = this.props;
         return (
             <header className='app-header navbar'>
                 <Navbar.Toggle className='d-lg-none' onClick={this.mobileSidebarToggle}>
@@ -60,31 +49,12 @@ export default class Header extends React.Component<HeaderProps, HeaderState> {
                     <span className='navbar-toggler-icon'></span>
                 </Navbar.Toggle>
                 <Nav className='ml-auto' navbar>
-                    <NavItem className='d-md-down-none' onClick={authToken ? this.logout : this.login}>
+                    <NavItem className='d-md-down-none' onClick={this.logout}>
                         <NavLink href='#'>
-                            {authToken ?
-                                <>
-                                    <SignOutAltIcon />
-                                    {' Logout'}
-                                </>
-                                :
-                                <>
-                                    <SignInAltIcon />
-                                    {' Login'}
-                                </>}
+                            <SignOutAltIcon />
+                            {' Logout'}
                         </NavLink>
                     </NavItem>
-                    {
-                        !authToken &&
-                        <NavItem className='d-md-down-none' onClick={this.register}>
-                            <NavLink href='#'>
-                                <>
-                                    <UserPlusIcon />
-                                    {' Register'}
-                                </>
-                            </NavLink>
-                        </NavItem>
-                    }
                 </Nav>
             </header>
         );

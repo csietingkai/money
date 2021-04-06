@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-import { API_URL, FILE_DOWNLOAD_PATH, FILE_UPLOAD_PATH } from 'api/Constant';
+import { FILE_DOWNLOAD_PATH, FILE_UPLOAD_PATH } from 'api/Constant';
 
-import { getAuthHeader } from 'util/AppUtil';
 import { ApiResponse } from 'util/Interface';
 
 export interface FileUploadResponse extends ApiResponse<void> { }
