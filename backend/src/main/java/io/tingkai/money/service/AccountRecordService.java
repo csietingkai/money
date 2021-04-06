@@ -16,12 +16,6 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 
-/**
- * provide method for get single or multiple data from database table
- * 'account_record'
- * 
- * @author tingkai
- */
 @Service
 public class AccountRecordService {
 

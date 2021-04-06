@@ -6,11 +6,6 @@ import org.springframework.stereotype.Component;
 
 import io.tingkai.money.enumeration.FileType;
 
-/**
- * repository store video file, eg: mp4, mkv, wmv, avi
- * 
- * @author tingkai
- */
 @Component
 public class VideoRepository extends FileRepository {
 

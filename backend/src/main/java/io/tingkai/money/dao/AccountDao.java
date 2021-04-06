@@ -8,11 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import io.tingkai.money.entity.Account;
 
-/**
- * JpaRepository for sql database table 'account'
- * 
- * @author tingkai
- */
 @Repository
 public interface AccountDao extends JpaRepository<Account, UUID> {
 

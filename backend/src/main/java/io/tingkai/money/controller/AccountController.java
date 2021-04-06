@@ -22,11 +22,6 @@ import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.service.AccountRecordService;
 import io.tingkai.money.service.AccountService;
 
-/**
- * Controller for account
- * 
- * @author tingkai
- */
 @RestController
 @RequestMapping(value = AccountController.CONTROLLER_PREFIX)
 public class AccountController {

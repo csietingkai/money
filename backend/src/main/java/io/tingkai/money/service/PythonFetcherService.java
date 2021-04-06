@@ -35,11 +35,6 @@ import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 
-/**
- * provide method for fetch data to client or store into database
- * 
- * @author tingkai
- */
 @Service
 @Slf4j
 public class PythonFetcherService {

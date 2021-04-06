@@ -9,11 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import io.tingkai.money.entity.ExchangeRateRecord;
 
-/**
- * JpaRepository for sql database table 'exchange_rate'
- * 
- * @author tingkai
- */
 @Repository
 public interface ExchangeRateRecordDao extends JpaRepository<ExchangeRateRecord, UUID> {
 

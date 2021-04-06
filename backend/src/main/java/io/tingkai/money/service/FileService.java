@@ -27,12 +27,6 @@ import io.tingkai.money.repository.FileRepository;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
 
-/**
- * provide method for upload, download, find, delete files stored in
- * {@link FileRepository}
- * 
- * @author tingkai
- */
 @Service
 public class FileService {
 

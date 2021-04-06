@@ -1,12 +1,5 @@
 package io.tingkai.money.constant;
 
-import com.mongodb.client.gridfs.model.GridFSFile;
-
-/**
- * Field names for {@link GridFSFile}
- * 
- * @author tingkai
- */
 public class GridFSFileField {
 
 	public static final String ID = "_id";

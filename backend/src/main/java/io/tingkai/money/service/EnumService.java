@@ -16,11 +16,6 @@ import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.enumeration.Role;
 import io.tingkai.money.enumeration.SportType;
 
-/**
- * process data of enums
- * 
- * @author tingkai
- */
 @Service
 public class EnumService {
 

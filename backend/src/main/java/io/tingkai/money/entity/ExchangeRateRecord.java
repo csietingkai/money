@@ -15,11 +15,6 @@ import javax.persistence.UniqueConstraint;
 import io.tingkai.money.constant.DatabaseConstants;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'exchange_rate_record'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD, uniqueConstraints = { @UniqueConstraint(columnNames = { "currency", "date" }) })

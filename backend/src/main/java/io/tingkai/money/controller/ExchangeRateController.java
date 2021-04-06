@@ -18,11 +18,6 @@ import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.service.ExchangeRateService;
 import io.tingkai.money.service.PythonFetcherService;
 
-/**
- * Simple controller for CRUD methods to postgresql
- * 
- * @author tingkai
- */
 @RestController
 @RequestMapping(value = ExchangeRateController.CONROLLER_PREFIX)
 public class ExchangeRateController {

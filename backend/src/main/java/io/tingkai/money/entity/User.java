@@ -15,11 +15,6 @@ import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.enumeration.Role;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'users'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_USER)

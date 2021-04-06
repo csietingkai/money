@@ -2,11 +2,6 @@ package io.tingkai.money.enumeration;
 
 import io.tingkai.money.util.AppUtil;
 
-/**
- * File types aka file extension
- * 
- * @author tingkai
- */
 public enum FileType {
 
 	// @formatter:off

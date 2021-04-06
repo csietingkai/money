@@ -22,12 +22,6 @@ import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.enumeration.Role;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Filter Layer of Spring, filter token string send with request is passed or
- * not.
- * 
- * @author tingkai
- */
 @Slf4j
 @Component
 public class AuthTokenAuthenticationFilter extends GenericFilterBean {

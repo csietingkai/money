@@ -14,12 +14,6 @@ import io.tingkai.money.dao.UserTrackingStockDao;
 import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.util.AppUtil;
 
-/**
- * provide methods for upload, download, find, delete database table
- * 'user_tracking_stock'
- * 
- * @author tingkai
- */
 @Service
 public class UserTrackingStockService {
 

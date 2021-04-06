@@ -20,11 +20,6 @@ import io.tingkai.money.service.MailService;
 import io.tingkai.money.service.UserService;
 import io.tingkai.money.util.AppUtil;
 
-/**
- * Controller let user login and register
- * 
- * @author tingkai
- */
 @RestController
 public class AuthController {
 

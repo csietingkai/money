@@ -10,11 +10,6 @@ import org.springframework.stereotype.Repository;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.enumeration.MarketType;
 
-/**
- * JpaRepository for sql database table 'stock'
- * 
- * @author tingkai
- */
 @Repository
 public interface StockDao extends JpaRepository<Stock, UUID> {
 

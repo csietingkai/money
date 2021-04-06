@@ -10,12 +10,6 @@ import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.util.AppUtil;
 
-/**
- * Override Spring Authentication flow, check current user's AuthToken is
- * validate or not.
- * 
- * @author tingkai
- */
 @Component
 public class AuthTokenAuthenticationProvider implements AuthenticationProvider {
 

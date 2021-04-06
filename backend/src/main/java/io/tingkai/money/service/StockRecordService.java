@@ -14,11 +14,6 @@ import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.TimeUtil;
 
-/**
- * provide method for upload, download, find, delete database table 'stock'
- * 
- * @author tingkai
- */
 @Service
 public class StockRecordService {
 

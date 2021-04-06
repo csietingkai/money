@@ -14,11 +14,6 @@ import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
 
-/**
- * Store login token to redis
- * 
- * @author tingkai
- */
 @Service
 public final class AuthTokenService {
 

@@ -6,11 +6,6 @@ import org.springframework.stereotype.Component;
 
 import io.tingkai.money.enumeration.FileType;
 
-/**
- * repository store sound file, eg: mp3, flac, m4a, aac, wav, ogg
- * 
- * @author tingkai
- */
 @Component
 public class AudoioRepository extends FileRepository {
 

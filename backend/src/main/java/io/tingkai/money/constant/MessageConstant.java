@@ -1,10 +1,5 @@
 package io.tingkai.money.constant;
 
-/**
- * messages used for responses
- * 
- * @author tingkai
- */
 public class MessageConstant {
 
 	// simple message

@@ -16,11 +16,6 @@ import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.enumeration.MarketType;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'stock'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_STOCK)

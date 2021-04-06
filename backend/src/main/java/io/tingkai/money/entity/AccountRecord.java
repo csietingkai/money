@@ -13,11 +13,6 @@ import javax.persistence.Table;
 import io.tingkai.money.constant.DatabaseConstants;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'account_record'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_ACCOUNT_RECORD)

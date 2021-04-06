@@ -17,11 +17,6 @@ import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
 
-/**
- * provide method for delete user stored in sql database table 'user_stock'
- * 
- * @author tingkai
- */
 @Service
 public class UserStockService {
 

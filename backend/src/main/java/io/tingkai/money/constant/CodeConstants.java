@@ -5,11 +5,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 
-/**
- * constants used in code
- * 
- * @author tingkai
- */
 public class CodeConstants {
 
 	// === init === //

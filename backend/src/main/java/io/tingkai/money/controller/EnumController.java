@@ -9,11 +9,6 @@ import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.model.response.EnumResponse;
 import io.tingkai.money.service.EnumService;
 
-/**
- * Controller for enumerations
- * 
- * @author tingkai
- */
 @RestController
 @RequestMapping(value = EnumController.CONTROLLER_PREFIX)
 public class EnumController {

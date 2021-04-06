@@ -11,12 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import io.tingkai.money.constant.AppConstants;
 
-/**
- * Simple configuration for spring, currently only provide
- * {@link PasswordEncoder}
- * 
- * @author tingkai
- */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 

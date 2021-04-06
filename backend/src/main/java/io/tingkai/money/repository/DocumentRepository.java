@@ -6,11 +6,6 @@ import org.springframework.stereotype.Component;
 
 import io.tingkai.money.enumeration.FileType;
 
-/**
- * repository store document file, eg: doc, docx, xls, xlsx, ppt, pptx, pdf, csv, txt
- * 
- * @author tingkai
- */
 @Component
 public class DocumentRepository extends FileRepository {
 

@@ -1,12 +1,5 @@
 package io.tingkai.money.model.response;
 
-import io.tingkai.money.controller.AccountController;
-
-/**
- * response for {@link AccountController} request.
- * 
- * @author tingkai
- */
 public class AccountResponse<T> extends BaseResponse<T> {
 
 	public AccountResponse(boolean success, T t, String pattern) {

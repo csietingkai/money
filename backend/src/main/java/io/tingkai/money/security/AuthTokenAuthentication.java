@@ -8,11 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-/**
- * Instance of {@link Authentication}, used for Spring Security.
- * 
- * @author tingkai
- */
 public class AuthTokenAuthentication implements Authentication {
 
 	private static final long serialVersionUID = 3476207526350034201L;

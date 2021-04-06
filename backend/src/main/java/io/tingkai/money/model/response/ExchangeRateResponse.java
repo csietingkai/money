@@ -1,12 +1,5 @@
 package io.tingkai.money.model.response;
 
-import io.tingkai.money.controller.ExchangeRateController;
-
-/**
- * response for {@link ExchangeRateController} request.
- * 
- * @author tingkai
- */
 public class ExchangeRateResponse<T> extends BaseResponse<T> {
 
 	public ExchangeRateResponse(boolean success, T t, String pattern) {

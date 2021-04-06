@@ -7,12 +7,6 @@ import org.springframework.stereotype.Service;
 import io.tingkai.money.enumeration.FileType;
 import io.tingkai.money.repository.FileRepository;
 
-/**
- * use spring dependency injection to store list of {@link FileRepository},
- * provide methods to judge this file should store into which file repository.
- * 
- * @author tingkai
- */
 @Service
 public class RepositoryService {
 

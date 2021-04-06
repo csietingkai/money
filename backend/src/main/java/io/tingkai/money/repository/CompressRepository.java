@@ -6,11 +6,6 @@ import org.springframework.stereotype.Component;
 
 import io.tingkai.money.enumeration.FileType;
 
-/**
- * repository store compressed file, eg: zip, rar, 7z, tar.gz, gzip
- * 
- * @author tingkai
- */
 @Component
 public class CompressRepository extends FileRepository {
 

@@ -1,10 +1,5 @@
 package io.tingkai.money.constant;
 
-/**
- * table name for entities.
- * 
- * @author tingkai
- */
 public class DatabaseConstants {
 	public static final String TABLE_USER = "users";
 	public static final String TABLE_STOCK = "stock";

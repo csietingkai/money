@@ -14,11 +14,6 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import io.tingkai.money.entity.File;
 import io.tingkai.money.enumeration.CompareOrderType;
 
-/**
- * Provide method to get mimetype, convert {@link GridFSFile} to {@link File}
- * 
- * @author tingkai
- */
 public class FileUtil {
 
 	public static String getMimeType(String filename) {

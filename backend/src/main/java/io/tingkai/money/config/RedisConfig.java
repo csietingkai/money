@@ -20,11 +20,6 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 
 import io.tingkai.money.constant.CodeConstants;
 
-/**
- * Setting of {@link RedisTemplate} and redis connection
- * 
- * @author tingkai
- */
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {

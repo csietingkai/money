@@ -16,11 +16,6 @@ import io.tingkai.money.controller.AuthController;
 import io.tingkai.money.security.AuthTokenAuthenticationFilter;
 import io.tingkai.money.security.AuthTokenAuthenticationProvider;
 
-/**
- * Setting for login token, create filter to block requests without tokenString
- * 
- * @author tingkai
- */
 @EnableWebSecurity
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)

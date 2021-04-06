@@ -9,12 +9,6 @@ import java.time.temporal.TemporalUnit;
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.enumeration.CompareResult;
 
-/**
- * Provide method to generate random datetime, convert datetime to String and
- * reversely, get current date and time.
- * 
- * @author tingkai
- */
 public class TimeUtil {
 
 	public static final long SECOND_MILISECS = 1000;

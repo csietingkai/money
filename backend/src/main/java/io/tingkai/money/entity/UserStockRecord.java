@@ -17,11 +17,6 @@ import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.enumeration.DealType;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'user_stock_record'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_USER_STOCK_RECORD)

@@ -9,11 +9,6 @@ import org.springframework.stereotype.Repository;
 import io.tingkai.money.entity.User;
 import io.tingkai.money.enumeration.Role;
 
-/**
- * JpaRepository for sql database table 'users'
- * 
- * @author tingkai
- */
 @Repository
 public interface UserDao extends JpaRepository<User, UUID> {
 

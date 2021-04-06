@@ -3,11 +3,6 @@ package io.tingkai.money.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller for sport lottery
- * 
- * @author tingkai
- */
 @RestController
 @RequestMapping(value = SportLotteryController.CONTROLLER_PREFIX)
 public class SportLotteryController {

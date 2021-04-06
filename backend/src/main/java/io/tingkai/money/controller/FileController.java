@@ -27,11 +27,6 @@ import io.tingkai.money.service.FileService;
 import io.tingkai.money.service.RepositoryService;
 import io.tingkai.money.util.FileUtil;
 
-/**
- * Controller let user upload and download file to MongoDB
- * 
- * @author tingkai
- */
 @RestController
 @RequestMapping(value = FileController.CONTROLLER_PREFIX)
 public class FileController {

@@ -15,12 +15,6 @@ import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.util.ContextUtil;
 
-/**
- * provide method for upload, download, find, delete user stored in sql database
- * table 'users'
- * 
- * @author tingkai
- */
 @Service
 public class UserService {
 

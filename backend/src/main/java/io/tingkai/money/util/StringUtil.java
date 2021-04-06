@@ -4,11 +4,6 @@ import java.security.SecureRandom;
 
 import io.tingkai.money.constant.CodeConstants;
 
-/**
- * Provide methods to process strings.
- * 
- * @author tingkai
- */
 public class StringUtil {
 
 	public static boolean isEmpty(String str) {

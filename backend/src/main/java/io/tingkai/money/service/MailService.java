@@ -9,11 +9,6 @@ import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.controller.AuthController;
 
-/**
- * Provide method for send mail.
- * 
- * @author tingkai
- */
 @Service
 public class MailService {
 

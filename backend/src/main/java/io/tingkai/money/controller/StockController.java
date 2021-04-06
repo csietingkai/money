@@ -20,11 +20,6 @@ import io.tingkai.money.service.StockRecordService;
 import io.tingkai.money.service.StockService;
 import io.tingkai.money.service.UserTrackingStockService;
 
-/**
- * Simple controller for stocks info and their records
- * 
- * @author tingkai
- */
 @RestController
 @RequestMapping(value = StockController.CONROLLER_PREFIX)
 public class StockController {

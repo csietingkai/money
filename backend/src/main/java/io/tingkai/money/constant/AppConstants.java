@@ -3,12 +3,6 @@ package io.tingkai.money.constant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * read variables from <a href=
- * "file:../../../../../resources/application.properties">application.properties</a>
- * 
- * @author tingkai
- */
 @Component
 public class AppConstants {
 

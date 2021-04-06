@@ -18,11 +18,6 @@ import io.tingkai.money.enumeration.LotteryResult;
 import io.tingkai.money.enumeration.SportType;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'sport_lottery_record'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_SPORT_LOTTERY_RECORD)

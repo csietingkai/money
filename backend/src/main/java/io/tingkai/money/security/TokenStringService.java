@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.CodeConstants;
 
-/**
- * generate random tokenString
- * 
- * @author tingkai
- */
 @Service
 public class TokenStringService {
 

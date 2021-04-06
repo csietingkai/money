@@ -12,11 +12,6 @@ import javax.persistence.UniqueConstraint;
 import io.tingkai.money.constant.DatabaseConstants;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'user_tracking_stock'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_USER_TRACKING_STOCK, uniqueConstraints = { @UniqueConstraint(columnNames = { "userName", "stockCode" }) })

@@ -4,11 +4,6 @@ import java.text.MessageFormat;
 
 import lombok.Data;
 
-/**
- * base response
- * 
- * @author tingkai
- */
 @Data
 public abstract class BaseResponse<T> {
 

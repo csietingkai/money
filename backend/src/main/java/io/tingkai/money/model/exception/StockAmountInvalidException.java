@@ -4,12 +4,6 @@ import java.math.BigDecimal;
 
 import io.tingkai.money.constant.MessageConstant;
 
-/**
- * when frontend send stock request and share amount are invalid, throw this
- * exception
- * 
- * @author tingkai
- */
 public class StockAmountInvalidException extends BaseException {
 
 	private static final long serialVersionUID = 9139982358950833235L;

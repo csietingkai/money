@@ -13,11 +13,6 @@ import javax.persistence.UniqueConstraint;
 import io.tingkai.money.constant.DatabaseConstants;
 import lombok.Data;
 
-/**
- * Entity for sql database table 'account'
- * 
- * @author tingkai
- */
 @Entity
 @Data
 @Table(name = DatabaseConstants.TABLE_ACCOUNT, uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "ownerName" }) })

@@ -8,11 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import io.tingkai.money.entity.UserStockRecord;
 
-/**
- * JpaRepository for sql database table 'user_stock_record'
- * 
- * @author tingkai
- */
 @Repository
 public interface UserStockRecordDao extends JpaRepository<UserStockRecord, UUID> {
 
