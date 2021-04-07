@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS user_stock (
 
 CREATE TABLE IF NOT EXISTS user_stock_record (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	user_stock_id uuid NOT NULL UNIQUE,
+	user_stock_id uuid NOT NULL,
 	type VARCHAR NOT NULL, --買 or 賣
 	date TIMESTAMP NOT NULL,
 	share NUMERIC NOT NULL, --股數
