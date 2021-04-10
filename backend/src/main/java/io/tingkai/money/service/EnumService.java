@@ -15,8 +15,10 @@ import io.tingkai.money.enumeration.LotteryResult;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.enumeration.Role;
 import io.tingkai.money.enumeration.SportType;
+import io.tingkai.money.logging.Loggable;
 
 @Service
+@Loggable
 public class EnumService {
 
 	public List<String> betTypeList() {

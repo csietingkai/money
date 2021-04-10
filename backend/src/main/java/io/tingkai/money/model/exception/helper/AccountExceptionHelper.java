@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
+import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,14 @@ public class AccountExceptionHelper {
 
 	@ExceptionHandler(AccountBalanceNotEnoughException.class)
 	public ResponseEntity<BaseResponse<?>> handleAccountBalanceNotEnoughException(Exception e) {
+		if (AppConstants.DEBUG_MODE) {
+			log.debug(e.getMessage(), e);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(new AccountResponse<Void>(e));
+	}
+
+	@ExceptionHandler(AccountBalanceWrongException.class)
+	public ResponseEntity<BaseResponse<?>> handleAccountBalanceWrongException(Exception e) {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}

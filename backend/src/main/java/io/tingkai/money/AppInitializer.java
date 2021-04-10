@@ -42,13 +42,13 @@ public class AppInitializer {
 	private RedisTemplate<String, Set<String>> skipStockCache;
 
 	@EventListener(ApplicationReadyEvent.class)
-	public void onStarted() {
+	public void onStarted() throws QueryNotResultException, AlreadyExistException, FieldMissingException {
 		this.addRoot();
 		this.fetchExchangeRate();
 		this.fetchStock();
 	}
 
-	private void addRoot() {
+	private void addRoot() throws QueryNotResultException, AlreadyExistException, FieldMissingException {
 		if (!this.userService.isRootExist()) {
 			String initRootPassword = AppConstants.INIT_ROOT_PASSWORD;
 			if (AppUtil.isEmpty(initRootPassword) && !StringUtil.isBlank(initRootPassword)) {

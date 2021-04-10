@@ -12,4 +12,8 @@ import io.tingkai.money.entity.UserStockRecord;
 public interface UserStockRecordDao extends JpaRepository<UserStockRecord, UUID> {
 
 	public Iterable<UserStockRecord> findByUserStockIdIn(List<UUID> userStockIds);
+
+	public Iterable<UserStockRecord> findByUserStockId(UUID userStockId);
+
+	public Iterable<UserStockRecord> findByAccountId(UUID accountId);
 }

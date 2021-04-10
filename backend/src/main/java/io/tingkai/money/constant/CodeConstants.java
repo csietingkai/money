@@ -45,11 +45,11 @@ public class CodeConstants {
 
 	/// === stock list === //
 	public static final String STOCK_UPDATE_TIME_KEY = "stock-update-time";
-	public static final String STOCK_LIST_KEY = "stock-list";
 	public static final String STOCK_SKIP_FETCH_LIST_KEY = "stock-skip-fetch-list";
 	public static final String STOCK_RECORD_UPDATE_TIME_KEY = "stock-record-update-time";
 	public static final String STOCK_FETCHING_CODE = "fetching-stock-record";
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.001425d);
+	public static final BigDecimal FEE_DISCOUNT_RATE = new BigDecimal(0.28d);
 	public static final BigDecimal MIN_FEE = new BigDecimal(20);
 	public static final BigDecimal TAX_RATE = new BigDecimal(0.003d);
 

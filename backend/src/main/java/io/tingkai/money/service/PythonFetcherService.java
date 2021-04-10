@@ -27,6 +27,11 @@ import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.enumeration.MarketType;
+import io.tingkai.money.facade.ExchangeRateFacade;
+import io.tingkai.money.facade.ExchangeRateRecordFacade;
+import io.tingkai.money.facade.StockFacade;
+import io.tingkai.money.facade.StockRecordFacade;
+import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.QueryNotResultException;
@@ -36,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 
 @Service
+@Loggable
 @Slf4j
 public class PythonFetcherService {
 
@@ -65,19 +71,19 @@ public class PythonFetcherService {
 	private RedisTemplate<String, Map<String, Long>> stockRecordCache;
 
 	@Autowired
-	private ExchangeRateService exchangeRateService;
+	private ExchangeRateFacade exchangeRateFacade;
 
 	@Autowired
-	private ExchangeRateRecordService exchangeRateRecordService;
+	private ExchangeRateRecordFacade exchangeRateRecordFacade;
 
 	@Autowired
-	private StockService stockService;
+	private StockFacade stockFacade;
 
 	@Autowired
-	private StockRecordService stockRecordService;
+	private StockRecordFacade stockRecordFacade;
 
 	public void fetchExchangeRate() throws AlreadyExistException, FieldMissingException, QueryNotResultException {
-		if (this.exchangeRateService.count() == 0L) {
+		if (this.exchangeRateFacade.count() == 0L) {
 			List<ExchangeRate> data = new ArrayList<ExchangeRate>();
 			ExchangeRate twd = new ExchangeRate();
 			twd.setCurrency("TWD");
@@ -90,13 +96,13 @@ public class PythonFetcherService {
 				entity.setName(response.getAsString(currency));
 				data.add(entity);
 			});
-			this.exchangeRateService.insertAll(data);
+			this.exchangeRateFacade.insertAll(data);
 		}
 
 		// sync cache
 		List<ExchangeRate> cache = this.exchangeRateCache.opsForValue().get(CodeConstants.EXCHANGE_RATE_LIST_KEY);
-		if (AppUtil.isEmpty(cache) || cache.size() != this.exchangeRateService.count()) {
-			cache = this.exchangeRateService.getAll();
+		if (AppUtil.isEmpty(cache) || cache.size() != this.exchangeRateFacade.count()) {
+			cache = this.exchangeRateFacade.queryAll();
 			this.exchangeRateCache.opsForValue().set(CodeConstants.EXCHANGE_RATE_LIST_KEY, cache);
 		}
 	}
@@ -105,7 +111,7 @@ public class PythonFetcherService {
 		LocalDateTime target = CodeConstants.EXCHANGE_RATE_FETCH_START_DATETIME;
 		ExchangeRateRecord lastestRecord = null;
 		try {
-			lastestRecord = this.exchangeRateRecordService.lastestRecord(currency);
+			lastestRecord = this.exchangeRateRecordFacade.queryNewestRecord(currency);
 		} catch (QueryNotResultException e) {
 			log.debug(e.getMessage());
 		}
@@ -130,7 +136,7 @@ public class PythonFetcherService {
 			target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
 		}
 		if (records.size() > 0) {
-			this.exchangeRateRecordService.insertAll(records);
+			this.exchangeRateRecordFacade.insertAll(records);
 		}
 
 		saveUpdateTime(exchangeRateRecordCache, CodeConstants.EXCHANGE_RATE_RECORD_UPDATE_TIME_KEY, currency);
@@ -154,7 +160,7 @@ public class PythonFetcherService {
 	public void fetchStock() {
 		List<Stock> data = new ArrayList<Stock>();
 		for (MarketType marketType : MarketType.values()) {
-			if (this.stockService.countByMarketType(marketType) == 0L) {
+			if (this.stockFacade.countByMarketType(marketType) == 0L) {
 				// @formatter:off
 				UriComponentsBuilder builder = UriComponentsBuilder
 						.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX)
@@ -183,7 +189,7 @@ public class PythonFetcherService {
 		}
 
 		try {
-			this.stockService.insertAll(data);
+			this.stockFacade.insertAll(data);
 		} catch (AlreadyExistException | FieldMissingException e) {
 			log.warn(e.getMessage());
 		}
@@ -192,7 +198,7 @@ public class PythonFetcherService {
 	public boolean fetchStockRecord(String code) {
 		List<Stock> list = new ArrayList<Stock>();
 		try {
-			list = this.stockService.getAll();
+			list = this.stockFacade.queryAll();
 		} catch (QueryNotResultException e) {
 			log.warn(e.getMessage());
 		}
@@ -200,7 +206,7 @@ public class PythonFetcherService {
 		if (stockOptional.isPresent()) {
 			Stock stock = stockOptional.get();
 			LocalDateTime target = stock.getOfferingDate();
-			StockRecord lastestRecord = this.stockRecordService.lastestRecord(stock.getCode());
+			StockRecord lastestRecord = this.stockRecordFacade.lastestRecord(stock.getCode());
 			if (AppUtil.isPresent(lastestRecord)) {
 				target = lastestRecord.getDealDate();
 				target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
@@ -242,7 +248,7 @@ public class PythonFetcherService {
 			}
 			if (records.size() > 0) {
 				try {
-					this.stockRecordService.saveAll(records);
+					this.stockRecordFacade.insertAll(records);
 					saveUpdateTime(stockRecordCache, CodeConstants.STOCK_RECORD_UPDATE_TIME_KEY, code);
 				} catch (Exception e) {
 					log.warn(e.getMessage());

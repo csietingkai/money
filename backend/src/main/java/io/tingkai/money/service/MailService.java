@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.controller.AuthController;
+import io.tingkai.money.logging.Loggable;
 
 @Service
+@Loggable
 public class MailService {
 
 	@Autowired

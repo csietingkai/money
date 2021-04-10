@@ -19,6 +19,8 @@ public interface StockRecordDao extends JpaRepository<StockRecord, UUID> {
 
 	public Iterable<StockRecord> findByCodeAndDealDateAfterAndDealDateBeforeOrderByDealDate(String code, LocalDateTime start, LocalDateTime end);
 
+	public Optional<StockRecord> findByCodeAndDealDate(String code, LocalDateTime dealDate);
+
 	public Optional<StockRecord> findFirstByCodeOrderByDealDateDesc(String code);
 
 	@Query(value = "SELECT DISTINCT sr.code FROM stock_record sr", nativeQuery = true)

@@ -23,11 +23,13 @@ import com.mongodb.client.model.Filters;
 
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.GridFSFileField;
+import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.repository.FileRepository;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
 
 @Service
+@Loggable
 public class FileService {
 
 	@Autowired

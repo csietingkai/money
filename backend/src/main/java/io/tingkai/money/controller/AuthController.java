@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.User;
+import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.AuthTokenExpireException;
+import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.IllegalRoleException;
+import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.model.response.AuthResponse;
@@ -45,7 +49,7 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = AuthController.REGISTER_PATH, method = RequestMethod.POST)
-	public AuthResponse register(@RequestBody User user, @RequestParam(required = false, defaultValue = "true") boolean sendMail) throws IllegalRoleException {
+	public AuthResponse register(@RequestBody User user, @RequestParam(required = false, defaultValue = "true") boolean sendMail) throws IllegalRoleException, AlreadyExistException, FieldMissingException {
 		this.userService.create(user);
 		if (sendMail) {
 			this.mailService.sendConfirmEmail(user.getEmail());
@@ -55,7 +59,7 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = AuthController.CONFIRM_PATH, method = RequestMethod.POST)
-	public AuthResponse confirm(@RequestParam String email) {
+	public AuthResponse confirm(@RequestParam String email) throws QueryNotResultException, NotExistException, FieldMissingException {
 		// TODO browser can not open, but postman can
 		this.userService.confirm(email);
 		return new AuthResponse(true, null, MessageConstant.SUCCESS);

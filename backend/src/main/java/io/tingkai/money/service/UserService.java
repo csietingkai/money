@@ -1,102 +1,104 @@
 package io.tingkai.money.service;
 
-import java.util.Optional;
+import java.text.MessageFormat;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.AppConstants;
-import io.tingkai.money.dao.UserDao;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.User;
 import io.tingkai.money.enumeration.Role;
+import io.tingkai.money.facade.UserFacade;
+import io.tingkai.money.logging.Loggable;
+import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.IllegalRoleException;
+import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.util.ContextUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Loggable
+@Slf4j
 public class UserService {
 
 	@Autowired
-	private UserDao userDao;
+	private UserFacade userFacade;
 
 	@Autowired
 	private PasswordEncoder bCryptPasswordEncoder;
 
-	public User get(String name) {
-		return this.userDao.findByName(name).get();
+	public User get(String name) throws QueryNotResultException {
+		return this.userFacade.queryByName(name);
 	}
 
 	public User login(String name, String pwd) throws UserNotFoundException, WrongPasswordException {
-		Optional<User> userOptional = this.userDao.findByName(name);
-		if (userOptional.isPresent()) {
-			User user = userOptional.get();
-			if (this.bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
-				return user;
+		try {
+			User user = this.userFacade.queryByName(name);
+			if (!this.bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
+				throw new WrongPasswordException();
 			}
-			throw new WrongPasswordException();
-		} else {
+			return user;
+		} catch (QueryNotResultException e) {
 			throw new UserNotFoundException(name);
 		}
 	}
 
-	public void create(User user) throws IllegalRoleException {
-		if (user.getRole() != Role.USER) {
-			throw new IllegalRoleException(user.getRole().name());
+	public User create(User entity) throws AlreadyExistException, FieldMissingException {
+		if (entity.getRole() != Role.USER) {
+			log.warn(MessageFormat.format(MessageConstant.CREATE_USER_WARN, entity.getName(), "Role Error"));
+			entity.setRole(Role.USER);
 		}
-		user.setPwd(this.bCryptPasswordEncoder.encode(user.getPwd()));
-		user.setRole(Role.USER);
-		this.userDao.save(user);
+		entity.setPwd(this.bCryptPasswordEncoder.encode(entity.getPwd()));
+		return this.userFacade.insert(entity);
 	}
 
-	public void confirm(String email) {
-		Optional<User> optionalUser = this.userDao.findByEmail(email);
-		if (optionalUser.isPresent()) {
-			User user = optionalUser.get();
-			user.setConfirm(true);
-			this.userDao.save(user);
+	public User confirm(String email) throws QueryNotResultException, NotExistException, FieldMissingException {
+		User entity = this.userFacade.queryByEmail(email);
+		entity.setConfirm(true);
+		return this.userFacade.update(entity);
+	}
+
+	public User setUserAsAdmin(User userToBeAdmin) throws NotExistException, FieldMissingException, IllegalRoleException, QueryNotResultException {
+		if (!isCurrentUserRoot()) {
+			throw new IllegalRoleException("Need Root Role");
 		}
+		userToBeAdmin.setRole(Role.ADMIN);
+		return this.userFacade.update(userToBeAdmin);
 	}
 
-	public void setUserAsAdmin(User userToBeAdmin) {
-		if (isCurrentUserRoot()) {
-			userToBeAdmin.setRole(Role.ADMIN);
-			this.userDao.save(userToBeAdmin);
-		}
+	public boolean isCurrentUserRoot() throws QueryNotResultException {
+		User loginUser = getCurrentLoginUser();
+		return loginUser.getRole() == Role.ROOT;
 	}
 
-	public boolean isCurrentUserRoot() {
-		Optional<User> loginUser = getCurrentLoginUser();
-		return loginUser.isPresent() && loginUser.get().getRole() == Role.ROOT;
+	public boolean isCurrentUserConfirm() throws QueryNotResultException {
+		User loginUser = getCurrentLoginUser();
+		return loginUser.getRole() == Role.ROOT;
 	}
 
-	public boolean isCurrentUserConfirm() {
-		Optional<User> loginUser = getCurrentLoginUser();
-		return loginUser.isPresent() && loginUser.get().getRole() == Role.ROOT;
+	public boolean isRootExist() throws QueryNotResultException {
+		List<User> entities = this.userFacade.queryByRole(Role.ROOT);
+		return entities.size() > 0;
 	}
 
-	public boolean isRootExist() {
-		Iterable<User> users = this.userDao.findByRole(Role.ROOT);
-		for (User user : users) {
-			if (Role.ROOT == user.getRole()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public void createRoot(String initRootPassword) {
+	public User createRoot(String initRootPassword) throws AlreadyExistException, FieldMissingException {
 		User root = new User();
 		root.setName(AppConstants.INIT_ROOT_USERNAME);
 		root.setPwd(this.bCryptPasswordEncoder.encode(initRootPassword));
 		root.setEmail(AppConstants.INIT_ROOT_EMAIL);
 		root.setRole(Role.ROOT);
-		this.userDao.save(root);
+		return this.userFacade.insert(root);
 	}
 
-	private Optional<User> getCurrentLoginUser() {
+	private User getCurrentLoginUser() throws QueryNotResultException {
 		String loginUsername = ContextUtil.getUserName();
-		return this.userDao.findByName(loginUsername);
+		return this.userFacade.queryByName(loginUsername);
 	}
 }

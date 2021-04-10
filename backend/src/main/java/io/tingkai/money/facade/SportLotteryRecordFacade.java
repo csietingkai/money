@@ -1,4 +1,4 @@
-package io.tingkai.money.service;
+package io.tingkai.money.facade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,12 @@ import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 
 @Service
-public class SportLotteryRecordService {
+public class SportLotteryRecordFacade {
 
 	@Autowired
 	private SportLotteryRecordDao sportLotteryRecordDao;
 
-	public List<SportLotteryRecord> getAll() throws QueryNotResultException {
+	public List<SportLotteryRecord> queryAll() throws QueryNotResultException {
 		List<SportLotteryRecord> entities = new ArrayList<SportLotteryRecord>();
 		Iterable<SportLotteryRecord> iterable = this.sportLotteryRecordDao.findAll();
 		iterable.forEach(entities::add);
@@ -33,7 +33,7 @@ public class SportLotteryRecordService {
 		return entities;
 	}
 
-	public SportLotteryRecord get(UUID id) throws QueryNotResultException {
+	public SportLotteryRecord query(UUID id) throws QueryNotResultException {
 		Optional<SportLotteryRecord> optional = this.sportLotteryRecordDao.findById(id);
 		if (optional.isEmpty()) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
@@ -42,18 +42,38 @@ public class SportLotteryRecordService {
 	}
 
 	public SportLotteryRecord insert(SportLotteryRecord entity) throws FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getAccountId(), entity)) {
+		if (!AppUtil.isAllPresent(entity, entity.getAccountId())) {
 			throw new FieldMissingException();
 		}
 		return this.sportLotteryRecordDao.save(entity);
 	}
 
 	public List<SportLotteryRecord> insertAll(List<SportLotteryRecord> entities) throws AlreadyExistException, FieldMissingException {
-		List<SportLotteryRecord> inserted = new ArrayList<SportLotteryRecord>();
-		for (SportLotteryRecord entity : entities) {
-			inserted.add(this.insert(entity));
+		long hasFieldMissingCount = entities.stream().filter(entity -> !AppUtil.isAllPresent(entity, entity.getAccountId())).count();
+		if (hasFieldMissingCount > 0L) {
+			throw new FieldMissingException();
 		}
-		return inserted;
+		return this.sportLotteryRecordDao.saveAll(entities);
+	}
+
+	public SportLotteryRecord update(SportLotteryRecord entity) throws NotExistException, FieldMissingException {
+		if (!AppUtil.isAllPresent(entity, entity.getId())) {
+			throw new FieldMissingException();
+		}
+		Optional<SportLotteryRecord> optional = this.sportLotteryRecordDao.findById(entity.getId());
+		if (optional.isEmpty()) {
+			throw new NotExistException();
+		}
+		SportLotteryRecord updateEntity = optional.get();
+		updateEntity.setAccountId(entity.getAccountId());
+		updateEntity.setSportType(entity.getSportType());
+		updateEntity.setStake(entity.getStake());
+		updateEntity.setOdds(entity.getOdds());
+		updateEntity.setDate(entity.getDate());
+		updateEntity.setBetType(entity.getBetType());
+		updateEntity.setPointSpread(entity.getPointSpread());
+		updateEntity.setResult(entity.getResult());
+		return this.sportLotteryRecordDao.save(updateEntity);
 	}
 
 	public void delete(UUID id) throws NotExistException {

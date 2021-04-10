@@ -1,4 +1,4 @@
-package io.tingkai.money.service;
+package io.tingkai.money.facade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +17,22 @@ import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 
 @Service
-public class AccountRecordService {
+public class AccountRecordFacade {
 
 	@Autowired
 	private AccountRecordDao accountRecordDao;
 
-	public List<AccountRecord> getAll(UUID accountId) throws QueryNotResultException {
+	public List<AccountRecord> queryAll() throws QueryNotResultException {
+		List<AccountRecord> entities = new ArrayList<AccountRecord>();
+		Iterable<AccountRecord> iterable = this.accountRecordDao.findAll();
+		iterable.forEach(entities::add);
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
+		}
+		return entities;
+	}
+
+	public List<AccountRecord> queryAll(UUID accountId) throws QueryNotResultException {
 		List<AccountRecord> entities = new ArrayList<AccountRecord>();
 		Iterable<AccountRecord> iterable = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
 		iterable.forEach(entities::add);
@@ -32,7 +42,7 @@ public class AccountRecordService {
 		return entities;
 	}
 
-	public AccountRecord get(UUID id) throws QueryNotResultException {
+	public AccountRecord query(UUID id) throws QueryNotResultException {
 		Optional<AccountRecord> optional = this.accountRecordDao.findById(id);
 		if (optional.isEmpty()) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
