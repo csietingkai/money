@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS user_stock (
 CREATE TABLE IF NOT EXISTS user_stock_record (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	user_stock_id uuid NOT NULL,
+	account_id uuid NOT NULL,
 	type VARCHAR NOT NULL, --買 or 賣
 	date TIMESTAMP NOT NULL,
 	share NUMERIC NOT NULL, --股數
@@ -68,7 +69,8 @@ CREATE TABLE IF NOT EXISTS user_stock_record (
 	fee NUMERIC NOT NULL, --手續費
 	tax NUMERIC NOT NULL DEFAULT 0, --稅
 	PRIMARY KEY (id),
-	CONSTRAINT fk_user_stock_id FOREIGN KEY (user_stock_id) REFERENCES user_stock(id)
+	CONSTRAINT fk_user_stock_id FOREIGN KEY (user_stock_id) REFERENCES user_stock(id),
+	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id)
 );
 
 CREATE TABLE IF NOT EXISTS account (

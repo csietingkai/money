@@ -24,6 +24,7 @@ public class UserStockRecord {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private UUID id;
 	private UUID userStockId;
+	private UUID accountId;
 	@Enumerated(EnumType.STRING)
 	private DealType type;
 	private LocalDateTime date;
