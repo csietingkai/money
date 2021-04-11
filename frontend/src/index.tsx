@@ -21,6 +21,7 @@ import store, { fetchExchangeRateList, validateToken } from 'reducer/Store';
 import { API_URL } from 'api/Constant';
 
 // utils
+import { handleRequestDate } from 'util/AppUtil';
 import Notify from 'util/Notify';
 
 // css
@@ -33,18 +34,28 @@ import 'assets/scss/style.scss';
 
 axios.defaults.baseURL = API_URL;
 axios.defaults.headers = { 'X-Auth-Token': getAuthToken()?.tokenString };
-axios.interceptors.request.use((response) => response, (error) => {
-    const { status } = error.response.data;
-    if (status === 403) {
-        Notify.warning('Maybe You Need to Login First.');
-        window.location.replace('/#/login');
-    } else if (status === 404) {
-        window.location.replace('/#/404');
-    } else if (status === 500) {
-        window.location.replace('/#/500');
+axios.interceptors.request.use(
+    (config) => {
+        config.headers = { ...config.headers, 'Content-Type': 'application/json;charset=utf-8' };
+        config.transformRequest = [].concat((data: any) => {
+            data = handleRequestDate(data);
+            return JSON.stringify(data);
+        });
+        return config;
+    },
+    (error) => {
+        const { status } = error.response.data;
+        if (status === 403) {
+            Notify.warning('Maybe You Need to Login First.');
+            window.location.replace('/#/login');
+        } else if (status === 404) {
+            window.location.replace('/#/404');
+        } else if (status === 500) {
+            window.location.replace('/#/500');
+        }
+        throw error;
     }
-    throw error;
-});
+);
 
 // validate token on refresh
 store.dispatch(validateToken);

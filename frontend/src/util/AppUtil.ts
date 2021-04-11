@@ -78,6 +78,14 @@ export const toDateStr = (date: Date): string => {
     }).format(date);
 };
 
+export const numberComma = (num: number): string => {
+    if (!num || parseFloat(num.toString()) === Number.NaN) {
+        num = 0;
+    }
+    const strNum = num.toString();
+    return strNum.replace(/(?<=\d)(?=(\d\d\d)+(?!\d))/g, ',');
+};
+
 export const convert = <K, V>(records: Record<K, V>[], key: K): K | V => {
     const record = records.find(x => x.key === key);
     return record ? record.value : key;
@@ -132,4 +140,24 @@ export const sort = <T extends {}>(list: T[], sortType: SortType = SortType.ASC)
 
 export const sortByKey = (list: any[], key: string, sortType: SortType = SortType.ASC): any[] => {
     return sort(list.map(x => x[key], sortType));
+};
+
+export const handleRequestDate = (data: any) => {
+    if (!data || typeof data !== 'object') {
+        return data;
+    }
+    for (const key in data) {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+            const value = data[key];
+            if (value && value instanceof Date) {
+                const date = new Date(value);
+                // TODO time zone in config?
+                date.setHours(date.getHours() + 8);
+                data[key] = date.toISOString();
+            } else if (typeof value === "object") {
+                data[key] = handleRequestDate(data[key]);
+            }
+        }
+    }
+    return data;
 };
