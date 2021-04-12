@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-import { ACCOUNT_CREATE_PATH, ACCOUNT_CREATE_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH } from 'api/Constant';
+import { ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH } from 'api/Constant';
 
 import { ApiResponse, SimpleResponse } from 'util/Interface';
+import { handleRequestDate } from 'util/AppUtil';
 
 export interface Account {
     id: string;
@@ -60,14 +61,29 @@ const deleteAccount = async (id: string) => {
 const getRecords = async (accountId: string) => {
     const response = await axios.get(ACCOUNT_GET_RECORDS_PATH, { params: { accountId } });
     const data: AccountRecordsResponse = response.data;
+    data.data = data.data?.map(x => {
+        x.transDate = new Date(x.transDate);
+        return x;
+    });
     return data;
 };
 
-const addRecord = async (entity: AccountRecord) => {
-    entity.transDate = new Date();
-    const response = await axios.post(ACCOUNT_CREATE_RECORD_PATH, entity);
+const income = async (accountId: string, entity: AccountRecord) => {
+    if (!entity.transDate) {
+        entity.transDate = new Date();
+    }
+    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, handleRequestDate(entity), { params: { accountId } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-export default { get, getAccounts, createAccount, updateAccount, deleteAccount, getRecords, addRecord };
+const expend = async (accountId: string, entity: AccountRecord) => {
+    if (!entity.transDate) {
+        entity.transDate = new Date();
+    }
+    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, handleRequestDate(entity), { params: { accountId } });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
+export default { get, getAccounts, createAccount, updateAccount, deleteAccount, getRecords, income, expend };

@@ -2,29 +2,22 @@ import * as React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
+import Button from 'component/common/Button';
 import Card from 'component/common/Card';
-import LineChart from 'component/common/chart/LineChart';
-import BarChart from 'component/common/chart/BarChart';
-import BubbleChart from 'component/common/chart/BubbleChart';
-import PieChart from 'component/common/chart/PieChart';
-import RadarChart from 'component/common/chart/RadarChart';
-import ScatterChart from 'component/common/chart/ScatterChart';
+import Form from 'component/common/Form';
+import { CheckIcon, PencilAltIcon, PlusIcon, TimesIcon, TrashAltIcon } from 'component/common/Icons';
+import Modal from 'component/common/Modal';
+import Table from 'component/common/Table';
 
 import { getAuthTokenName, getExchangeRateList } from 'reducer/Selector';
 
-import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountResponse, AccountsResponse } from 'api/account';
+import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountsResponse } from 'api/account';
 import { ExchangeRate } from 'api/exchangeRate';
 
-import { find, isArrayEmpty, toDateStr } from 'util/AppUtil';
-import Notify from 'util/Notify';
-import Table from 'component/common/Table';
-import Button from 'component/common/Button';
-import { CheckIcon, PencilAltIcon, PlusIcon, TimesIcon, TrashAltIcon } from 'component/common/Icons';
-import Modal from 'component/common/Modal';
-import Form, { Input } from 'component/common/Form';
+import { numberComma, toDateStr } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import { SimpleResponse } from 'util/Interface';
-import account from 'api/account';
+import Notify from 'util/Notify';
 
 export interface AccountManagementProps {
     username: string;
@@ -134,6 +127,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         const { accounts, currentAccount } = this.state;
         if (currentAccount.balance !== 0) {
             Notify.warning('Balance is not ZERO, can not change currency');
+            this.toggleDeleteAccountModal(currentAccount)();
             return;
         }
         const idx: number = accounts.findIndex(x => x.id === currentAccount.id);
@@ -147,15 +141,29 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             }
         }
         await this.fetchAccounts();
-        this.toggleDeleteAccountModal()();
     };
 
-    private onAccountRecordCreateClick = async () => {
+    private onAccountRecordIncomeClick = async () => {
         const { accounts, currentAccount, currentAccountRecord } = this.state;
-        const resposne: SimpleResponse = await AccountApi.addRecord(currentAccountRecord);
+        const resposne: SimpleResponse = await AccountApi.income(currentAccount.id, currentAccountRecord);
         const { success, message } = resposne;
         if (success) {
             Notify.success(message);
+            await this.fetchAccounts();
+            await this.onAccountTableRowClick(accounts.findIndex(x => x.id === currentAccount.id));
+            this.toPage();
+        } else {
+            Notify.error(message);
+        }
+    };
+
+    private onAccountRecordExpendClick = async () => {
+        const { accounts, currentAccount, currentAccountRecord } = this.state;
+        const resposne: SimpleResponse = await AccountApi.expend(currentAccount.id, currentAccountRecord);
+        const { success, message } = resposne;
+        if (success) {
+            Notify.success(message);
+            await this.fetchAccounts();
             await this.onAccountTableRowClick(accounts.findIndex(x => x.id === currentAccount.id));
             this.toPage();
         } else {
@@ -174,6 +182,19 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             description: ''
         };
         this.setState({ currentAccountRecord }, () => this.toPage('record-income'));
+    };
+
+    private createAccountRecordExpend = () => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const { currentAccount } = this.state;
+        const currentAccountRecord: AccountRecord = {
+            id: '',
+            transDate: new Date(),
+            transAmount: 0,
+            transFrom: currentAccount.id,
+            transTo: currentAccount.id,
+            description: ''
+        };
+        this.setState({ currentAccountRecord }, () => this.toPage('record-expend'));
     };
 
     private renderMainPage = (): JSX.Element => {
@@ -213,7 +234,9 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 selectedRow={accounts.findIndex(x => x.id === currentAccount?.id)}
                                 onRowClick={this.onAccountTableRowClick}
                                 columnConverter={(header: string, rowData: any) => {
-                                    if (header === 'functions') {
+                                    if (header === 'balance') {
+                                        return numberComma(rowData[header]);
+                                    } else if (header === 'functions') {
                                         return (
                                             <>
                                                 <Button size='sm' variant='info' outline onClick={this.editAccount(rowData)}><PencilAltIcon /></Button>
@@ -247,7 +270,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                     <Button
                                         variant='danger'
                                         outline
-                                    // onClick={this.toPage('record-income')}
+                                        onClick={this.createAccountRecordExpend()}
                                     >
                                         <PlusIcon />
                                         {' Expend'}
@@ -255,8 +278,20 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 </div>
                                 <Table
                                     id='account-record'
-                                    header={['ownerName', 'currency', 'balance', 'functions']}
+                                    header={['transDate', 'transAmount', 'transFrom', 'transTo', 'description']}
                                     data={accountRecords}
+                                    columnConverter={(header: string, rowData: any) => {
+                                        if (header === 'transDate') {
+                                            return toDateStr(rowData[header]);
+                                        } else if (header === 'transAmount') {
+                                            return numberComma(rowData[header]);
+                                        } else if (['transFrom', 'transTo'].indexOf(header) >= 0) {
+                                            if (rowData.transFrom === rowData.transTo) {
+                                                return "";
+                                            }
+                                        }
+                                        return rowData[header];
+                                    }}
                                 />
                             </Card>
                         </Col>
@@ -325,7 +360,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                 <Row>
                     <Col>
                         <Card
-                            title='Income'
+                            title={page === 'record-income' ? 'Income' : 'Expend'}
                         >
                             <Form
                                 singleRow
@@ -345,7 +380,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 <Button
                                     variant='success'
                                     outline
-                                    onClick={this.onAccountRecordCreateClick}
+                                    onClick={page === 'record-income' ? this.onAccountRecordIncomeClick : this.onAccountRecordExpendClick}
                                 >
                                     <CheckIcon />
                                     {' Confirm'}
@@ -374,7 +409,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         let element = null;
         if (page === 'account-create' || page === 'account-edit') {
             element = this.renderAccountFormPage();
-        } else if (page === 'record-income') {
+        } else if (page === 'record-income' || page === 'record-expend') {
             element = this.renderAccountRecordFormPage();
         } else {
             element = this.renderMainPage();

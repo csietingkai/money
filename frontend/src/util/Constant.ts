@@ -2,7 +2,7 @@ import { ToastOptions, ToastPosition } from 'react-toastify';
 
 import { CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon, VolleyBallIcon } from 'component/common/Icons';
 
-import AccountManagementPage from 'view/AccountManagementPage';
+import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
 import SportLotteryPage from 'view/SportLotteryPage';
 
@@ -20,6 +20,7 @@ export const NOTIFICATION_PAUSE_ON_HOVER: boolean = true;
 export const NOTIFICATION_CLOSE_DELAY_SECONDS: number = 2;
 
 export const NOTIFICATION_DEFAULT_CONFIG: ToastOptions = {
+    style: { fontSize: '16px' },
     position: NOTIFICATION_POSTITION,
     hideProgressBar: !NOTIFICATION_SHOW_POGRESS_BAR,
     pauseOnHover: NOTIFICATION_PAUSE_ON_HOVER,

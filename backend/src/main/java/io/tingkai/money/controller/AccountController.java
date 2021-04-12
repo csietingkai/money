@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mongodb.lang.Nullable;
+
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
@@ -63,14 +65,20 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public AccountResponse<List<AccountRecord>> getRecords(@RequestParam UUID accountId) throws QueryNotResultException {
-		List<AccountRecord> entities = this.accountService.getAllRecords(accountId);
+	public AccountResponse<List<AccountRecord>> getRecords(@RequestParam UUID accountId, @Nullable @RequestParam(defaultValue = "true") boolean latestFirstOrder) throws QueryNotResultException {
+		List<AccountRecord> entities = this.accountService.getAllRecords(accountId, latestFirstOrder);
 		return new AccountResponse<List<AccountRecord>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS, accountId.toString());
 	}
 
 	@RequestMapping(value = AccountController.INCOME_PATH, method = RequestMethod.POST)
-	public AccountResponse<AccountRecord> income(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException {
+	public AccountResponse<AccountRecord> income(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.income(entity, accountId);
+		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, entity.getId().toString());
+	}
+
+	@RequestMapping(value = AccountController.EXPEND_PATH, method = RequestMethod.POST)
+	public AccountResponse<AccountRecord> expend(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+		AccountRecord inserted = this.accountService.expend(entity, accountId);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, entity.getId().toString());
 	}
 }

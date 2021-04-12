@@ -32,6 +32,9 @@ public class AccountService {
 
 	public List<Account> getAll(String ownerName) throws QueryNotResultException {
 		List<Account> entities = this.accountFacade.queryAll(ownerName);
+		entities.sort((Account a, Account b) -> {
+			return a.getName().compareToIgnoreCase(b.getName());
+		});
 		return entities;
 	}
 
@@ -54,17 +57,41 @@ public class AccountService {
 		this.accountFacade.delete(id);
 	}
 
-	public List<AccountRecord> getAllRecords(UUID accountId) throws QueryNotResultException {
-		return this.accountRecordFacade.queryAll(accountId);
+	public List<AccountRecord> getAllRecords(UUID accountId, boolean latestFirstOrder) throws QueryNotResultException {
+		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountId);
+		if (latestFirstOrder) {
+			entities.sort((AccountRecord a, AccountRecord b) -> {
+				return b.getTransDate().compareTo(a.getTransDate());
+			});
+		}
+		return entities;
 	}
 
-	public AccountRecord income(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException {
+	public AccountRecord income(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+		Account account = this.accountFacade.query(accountId);
+		entity.setTransAmount(entity.getTransAmount().abs());
+		account.setBalance(account.getBalance().add(entity.getTransAmount()));
 		entity.setTransFrom(accountId);
 		entity.setTransTo(accountId);
-		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_INCOME_DESC, accountId.toString(), entity.getDescription()));
+		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_INCOME_DESC, account.getName(), entity.getDescription()));
 		if (BigDecimal.ZERO.compareTo(entity.getTransAmount()) > 0) {
 			throw new AccountBalanceWrongException(entity.getTransAmount());
 		}
+		this.accountFacade.update(account);
+		return this.accountRecordFacade.insert(entity);
+	}
+
+	public AccountRecord expend(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+		Account account = this.accountFacade.query(accountId);
+		entity.setTransAmount(BigDecimal.ZERO.subtract(entity.getTransAmount().abs()));
+		account.setBalance(account.getBalance().add(entity.getTransAmount()));
+		entity.setTransFrom(accountId);
+		entity.setTransTo(accountId);
+		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), entity.getDescription()));
+		if (BigDecimal.ZERO.compareTo(entity.getTransAmount()) < 0) {
+			throw new AccountBalanceWrongException(entity.getTransAmount());
+		}
+		this.accountFacade.update(account);
 		return this.accountRecordFacade.insert(entity);
 	}
 }
