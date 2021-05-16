@@ -1,7 +1,5 @@
 package io.tingkai.money.logging;
 
-import java.text.MessageFormat;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,14 +8,13 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
 
+import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
 @Slf4j
 public class MethodLogger {
-
-	private static final String LOGGING_MESSAGE_FORMAT = "### {0}({1}): {2} in {3} milliseconds";
 
 	@Pointcut("execution(* (@Loggable *).*(..))")
 	protected void methodOfAnnotatedClass() {
@@ -28,10 +25,9 @@ public class MethodLogger {
 		long start = System.currentTimeMillis();
 		Object result = point.proceed();
 		long spentTime = System.currentTimeMillis() - start;
-
 		String methodName = MethodSignature.class.cast(point.getSignature()).getMethod().getName();
-		Object args = point.getArgs();
-		this.loggingOut(loggable.level(), MessageFormat.format(LOGGING_MESSAGE_FORMAT, methodName, args, result, spentTime));
+		Object[] args = point.getArgs();
+		this.loggingOut(loggable.level(), this.composeMessage(methodName, args, result, spentTime));
 		return result;
 	}
 
@@ -54,5 +50,32 @@ public class MethodLogger {
 			log.debug(message);
 			break;
 		}
+	}
+
+	private String composeMessage(String methodName, Object[] args, Object result, long spentTime) {
+		StringBuilder messageBuilder = new StringBuilder();
+		messageBuilder.append("### ");
+		messageBuilder.append(methodName);
+		messageBuilder.append("(");
+		for (int argsCnt = 0; argsCnt < args.length; argsCnt++) {
+			if (AppUtil.isPresent(args[argsCnt])) {
+				messageBuilder.append(args[argsCnt].toString());
+			} else {
+				messageBuilder.append("null");
+			}
+			if (argsCnt != args.length - 1) {
+				messageBuilder.append(", ");
+			}
+		}
+		messageBuilder.append("): ");
+		if (AppUtil.isPresent(result)) {
+			messageBuilder.append(result.toString());
+		} else {
+			messageBuilder.append("null");
+		}
+		messageBuilder.append(" in ");
+		messageBuilder.append(spentTime);
+		messageBuilder.append(" milliseconds");
+		return messageBuilder.toString();
 	}
 }
