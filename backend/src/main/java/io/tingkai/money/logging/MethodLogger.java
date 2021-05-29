@@ -25,9 +25,10 @@ public class MethodLogger {
 		long start = System.currentTimeMillis();
 		Object result = point.proceed();
 		long spentTime = System.currentTimeMillis() - start;
+		String className = point.getTarget().getClass().getSimpleName();
 		String methodName = MethodSignature.class.cast(point.getSignature()).getMethod().getName();
 		Object[] args = point.getArgs();
-		this.loggingOut(loggable.level(), this.composeMessage(methodName, args, result, spentTime));
+		this.loggingOut(loggable.level(), this.composeMessage(className, methodName, args, result, spentTime));
 		return result;
 	}
 
@@ -52,9 +53,11 @@ public class MethodLogger {
 		}
 	}
 
-	private String composeMessage(String methodName, Object[] args, Object result, long spentTime) {
+	private String composeMessage(String className, String methodName, Object[] args, Object result, long spentTime) {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("### ");
+		messageBuilder.append(className);
+		messageBuilder.append(".");
 		messageBuilder.append(methodName);
 		messageBuilder.append("(");
 		for (int argsCnt = 0; argsCnt < args.length; argsCnt++) {
