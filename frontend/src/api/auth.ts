@@ -1,9 +1,14 @@
 import axios from 'axios';
 
-import { API_URL, AUTH_LOGIN_PATH, AUTH_REGISTER_PATH, AUTH_VALIDATE_PATH } from 'api/Constant';
+import { AUTH_LOGIN_PATH, AUTH_REGISTER_PATH, AUTH_VALIDATE_PATH } from 'api/Constant';
 
-import { Role } from 'util/Enum';
 import { ApiResponse } from 'util/Interface';
+
+export enum Role {
+    ROOT = 'ROOT',
+    ADMIN = 'ADMIN',
+    USER = 'USER'
+}
 
 export interface AuthToken {
     name: string;

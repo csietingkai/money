@@ -1,13 +1,13 @@
 import { ToastOptions, ToastPosition } from 'react-toastify';
 
-import { CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon, VolleyBallIcon } from 'component/common/Icons';
+import { ChartLineIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
-import SportLotteryPage from 'view/SportLotteryPage';
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { Record, SidebarItem } from 'util/Interface';
+import StockQuerier from 'view/investment/StockQuerier';
 
 
 // localStorage
@@ -44,10 +44,10 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         needAuth: true,
         children: [
             {
-                name: 'Sport Lottery',
-                url: '/sportLottery',
-                icon: VolleyBallIcon(),
-                component: SportLotteryPage,
+                name: 'Stock Querier',
+                url: '/stockQuerier',
+                icon: ChartLineIcon(),
+                component: StockQuerier,
                 needAuth: true
             }
         ]

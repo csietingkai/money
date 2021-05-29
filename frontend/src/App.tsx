@@ -1,15 +1,11 @@
 import * as React from 'react';
-import axios from 'axios';
 import { Container } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Route, Redirect, Switch, RouteChildrenProps } from 'react-router-dom';
 
-import { LoginDispatcher, LogoutDispatcher } from 'reducer/PropsMapper';
+import { LogoutDispatcher } from 'reducer/PropsMapper';
 import { getAuthToken, getAuthTokenString } from 'reducer/Selector';
-import { removeAuthToken } from 'reducer/StateHolder';
 
-import Form from 'component/common/Form';
-import Modal from 'component/common/Modal';
 import Breadcrumb from 'component/layout/Breadcrumb';
 import Footer from 'component/layout/Footer';
 import Header from 'component/layout/Header';
@@ -17,8 +13,6 @@ import Sidebar from 'component/layout/Sidebar';
 
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
-import Notify from 'util/Notify';
-import { InputType } from 'util/Enum';
 import { APP_ROUTES } from 'util/Constant';
 
 export interface AppProps extends RouteChildrenProps<any> {

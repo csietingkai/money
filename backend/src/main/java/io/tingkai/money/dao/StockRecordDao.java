@@ -17,7 +17,7 @@ public interface StockRecordDao extends JpaRepository<StockRecord, UUID> {
 
 	public Iterable<StockRecord> findByCodeOrderByDealDate(String code);
 
-	public Iterable<StockRecord> findByCodeAndDealDateAfterAndDealDateBeforeOrderByDealDate(String code, LocalDateTime start, LocalDateTime end);
+	public Iterable<StockRecord> findByCodeAndDealDateBetweenOrderByDealDate(String code, LocalDateTime start, LocalDateTime end);
 
 	public Optional<StockRecord> findByCodeAndDealDate(String code, LocalDateTime dealDate);
 

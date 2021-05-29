@@ -36,7 +36,7 @@ public class StockRecordFacade {
 
 	public List<StockRecord> queryAll(String code, long start, long end) throws QueryNotResultException {
 		List<StockRecord> entities = new ArrayList<StockRecord>();
-		Iterable<StockRecord> iterable = this.stockRecordDao.findByCodeAndDealDateAfterAndDealDateBeforeOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
+		Iterable<StockRecord> iterable = this.stockRecordDao.findByCodeAndDealDateBetweenOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		iterable.forEach(entities::add);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);

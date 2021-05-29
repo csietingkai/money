@@ -24,6 +24,10 @@ public class StockService {
 		return this.stockFacade.queryAll();
 	}
 
+	public Stock get(String code) throws QueryNotResultException {
+		return this.stockFacade.query(code);
+	}
+
 	public List<StockRecord> getAllRecords(String code) throws QueryNotResultException {
 		return this.stockRecordFacade.queryAll(code);
 	}

@@ -23,7 +23,7 @@ import io.tingkai.money.service.UserStockService;
 public class StockController {
 
 	public static final String CONROLLER_PREFIX = "/stock";
-	public static final String GET_ALL_PATH = "/getAll";
+	public static final String GET_PATH = "/get";
 	public static final String GET_RECORDS_PATH = "/getRecords";
 	public static final String REFRESH_PATH = "/refresh";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
@@ -37,15 +37,15 @@ public class StockController {
 	@Autowired
 	private PythonFetcherService pythonFetcherService;
 
-	@RequestMapping(value = StockController.GET_ALL_PATH, method = RequestMethod.GET)
-	public StockResponse<List<Stock>> getAll() throws QueryNotResultException {
-		List<Stock> stocks = this.stockService.getAll();
-		return new StockResponse<List<Stock>>(true, stocks, MessageConstant.STOCK_GET_ALL_SUCCESS);
+	@RequestMapping(value = StockController.GET_PATH, method = RequestMethod.GET)
+	public StockResponse<Stock> get(@RequestParam String code) throws QueryNotResultException {
+		Stock stock = this.stockService.get(code);
+		return new StockResponse<Stock>(true, stock, MessageConstant.STOCK_GET_SUCCESS, stock.getName());
 	}
 
 	@RequestMapping(value = StockController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<StockRecord>> getRecords(@RequestParam String code) throws QueryNotResultException {
-		List<StockRecord> records = this.stockService.getAllRecords(code);
+	public StockResponse<List<StockRecord>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) throws QueryNotResultException {
+		List<StockRecord> records = this.stockService.getAllRecords(code, start, end);
 		return new StockResponse<List<StockRecord>>(true, records, MessageConstant.STOCK_GET_SUCCESS, code);
 	}
 

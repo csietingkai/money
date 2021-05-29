@@ -62,7 +62,7 @@ export const find = <K, V>(records: Record<K, V>[], key: K): boolean => {
     return !!record;
 };
 
-export const toDate = (str: string, defaultVal: Date | null = null): Date | null => {
+export const toDate = (str: any, defaultVal: Date | null = null): Date | null => {
     const d: Date = new Date(str);
     if (isValidDate(d)) {
         return d;

@@ -26,12 +26,6 @@ export interface AccountResponse extends ApiResponse<Account> { }
 export interface AccountsResponse extends ApiResponse<Account[]> { }
 export interface AccountRecordsResponse extends ApiResponse<AccountRecord[]> { }
 
-const get = async (accountId: string) => {
-    const response = await axios.get(ACCOUNT_GET_PATH, { params: { accountId } });
-    const data: AccountRecordsResponse = response.data;
-    return data;
-};
-
 const getAccounts = async (ownerName: string) => {
     const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { ownerName } });
     const data: AccountsResponse = response.data;
@@ -86,4 +80,4 @@ const expend = async (accountId: string, entity: AccountRecord) => {
     return data;
 };
 
-export default { get, getAccounts, createAccount, updateAccount, deleteAccount, getRecords, income, expend };
+export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, income, expend };

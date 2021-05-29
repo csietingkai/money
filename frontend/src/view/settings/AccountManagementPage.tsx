@@ -74,7 +74,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         this.setState({ page });
     };
 
-    private createAccount = () => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    private createAccount = () => () => {
         const currentAccount: Account = {
             id: '',
             name: '',
@@ -85,11 +85,11 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         this.setState({ currentAccount }, () => this.toPage('account-create'));
     };
 
-    private editAccount = (rowData: Account) => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    private editAccount = (rowData: Account) => () => {
         this.setState({ currentAccount: rowData }, () => this.toPage('account-edit'));
     };
 
-    private toggleDeleteAccountModal = (rowData?: Account) => (event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+    private toggleDeleteAccountModal = (rowData?: Account) => () => {
         this.setState({ deleteAccountModalOpen: !this.state.deleteAccountModalOpen, currentAccount: rowData });
     };
 
@@ -171,7 +171,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         }
     };
 
-    private createAccountRecordIncome = () => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    private createAccountRecordIncome = () => () => {
         const { currentAccount } = this.state;
         const currentAccountRecord: AccountRecord = {
             id: '',
@@ -184,7 +184,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         this.setState({ currentAccountRecord }, () => this.toPage('record-income'));
     };
 
-    private createAccountRecordExpend = () => (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    private createAccountRecordExpend = () => () => {
         const { currentAccount } = this.state;
         const currentAccountRecord: AccountRecord = {
             id: '',
@@ -198,7 +198,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderMainPage = (): JSX.Element => {
-        const { accounts, currentAccount, accountRecords, currentAccountRecord, deleteAccountModalOpen } = this.state;
+        const { accounts, currentAccount, accountRecords, deleteAccountModalOpen } = this.state;
         const deleteAccountModal = (
             <Modal
                 headerText='Dedete Account'
@@ -403,8 +403,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     render() {
-        const { username, exchangeRateList } = this.props;
-        const { accounts, accountRecords, deleteAccountModalOpen, page } = this.state;
+        const { page } = this.state;
 
         let element = null;
         if (page === 'account-create' || page === 'account-edit') {

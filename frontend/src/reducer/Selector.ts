@@ -1,7 +1,5 @@
-import { AuthToken } from 'api/auth';
+import { AuthToken, Role } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
-
-import { Role } from 'util/Enum';
 
 // authReducer
 const getAuthState = (state: any): any => state.auth;

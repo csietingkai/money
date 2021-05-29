@@ -18,5 +18,4 @@ public interface StockDao extends JpaRepository<Stock, UUID> {
 	public long countByMarketType(MarketType marketType);
 
 	public Iterable<Stock> findByCodeNotIn(List<String> codes);
-
 }

@@ -11,6 +11,7 @@ interface BaseInput {
     title: string,
     width?: DivWidth; // default 2
     type?: InputType; // default text
+    required?: boolean;
     disabled?: boolean;
 }
 
@@ -66,7 +67,12 @@ export interface DateInput extends BaseInput {
     value: Date;
 }
 
-export type Input = TextInput | NumericInput | TextareaInput | SelectInput | RadioInput | CheckboxInput | FileInput | DateInput;
+export interface DateTimeInput extends BaseInput {
+    type: InputType.datetime;
+    value: Date;
+}
+
+export type Input = TextInput | NumericInput | TextareaInput | SelectInput | RadioInput | CheckboxInput | FileInput | DateInput | DateTimeInput;
 
 export interface FormProps {
     singleRow?: boolean;
@@ -186,7 +192,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         const { singleRow, inputs } = this.props;
 
         const formGroups = inputs.map((input: Input) => {
-            const { key, title, value, disabled } = input;
+            const { key, title, value, required, disabled } = input;
             let { type, width } = input;
             width = input.width || 2;
             type = input.type || InputType.text;
@@ -332,6 +338,20 @@ export default class Form extends React.Component<FormProps, FormState> {
                                 onChange={onDateChange}
                             />
                         </Col>
+                    </Row>
+                );
+            } else if (type === InputType.datetime) {
+                inputElement = (
+                    <Row>
+                        <Col>
+                            <RbForm.Control
+                                id={`form-${key}-date`}
+                                type='date'
+                                value={moment(value).format('YYYY-MM-DD')}
+                                disabled={disabled}
+                                onChange={onDateChange}
+                            />
+                        </Col>
                         <Col>
                             <RbForm.Control
                                 id={`form-${key}-time`}
@@ -368,7 +388,7 @@ export default class Form extends React.Component<FormProps, FormState> {
             return (
                 <RbForm.Group as={singleRow ? Row : undefined} key={`formInput${key}`}>
                     <Col md={width}>
-                        <RbForm.Label>{title}</RbForm.Label>
+                        <RbForm.Label>{required ? <span style={{ color: 'red' }}>* </span> : null}{title}</RbForm.Label>
                     </Col>
                     <Col xs={12} md={12 - width}>
                         {inputElement}

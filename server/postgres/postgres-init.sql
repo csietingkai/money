@@ -115,17 +115,3 @@ CREATE TABLE IF NOT EXISTS exchange_rate_record (
 	UNIQUE (currency, date),
 	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
 );
-
-CREATE TABLE IF NOT EXISTS sport_lottery_record (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	account_id uuid NOT NULL,
-	sport_type VARCHAR NOT NULL,
-	stake NUMERIC NOT NULL, --下注金額
-	odds NUMERIC NOT NULL, --賠率
-	date TIMESTAMP NOT NULL, --結果日期
-	bet_type VARCHAR NOT NULL, --盤口(大分/讓分/輸贏)
-	point_spread NUMERIC NOT NULL DEFAULT 0, --大分/讓分/輸贏, 輸贏盤預設0
-	result VARCHAR NOT NULL, -- WIN/HALF_WIN/HALF_LOSE/LOSE
-	PRIMARY KEY (id),
-	CONSTRAINT fk_account_id FOREIGN KEY (account_id) REFERENCES account(id)
-);

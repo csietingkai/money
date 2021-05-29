@@ -1,7 +1,6 @@
-import { AuthToken } from 'api/auth';
+import { AuthToken, Role } from 'api/auth';
 
 import { AUTH_TOKEN_KEY } from 'util/Constant';
-import { Role } from 'util/Enum';
 
 const setState = (key: string, value: string) => {
     localStorage.setItem(key, value);
