@@ -46,7 +46,7 @@ class App extends React.Component<AppProps, AppState> {
                             <Switch>
                                 {
                                     APP_ROUTES.map((route, idx) => {
-                                        return <Route key={`route-${idx}-${route.path}`} path={route.path} name={route.name} component={route.component} />;
+                                        return <Route key={`route-${idx}-${route.path}`} path={route.path} component={route.component} />;
                                     })
                                 }
                                 <Redirect from='/' to='/login' />

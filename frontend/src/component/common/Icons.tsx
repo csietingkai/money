@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { library } from '@fortawesome/fontawesome';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/fontawesome-free-solid';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/free-solid-svg-icons';
+import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
 library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
 

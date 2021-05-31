@@ -67,11 +67,11 @@ const app = (
     <Provider store={store}>
         <Router>
             <Switch>
-                <Route exact path='/login' name='Login Page' component={LoginPage} />
-                <Route exact path='/register' name='Register Page' component={RegisterPage} />
-                <Route exact path='/404' name='Page 404' component={Page404} />
-                <Route exact path='/500' name='Page 500' component={Page500} />
-                <Route path='/' name='Home' component={App} />
+                <Route exact path='/login' component={LoginPage} />
+                <Route exact path='/register' component={RegisterPage} />
+                <Route exact path='/404' component={Page404} />
+                <Route exact path='/500' component={Page500} />
+                <Route path='/' component={App} />
             </Switch>
         </Router>
         <ToastContainer />
