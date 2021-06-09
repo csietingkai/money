@@ -9,7 +9,7 @@ import { CheckIcon, PencilAltIcon, PlusIcon, TimesIcon, TrashAltIcon } from 'com
 import Modal from 'component/common/Modal';
 import Table from 'component/common/Table';
 
-import { getAuthTokenName, getExchangeRateList } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getExchangeRateList } from 'reducer/Selector';
 
 import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountsResponse } from 'api/account';
 import { ExchangeRate } from 'api/exchangeRate';
@@ -18,14 +18,17 @@ import { numberComma, toDateStr } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import { SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';
+import { SetAccountList } from 'reducer/Action';
+import { SetAccountListDispatcher } from 'reducer/PropsMapper';
 
 export interface AccountManagementProps {
     username: string;
     exchangeRateList: ExchangeRate[];
+    accounts: Account[];
+    setAccountList: (accounts: Account[]) => void;
 }
 
 export interface AccountManagementState {
-    accounts: Account[];
     currentAccount: Account;
     accountRecords: AccountRecord[];
     currentAccountRecord: AccountRecord;
@@ -38,7 +41,6 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     constructor(props: AccountManagementProps) {
         super(props);
         this.state = {
-            accounts: [],
             currentAccount: undefined,
             accountRecords: [],
             currentAccountRecord: undefined,
@@ -55,14 +57,15 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         const response: AccountsResponse = await AccountApi.getAccounts(username);
         const { success, data: accounts, message } = response;
         if (success) {
-            this.setState({ accounts });
+            const { setAccountList } = this.props;
+            setAccountList(accounts);
         } else {
             Notify.warning(message);
         }
     };
 
     private onAccountTableRowClick = async (selectedRow: number) => {
-        const { accounts } = this.state;
+        const { accounts } = this.props;
         const currentAccount: Account = accounts[selectedRow];
         const { id } = currentAccount;
         const resposne: AccountRecordsResponse = await AccountApi.getRecords(id);
@@ -124,7 +127,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private onAccountDeleteClick = async () => {
-        const { accounts, currentAccount } = this.state;
+        const { accounts } = this.props;
+        const { currentAccount } = this.state;
         if (currentAccount.balance !== 0) {
             Notify.warning('Balance is not ZERO, can not change currency');
             this.toggleDeleteAccountModal(currentAccount)();
@@ -144,7 +148,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private onAccountRecordIncomeClick = async () => {
-        const { accounts, currentAccount, currentAccountRecord } = this.state;
+        const { accounts } = this.props;
+        const { currentAccount, currentAccountRecord } = this.state;
         const resposne: SimpleResponse = await AccountApi.income(currentAccount.id, currentAccountRecord);
         const { success, message } = resposne;
         if (success) {
@@ -158,7 +163,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private onAccountRecordExpendClick = async () => {
-        const { accounts, currentAccount, currentAccountRecord } = this.state;
+        const { accounts } = this.props;
+        const { currentAccount, currentAccountRecord } = this.state;
         const resposne: SimpleResponse = await AccountApi.expend(currentAccount.id, currentAccountRecord);
         const { success, message } = resposne;
         if (success) {
@@ -198,7 +204,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderMainPage = (): JSX.Element => {
-        const { accounts, currentAccount, accountRecords, deleteAccountModalOpen } = this.state;
+        const { accounts } = this.props;
+        const { currentAccount, accountRecords, deleteAccountModalOpen } = this.state;
         const deleteAccountModal = (
             <Modal
                 headerText='Dedete Account'
@@ -420,8 +427,15 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
 const mapStateToProps = (state: any) => {
     return {
         username: getAuthTokenName(state),
-        exchangeRateList: getExchangeRateList(state)
+        exchangeRateList: getExchangeRateList(state),
+        accounts: getAccountList(state)
     };
 };
 
-export default connect(mapStateToProps)(AccountManagement);
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setAccountList: SetAccountListDispatcher(dispatch)
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AccountManagement);

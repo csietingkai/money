@@ -15,7 +15,7 @@ import RegisterPage from 'view/RegisterPage';
 
 // reducer
 import { getAuthToken } from 'reducer/StateHolder';
-import store, { fetchExchangeRateList, validateToken } from 'reducer/Store';
+import store, { fetchAccountList, fetchExchangeRateList, validateToken } from 'reducer/Store';
 
 // apis
 import { API_URL } from 'api/Constant';
@@ -61,6 +61,8 @@ axios.interceptors.request.use(
 store.dispatch(validateToken);
 // get exchange rate list on refresh
 store.dispatch(fetchExchangeRateList);
+// get user's accounts
+store.dispatch(fetchAccountList);
 
 const ROOT = document.querySelector('#root');
 const app = (

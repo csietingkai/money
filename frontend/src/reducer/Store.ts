@@ -1,10 +1,11 @@
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetExchangeRateList } from 'reducer/Action';
-import { getAuthToken, getAuthTokenString, getExchangeRateList } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList } from 'reducer/Action';
+import { getAccountList, getAuthToken, getAuthTokenName, getAuthTokenString, getExchangeRateList } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
+import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exchangeRate';
 
@@ -39,6 +40,22 @@ export const fetchExchangeRateList = (dispatch: any, getState: () => ExchangeRat
                 dispatch(SetExchangeRateList(data));
             } else {
                 dispatch(SetExchangeRateList([]));
+            }
+        });
+    }
+};
+
+export const fetchAccountList = (dispatch: any, getState: () => Account[]) => {
+    const tokenString: string = getAuthTokenString(getState());
+    const accountList: Account[] = getAccountList(getState());
+    if (tokenString && isArrayEmpty(accountList)) {
+        const ownerName: string = getAuthTokenName(getState());
+        AccountApi.getAccounts(ownerName).then((response: AccountsResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetAccountList(data));
+            } else {
+                dispatch(SetAccountList([]));
             }
         });
     }

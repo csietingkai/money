@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { combineReducers } from 'redux';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST } from 'reducer/ActionType';
 import { getAuthToken, setAuthToken, removeAuthToken } from 'reducer/StateHolder';
 
 import { AuthToken } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
 
 import { Action } from 'util/Interface';
+import { Account } from 'api/account';
 
 const authReducer = (state: any = { authToken: getAuthToken() }, action: Action<AuthToken>): any => {
     const newState: any = { ...state };
@@ -37,9 +38,19 @@ const exchangeRateReducer = (state: any = { list: [] }, action: Action<ExchangeR
     return newState;
 };
 
+const accountReducer = (state: any = { list: [] }, action: Action<Account[]>): any => {
+    const newState: any = { ...state };
+    const { type, payload } = action;
+    if (type === SET_ACCOUNT_LIST) {
+        newState.list = payload;
+    }
+    return newState;
+};
+
 const reducers = [
     { key: 'auth', reducer: authReducer },
-    { key: 'exchangeRate', reducer: exchangeRateReducer }
+    { key: 'exchangeRate', reducer: exchangeRateReducer },
+    { key: 'account', reducer: accountReducer }
 ];
 
 export default combineReducers(reducers.reduce((acc: any, curr: any) => {

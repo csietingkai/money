@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/free-solid-svg-icons';
 import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
+library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
 
 const Icon = (icon: IconProp) => () => <span className='icon'><FontAwesomeIcon icon={icon} /></span>;
 export const AddressCardIcon = Icon('address-card');
@@ -26,6 +26,7 @@ export const LockIcon = Icon('lock');
 export const MagicIcon = Icon('magic');
 export const MoonIcon = Icon('moon');
 export const PencilAltIcon = Icon('pencil-alt');
+export const PiggyBankIcon = Icon('piggy-bank');
 export const PlayCircleIcon = Icon('play-circle');
 export const PlusIcon = Icon('plus');
 export const SearchIcon = Icon('search');

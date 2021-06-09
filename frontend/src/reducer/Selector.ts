@@ -1,3 +1,4 @@
+import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
 
@@ -16,3 +17,7 @@ export const getStockTrackingList = (state: any): any[] => [];
 // exchangeReducer
 const getExchangeRateState = (state: any): any => state.exchangeRate;
 export const getExchangeRateList = (state: any): ExchangeRate[] => getExchangeRateState(state)?.list;
+
+// accountReducer
+const getAccountState = (state: any): any => state.account;
+export const getAccountList = (state: any): Account[] => getAccountState(state)?.list;

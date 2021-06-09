@@ -9,3 +9,6 @@ export const FILE_DOWNLOAD: string = 'FILE_DOWNLOAD';
 
 // exchange_rate
 export const SET_EXCHANGE_RATE_LIST: string = 'SET_EXCHANGE_RATE_LIST';
+
+// account
+export const SET_ACCOUNT_LIST: string = 'SET_ACCOUNT_LIST';
