@@ -2,14 +2,16 @@ import * as React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
+import Button from 'component/common/Button';
 import Card from 'component/common/Card';
+import CandleStickChart from 'component/common/chart/CandleStockChart';
+import Form from 'component/common/Form';
+import { SearchIcon } from 'component/common/Icons';
 
 import StockApi, { StockRecord } from 'api/stock';
+
 import { toDateStr } from 'util/AppUtil';
-import Form from 'component/common/Form';
 import { InputType } from 'util/Enum';
-import Button from 'component/common/Button';
-import { SearchIcon } from 'component/common/Icons';
 import Notify from 'util/Notify';
 
 export interface StockQuerierProps { }
@@ -99,9 +101,9 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                         <Card
                             title='Candle Chart'
                         >
-                            {/* <CandleStickChart
+                            <CandleStickChart
                                 data={data}
-                            /> */}
+                            />
                         </Card>
                     </Col>
                 </Row>
