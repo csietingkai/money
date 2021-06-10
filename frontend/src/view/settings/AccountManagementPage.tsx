@@ -143,6 +143,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             } else {
                 Notify.error(message);
             }
+            this.toggleDeleteAccountModal()();
         }
         await this.fetchAccounts();
     };

@@ -2,75 +2,84 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Card as RbCard, Row, Col, ProgressBar } from 'react-bootstrap';
 
-import { getAuthToken, getStockTrackingList } from 'reducer/Selector';
+import { getAccountList, getAuthToken } from 'reducer/Selector';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
 
-import Button from 'component/common/Button';
-import Card from 'component/common/Card';
 import { PiggyBankIcon } from 'component/common/Icons';
+import { numberComma, sum } from 'util/AppUtil';
+
+const ACCOUNT_CARD_AMOUNT_PER_ROW: number = 4;
 
 export interface DashBoardProps {
     authToken?: AuthToken;
+    userAccounts?: Account[];
 }
 
-export interface DashBoardState {
-    trackingList: string[];
-}
+export interface DashBoardState { }
 
 class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
 
     constructor(props: DashBoardProps) {
         super(props);
-        this.state = {
-            trackingList: []
-        };
+        this.state = {};
     }
 
-    private accountInfoCards = (accounts: Account[]): JSX.Element => {
-        return (
-            <RbCard>
-                <RbCard.Body>
-                    <div className="h1 text-muted text-right mb-2">
-                        <PiggyBankIcon />
-                    </div>
-                    <div className="h4 mb-0">rrr</div>
-                    <small className="text-muted text-uppercase font-weight-bold">RRR</small>
-                    <ProgressBar now={20} />
-                </RbCard.Body>
-            </RbCard>
-        );
+    private accountInfoCards = (accounts: Account[]) => {
+        const allBalance: number = sum(accounts.map(x => x.balance));
+        const cards: JSX.Element[] = accounts.map(x => {
+            let variant: string = 'danger';
+            let percent: number = 0;
+            if (allBalance !== 0) {
+                percent = x.balance / allBalance * 100;
+                if (percent >= 50) {
+                    variant = 'success';
+                } else if (percent >= 25) {
+                    variant = 'warning';
+                }
+            }
+            return (
+                <RbCard key={`dashboard-account-card-${x.name}`}>
+                    <RbCard.Body className='clearfix p-3'>
+                        <div className='clearfix'>
+                            <h1 className='float-left display-4 mr-4'><PiggyBankIcon className={`bg-${variant} p-3`} /></h1>
+                            <h3 className={`mb-0 text-${variant} mt-2`}>{`$${numberComma(x.balance)}`}</h3>
+                            <p className='text-muted text-uppercase font-weight-bold font-xs'>{x.name}</p>
+                            <ProgressBar now={percent} label={`${percent}%`} variant={variant} />
+                        </div>
+                    </RbCard.Body>
+                </RbCard>
+            );
+        });
+        const cardGroups: JSX.Element[][] = [];
+        while (cards.length) cardGroups.push(cards.splice(0, ACCOUNT_CARD_AMOUNT_PER_ROW));
+
+        return cardGroups.map((group, gIdx) => (
+            <Row key={`dashboard-account-row-${gIdx}`}>
+                {group.map((card, cIdx) => (
+                    <Col xs="12" sm="6" lg="3" key={`dashboard-account-col-${cIdx}`}>
+                        {card}
+                    </Col>
+                ))}
+            </Row>
+        ));
     };
 
     render() {
-        const { authToken } = this.props;
-        const { trackingList } = this.state;
-        if (!authToken) {
-            return (
-                <Card
-                    title='INFO'
-                    textCenter
-                >
-                    <Row>
-                        <Col>
-                            <h2>{'Login For More Information'}</h2>
-                        </Col>
-                    </Row>
-                </Card>
-            );
-        }
-        return <><Button onClick={
-            async () => {
-
-            }}>RRR</Button></>;
+        const { userAccounts } = this.props;
+        return (
+            <div className='animated fadeIn'>
+                {this.accountInfoCards(userAccounts)}
+            </div>
+        );
     }
 }
 
 const mapStateToProps = (state: any) => {
     return {
         authToken: getAuthToken(state),
-        // userStockTrackingList: getStockTrackingList(state)
+        userAccounts: getAccountList(state)
     };
 };
 

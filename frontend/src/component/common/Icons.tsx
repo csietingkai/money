@@ -5,7 +5,7 @@ import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
 library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
 
-const Icon = (icon: IconProp) => () => <span className='icon'><FontAwesomeIcon icon={icon} /></span>;
+const Icon = (icon: IconProp) => (props?: { className?: string; }) => <span className={`icon ${props?.className}`}><FontAwesomeIcon icon={icon} /></span>;
 export const AddressCardIcon = Icon('address-card');
 export const AngleDownIcon = Icon('angle-down');
 export const AngleUpIcon = Icon('angle-up');

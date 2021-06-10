@@ -6,14 +6,16 @@ import { RouteChildrenProps } from 'react-router-dom';
 import { LockIcon, UserIcon } from 'component/common/Icons';
 
 import { removeAuthToken } from 'reducer/StateHolder';
-import { LoginDispatcher } from 'reducer/PropsMapper';
+import { LoginDispatcher, SetAccountListDispatcher } from 'reducer/PropsMapper';
 
+import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
 import Notify from 'util/Notify';
 
 export interface LoginPageProps extends RouteChildrenProps<any> {
     login: (authToken: AuthToken) => void;
+    setAccountList: (accounts: Account[]) => void;
 }
 
 export interface LoginPageState {
@@ -43,6 +45,11 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
         const { success, data, message } = response;
         if (success) {
             this.props.login(data);
+            const response2: AccountsResponse = await AccountApi.getAccounts(data.name);
+            const { success: success2, data: data2 } = response2;
+            if (success2) {
+                this.props.setAccountList(data2);
+            }
             Notify.success(message);
             this.setState({ username: '', password: '' });
         } else {
@@ -53,7 +60,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
 
     private onRegisterClick = () => {
         window.location.replace('/#/register');
-    }
+    };
 
     render() {
         const { username, password } = this.state;
@@ -117,7 +124,8 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        login: LoginDispatcher(dispatch)
+        login: LoginDispatcher(dispatch),
+        setAccountList: SetAccountListDispatcher(dispatch)
     };
 };
 
