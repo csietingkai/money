@@ -33,18 +33,21 @@ export const NOTIFICATION_DEFAULT_CONFIG: ToastOptions = {
 export const SIDEBAR_ITEMS: SidebarItem[] = [
     {
         name: 'Dashboard',
+        level: 0,
         url: '/dashboard',
         icon: TachometerAltIcon(),
         component: DashBoard
     },
     {
         name: 'Investment',
+        level: 0,
         url: '/investment',
         type: 'dropdown',
         icon: HandHoldingUsdIcon(),
         children: [
             {
                 name: 'Stock Querier',
+                level: 1,
                 url: '/stockQuerier',
                 icon: ChartLineIcon(),
                 component: StockQuerier
@@ -53,18 +56,21 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
     },
     {
         name: 'Settings',
+        level: 0,
         url: '/setting',
         type: 'dropdown',
         icon: CogsIcon(),
         children: [
             {
                 name: 'Account Management',
+                level: 1,
                 url: '/account',
                 icon: UserIcon(),
                 component: AccountManagementPage
             },
             {
                 name: 'Personal Setting',
+                level: 1,
                 url: 'personalSetting',
                 icon: CogIcon(),
                 component: PersonalSettingPage

@@ -40,7 +40,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
 
     private navList = (items: SidebarItem[]) => {
         return !isArrayEmpty(items) && items.map((item, idx) => {
-            const { type } = item;
+            const { type, level } = item;
             const key: React.Key = `sidebar-item-${idx}`;
             if (type === 'dropdown') {
                 if (isArray(item.children)) {
@@ -50,7 +50,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
                     return (
                         <li key={key} className={this.activeRoute(item.url)}>
                             <a className='nav-link nav-dropdown-toggle' href='#' onClick={this.handleClick}>
-                                <span className='icon'>{item.icon}</span>
+                                <span className={`icon ${level ? `ml-${level}` : ''}`}>{item.icon}</span>
                                 {item.name}
                             </a>
                             <ul className='nav-dropdown-items'>
@@ -69,7 +69,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
     };
 
     private navLink = (item: SidebarItem, key: React.Key, classes: any) => {
-        const url = item.url ? item.url : '';
+        const { url, level } = item;
         const { authToken } = this.props;
         if (!authToken) {
             return null;
@@ -78,12 +78,12 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
             <NavItem key={key}>
                 {isExternalUrl(url) ?
                     <RbNavLink href={url} active className={classes.link}>
-                        <span className='icon'>{item.icon}</span>
+                        <span className={`icon ${level ? `ml-${level}` : ''}`}>{item.icon}</span>
                         {item.name}
                     </RbNavLink>
                     :
                     <NavLink to={url} activeClassName='active' className={classes.link} onClick={this.hideMobile}>
-                        <span className='icon'>{item.icon}</span>
+                        <span className={`icon ${level ? `ml-${level}` : ''}`}>{item.icon}</span>
                         {item.name}
                     </NavLink>
                 }

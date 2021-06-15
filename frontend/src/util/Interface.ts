@@ -28,6 +28,7 @@ export interface SimpleResponse {
 // component/layout
 export interface SidebarItem {
     name: string;
+    level: number;
     type?: 'dropdown' | 'wrapper' | 'divider';
     url?: string;
     icon?: JSX.Element;
