@@ -282,7 +282,7 @@ export default class Form extends React.Component<FormProps, FormState> {
                                     name={`radio-${key}`}
                                     label={record.value}
                                     inline={inline}
-                                    checked={value[record.key]}
+                                    checked={value === record.key}
                                     onChange={onFormRadioChange(record.key)}
                                     disabled={disabled}
                                 />

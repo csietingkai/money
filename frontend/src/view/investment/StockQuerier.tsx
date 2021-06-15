@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
+import { getStockStyle } from 'reducer/Selector';
+
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import CandleStickChart from 'component/common/chart/CandleStockChart';
@@ -11,10 +13,12 @@ import { SearchIcon } from 'component/common/Icons';
 import StockApi, { StockRecord } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
-import { InputType } from 'util/Enum';
+import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
 
-export interface StockQuerierProps { }
+export interface StockQuerierProps {
+    stockStyle: StockStyle;
+}
 
 export interface StockQuerierState {
     queryCondition: { code: string, start: Date, end: Date; };
@@ -61,6 +65,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     };
 
     render() {
+        const { stockStyle } = this.props;
         const { queryCondition, stockName, xAxis, data } = this.state;
         return (
             <div className='animated fadeIn'>
@@ -102,6 +107,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                             title='Candle Chart'
                         >
                             <CandleStickChart
+                                stockStyle={stockStyle}
                                 data={data}
                             />
                         </Card>
@@ -112,8 +118,10 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     }
 }
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = (state: any) => {
+    return {
+        stockStyle: getStockStyle(state)
+    };
 };
 
 export default connect(mapStateToProps)(StockQuerier);

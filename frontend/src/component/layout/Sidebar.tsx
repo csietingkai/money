@@ -44,7 +44,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
             const key: React.Key = `sidebar-item-${idx}`;
             if (type === 'dropdown') {
                 if (isArray(item.children)) {
-                    if (item.needAuth && !this.props.authToken) {
+                    if (!this.props.authToken) {
                         return null;
                     }
                     return (
@@ -71,13 +71,12 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
     private navLink = (item: SidebarItem, key: React.Key, classes: any) => {
         const url = item.url ? item.url : '';
         const { authToken } = this.props;
-        const { needAuth } = item;
-        if (needAuth && !authToken) {
+        if (!authToken) {
             return null;
         }
         return (
             <NavItem key={key}>
-                { isExternalUrl(url) ?
+                {isExternalUrl(url) ?
                     <RbNavLink href={url} active className={classes.link}>
                         <span className='icon'>{item.icon}</span>
                         {item.name}

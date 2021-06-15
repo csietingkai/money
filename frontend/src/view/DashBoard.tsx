@@ -58,7 +58,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         return cardGroups.map((group, gIdx) => (
             <Row key={`dashboard-account-row-${gIdx}`}>
                 {group.map((card, cIdx) => (
-                    <Col xs="12" sm="6" lg="3" key={`dashboard-account-col-${cIdx}`}>
+                    <Col xs='12' sm='6' lg='3' key={`dashboard-account-col-${cIdx}`}>
                         {card}
                     </Col>
                 ))}

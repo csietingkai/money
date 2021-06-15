@@ -1,8 +1,8 @@
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList } from 'reducer/Action';
-import { getAccountList, getAuthToken, getAuthTokenName, getAuthTokenString, getExchangeRateList } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetStockStyle } from 'reducer/Action';
+import { getAccountList, getAuthToken, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
@@ -10,6 +10,7 @@ import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exchangeRate';
 
 import { isArrayEmpty } from 'util/AppUtil';
+import { StockStyle } from 'util/Enum';
 
 export const validateToken = (dispatch: any, getState: () => any) => {
     const tokenString: string = getAuthTokenString(getState());
@@ -59,6 +60,10 @@ export const fetchAccountList = (dispatch: any, getState: () => Account[]) => {
             }
         });
     }
+};
+
+export const setStockStyle = (dispatch: any, getState: () => StockStyle) => {
+    dispatch(SetStockStyle(getStockStyle(getState())));
 };
 
 const store = createStore<any, any, any, any>(rootReducer, applyMiddleware(thunkMiddleware));

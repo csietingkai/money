@@ -19,3 +19,8 @@ export enum InputType {
     date = 'date',
     datetime = 'datetime'
 }
+
+export enum StockStyle {
+    US = 'US',
+    TW = 'TW'
+}

@@ -27,6 +27,7 @@ import Notify from 'util/Notify';
 // css
 import 'bootstrap/dist/css/bootstrap.css';
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+import 'flag-icon-css/css/flag-icon.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import 'assets/scss/style.scss';
 

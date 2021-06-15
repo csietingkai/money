@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faAngleDown, faAngleUp, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCog, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/free-solid-svg-icons';
 import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
+library.add(faAddressCard, faAngleUp, faAngleDown, faBolt, faBoxes, faChartLine, faChartPie, faCheck, faCog, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall);
 
 const Icon = (icon: IconProp) => (props?: { className?: string; }) => <span className={`icon ${props?.className}`}><FontAwesomeIcon icon={icon} /></span>;
 export const AddressCardIcon = Icon('address-card');
@@ -14,6 +14,7 @@ export const BoxesIcon = Icon('boxes');
 export const ChartLineIcon = Icon('chart-line');
 export const ChartPieIcon = Icon('chart-pie');
 export const CheckIcon = Icon('check');
+export const CogIcon = Icon('cog');
 export const CogsIcon = Icon('cogs');
 export const ExclamationCircleIcon = Icon('exclamation-circle');
 export const HandHoldingUsdIcon = Icon('hand-holding-usd');
@@ -43,3 +44,7 @@ export const TrashAltIcon = Icon('trash-alt');
 export const UserIcon = Icon('user');
 export const UserPlusIcon = Icon('user-plus');
 export const VolleyBallIcon = Icon('volleyball-ball');
+
+const Flag = (countryCode: string) => (props?: { className?: string; }) => <i className={`flag-icon flag-icon-${countryCode}`} title={countryCode} id={countryCode}></i>;
+export const TwFlag = Flag('tw');
+export const UsFlag = Flag('us');

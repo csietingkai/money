@@ -1,6 +1,7 @@
 import { AuthToken, Role } from 'api/auth';
 
-import { AUTH_TOKEN_KEY } from 'util/Constant';
+import { AUTH_TOKEN_KEY, STOCK_STYLE_KEY } from 'util/Constant';
+import { StockStyle } from 'util/Enum';
 
 const setState = (key: string, value: string) => {
     localStorage.setItem(key, value);
@@ -35,4 +36,20 @@ export const getAuthToken = (): AuthToken => {
 
 export const removeAuthToken = () => {
     removeState(AUTH_TOKEN_KEY);
+};
+
+export const getStockStyle = (): StockStyle => {
+    const style = getState(STOCK_STYLE_KEY);
+    if (StockStyle.US === style) {
+        return StockStyle.US;
+    } else if (StockStyle.TW === style) {
+        return StockStyle.TW;
+    } else {
+        setStockStyle(StockStyle.US);
+        return StockStyle.US;
+    }
+};
+
+export const setStockStyle = (style: StockStyle) => {
+    setState(STOCK_STYLE_KEY, style);
 };

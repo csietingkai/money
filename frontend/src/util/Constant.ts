@@ -1,6 +1,6 @@
 import { ToastOptions, ToastPosition } from 'react-toastify';
 
-import { ChartLineIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
+import { ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
@@ -8,10 +8,12 @@ import DashBoard from 'view/DashBoard';
 import { isArrayEmpty } from 'util/AppUtil';
 import { Record, SidebarItem } from 'util/Interface';
 import StockQuerier from 'view/investment/StockQuerier';
+import PersonalSettingPage from 'view/settings/PersonalSettingPage';
 
 
 // localStorage
 export const AUTH_TOKEN_KEY: string = 'AUTH_TOKEN';
+export const STOCK_STYLE_KEY: string = 'STOCK_STYLE';
 
 // notify position
 export const NOTIFICATION_POSTITION: ToastPosition = 'bottom-right';
@@ -33,22 +35,19 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         name: 'Dashboard',
         url: '/dashboard',
         icon: TachometerAltIcon(),
-        component: DashBoard,
-        needAuth: false
+        component: DashBoard
     },
     {
         name: 'Investment',
         url: '/investment',
         type: 'dropdown',
         icon: HandHoldingUsdIcon(),
-        needAuth: true,
         children: [
             {
                 name: 'Stock Querier',
                 url: '/stockQuerier',
                 icon: ChartLineIcon(),
-                component: StockQuerier,
-                needAuth: true
+                component: StockQuerier
             }
         ]
     },
@@ -57,14 +56,18 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         url: '/setting',
         type: 'dropdown',
         icon: CogsIcon(),
-        needAuth: true,
         children: [
             {
                 name: 'Account Management',
                 url: '/account',
                 icon: UserIcon(),
-                component: AccountManagementPage,
-                needAuth: true
+                component: AccountManagementPage
+            },
+            {
+                name: 'Personal Setting',
+                url: 'personalSetting',
+                icon: CogIcon(),
+                component: PersonalSettingPage
             }
         ]
     }

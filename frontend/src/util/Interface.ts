@@ -33,5 +33,4 @@ export interface SidebarItem {
     icon?: JSX.Element;
     children?: SidebarItem[];
     component?: React.ComponentType<any>;
-    needAuth: boolean;
 }

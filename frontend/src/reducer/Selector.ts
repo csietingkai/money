@@ -1,6 +1,7 @@
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
+import { StockStyle } from 'util/Enum';
 
 // authReducer
 const getAuthState = (state: any): any => state.auth;
@@ -21,3 +22,7 @@ export const getExchangeRateList = (state: any): ExchangeRate[] => getExchangeRa
 // accountReducer
 const getAccountState = (state: any): any => state.account;
 export const getAccountList = (state: any): Account[] => getAccountState(state)?.list;
+
+// system variable
+const getSystemSetting = (state: any): any => state.setting;
+export const getStockStyle = (state: any): StockStyle => getSystemSetting(state)?.stockStyle;
