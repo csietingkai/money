@@ -18,7 +18,7 @@ import lombok.Data;
 public class UserTrackingStock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private String userName;
-	private String stockCode;
+	protected UUID id;
+	protected String userName;
+	protected String stockCode;
 }

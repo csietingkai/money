@@ -19,9 +19,9 @@ import lombok.Data;
 public class Account {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private String name;
-	private String ownerName;
-	private String currency;
-	private BigDecimal balance;
+	protected UUID id;
+	protected String name;
+	protected String ownerName;
+	protected String currency;
+	protected BigDecimal balance;
 }

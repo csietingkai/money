@@ -19,10 +19,10 @@ import lombok.Data;
 public class AccountRecord {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private LocalDateTime transDate;
-	private BigDecimal transAmount;
-	private UUID transFrom;
-	private UUID transTo;
-	private String description;
+	protected UUID id;
+	protected LocalDateTime transDate;
+	protected BigDecimal transAmount;
+	protected UUID transFrom;
+	protected UUID transTo;
+	protected String description;
 }

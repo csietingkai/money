@@ -12,6 +12,6 @@ import lombok.Data;
 @Table(name = DatabaseConstants.TABLE_EXCHANGE_RATE)
 public class ExchangeRate {
 	@Id
-	private String currency;
-	private String name;
+	protected String currency;
+	protected String name;
 }

@@ -20,12 +20,12 @@ import lombok.Data;
 public class StockRecord {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private String code;
-	private LocalDateTime dealDate;
-	private BigDecimal dealShare;
-	private BigDecimal openPrice;
-	private BigDecimal highPrice;
-	private BigDecimal lowPrice;
-	private BigDecimal closePrice;
+	protected UUID id;
+	protected String code;
+	protected LocalDateTime dealDate;
+	protected BigDecimal dealShare;
+	protected BigDecimal openPrice;
+	protected BigDecimal highPrice;
+	protected BigDecimal lowPrice;
+	protected BigDecimal closePrice;
 }

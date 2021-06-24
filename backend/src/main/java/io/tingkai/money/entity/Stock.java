@@ -22,16 +22,16 @@ import lombok.Data;
 public class Stock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
+	protected UUID id;
 	@Column(unique = true)
-	private String code;
-	private String name;
+	protected String code;
+	protected String name;
 	@Column(unique = true)
-	private String isinCode;
-	private LocalDateTime offeringDate;
+	protected String isinCode;
+	protected LocalDateTime offeringDate;
 	@Enumerated(EnumType.STRING)
-	private MarketType marketType;
-	private String industryType;
-	private String cfiCode;
-	private String description;
+	protected MarketType marketType;
+	protected String industryType;
+	protected String cfiCode;
+	protected String description;
 }

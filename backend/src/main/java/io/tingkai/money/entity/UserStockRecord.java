@@ -22,14 +22,14 @@ import lombok.Data;
 public class UserStockRecord {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private UUID userStockId;
-	private UUID accountId;
+	protected UUID id;
+	protected UUID userStockId;
+	protected UUID accountId;
 	@Enumerated(EnumType.STRING)
-	private DealType type;
-	private LocalDateTime date;
-	private BigDecimal share;
-	private BigDecimal price;
-	private BigDecimal fee;
-	private BigDecimal tax;
+	protected DealType type;
+	protected LocalDateTime date;
+	protected BigDecimal share;
+	protected BigDecimal price;
+	protected BigDecimal fee;
+	protected BigDecimal tax;
 }

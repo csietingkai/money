@@ -21,12 +21,12 @@ import lombok.Data;
 public class ExchangeRateRecord {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
+	protected UUID id;
 	@Column(unique = true)
-	private String currency;
-	private LocalDateTime date;
-	private BigDecimal cashBuy;
-	private BigDecimal cashSell;
-	private BigDecimal spotBuy;
-	private BigDecimal spotSell;
+	protected String currency;
+	protected LocalDateTime date;
+	protected BigDecimal cashBuy;
+	protected BigDecimal cashSell;
+	protected BigDecimal spotBuy;
+	protected BigDecimal spotSell;
 }

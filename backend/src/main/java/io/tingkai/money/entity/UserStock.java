@@ -19,8 +19,8 @@ import lombok.Data;
 public class UserStock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private String userName;
-	private String stockCode;
-	private BigDecimal amount;
+	protected UUID id;
+	protected String userName;
+	protected String stockCode;
+	protected BigDecimal amount;
 }

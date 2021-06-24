@@ -21,13 +21,13 @@ import lombok.Data;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
+	protected UUID id;
 	@Column(unique = true)
-	private String name;
+	protected String name;
 	@Column(unique = true)
-	private String email;
-	private String pwd;
+	protected String email;
+	protected String pwd;
 	@Enumerated(EnumType.STRING)
-	private Role role;
-	private boolean confirm;
+	protected Role role;
+	protected boolean confirm;
 }
