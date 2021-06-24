@@ -25,9 +25,14 @@ public class StockFacade {
 	@Autowired
 	private StockDao stockDao;
 
-	public List<Stock> queryAll() throws QueryNotResultException {
+	public List<Stock> queryAll(boolean sort) throws QueryNotResultException {
 		List<Stock> entities = new ArrayList<Stock>();
-		Iterable<Stock> iterable = this.stockDao.findAll();
+		Iterable<Stock> iterable;
+		if (sort) {
+			iterable = this.stockDao.findAllByOrderByCode();
+		} else {
+			iterable = this.stockDao.findAll();
+		}
 		iterable.forEach(entities::add);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);

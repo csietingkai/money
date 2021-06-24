@@ -20,6 +20,7 @@ import { SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';
 import { SetAccountList } from 'reducer/Action';
 import { SetAccountListDispatcher } from 'reducer/PropsMapper';
+import Loading from 'component/common/Loading';
 
 export interface AccountManagementProps {
     username: string;
@@ -30,6 +31,7 @@ export interface AccountManagementProps {
 
 export interface AccountManagementState {
     currentAccount: Account;
+    recordFetched: boolean;
     accountRecords: AccountRecord[];
     currentAccountRecord: AccountRecord;
     deleteAccountModalOpen: boolean;
@@ -42,6 +44,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         super(props);
         this.state = {
             currentAccount: undefined,
+            recordFetched: false,
             accountRecords: [],
             currentAccountRecord: undefined,
             deleteAccountModalOpen: false
@@ -65,12 +68,13 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private onAccountTableRowClick = async (selectedRow: number) => {
+        this.setState({ recordFetched: false });
         const { accounts } = this.props;
         const currentAccount: Account = accounts[selectedRow];
         const { id } = currentAccount;
         const resposne: AccountRecordsResponse = await AccountApi.getRecords(id);
         const accountRecords: AccountRecord[] = resposne.data || [];
-        this.setState({ currentAccount, accountRecords });
+        this.setState({ currentAccount, accountRecords, recordFetched: true });
     };
 
     private toPage = (page?: 'account-create' | 'account-edit' | 'record-income' | 'record-expend') => {
@@ -206,7 +210,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
 
     private renderMainPage = (): JSX.Element => {
         const { accounts } = this.props;
-        const { currentAccount, accountRecords, deleteAccountModalOpen } = this.state;
+        const { currentAccount, recordFetched, accountRecords, deleteAccountModalOpen } = this.state;
         const deleteAccountModal = (
             <Modal
                 headerText='Dedete Account'
@@ -237,7 +241,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                             </div>
                             <Table
                                 id='account'
-                                header={['name', 'ownerName', 'currency', 'balance', 'functions']}
+                                header={['name', 'currency', 'balance', 'functions']}
                                 data={accounts}
                                 selectedRow={accounts.findIndex(x => x.id === currentAccount?.id)}
                                 onRowClick={this.onAccountTableRowClick}
@@ -251,9 +255,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                                 <Button size='sm' variant='danger' outline onClick={this.toggleDeleteAccountModal(rowData)}><TrashAltIcon /></Button>
                                             </>
                                         );
-                                    } else {
-                                        return rowData[header];
                                     }
+                                    return rowData[header];
                                 }}
                             />
                         </Card>
@@ -284,23 +287,27 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                         {' Expend'}
                                     </Button>
                                 </div>
-                                <Table
-                                    id='account-record'
-                                    header={['transDate', 'transAmount', 'transFrom', 'transTo', 'description']}
-                                    data={accountRecords}
-                                    columnConverter={(header: string, rowData: any) => {
-                                        if (header === 'transDate') {
-                                            return toDateStr(rowData[header]);
-                                        } else if (header === 'transAmount') {
-                                            return numberComma(rowData[header]);
-                                        } else if (['transFrom', 'transTo'].indexOf(header) >= 0) {
-                                            if (rowData.transFrom === rowData.transTo) {
-                                                return "";
-                                            }
-                                        }
-                                        return rowData[header];
-                                    }}
-                                />
+                                {
+                                    recordFetched ?
+                                        <Table
+                                            id='account-record'
+                                            header={['transDate', 'transAmount', 'transFrom', 'transTo', 'description']}
+                                            data={accountRecords}
+                                            columnConverter={(header: string, rowData: any) => {
+                                                if (header === 'transDate') {
+                                                    return toDateStr(rowData[header]);
+                                                } else if (header === 'transAmount') {
+                                                    return numberComma(rowData[header]);
+                                                } else if (['transFrom', 'transTo'].indexOf(header) >= 0) {
+                                                    if (rowData.transFrom === rowData.transTo) {
+                                                        return '';
+                                                    }
+                                                }
+                                                return rowData[header];
+                                            }}
+                                        />
+                                        : <Loading />
+                                }
                             </Card>
                         </Col>
                     </Row>
@@ -361,7 +368,6 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderAccountRecordFormPage = (): JSX.Element => {
-        const { username, exchangeRateList } = this.props;
         const { currentAccountRecord, page } = this.state;
         return (
             <div className='animated fadeIn'>

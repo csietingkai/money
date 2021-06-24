@@ -104,12 +104,12 @@ public class StockRecordFacade {
 		return this.stockRecordDao.count();
 	}
 
-	public StockRecord lastestRecord(String code) {
+	public StockRecord latestRecord(String code) throws QueryNotResultException {
 		Optional<StockRecord> optional = this.stockRecordDao.findFirstByCodeOrderByDealDateDesc(code);
 		if (optional.isPresent()) {
 			return optional.get();
 		} else {
-			return null;
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
 		}
 	}
 }

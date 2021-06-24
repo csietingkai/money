@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { API_URL, STOCK_GET_PATH, STOCK_GET_RECORDS_PATH, STOCK_REFRESH_PATH } from 'api/Constant';
+import { STOCK_GET_ALL_PATH, STOCK_GET_PATH, STOCK_GET_RECORDS_PATH, STOCK_LATEST_RECORD_PATH, STOCK_REFRESH_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
@@ -23,6 +23,10 @@ export interface Stock {
     description: string;
 }
 
+export interface StockVo extends Stock {
+    updateTime: Date;
+}
+
 export interface StockRecord {
     id: string;
     code: string;
@@ -34,16 +38,28 @@ export interface StockRecord {
     closePrice: number;
 }
 
-export interface StockResponse extends ApiResponse<Stock> { }
-export interface StockListResponse extends ApiResponse<Stock[]> { }
+export interface StockResponse extends ApiResponse<StockVo> { }
+export interface StockListResponse extends ApiResponse<StockVo[]> { }
 export interface StockRecordResponse extends ApiResponse<StockRecord> { }
 export interface StockRecordListResponse extends ApiResponse<StockRecord[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
 
+const getAll = async (sort: boolean = true) => {
+    const response = await axios.get(STOCK_GET_ALL_PATH, { params: { sort } });
+    const data: StockListResponse = response.data;
+    if (data.success) {
+        data.data = data.data.map(x => ({ ...x, offeringDate: toDate(x.offeringDate), updateTime: toDate(x.updateTime, toDate(x.offeringDate)) }));
+    }
+    return data;
+};
+
 const get = async (code: string) => {
     const response = await axios.get(STOCK_GET_PATH, { params: { code } });
     const data: StockResponse = response.data;
+    if (data.success) {
+        data.data = { ...data.data, offeringDate: toDate(data.data.offeringDate), updateTime: toDate(data.data.updateTime) };
+    }
     return data;
 };
 
@@ -56,9 +72,18 @@ const getRecords = async (code: string, start: Date, end: Date) => {
     return data;
 };
 
+const latestRecord = async (code: string) => {
+    const response = await axios.get(STOCK_LATEST_RECORD_PATH, { params: { code } });
+    const data: StockRecordResponse = response.data;
+    if (data.success) {
+        data.data = { ...data.data, dealDate: toDate(data.data.dealDate) };
+    }
+    return data;
+};
+
 const refresh = async (code: string) => {
     const response = await axios.post(STOCK_REFRESH_PATH, null, { params: { code }, timeout: REFRESH_STOCK_MAX_TIME });
     const data: SimpleResponse = response.data;
     return data;
 };
-export default { get, getRecords, refresh };
+export default { getAll, get, getRecords, latestRecord, refresh };

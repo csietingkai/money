@@ -198,7 +198,7 @@ public class PythonFetcherService {
 	public boolean fetchStockRecord(String code) {
 		List<Stock> list = new ArrayList<Stock>();
 		try {
-			list = this.stockFacade.queryAll();
+			list = this.stockFacade.queryAll(false);
 		} catch (QueryNotResultException e) {
 			log.warn(e.getMessage());
 		}
@@ -206,7 +206,12 @@ public class PythonFetcherService {
 		if (stockOptional.isPresent()) {
 			Stock stock = stockOptional.get();
 			LocalDateTime target = stock.getOfferingDate();
-			StockRecord lastestRecord = this.stockRecordFacade.lastestRecord(stock.getCode());
+			StockRecord lastestRecord = null;
+			try {
+				lastestRecord = this.stockRecordFacade.latestRecord(stock.getCode());
+			} catch (QueryNotResultException e) {
+				e.printStackTrace();
+			}
 			if (AppUtil.isPresent(lastestRecord)) {
 				target = lastestRecord.getDealDate();
 				target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);

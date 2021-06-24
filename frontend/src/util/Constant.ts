@@ -1,6 +1,6 @@
 import { ToastOptions, ToastPosition } from 'react-toastify';
 
-import { ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
+import { CalendarAltIcon, ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
@@ -9,6 +9,7 @@ import { isArrayEmpty } from 'util/AppUtil';
 import { Record, SidebarItem } from 'util/Interface';
 import StockQuerier from 'view/investment/StockQuerier';
 import PersonalSettingPage from 'view/settings/PersonalSettingPage';
+import StockRecordUpdater from 'view/investment/StockRecordUpdater';
 
 
 // localStorage
@@ -51,6 +52,13 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 url: '/stockQuerier',
                 icon: ChartLineIcon(),
                 component: StockQuerier
+            },
+            {
+                name: 'Stock Updater',
+                level: 1,
+                url: '/stockUpdater',
+                icon: CalendarAltIcon(),
+                component: StockRecordUpdater
             }
         ]
     },

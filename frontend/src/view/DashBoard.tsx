@@ -44,9 +44,9 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
                     <RbCard.Body className='clearfix p-3'>
                         <div className='clearfix'>
                             <h1 className='float-left display-4 mr-4'><PiggyBankIcon className={`bg-${variant} p-3`} /></h1>
-                            <h3 className={`mb-0 text-${variant} mt-2`}>{`$${numberComma(x.balance)}`}</h3>
+                            <h2 className={`mb-0 text-${variant} mt-2`}>{`$${numberComma(x.balance)}`}</h2>
                             <p className='text-muted text-uppercase font-weight-bold font-xs'>{x.name}</p>
-                            <ProgressBar now={percent} label={`${percent}%`} variant={variant} />
+                            <ProgressBar now={percent} label={`${percent.toFixed(2)}%`} variant={variant} />
                         </div>
                     </RbCard.Body>
                 </RbCard>
