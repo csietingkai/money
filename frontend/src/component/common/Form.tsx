@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Col, Form as RbForm, Row } from 'react-bootstrap';
 import * as moment from 'moment';
 
-import { getValueByKeys, isNumber, toNumber } from 'util/AppUtil';
+import { getValueByKeys, toNumber } from 'util/AppUtil';
 import { DivWidth, InputType } from 'util/Enum';
 import { Record } from 'util/Interface';
 
@@ -188,7 +188,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         }
     };
 
-    render() {
+    render(): JSX.Element {
         const { singleRow, inputs } = this.props;
 
         const formGroups = inputs.map((input: Input) => {

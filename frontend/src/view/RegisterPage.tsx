@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { Button, Card, CardGroup, Col, Container, FormControl, InputGroup, Row } from 'react-bootstrap';
 import { RouteChildrenProps } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { LoginDispatcher } from 'reducer/PropsMapper';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
 import Notify from 'util/Notify';
+import { Action } from 'util/Interface';
 
 export interface RegisterPageProps extends RouteChildrenProps<any> {
     login: (authToken: AuthToken) => void;
@@ -81,32 +83,32 @@ class RegisterPage extends React.Component<RegisterPageProps, RegisterPageState>
                                         <InputGroup className="mb-3">
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>
-                                                    <UserIcon/>
+                                                    <UserIcon />
                                                 </InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="text" placeholder="Username" value={username} onChange={this.onFormFieldChange('username')}/>
+                                            <FormControl type="text" placeholder="Username" value={username} onChange={this.onFormFieldChange('username')} />
                                         </InputGroup>
                                         <InputGroup className="mb-3">
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>@</InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="text" placeholder="Email" value={email} onChange={this.onFormFieldChange('email')}/>
+                                            <FormControl type="text" placeholder="Email" value={email} onChange={this.onFormFieldChange('email')} />
                                         </InputGroup>
                                         <InputGroup className="mb-3">
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>
-                                                    <LockIcon/>
+                                                    <LockIcon />
                                                 </InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="password" placeholder="Password" value={password} onChange={this.onFormFieldChange('password')}/>
+                                            <FormControl type="password" placeholder="Password" value={password} onChange={this.onFormFieldChange('password')} />
                                         </InputGroup>
                                         <InputGroup className="mb-4">
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>
-                                                <LockIcon/>
+                                                    <LockIcon />
                                                 </InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="password" placeholder="Repeat password" value={confirmPassword} onChange={this.onFormFieldChange('confirmPassword')}/>
+                                            <FormControl type="password" placeholder="Repeat password" value={confirmPassword} onChange={this.onFormFieldChange('confirmPassword')} />
                                         </InputGroup>
                                         <Button color="success" block onClick={this.onRegisterClick}>Create Account</Button>
                                     </Card.Body>
@@ -120,11 +122,11 @@ class RegisterPage extends React.Component<RegisterPageProps, RegisterPageState>
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = () => {
     return {};
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<AuthToken>>) => {
     return {
         login: LoginDispatcher(dispatch)
     };

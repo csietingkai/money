@@ -91,7 +91,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
         );
     };
 
-    render() {
+    render(): JSX.Element {
         return (
             <div className='sidebar'>
                 <nav className='sidebar-nav'>

@@ -47,6 +47,6 @@ export const UserIcon = Icon('user');
 export const UserPlusIcon = Icon('user-plus');
 export const VolleyBallIcon = Icon('volleyball-ball');
 
-const Flag = (countryCode: string) => (props?: { className?: string; }) => <i className={`flag-icon flag-icon-${countryCode}`} title={countryCode} id={countryCode}></i>;
+const Flag = (countryCode: string) => (props?: { className?: string; }) => <i className={`flag-icon flag-icon-${countryCode} ${props?.className}`} title={countryCode} id={countryCode}></i>;
 export const TwFlag = Flag('tw');
 export const UsFlag = Flag('us');

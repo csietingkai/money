@@ -24,7 +24,6 @@ public class StockController {
 
 	public static final String CONROLLER_PREFIX = "/stock";
 	public static final String GET_ALL_PATH = "/getAll";
-	public static final String GET_PATH = "/get";
 	public static final String GET_RECORDS_PATH = "/getRecords";
 	public static final String LATEST_RECORD_PATH = "/latestRecord";
 	public static final String REFRESH_PATH = "/refresh";

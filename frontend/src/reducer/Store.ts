@@ -1,8 +1,9 @@
+import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
 import { Login, Logout, SetAccountList, SetExchangeRateList, SetStockStyle } from 'reducer/Action';
-import { getAccountList, getAuthToken, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
@@ -11,8 +12,9 @@ import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exc
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
+import { Action } from 'util/Interface';
 
-export const validateToken = (dispatch: any, getState: () => any) => {
+export const validateToken = (dispatch: Dispatch<Action<AuthToken>>, getState: () => ReduxState): void => {
     const tokenString: string = getAuthTokenString(getState());
     if (tokenString) {
         AuthApi.validate(tokenString).then((response: AuthResponse) => {
@@ -31,7 +33,7 @@ export const validateToken = (dispatch: any, getState: () => any) => {
     }
 };
 
-export const fetchExchangeRateList = (dispatch: any, getState: () => ExchangeRate[]) => {
+export const fetchExchangeRateList = (dispatch: Dispatch<Action<ExchangeRate[]>>, getState: () => ReduxState): void => {
     const tokenString: string = getAuthTokenString(getState());
     const exchangeRateList: ExchangeRate[] = getExchangeRateList(getState());
     if (tokenString && isArrayEmpty(exchangeRateList)) {
@@ -46,7 +48,7 @@ export const fetchExchangeRateList = (dispatch: any, getState: () => ExchangeRat
     }
 };
 
-export const fetchAccountList = (dispatch: any, getState: () => Account[]) => {
+export const fetchAccountList = (dispatch: Dispatch<Action<Account[]>>, getState: () => ReduxState): void => {
     const tokenString: string = getAuthTokenString(getState());
     const accountList: Account[] = getAccountList(getState());
     if (tokenString && isArrayEmpty(accountList)) {
@@ -62,7 +64,7 @@ export const fetchAccountList = (dispatch: any, getState: () => Account[]) => {
     }
 };
 
-export const setStockStyle = (dispatch: any, getState: () => StockStyle) => {
+export const setStockStyle = (dispatch: Dispatch<Action<StockStyle>>, getState: () => ReduxState): void => {
     dispatch(SetStockStyle(getStockStyle(getState())));
 };
 

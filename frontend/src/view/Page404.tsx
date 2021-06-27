@@ -20,8 +20,7 @@ class Page404 extends React.Component<Page404Props, Page404State> {
         this.props.history.push('/');
     };
 
-    render() {
-
+    render(): JSX.Element {
         return (
             <div className='app flex-row align-items-center'>
                 <Container>
@@ -45,7 +44,7 @@ class Page404 extends React.Component<Page404Props, Page404State> {
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = () => {
     return {};
 };
 

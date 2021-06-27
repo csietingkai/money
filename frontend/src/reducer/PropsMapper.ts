@@ -1,17 +1,21 @@
+import { Dispatch } from 'react';
+
 import { Login, Logout, SetAccountList, SetStockStyle } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
+
 import { StockStyle } from 'util/Enum';
+import { Action } from 'util/Interface';
 
 // auth
-export const LoginDispatcher = (dispatch: any) => (authToken: AuthToken) => dispatch(Login(authToken));
-export const LogoutDispatcher = (dispatch: any) => () => dispatch(Logout());
+export const LoginDispatcher = (dispatch: Dispatch<Action<AuthToken>>) => (authToken: AuthToken): void => dispatch(Login(authToken));
+export const LogoutDispatcher = (dispatch: Dispatch<Action<undefined>>) => (): void => dispatch(Logout());
 
 // stock
 
 // account
-export const SetAccountListDispatcher = (dispatch: any) => (accounts: Account[]) => dispatch(SetAccountList(accounts));
+export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) => (accounts: Account[]): void => dispatch(SetAccountList(accounts));
 
 // system setting
-export const SetStockStyleDispatcher = (dispatch: any) => (style: StockStyle) => dispatch(SetStockStyle(style));
+export const SetStockStyleDispatcher = (dispatch: Dispatch<Action<StockStyle>>) => (style: StockStyle): void => dispatch(SetStockStyle(style));

@@ -29,7 +29,7 @@ export default class Breadcrumb extends React.Component<BreadcrumbProps, Breadcr
         return paths;
     };
 
-    render() {
+    render(): JSX.Element {
         const paths: string[] = this.getPaths(this.props.location.pathname);
         const breadcrumbItems = paths.map((path, idx) => {
             return (

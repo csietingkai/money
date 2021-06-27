@@ -11,7 +11,7 @@ export interface ExchangeRate {
 
 export interface ExchangeRateListResponse extends ApiResponse<ExchangeRate[]> { }
 
-const getAll = async () => {
+const getAll = async (): Promise<ExchangeRateListResponse> => {
     const response = await axios.get(EXCHANGE_RATE_GET_ALL_PATH);
     const data: ExchangeRateListResponse = response.data;
     return data;

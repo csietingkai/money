@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { getStockStyle } from 'reducer/Selector';
+import { getStockStyle, ReduxState } from 'reducer/Selector';
 
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
@@ -66,7 +66,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
 
     render() {
         const { stockStyle } = this.props;
-        const { queryCondition, stockName, xAxis, data } = this.state;
+        const { queryCondition, data } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -118,7 +118,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state)
     };

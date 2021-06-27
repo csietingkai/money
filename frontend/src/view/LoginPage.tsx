@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { Button, Card, CardGroup, Col, Container, FormControl, InputGroup, Row } from 'react-bootstrap';
 import { RouteChildrenProps } from 'react-router-dom';
@@ -12,6 +13,7 @@ import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
 import Notify from 'util/Notify';
+import { Action } from 'util/Interface';
 
 export interface LoginPageProps extends RouteChildrenProps<any> {
     login: (authToken: AuthToken) => void;
@@ -62,7 +64,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
         window.location.replace('/#/register');
     };
 
-    render() {
+    render(): JSX.Element {
         const { username, password } = this.state;
         return (
             <div className='app flex-row align-items-center'>
@@ -118,11 +120,11 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = () => {
     return {};
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<AuthToken | Account[]>>) => {
     return {
         login: LoginDispatcher(dispatch),
         setAccountList: SetAccountListDispatcher(dispatch)

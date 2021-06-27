@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { STOCK_GET_ALL_PATH, STOCK_GET_PATH, STOCK_GET_RECORDS_PATH, STOCK_LATEST_RECORD_PATH, STOCK_REFRESH_PATH } from 'api/Constant';
+import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_LATEST_RECORD_PATH, STOCK_REFRESH_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
@@ -45,7 +45,7 @@ export interface StockRecordListResponse extends ApiResponse<StockRecord[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
 
-const getAll = async (code?: string, name?: string, sort: boolean = true) => {
+const getAll = async (code?: string, name?: string, sort: boolean = true): Promise<StockListResponse> => {
     const response = await axios.get(STOCK_GET_ALL_PATH, { params: { code, name, sort } });
     const data: StockListResponse = response.data;
     if (data.success) {
@@ -54,7 +54,7 @@ const getAll = async (code?: string, name?: string, sort: boolean = true) => {
     return data;
 };
 
-const getRecords = async (code: string, start: Date, end: Date) => {
+const getRecords = async (code: string, start: Date, end: Date): Promise<StockRecordListResponse> => {
     const response = await axios.get(STOCK_GET_RECORDS_PATH, { params: { code, start: start.getTime(), end: end.getTime() } });
     const data: StockRecordListResponse = response.data;
     if (data.success) {
@@ -63,7 +63,7 @@ const getRecords = async (code: string, start: Date, end: Date) => {
     return data;
 };
 
-const latestRecord = async (code: string) => {
+const latestRecord = async (code: string): Promise<StockRecordResponse> => {
     const response = await axios.get(STOCK_LATEST_RECORD_PATH, { params: { code } });
     const data: StockRecordResponse = response.data;
     if (data.success) {
@@ -72,7 +72,7 @@ const latestRecord = async (code: string) => {
     return data;
 };
 
-const refresh = async (code: string) => {
+const refresh = async (code: string): Promise<SimpleResponse> => {
     const response = await axios.post(STOCK_REFRESH_PATH, null, { params: { code }, timeout: REFRESH_STOCK_MAX_TIME });
     const data: SimpleResponse = response.data;
     return data;

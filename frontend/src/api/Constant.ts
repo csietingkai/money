@@ -13,7 +13,6 @@ export const FILE_DOWNLOAD_PATH: string = FILE_API_PREFIX + '/download';
 // api stock
 const STOCK_API_PREFIX: string = '/stock';
 export const STOCK_GET_ALL_PATH: string = STOCK_API_PREFIX + '/getAll';
-export const STOCK_GET_PATH: string = STOCK_API_PREFIX + '/get';
 export const STOCK_GET_RECORDS_PATH: string = STOCK_API_PREFIX + '/getRecords';
 export const STOCK_LATEST_RECORD_PATH: string = STOCK_API_PREFIX + '/latestRecord';
 export const STOCK_REFRESH_PATH: string = STOCK_API_PREFIX + '/refresh';

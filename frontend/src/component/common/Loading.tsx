@@ -11,7 +11,7 @@ export default class Loading extends React.Component<LoadingProps, LoadingState>
         this.state = {};
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <div className='spinner-border' role='status'>
                 <span className='sr-only'>Loading...</span>

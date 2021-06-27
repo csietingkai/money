@@ -58,7 +58,7 @@ export default class Card extends React.Component<CardProps, CardState> {
         this.setState({ collapseOpen: !this.state.collapseOpen });
     };
 
-    render() {
+    render(): JSX.Element {
         const { icon, title, accent, border, background, textCenter, collapsable, footer, children } = this.props;
         const { collapseOpen } = this.state;
         const cardClassName = classNames(

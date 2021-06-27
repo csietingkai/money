@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Card as RbCard, Row, Col, ProgressBar } from 'react-bootstrap';
 
-import { getAccountList, getAuthToken } from 'reducer/Selector';
+import { getAccountList, getAuthToken, ReduxState } from 'reducer/Selector';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -66,7 +66,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         ));
     };
 
-    render() {
+    render(): JSX.Element {
         const { userAccounts } = this.props;
         return (
             <div className='animated fadeIn'>
@@ -76,11 +76,11 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: ReduxState) => {
     return {
         authToken: getAuthToken(state),
         userAccounts: getAccountList(state)
     };
 };
 
-export default connect(mapStateToProps)(DashBoard);;
+export default connect(mapStateToProps)(DashBoard);

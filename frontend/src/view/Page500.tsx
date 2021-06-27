@@ -20,8 +20,7 @@ class Page500 extends React.Component<Page500Props, Page500State> {
         this.props.history.push('/');
     };
 
-    render() {
-
+    render(): JSX.Element {
         return (
             <div className='app flex-row align-items-center'>
                 <Container>

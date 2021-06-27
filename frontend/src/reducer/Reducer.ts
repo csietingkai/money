@@ -2,6 +2,7 @@ import axios from 'axios';
 import { combineReducers } from 'redux';
 
 import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE } from 'reducer/ActionType';
+import { ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxSystemSettingState } from 'reducer/Selector';
 import { getAuthToken, setAuthToken, removeAuthToken, getStockStyle, setStockStyle } from 'reducer/StateHolder';
 
 import { AuthToken } from 'api/auth';
@@ -11,8 +12,8 @@ import { Action } from 'util/Interface';
 import { Account } from 'api/account';
 import { StockStyle } from 'util/Enum';
 
-const authReducer = (state: any = { authToken: getAuthToken() }, action: Action<AuthToken>): any => {
-    const newState: any = { ...state };
+const authReducer = (state: ReduxAuthState = { authToken: getAuthToken() }, action: Action<AuthToken>): ReduxAuthState => {
+    const newState: ReduxAuthState = { ...state };
     const { type, payload } = action;
     if (type === LOGIN) {
         setAuthToken(payload);
@@ -30,8 +31,8 @@ const authReducer = (state: any = { authToken: getAuthToken() }, action: Action<
     return newState;
 };
 
-const exchangeRateReducer = (state: any = { list: [] }, action: Action<ExchangeRate[]>): any => {
-    const newState: any = { ...state };
+const exchangeRateReducer = (state: ReduxExchangeRateState = { list: [] }, action: Action<ExchangeRate[]>): ReduxExchangeRateState => {
+    const newState: ReduxExchangeRateState = { ...state };
     const { type, payload } = action;
     if (type === SET_EXCHANGE_RATE_LIST) {
         newState.list = payload;
@@ -39,8 +40,8 @@ const exchangeRateReducer = (state: any = { list: [] }, action: Action<ExchangeR
     return newState;
 };
 
-const accountReducer = (state: any = { list: [] }, action: Action<Account[]>): any => {
-    const newState: any = { ...state };
+const accountReducer = (state: ReduxAccountState = { list: [] }, action: Action<Account[]>): ReduxAccountState => {
+    const newState: ReduxAccountState = { ...state };
     const { type, payload } = action;
     if (type === SET_ACCOUNT_LIST) {
         newState.list = payload;
@@ -48,8 +49,8 @@ const accountReducer = (state: any = { list: [] }, action: Action<Account[]>): a
     return newState;
 };
 
-const systemReducer = (state: any = { stockStyle: getStockStyle() }, action: Action<StockStyle>): any => {
-    const newState: any = { ...state };
+const systemReducer = (state: ReduxSystemSettingState = { stockStyle: getStockStyle() }, action: Action<StockStyle>): ReduxSystemSettingState => {
+    const newState: ReduxSystemSettingState = { ...state };
     const { type, payload } = action;
     if (type === SET_STOCK_STYLE) {
         setStockStyle(payload);

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Button as RbButton } from 'react-bootstrap';
 
-import { firstDigitUppercase } from 'util/AppUtil';
 import { Variant } from 'util/Enum';
 
 export interface ButtonProps {
@@ -32,7 +31,7 @@ export default class Button extends React.Component<ButtonProps, ButtonState> {
         this.state = {};
     }
 
-    render() {
+    render(): JSX.Element {
         const { className, variant, outline, icon, size, disable, active, block, onClick, children } = this.props;
         return (
             <RbButton

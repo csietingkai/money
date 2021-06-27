@@ -3,23 +3,23 @@ import { toast, ToastOptions } from 'react-toastify';
 
 import { NOTIFICATION_DEFAULT_CONFIG } from 'util/Constant';
 
-const info = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG) => {
+const info = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG): void => {
     toast.info(msg, options);
 };
 
-const success = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG) => {
+const success = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG): void => {
     toast.success(msg, options);
 };
 
-const warning = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG) => {
+const warning = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG): void => {
     toast.warning(msg, options);
 };
 
-const error = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG) => {
+const error = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG): void => {
     toast.error(msg, options);
 };
 
-const dark = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG) => {
+const dark = (msg: string, options: ToastOptions = NOTIFICATION_DEFAULT_CONFIG): void => {
     toast.dark(msg, options);
 };
 

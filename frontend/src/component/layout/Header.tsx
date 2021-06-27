@@ -38,7 +38,7 @@ export default class Header extends React.Component<HeaderProps, HeaderState> {
         Notify.success('Lougout Success');
     };
 
-    render() {
+    render(): JSX.Element {
         return (
             <header className='app-header navbar'>
                 <Navbar.Toggle className='d-lg-none' onClick={this.mobileSidebarToggle}>

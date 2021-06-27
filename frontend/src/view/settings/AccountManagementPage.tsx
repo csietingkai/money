@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
@@ -6,21 +7,20 @@ import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
 import { CheckIcon, PencilAltIcon, PlusIcon, TimesIcon, TrashAltIcon } from 'component/common/Icons';
+import Loading from 'component/common/Loading';
 import Modal from 'component/common/Modal';
 import Table from 'component/common/Table';
 
-import { getAccountList, getAuthTokenName, getExchangeRateList } from 'reducer/Selector';
+import { SetAccountListDispatcher } from 'reducer/PropsMapper';
+import { getAccountList, getAuthTokenName, getExchangeRateList, ReduxState } from 'reducer/Selector';
 
 import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountsResponse } from 'api/account';
 import { ExchangeRate } from 'api/exchangeRate';
 
 import { numberComma, toDateStr } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
-import { SimpleResponse } from 'util/Interface';
+import { Action, SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';
-import { SetAccountList } from 'reducer/Action';
-import { SetAccountListDispatcher } from 'reducer/PropsMapper';
-import Loading from 'component/common/Loading';
 
 export interface AccountManagementProps {
     username: string;
@@ -431,7 +431,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: ReduxState) => {
     return {
         username: getAuthTokenName(state),
         exchangeRateList: getExchangeRateList(state),
@@ -439,7 +439,7 @@ const mapStateToProps = (state: any) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<Account[]>>) => {
     return {
         setAccountList: SetAccountListDispatcher(dispatch)
     };

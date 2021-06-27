@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH } from 'api/Constant';
+import { ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH } from 'api/Constant';
 
 import { ApiResponse, SimpleResponse } from 'util/Interface';
 import { handleRequestDate } from 'util/AppUtil';
@@ -26,13 +26,13 @@ export interface AccountResponse extends ApiResponse<Account> { }
 export interface AccountsResponse extends ApiResponse<Account[]> { }
 export interface AccountRecordsResponse extends ApiResponse<AccountRecord[]> { }
 
-const getAccounts = async (ownerName: string) => {
+const getAccounts = async (ownerName: string): Promise<AccountsResponse> => {
     const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { ownerName } });
     const data: AccountsResponse = response.data;
     return data;
 };
 
-const createAccount = async (entity: Account) => {
+const createAccount = async (entity: Account): Promise<SimpleResponse> => {
     entity.id = '';
     entity.balance = 0;
     const response = await axios.post(ACCOUNT_CREATE_PATH, entity);
@@ -40,19 +40,19 @@ const createAccount = async (entity: Account) => {
     return data;
 };
 
-const updateAccount = async (entity: Account) => {
+const updateAccount = async (entity: Account): Promise<SimpleResponse> => {
     const response = await axios.put(ACCOUNT_UPDATE_PATH, entity);
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const deleteAccount = async (id: string) => {
+const deleteAccount = async (id: string): Promise<SimpleResponse> => {
     const response = await axios.delete(ACCOUNT_DELETE_PATH, { params: { id } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const getRecords = async (accountId: string) => {
+const getRecords = async (accountId: string): Promise<AccountRecordsResponse> => {
     const response = await axios.get(ACCOUNT_GET_RECORDS_PATH, { params: { accountId } });
     const data: AccountRecordsResponse = response.data;
     data.data = data.data?.map(x => {
@@ -62,7 +62,7 @@ const getRecords = async (accountId: string) => {
     return data;
 };
 
-const income = async (accountId: string, entity: AccountRecord) => {
+const income = async (accountId: string, entity: AccountRecord): Promise<SimpleResponse> => {
     if (!entity.transDate) {
         entity.transDate = new Date();
     }
@@ -71,7 +71,7 @@ const income = async (accountId: string, entity: AccountRecord) => {
     return data;
 };
 
-const expend = async (accountId: string, entity: AccountRecord) => {
+const expend = async (accountId: string, entity: AccountRecord): Promise<SimpleResponse> => {
     if (!entity.transDate) {
         entity.transDate = new Date();
     }

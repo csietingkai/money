@@ -29,7 +29,7 @@ export default class Modal extends React.Component<ModalProps, ModalState> {
         this.state = {};
     }
 
-    render() {
+    render(): JSX.Element {
         const { headerText, okBtnText, cancelBtnText } = this.props;
         return (
             <RbModal show={this.props.isShow} size={this.props.size} onHide={() => { }} centered={this.props.verticalCentered}>

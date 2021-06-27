@@ -15,7 +15,7 @@ const removeState = (key: string) => {
     localStorage.removeItem(key);
 };
 
-export const setAuthToken = (authToken: AuthToken) => {
+export const setAuthToken = (authToken: AuthToken): void => {
     setState(AUTH_TOKEN_KEY, JSON.stringify(authToken));
 };
 
@@ -34,7 +34,7 @@ export const getAuthToken = (): AuthToken => {
     return authToken;
 };
 
-export const removeAuthToken = () => {
+export const removeAuthToken = (): void => {
     removeState(AUTH_TOKEN_KEY);
 };
 
@@ -50,6 +50,6 @@ export const getStockStyle = (): StockStyle => {
     }
 };
 
-export const setStockStyle = (style: StockStyle) => {
+export const setStockStyle = (style: StockStyle): void => {
     setState(STOCK_STYLE_KEY, style);
 };

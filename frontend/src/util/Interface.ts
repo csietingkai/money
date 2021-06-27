@@ -1,6 +1,3 @@
-import { AuthToken } from 'api/auth';
-import { ExchangeRate } from 'api/exchangeRate';
-
 // common
 export interface Record<K, V> {
     key: K;

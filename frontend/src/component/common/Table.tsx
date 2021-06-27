@@ -78,7 +78,7 @@ export default class Table extends React.Component<TableProps, TableState> {
         return page * dataCountPerPage;
     };
 
-    private onRowClick = (selectedRow: number) => (event: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+    private onRowClick = (selectedRow: number) => () => {
         const { onRowClick } = this.props;
         this.setState({ selectedRow });
         if (onRowClick) {
@@ -86,10 +86,10 @@ export default class Table extends React.Component<TableProps, TableState> {
         }
     };
 
-    render() {
+    render(): JSX.Element {
         const { id, striped, condensed, bordered, header, data, countPerPage, columnConverter } = this.props;
 
-        const { current, selectedRow } = this.state;
+        const { current } = this.state;
 
         const showData: any[] = data.slice(current, current + countPerPage);
 

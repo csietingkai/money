@@ -2,21 +2,18 @@ import * as React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { getStockStyle } from 'reducer/Selector';
-
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
-import CandleStickChart from 'component/common/chart/CandleStockChart';
 import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
-
-import StockApi, { StockRecord, StockVo } from 'api/stock';
-
-import { numberComma, toDateStr } from 'util/AppUtil';
-import { InputType } from 'util/Enum';
-import Notify from 'util/Notify';
 import Loading from 'component/common/Loading';
 import Table from 'component/common/Table';
+
+import StockApi, { StockVo } from 'api/stock';
+
+import { toDateStr } from 'util/AppUtil';
+import { InputType } from 'util/Enum';
+import Notify from 'util/Notify';
 
 export interface StockRecordUpdaterProps { }
 
@@ -64,7 +61,7 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
         }
     };
 
-    render() {
+    render(): JSX.Element {
         const { queryCondition, stocks, loaded } = this.state;
         let table = <div className='text-center'><Loading /></div>;
         if (loaded) {
@@ -136,7 +133,7 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = () => {
     return {};
 };
 

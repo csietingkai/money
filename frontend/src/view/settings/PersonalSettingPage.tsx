@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { Col, Form, Row } from 'react-bootstrap';
 
@@ -6,10 +7,10 @@ import Card from 'component/common/Card';
 import { TwFlag, UsFlag } from 'component/common/Icons';
 
 import { SetStockStyleDispatcher } from 'reducer/PropsMapper';
+import { getStockStyle, ReduxState } from 'reducer/Selector';
 
 import { StockStyle } from 'util/Enum';
-import { Record } from 'util/Interface';
-import { getStockStyle } from 'reducer/Selector';
+import { Action, Record } from 'util/Interface';
 
 export interface PersonalSettingPageProps {
     stockStyle: StockStyle;
@@ -36,7 +37,7 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
         this.props.setStockStyle(selection as StockStyle);
     };
 
-    render() {
+    render(): JSX.Element {
         const { stockStyle } = this.props;
         return (
             <div className='animated fadeIn'>
@@ -90,13 +91,13 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle>>) => {
     return {
         setStockStyle: SetStockStyleDispatcher(dispatch)
     };

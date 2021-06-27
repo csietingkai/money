@@ -1,11 +1,9 @@
-import Chart from 'chart.js/auto';
 import * as React from 'react';
 import { Bar } from 'react-chartjs-2';
 
 import { StockRecord } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
-import { getStockStyle } from 'reducer/StateHolder';
 import { StockStyle } from 'util/Enum';
 
 export interface CandleStickChartProps {
@@ -40,27 +38,30 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
         return color;
     };
 
-    render() {
+    render(): JSX.Element {
         const { data: records } = this.props;
-        const labels: string[] = records.map((x: StockRecord) => toDateStr(x.dealDate));
-        const datasets: Chart.ChartData = [];
-        datasets.push({
-            label: 'open and close',
-            data: records.map((x: StockRecord) => [x.openPrice, x.closePrice]),
-            backgroundColor: records.map((x: StockRecord) => this.getStickColor(x))
-        });
-        datasets.push({
-            label: 'high and low',
-            barPercentage: 0.1,
-            data: records.map((x: StockRecord) => [x.highPrice, x.lowPrice]),
-            backgroundColor: records.map((x: StockRecord) => this.getStickColor(x))
-        });
-        const data = { labels, datasets };
         return (
             <div className='chart-wrapper'>
                 <Bar
                     type='bar'
-                    data={data}
+                    data={
+                        {
+                            labels: records.map((x: StockRecord) => toDateStr(x.dealDate)),
+                            datasets: [
+                                {
+                                    label: 'open and close',
+                                    data: records.map((x: StockRecord) => [x.openPrice, x.closePrice]),
+                                    backgroundColor: records.map((x: StockRecord) => this.getStickColor(x))
+                                },
+                                {
+                                    label: 'high and low',
+                                    barPercentage: 0.1,
+                                    data: records.map((x: StockRecord) => [x.highPrice, x.lowPrice]),
+                                    backgroundColor: records.map((x: StockRecord) => this.getStickColor(x))
+                                }
+                            ]
+                        }
+                    }
                     options={{
                         responsive: true,
                         scales: {

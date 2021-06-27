@@ -1,19 +1,21 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { Container } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Route, Redirect, Switch, RouteChildrenProps } from 'react-router-dom';
 
 import { LogoutDispatcher } from 'reducer/PropsMapper';
-import { getAuthToken, getAuthTokenString } from 'reducer/Selector';
+import { getAuthToken, getAuthTokenString, ReduxState } from 'reducer/Selector';
 
 import Breadcrumb from 'component/layout/Breadcrumb';
 import Footer from 'component/layout/Footer';
 import Header from 'component/layout/Header';
 import Sidebar from 'component/layout/Sidebar';
 
-import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
+import { AuthToken } from 'api/auth';
 
 import { APP_ROUTES } from 'util/Constant';
+import { Action } from 'util/Interface';
 
 export interface AppProps extends RouteChildrenProps<any> {
     authToken?: AuthToken;
@@ -61,14 +63,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: ReduxState) => {
     return {
         authToken: getAuthToken(state),
         authTokenString: getAuthTokenString(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<undefined>>) => {
     return {
         logout: LogoutDispatcher(dispatch)
     };

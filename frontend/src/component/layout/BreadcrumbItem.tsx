@@ -15,7 +15,7 @@ export default class BreadcrumbItem extends React.Component<BreadcrumbItemProps,
         super(props);
     }
 
-    render() {
+    render(): JSX.Element {
         const { match } = this.props;
         if (find(BREADCRUMBS_ROUTES, match.url)) {
             const routeName: string = convert(BREADCRUMBS_ROUTES, match.url);

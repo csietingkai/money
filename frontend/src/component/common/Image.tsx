@@ -20,7 +20,7 @@ export default class Image extends React.Component<ImageProps, ImageState> {
         this.refresh();
     }
 
-    componentDidUpdate(previousProps: ImageProps) {
+    componentDidUpdate(previousProps: ImageProps): void {
         if (previousProps.filename !== this.props.filename) {
             this.refresh();
         }
@@ -34,7 +34,7 @@ export default class Image extends React.Component<ImageProps, ImageState> {
         }
     };
 
-    render() {
+    render(): JSX.Element {
         return (
             <img style={{ width: '100%' }} src={this.state.source} />
         );

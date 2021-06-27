@@ -6,7 +6,7 @@ import { ApiResponse } from 'util/Interface';
 
 export interface FileUploadResponse extends ApiResponse<void> { }
 
-const upload = async (file: any, category?: string) => {
+const upload = async (file: any, category?: string): Promise<FileUploadResponse> => {
     const formData = new FormData();
     formData.append('file', file);
     const response = await axios.post(FILE_UPLOAD_PATH, formData, { headers: { 'content-type': 'multipart/form-data' }, params: { category } });

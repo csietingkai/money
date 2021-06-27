@@ -126,7 +126,7 @@ export const sumByKey = (list: any[], key: string): number => {
     return sum(list.map(item => parseFloat(item[key]) || 0));
 };
 
-export const Comparator = (sortType: SortType = SortType.ASC) => <T extends {}>(a: T, b: T): number => {
+export const Comparator = (sortType: SortType = SortType.ASC) => <T>(a: T, b: T): number => {
     if (sortType === SortType.ASC) {
         return a > b ? 1 : (a === b ? 0 : -1);
     } else {
@@ -134,7 +134,7 @@ export const Comparator = (sortType: SortType = SortType.ASC) => <T extends {}>(
     }
 };
 
-export const sort = <T extends {}>(list: T[], sortType: SortType = SortType.ASC): T[] => {
+export const sort = <T>(list: T[], sortType: SortType = SortType.ASC): T[] => {
     return list.sort(Comparator(sortType));
 };
 

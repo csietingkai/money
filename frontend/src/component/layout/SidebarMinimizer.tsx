@@ -18,7 +18,7 @@ export default class SidebarMinimizer extends React.Component<SidebarMinimizerPr
         document.body.classList.toggle('brand-minimized');
     };
 
-    render() {
+    render(): JSX.Element {
         return (
             <button className='sidebar-minimizer' type='button' onClick={(event) => { this.sidebarMinimize(); this.brandMinimize(); }}></button>
         );
