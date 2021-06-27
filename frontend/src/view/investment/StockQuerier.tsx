@@ -49,7 +49,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
             Notify.warning('Please fill all required Fields.');
             return;
         }
-        const { success: success1, data: stock, message: message1 } = await StockApi.get(queryCondition.code);
+        const { success: success1, data: stock, message: message1 } = await StockApi.getAll(queryCondition.code);
         if (!success1) {
             Notify.warning(message1);
         }
@@ -61,7 +61,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         }
         records = records || [];
         const dealDates: string[] = records.map(x => toDateStr(x.dealDate));
-        this.setState({ stockName: stock.name, xAxis: dealDates, data: records });
+        this.setState({ stockName: stock[0].name, xAxis: dealDates, data: records });
     };
 
     render() {

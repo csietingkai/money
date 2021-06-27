@@ -1,5 +1,6 @@
 package io.tingkai.money.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.StockVo;
-import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.StringUtil;
 
 @Service
 public class StockService {
@@ -23,23 +24,16 @@ public class StockService {
 	@Autowired
 	private StockRecordFacade stockRecordFacade;
 
-	public List<StockVo> getAll(boolean sort) throws QueryNotResultException {
+	public List<StockVo> getAll(String code, String name, boolean sort) throws QueryNotResultException {
 		List<Stock> stocks = this.stockFacade.queryAll(sort);
 		List<StockVo> vos = new ArrayList<StockVo>();
 		for (Stock stock : stocks) {
+			if ((!StringUtil.isBlank(code) && !stock.getCode().equals(code)) || (!StringUtil.isBlank(name) && !stock.getName().toUpperCase().contains(name.toUpperCase()))) {
+				continue;
+			}
 			StockVo vo = new StockVo();
 			vo.transform(stock);
-			StockRecord record = null;
-			try {
-				record = this.stockRecordFacade.latestRecord(stock.getCode());
-			} catch (QueryNotResultException e) {
-				e.printStackTrace();
-			}
-			if (AppUtil.isPresent(record)) {
-				vo.setUpdateTime(record.getDealDate());
-			} else {
-				vo.setUpdateTime(stock.getOfferingDate());
-			}
+			vo.setUpdateTime(this.getUpdateTime(stock.getCode(), stock.getOfferingDate()));
 			vos.add(vo);
 		}
 		return vos;
@@ -49,6 +43,7 @@ public class StockService {
 		Stock stock = this.stockFacade.query(code);
 		StockVo vo = new StockVo();
 		vo.transform(stock);
+		vo.setUpdateTime(this.getUpdateTime(stock.getCode(), stock.getOfferingDate()));
 		return vo;
 	}
 
@@ -62,5 +57,16 @@ public class StockService {
 
 	public StockRecord latestRecord(String code) throws QueryNotResultException {
 		return this.stockRecordFacade.latestRecord(code);
+	}
+
+	private LocalDateTime getUpdateTime(String code, LocalDateTime defaultTime) {
+		StockRecord record = null;
+		try {
+			record = this.stockRecordFacade.latestRecord(code);
+			return record.getDealDate();
+		} catch (QueryNotResultException e) {
+			e.printStackTrace();
+		}
+		return defaultTime;
 	}
 }

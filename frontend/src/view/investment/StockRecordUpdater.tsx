@@ -21,6 +21,7 @@ import Table from 'component/common/Table';
 export interface StockRecordUpdaterProps { }
 
 export interface StockRecordUpdaterState {
+    queryCondition: { code: string, name: string; };
     stocks: StockVo[];
     loaded: boolean;
 }
@@ -30,27 +31,31 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
     constructor(props: StockRecordUpdaterProps) {
         super(props);
         this.state = {
+            queryCondition: { code: '', name: '' },
             stocks: [],
-            loaded: false
+            loaded: true
         };
-        this.init();
     }
 
-    private init = async () => {
-        const { success, data: vos, message } = await StockApi.getAll();
+    private onQueryBtnClick = async () => {
+        this.setState({ loaded: false });
+        const { queryCondition } = this.state;
+        const { success, data: stocks, message } = await StockApi.getAll(queryCondition.code, queryCondition.name);
         if (success) {
-            this.setState({ stocks: vos, loaded: true });
+            this.setState({ stocks });
         } else {
             Notify.warning(message);
         }
+        this.setState({ loaded: true });
     };
 
     private syncRecord = (code: string) => async () => {
+        const { queryCondition } = this.state;
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
         if (refreshSuccess) {
             Notify.success(message);
 
-            const { success: fetchSuccess, data: vos } = await StockApi.getAll();
+            const { success: fetchSuccess, data: vos } = await StockApi.getAll(queryCondition.code, queryCondition.name);
             if (fetchSuccess) {
                 this.setState({ stocks: vos });
             }
@@ -60,7 +65,7 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
     };
 
     render() {
-        const { stocks, loaded } = this.state;
+        const { queryCondition, stocks, loaded } = this.state;
         let table = <div className='text-center'><Loading /></div>;
         if (loaded) {
             const data = stocks.map(x => {
@@ -87,6 +92,36 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
         }
         return (
             <div className='animated fadeIn'>
+                <Row>
+                    <Col>
+                        <Card
+                            title='Query Condition'
+                        >
+                            <Form
+                                singleRow
+                                inputs={[
+                                    { key: 'code', title: 'Stock Code', type: InputType.text, value: queryCondition?.code, width: 3 },
+                                    { key: 'name', title: 'Stock Name', type: InputType.text, value: queryCondition?.name, width: 3 }
+                                ]}
+                                onChange={(formState: any) => {
+                                    queryCondition.code = formState.code;
+                                    queryCondition.name = formState.name;
+                                    this.setState({ queryCondition });
+                                }}
+                            />
+                            <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
+                                <Button
+                                    variant='success'
+                                    outline
+                                    onClick={this.onQueryBtnClick}
+                                >
+                                    <SearchIcon />
+                                    {' Search'}
+                                </Button>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
                 <Row>
                     <Col>
                         <Card

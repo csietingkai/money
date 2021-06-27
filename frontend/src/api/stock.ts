@@ -45,20 +45,11 @@ export interface StockRecordListResponse extends ApiResponse<StockRecord[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
 
-const getAll = async (sort: boolean = true) => {
-    const response = await axios.get(STOCK_GET_ALL_PATH, { params: { sort } });
+const getAll = async (code?: string, name?: string, sort: boolean = true) => {
+    const response = await axios.get(STOCK_GET_ALL_PATH, { params: { code, name, sort } });
     const data: StockListResponse = response.data;
     if (data.success) {
         data.data = data.data.map(x => ({ ...x, offeringDate: toDate(x.offeringDate), updateTime: toDate(x.updateTime, toDate(x.offeringDate)) }));
-    }
-    return data;
-};
-
-const get = async (code: string) => {
-    const response = await axios.get(STOCK_GET_PATH, { params: { code } });
-    const data: StockResponse = response.data;
-    if (data.success) {
-        data.data = { ...data.data, offeringDate: toDate(data.data.offeringDate), updateTime: toDate(data.data.updateTime) };
     }
     return data;
 };
@@ -86,4 +77,4 @@ const refresh = async (code: string) => {
     const data: SimpleResponse = response.data;
     return data;
 };
-export default { getAll, get, getRecords, latestRecord, refresh };
+export default { getAll, getRecords, latestRecord, refresh };

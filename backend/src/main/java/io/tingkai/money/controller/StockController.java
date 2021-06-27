@@ -40,15 +40,9 @@ public class StockController {
 	private PythonFetcherService pythonFetcherService;
 
 	@RequestMapping(value = StockController.GET_ALL_PATH, method = RequestMethod.GET)
-	public StockResponse<List<StockVo>> getAll(@RequestParam(required = false, defaultValue = "true") boolean sort) throws QueryNotResultException {
-		List<StockVo> stocks = this.stockService.getAll(sort);
+	public StockResponse<List<StockVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) throws QueryNotResultException {
+		List<StockVo> stocks = this.stockService.getAll(code, name, sort);
 		return new StockResponse<List<StockVo>>(true, stocks, MessageConstant.STOCK_GET_ALL_SUCCESS);
-	}
-
-	@RequestMapping(value = StockController.GET_PATH, method = RequestMethod.GET)
-	public StockResponse<StockVo> get(@RequestParam String code) throws QueryNotResultException {
-		StockVo stock = this.stockService.get(code);
-		return new StockResponse<StockVo>(true, stock, MessageConstant.STOCK_GET_SUCCESS, stock.getName());
 	}
 
 	@RequestMapping(value = StockController.GET_RECORDS_PATH, method = RequestMethod.GET)
