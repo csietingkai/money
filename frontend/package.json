@@ -5,7 +5,8 @@
     "main": "webpack.config.js",
     "scripts": {
         "start": "webpack serve --mode development --progress --hot",
-        "build": "webpack --mode production"
+        "build": "webpack --mode production",
+        "lint": "eslint . --ext .ts"
     },
     "keywords": [],
     "dependencies": {
@@ -19,10 +20,13 @@
         "@types/react-dom": "^17.0.5",
         "@types/react-redux": "^7.1.16",
         "@types/react-router-dom": "^5.1.7",
+        "@typescript-eslint/eslint-plugin": "^4.28.0",
+        "@typescript-eslint/parser": "^4.28.0",
         "axios": "^0.21.1",
         "bootstrap": "^4.5.0",
         "css-loader": "^5.2.6",
         "dotenv": "^10.0.0",
+        "eslint": "^7.29.0",
         "flag-icon-css": "^3.5.0",
         "html-webpack-plugin": "^5.3.1",
         "jquery": "^3.6.0",
