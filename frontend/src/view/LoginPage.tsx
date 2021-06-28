@@ -46,7 +46,6 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
         const response: AuthResponse = await AuthApi.login(username, password);
         const { success, data, message } = response;
         if (success) {
-            this.props.login(data);
             const response2: AccountsResponse = await AccountApi.getAccounts(data.name);
             const { success: success2, data: data2 } = response2;
             if (success2) {
@@ -54,6 +53,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
             }
             Notify.success(message);
             this.setState({ username: '', password: '' });
+            this.props.login(data);
         } else {
             removeAuthToken();
             Notify.error(message);
