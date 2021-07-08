@@ -77,4 +77,5 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     const data: SimpleResponse = response.data;
     return data;
 };
+
 export default { getAll, getRecords, latestRecord, refresh };

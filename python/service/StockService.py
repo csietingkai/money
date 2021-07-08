@@ -11,7 +11,7 @@ MarketTypes = {
 	'LES': '5'
 }
 
-def fetchStock(marketType):
+def fetchStocks(marketType):
     url='https://isin.twse.com.tw/isin/C_public.jsp?strMode=' + MarketTypes[marketType]
     res = requests.get(url)
     data = pandas.read_html(res.text)[0]
@@ -32,6 +32,14 @@ def fetchStock(marketType):
             returnData[code]['cfiCode'] = toEmptyString(data[5][row])
             returnData[code]['description'] = toEmptyString(data[6][row])
     return returnData
+
+def fetchStock(code):
+    for idx, marketType in enumerate(['LSE', 'OTC', 'LES']):
+        datas = fetchStocks(marketType)
+        if (datas[code]):
+            datas[code]['marketType'] = marketType
+            return datas[code]
+    return {}
 
 def fetchAllStockRecord(code, start, end):
     returnData = {}

@@ -38,7 +38,13 @@ export interface ReduxExchangeRateState {
     list: ExchangeRate[];
 }
 const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;
-export const getExchangeRateList = (state: ReduxState): ExchangeRate[] => getExchangeRateState(state)?.list;
+export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRate[] => {
+    let list = getExchangeRateState(state)?.list;
+    if (list && !withNtd) {
+        list = list.filter(x => x.currency !== 'TWD');
+    }
+    return list;
+};
 
 // accountReducer
 export interface ReduxAccountState {

@@ -13,6 +13,7 @@ import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.StockVo;
+import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
 
 @Service
@@ -35,6 +36,12 @@ public class StockService {
 			vo.transform(stock);
 			vo.setUpdateTime(this.getUpdateTime(stock.getCode(), stock.getOfferingDate()));
 			vos.add(vo);
+		}
+		if (vos.size() == 0) {
+			StockVo vo = this.get(code);
+			if (AppUtil.isPresent(vo)) {
+				vos.add(vo);
+			}
 		}
 		return vos;
 	}

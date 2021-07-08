@@ -20,10 +20,15 @@ def fetchExchangeRateRecord():
     day = int(request.args.get('day'))
     return ExchangeRateService.fetchExchangeRateRecords(currency, year, month, day)
 
+@app.route('/fetch/stocks')
+def fetchStocks():
+    marketType = request.args.get('marketType')
+    return StockService.fetchStocks(marketType)
+
 @app.route('/fetch/stock')
 def fetchStock():
-    marketType = request.args.get('marketType')
-    return StockService.fetchStock(marketType)
+    code = request.args.get('code')
+    return StockService.fetchStock(code)
 
 @app.route('/fetch/allStockRecord')
 def fetchAllStockRecord():

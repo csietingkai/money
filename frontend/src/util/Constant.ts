@@ -10,6 +10,7 @@ import { Record, SidebarItem } from 'util/Interface';
 import StockQuerier from 'view/investment/StockQuerier';
 import PersonalSettingPage from 'view/settings/PersonalSettingPage';
 import StockRecordUpdater from 'view/investment/StockRecordUpdater';
+import ExchangeRateQuerier from 'view/investment/ExchangeRateQuerier';
 
 
 // localStorage
@@ -59,6 +60,13 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 url: '/stockUpdater',
                 icon: CalendarAltIcon(),
                 component: StockRecordUpdater
+            },
+            {
+                name: 'Exchange Rate Querier',
+                level: 1,
+                url: '/exchangeRateQuerier',
+                icon: ChartLineIcon(),
+                component: ExchangeRateQuerier
             }
         ]
     },
@@ -79,7 +87,7 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
             {
                 name: 'Personal Setting',
                 level: 1,
-                url: 'personalSetting',
+                url: '/personalSetting',
                 icon: CogIcon(),
                 component: PersonalSettingPage
             }

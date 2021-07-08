@@ -82,7 +82,7 @@ public class AppInitializer {
 
 		Long lastUpdateTime = this.pythonCache.opsForValue().get(CodeConstants.STOCK_UPDATE_TIME_KEY);
 		if (AppUtil.isEmpty(lastUpdateTime) || TimeUtil.diff(LocalDateTime.now(), TimeUtil.convertToDateTime(lastUpdateTime)) > CodeConstants.UPDATE_FREQUENCY_HOURS * TimeUtil.HOUR_MILISECS) {
-			this.pythonFetcher.fetchStock();
+			this.pythonFetcher.fetchStocks();
 			lastUpdateTime = TimeUtil.getCurrentDateTime();
 			this.pythonCache.opsForValue().set(CodeConstants.STOCK_UPDATE_TIME_KEY, lastUpdateTime);
 		}

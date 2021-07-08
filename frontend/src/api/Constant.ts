@@ -31,4 +31,5 @@ export const ACCOUNT_EXPEND_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/expend'
 // api exchange rate
 const EXCHANGE_RATE_API_PREFIX: string = '/exchangeRate';
 export const EXCHANGE_RATE_GET_ALL_PATH: string = EXCHANGE_RATE_API_PREFIX + '/getAll';
+export const EXCHANGE_RATE_GET_RECORDS_PATH: string = EXCHANGE_RATE_API_PREFIX + '/getRecords';
 export const EXCHANGE_RATE_REFRESH_PATH: string = EXCHANGE_RATE_API_PREFIX + '/refresh';

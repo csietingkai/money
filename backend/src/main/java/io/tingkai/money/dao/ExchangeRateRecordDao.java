@@ -14,9 +14,9 @@ public interface ExchangeRateRecordDao extends JpaRepository<ExchangeRateRecord,
 
 	public Optional<ExchangeRateRecord> findByCurrencyAndDate(String currency, LocalDateTime date);
 
-	public Iterable<ExchangeRateRecord> findByCurrency(String currency);
+	public Iterable<ExchangeRateRecord> findByCurrencyOrderByDate(String currency);
 
-	public Iterable<ExchangeRateRecord> findByDate(LocalDateTime date);
+	public Iterable<ExchangeRateRecord> findByCurrencyAndDateBetweenOrderByDate(String currency, LocalDateTime start, LocalDateTime end);
 
 	public Optional<ExchangeRateRecord> findFirstByCurrencyOrderByDateDesc(String currency);
 

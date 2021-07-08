@@ -157,7 +157,7 @@ public class PythonFetcherService {
 		return record;
 	}
 
-	public void fetchStock() {
+	public void fetchStocks() {
 		List<Stock> data = new ArrayList<Stock>();
 		for (MarketType marketType : MarketType.values()) {
 			if (this.stockFacade.countByMarketType(marketType) == 0L) {
@@ -192,6 +192,34 @@ public class PythonFetcherService {
 			this.stockFacade.insertAll(data);
 		} catch (AlreadyExistException | FieldMissingException e) {
 			log.warn(e.getMessage());
+		}
+	}
+
+	public void fetchStock(String code) {
+		// @formatter:off
+		UriComponentsBuilder builder = UriComponentsBuilder
+				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX)
+				.queryParam("code", code);
+		// @formatter:on
+		JSONObject response = this.pythonServer.getForObject(builder.toUriString(), JSONObject.class);
+		System.out.println(response);
+		if (response instanceof HashMap) {
+			HashMap<String, Object> detail = (HashMap<String, Object>) response;
+			Stock entity = new Stock();
+			entity.setCode(code);
+			entity.setName(AppUtil.toString(detail.get("name")));
+			entity.setIsinCode(AppUtil.toString(detail.get("isinCode")));
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CodeConstants.DATE_FORMAT).withZone(CodeConstants.ZONE_TPE);
+			entity.setOfferingDate(LocalDate.parse(AppUtil.toString(detail.get("offeringDate")), formatter).atStartOfDay());
+			entity.setMarketType(MarketType.valueOf(AppUtil.toString(detail.get("marketType"))));
+			entity.setIndustryType(AppUtil.toString(detail.get("industryType")));
+			entity.setCfiCode(AppUtil.toString(detail.get("cfiCode")));
+			entity.setDescription(AppUtil.toString(detail.get("description")));
+			try {
+				this.stockFacade.insert(entity);
+			} catch (AlreadyExistException | FieldMissingException e) {
+				log.warn(e.getMessage());
+			}
 		}
 	}
 

@@ -16,6 +16,7 @@ import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.TimeUtil;
 
 @Service
 public class ExchangeRateRecordFacade {
@@ -23,9 +24,19 @@ public class ExchangeRateRecordFacade {
 	@Autowired
 	private ExchangeRateRecordDao exchangeRateRecordDao;
 
-	public List<ExchangeRateRecord> queryAll() throws QueryNotResultException {
+	public List<ExchangeRateRecord> queryAll(String currency) throws QueryNotResultException {
 		List<ExchangeRateRecord> entities = new ArrayList<ExchangeRateRecord>();
-		Iterable<ExchangeRateRecord> iterable = this.exchangeRateRecordDao.findAll();
+		Iterable<ExchangeRateRecord> iterable = this.exchangeRateRecordDao.findByCurrencyOrderByDate(currency);
+		iterable.forEach(entities::add);
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+		}
+		return entities;
+	}
+
+	public List<ExchangeRateRecord> queryAll(String currency, long start, long end) throws QueryNotResultException {
+		List<ExchangeRateRecord> entities = new ArrayList<ExchangeRateRecord>();
+		Iterable<ExchangeRateRecord> iterable = this.exchangeRateRecordDao.findByCurrencyAndDateBetweenOrderByDate(currency, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		iterable.forEach(entities::add);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);

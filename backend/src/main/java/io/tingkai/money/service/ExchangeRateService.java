@@ -40,11 +40,15 @@ public class ExchangeRateService {
 		return entities;
 	}
 
-	public void delete(String id) throws NotExistException {
-		this.exchangeRateFacade.delete(id);
+	public List<ExchangeRateRecord> getAllRecords(String code) throws QueryNotResultException {
+		return this.exchangeRateRecordFacade.queryAll(code);
 	}
 
-	public List<ExchangeRateRecord> getAllRecords() throws QueryNotResultException {
-		return this.exchangeRateRecordFacade.queryAll();
+	public List<ExchangeRateRecord> getAllRecords(String code, long start, long end) throws QueryNotResultException {
+		return this.exchangeRateRecordFacade.queryAll(code, start, end);
+	}
+
+	public void delete(String id) throws NotExistException {
+		this.exchangeRateFacade.delete(id);
 	}
 }
