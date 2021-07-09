@@ -16,7 +16,7 @@ import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.QueryNotResultException;
-import io.tingkai.money.service.PythonFetcherService;
+import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.UserService;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
@@ -31,7 +31,7 @@ public class AppInitializer {
 	private UserService userService;
 
 	@Autowired
-	private PythonFetcherService pythonFetcher;
+	private DataFetcherService pythonFetcher;
 
 	@Autowired
 	@Qualifier(CodeConstants.PYTHON_CACHE)

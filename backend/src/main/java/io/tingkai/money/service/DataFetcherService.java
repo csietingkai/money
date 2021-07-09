@@ -1,5 +1,10 @@
 package io.tingkai.money.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,7 +19,10 @@ import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,6 +34,7 @@ import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
+import io.tingkai.money.enumeration.FileType;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.facade.ExchangeRateFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
@@ -35,6 +44,7 @@ import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.QueryNotResultException;
+import io.tingkai.money.repository.FileRepository;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +53,10 @@ import net.minidev.json.JSONObject;
 @Service
 @Loggable
 @Slf4j
-public class PythonFetcherService {
+public class DataFetcherService {
 
 	@Autowired
-	private RestTemplate pythonServer;
+	private RestTemplate restTemplate;
 
 	@Autowired
 	@Qualifier(CodeConstants.PYTHON_CACHE)
@@ -82,6 +92,12 @@ public class PythonFetcherService {
 	@Autowired
 	private StockRecordFacade stockRecordFacade;
 
+	@Autowired
+	private FileService fileService;
+
+	@Autowired
+	RepositoryService repositoryService;
+
 	public void fetchExchangeRate() throws AlreadyExistException, FieldMissingException, QueryNotResultException {
 		if (this.exchangeRateFacade.count() == 0L) {
 			List<ExchangeRate> data = new ArrayList<ExchangeRate>();
@@ -89,7 +105,7 @@ public class PythonFetcherService {
 			twd.setCurrency("TWD");
 			twd.setName("新台幣");
 			data.add(twd);
-			JSONObject response = this.pythonServer.getForObject(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX, JSONObject.class);
+			JSONObject response = this.restTemplate.getForObject(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX, JSONObject.class);
 			response.keySet().forEach(currency -> {
 				ExchangeRate entity = new ExchangeRate();
 				entity.setCurrency(currency);
@@ -107,7 +123,7 @@ public class PythonFetcherService {
 		}
 	}
 
-	public void fetechExchangeRateRecord(String currency) throws AlreadyExistException, FieldMissingException {
+	public void fetechExchangeRateRecord(String currency) throws AlreadyExistException, FieldMissingException, IOException {
 		LocalDateTime target = CodeConstants.EXCHANGE_RATE_FETCH_START_DATETIME;
 		ExchangeRateRecord lastestRecord = null;
 		try {
@@ -120,25 +136,36 @@ public class PythonFetcherService {
 			target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
 		}
 		List<ExchangeRateRecord> records = new ArrayList<ExchangeRateRecord>();
-		while (TimeUtil.diff(LocalDateTime.now(), target) > CodeConstants.UPDATE_FREQUENCY_HOURS * TimeUtil.HOUR_MILISECS) {
+		while (target.getYear() * 12 + target.getMonthValue() <= LocalDateTime.now().getYear() * 12 + LocalDateTime.now().getMonthValue()) {
 			// @formatter:off
 			UriComponentsBuilder builder = UriComponentsBuilder
-					.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + "/exchangeRateRecord")
-					.queryParam("currency", currency)
-					.queryParam("year", target.getYear())
-					.queryParam("month", target.getMonthValue())
-					.queryParam("day", target.getDayOfMonth());
+					.fromHttpUrl(MessageFormat.format(AppConstants.EXCHANGE_RATE_RECORD_URL, String.valueOf(target.getYear()), (target.getMonthValue() >= 10 ? "" : "0") + String.valueOf(target.getMonthValue()), currency));
 			// @formatter:on
-			JSONObject datas = pythonServer.getForObject(builder.toUriString(), JSONObject.class);
-			for (String dateStr : datas.keySet()) {
-				records.add(this.toExchangeRateRecord(currency, dateStr, datas.get(dateStr)));
+			ResponseEntity<Resource> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, null, Resource.class);
+			String filename = currency + "-" + String.valueOf(target.getYear()) + (target.getMonthValue() >= 10 ? "" : "0") + String.valueOf(target.getMonthValue()) + ".csv";
+			FileRepository repository = this.repositoryService.getFileRepository(FileType.CSV);
+			OutputStream updaloadStream = this.fileService.getUploadStream(repository.getName(), filename, "backup");
+			updaloadStream.write(response.getBody().getInputStream().readAllBytes());
+			updaloadStream.close();
+
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getBody().getInputStream()))) {
+				br.readLine();
+				String line;
+				while ((line = br.readLine()) != null) {
+					String[] values = line.split(",");
+					ExchangeRateRecord record = new ExchangeRateRecord();
+					record.setCurrency(currency);
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(CodeConstants.ZONE_TPE);
+					record.setDate(LocalDate.parse(values[0], formatter).atStartOfDay());
+					record.setCashBuy(AppUtil.toBigDecimal(values[3], null));
+					record.setCashSell(AppUtil.toBigDecimal(values[13], null));
+					record.setSpotBuy(AppUtil.toBigDecimal(values[4], null));
+					record.setSpotSell(AppUtil.toBigDecimal(values[14], null));
+					records.add(record);
+				}
 			}
-			target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+
+			target = TimeUtil.plus(target, 1, ChronoUnit.MONTHS);
 		}
 		if (records.size() > 0) {
 			this.exchangeRateRecordFacade.insertAll(records);
@@ -171,7 +198,7 @@ public class PythonFetcherService {
 						.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX)
 						.queryParam("marketType", marketType);
 				// @formatter:on
-				JSONObject response = this.pythonServer.getForObject(builder.toUriString(), JSONObject.class);
+				JSONObject response = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
 
 				response.keySet().forEach(code -> {
 					Stock entity = new Stock();
@@ -206,7 +233,7 @@ public class PythonFetcherService {
 				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + AppConstants.PYTHON_FETCH_PATH + StockController.CONROLLER_PREFIX)
 				.queryParam("code", code);
 		// @formatter:on
-		JSONObject response = this.pythonServer.getForObject(builder.toUriString(), JSONObject.class);
+		JSONObject response = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
 		System.out.println(response);
 		if (response instanceof HashMap) {
 			HashMap<String, Object> detail = (HashMap<String, Object>) response;
@@ -262,7 +289,7 @@ public class PythonFetcherService {
 						.queryParam("start", startTime)
 						.queryParam("end", endTime);
 				// @formatter:on
-				JSONObject data = pythonServer.getForObject(builder.toUriString(), JSONObject.class);
+				JSONObject data = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
 				if (!data.isEmpty()) {
 					for (String dateStr : data.keySet()) {
 						StockRecord newRecord = this.toStockRecord(code, dateStr, data.get(dateStr));

@@ -14,7 +14,7 @@ import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.StockVo;
-import io.tingkai.money.service.PythonFetcherService;
+import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.StockService;
 import io.tingkai.money.service.UserStockService;
 
@@ -36,7 +36,7 @@ public class StockController {
 	private UserStockService userStockService;
 
 	@Autowired
-	private PythonFetcherService pythonFetcherService;
+	private DataFetcherService pythonFetcherService;
 
 	@RequestMapping(value = StockController.GET_ALL_PATH, method = RequestMethod.GET)
 	public StockResponse<List<StockVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) throws QueryNotResultException {

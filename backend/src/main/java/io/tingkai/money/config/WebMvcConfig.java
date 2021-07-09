@@ -30,7 +30,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public RestTemplate pythonServer(RestTemplateBuilder builder) {
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
 		return builder.build();
 	}
 }

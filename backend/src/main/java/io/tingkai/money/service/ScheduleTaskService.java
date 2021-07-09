@@ -30,7 +30,7 @@ public class ScheduleTaskService {
 	private StockRecordDao stockRecordDao;
 
 	@Autowired
-	private PythonFetcherService pythonFetcherService;
+	private DataFetcherService pythonFetcherService;
 
 	@Autowired
 	@Qualifier(CodeConstants.PYTHON_CACHE)

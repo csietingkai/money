@@ -12,14 +12,6 @@ app = Flask(__name__)
 def fetchExchangeRate():
     return ExchangeRateService.fetchExchangeRates()
 
-@app.route('/fetch/exchangeRateRecord')
-def fetchExchangeRateRecord():
-    currency = request.args.get('currency') #if key doesn't exist, returns None
-    year = int(request.args.get('year'))
-    month = int(request.args.get('month'))
-    day = int(request.args.get('day'))
-    return ExchangeRateService.fetchExchangeRateRecords(currency, year, month, day)
-
 @app.route('/fetch/stocks')
 def fetchStocks():
     marketType = request.args.get('marketType')

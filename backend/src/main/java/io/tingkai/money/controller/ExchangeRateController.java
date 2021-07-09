@@ -1,5 +1,6 @@
 package io.tingkai.money.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.ExchangeRateResponse;
 import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.model.response.StockResponse;
+import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.ExchangeRateService;
-import io.tingkai.money.service.PythonFetcherService;
 
 @RestController
 @RequestMapping(value = ExchangeRateController.CONROLLER_PREFIX)
@@ -33,7 +34,7 @@ public class ExchangeRateController {
 	private ExchangeRateService exchangeRateService;
 
 	@Autowired
-	private PythonFetcherService pythonFetcherService;
+	private DataFetcherService pythonFetcherService;
 
 	@RequestMapping(value = ExchangeRateController.GET_ALL_PATH, method = RequestMethod.GET)
 	public ExchangeRateResponse<List<ExchangeRate>> getAll() throws QueryNotResultException {
@@ -48,7 +49,7 @@ public class ExchangeRateController {
 	}
 
 	@RequestMapping(value = ExchangeRateController.REFRESH_PATH, method = RequestMethod.POST)
-	public SimpleResponse refresh(@RequestParam String currency) throws AlreadyExistException, FieldMissingException {
+	public SimpleResponse refresh(@RequestParam String currency) throws AlreadyExistException, FieldMissingException, IOException {
 		this.pythonFetcherService.fetechExchangeRateRecord(currency);
 		return new SimpleResponse(true);
 	}

@@ -17,7 +17,7 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
-import io.tingkai.money.service.PythonFetcherService;
+import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.util.AppUtil;
 
 @Service
@@ -27,7 +27,7 @@ public class StockFacade {
 	private StockDao stockDao;
 
 	@Autowired
-	private PythonFetcherService pythonFetcherService;
+	private DataFetcherService pythonFetcherService;
 
 	public List<Stock> queryAll(boolean sort) throws QueryNotResultException {
 		List<Stock> entities = new ArrayList<Stock>();
