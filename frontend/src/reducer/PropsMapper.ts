@@ -1,6 +1,6 @@
 import { Dispatch } from 'react';
 
-import { Login, Logout, SetAccountList, SetStockStyle } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetLoading, SetStockStyle } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -19,3 +19,4 @@ export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) 
 
 // system setting
 export const SetStockStyleDispatcher = (dispatch: Dispatch<Action<StockStyle>>) => (style: StockStyle): void => dispatch(SetStockStyle(style));
+export const SetLoadingDispatcher = (dispatch: Dispatch<Action<boolean>>) => (loading: boolean): void => dispatch(SetLoading(loading));

@@ -2,8 +2,8 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetStockStyle } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetLoading, SetStockStyle } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
@@ -66,6 +66,10 @@ export const fetchAccountList = (dispatch: Dispatch<Action<Account[]>>, getState
 
 export const setStockStyle = (dispatch: Dispatch<Action<StockStyle>>, getState: () => ReduxState): void => {
     dispatch(SetStockStyle(getStockStyle(getState())));
+};
+
+export const setLoading = (dispatch: Dispatch<Action<boolean>>, getState: () => ReduxState): void => {
+    dispatch(SetLoading(isLoading(getState())));
 };
 
 const store = createStore<any, any, any, any>(rootReducer, applyMiddleware(thunkMiddleware));

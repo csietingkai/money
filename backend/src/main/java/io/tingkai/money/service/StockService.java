@@ -11,12 +11,14 @@ import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
+import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.StockVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
 
 @Service
+@Loggable
 public class StockService {
 
 	@Autowired

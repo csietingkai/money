@@ -1,4 +1,4 @@
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING } from 'reducer/ActionType';
 
 import { AuthToken } from 'api/auth';
 
@@ -21,3 +21,4 @@ export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type
 
 // system setting
 export const SetStockStyle = (payload: StockStyle): Action<StockStyle> => ({ type: SET_STOCK_STYLE, payload });
+export const SetLoading = (payload: boolean): Action<boolean> => ({ type: SET_LOADING, payload });

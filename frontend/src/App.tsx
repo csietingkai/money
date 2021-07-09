@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Route, Redirect, Switch, RouteChildrenProps } from 'react-router-dom';
 
 import { LogoutDispatcher } from 'reducer/PropsMapper';
-import { getAuthToken, getAuthTokenString, ReduxState } from 'reducer/Selector';
+import { getAuthToken, getAuthTokenString, isLoading, ReduxState } from 'reducer/Selector';
 
 import Breadcrumb from 'component/layout/Breadcrumb';
 import Footer from 'component/layout/Footer';
@@ -16,10 +16,12 @@ import { AuthToken } from 'api/auth';
 
 import { APP_ROUTES } from 'util/Constant';
 import { Action } from 'util/Interface';
+import Loading from 'component/common/Loading';
 
 export interface AppProps extends RouteChildrenProps<any> {
     authToken?: AuthToken;
     authTokenString?: string;
+    loading: boolean;
     logout: () => void;
 }
 
@@ -37,8 +39,10 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     render() {
+        const { loading } = this.props;
         const app = (
             <div className='app'>
+                {loading && <Loading />}
                 <Header {...this.props} authToken={this.props.authToken} onLogoutClick={this.onLogoutClick} />
                 <div className='app-body'>
                     <Sidebar {...this.props} authToken={this.props.authToken} />
@@ -66,7 +70,8 @@ class App extends React.Component<AppProps, AppState> {
 const mapStateToProps = (state: ReduxState) => {
     return {
         authToken: getAuthToken(state),
-        authTokenString: getAuthTokenString(state)
+        authTokenString: getAuthTokenString(state),
+        loading: isLoading(state)
     };
 };
 

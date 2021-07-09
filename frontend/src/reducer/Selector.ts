@@ -1,3 +1,5 @@
+import * as StateHolder from 'reducer/StateHolder';
+
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
@@ -19,6 +21,9 @@ export type ReduxChildState = ReduxAuthState | ReduxStockState | ReduxExchangeRa
 export interface ReduxAuthState {
     authToken: AuthToken;
 }
+export const DEFAULT_REDUX_AUTH_STATE: ReduxAuthState = {
+    authToken: StateHolder.getAuthToken()
+};
 const getAuthState = (state: ReduxState): ReduxAuthState => state.auth;
 export const getAuthToken = (state: ReduxState): AuthToken => getAuthState(state)?.authToken;
 export const getAuthTokenName = (state: ReduxState): string => getAuthToken(state)?.name;
@@ -30,6 +35,9 @@ export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(
 export interface ReduxStockState {
     tracking: Stock[];
 }
+export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
+    tracking: []
+};
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
 export const getStockTrackingList = (state: ReduxState): Stock[] => getStockState(state)?.tracking;
 
@@ -37,6 +45,9 @@ export const getStockTrackingList = (state: ReduxState): Stock[] => getStockStat
 export interface ReduxExchangeRateState {
     list: ExchangeRate[];
 }
+export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
+    list: []
+};
 const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;
 export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRate[] => {
     let list = getExchangeRateState(state)?.list;
@@ -50,12 +61,21 @@ export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true):
 export interface ReduxAccountState {
     list: Account[];
 }
+export const DEFAULT_REDUX_ACCOUNT_STATE: ReduxAccountState = {
+    list: []
+};
 const getAccountState = (state: ReduxState): ReduxAccountState => state.account;
 export const getAccountList = (state: ReduxState): Account[] => getAccountState(state)?.list;
 
 // system variable
 export interface ReduxSystemSettingState {
     stockStyle: StockStyle;
+    loading: boolean;
 }
+export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
+    stockStyle: StateHolder.getStockStyle(),
+    loading: false
+};
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
 export const getStockStyle = (state: ReduxState): StockStyle => getSystemSetting(state)?.stockStyle;
+export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;

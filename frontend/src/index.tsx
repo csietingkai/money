@@ -14,6 +14,7 @@ import Page500 from 'view/Page500';
 import RegisterPage from 'view/RegisterPage';
 
 // reducer
+import { SetLoading } from 'reducer/Action';
 import { getAuthToken } from 'reducer/StateHolder';
 import store, { fetchAccountList, fetchExchangeRateList, validateToken } from 'reducer/Store';
 
@@ -37,6 +38,9 @@ axios.defaults.baseURL = API_URL;
 axios.defaults.headers = { 'X-Auth-Token': getAuthToken()?.tokenString };
 axios.interceptors.request.use(
     (config) => {
+        // system loading = true
+        SetLoading(true);
+        // transform date format
         config.headers = { ...config.headers, 'Content-Type': 'application/json;charset=utf-8' };
         config.transformRequest = [].concat((data: any) => {
             data = handleRequestDate(data);
@@ -55,6 +59,13 @@ axios.interceptors.request.use(
             window.location.replace('/#/500');
         }
         throw error;
+    }
+);
+axios.interceptors.response.use(
+    (response) => {
+        // system loading = false
+        SetLoading(false);
+        return response;
     }
 );
 

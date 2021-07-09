@@ -134,6 +134,11 @@ public class PythonFetcherService {
 				records.add(this.toExchangeRateRecord(currency, dateStr, datas.get(dateStr)));
 			}
 			target = TimeUtil.plus(target, 1, ChronoUnit.DAYS);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		if (records.size() > 0) {
 			this.exchangeRateRecordFacade.insertAll(records);

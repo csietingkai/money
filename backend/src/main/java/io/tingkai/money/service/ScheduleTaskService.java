@@ -14,10 +14,12 @@ import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.dao.StockDao;
 import io.tingkai.money.dao.StockRecordDao;
 import io.tingkai.money.entity.Stock;
+import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Loggable
 @Slf4j
 public class ScheduleTaskService {
 
