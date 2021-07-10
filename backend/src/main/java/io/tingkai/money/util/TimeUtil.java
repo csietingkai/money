@@ -105,7 +105,7 @@ public class TimeUtil {
 	 * else -> a is same as b <br/>
 	 */
 	public static long diff(LocalDateTime a, LocalDateTime b) {
-		return Math.abs((convertToTimeStamp(a) - convertToTimeStamp(b)));
+		return (convertToTimeStamp(a) - convertToTimeStamp(b));
 	}
 
 	public static boolean isLeap(int year) {

@@ -153,10 +153,14 @@ public class DataFetcherService {
 				String line;
 				while ((line = br.readLine()) != null) {
 					String[] values = line.split(",");
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(CodeConstants.ZONE_TPE);
+					LocalDateTime rowDate = LocalDate.parse(values[0], formatter).atStartOfDay();
+					if (TimeUtil.diff(rowDate, target) < 0) {
+						continue;
+					}
 					ExchangeRateRecord record = new ExchangeRateRecord();
 					record.setCurrency(currency);
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(CodeConstants.ZONE_TPE);
-					record.setDate(LocalDate.parse(values[0], formatter).atStartOfDay());
+					record.setDate(rowDate);
 					record.setCashBuy(AppUtil.toBigDecimal(values[3], null));
 					record.setCashSell(AppUtil.toBigDecimal(values[13], null));
 					record.setSpotBuy(AppUtil.toBigDecimal(values[4], null));
@@ -172,21 +176,6 @@ public class DataFetcherService {
 		}
 
 		saveUpdateTime(exchangeRateRecordCache, CodeConstants.EXCHANGE_RATE_RECORD_UPDATE_TIME_KEY, currency);
-	}
-
-	private ExchangeRateRecord toExchangeRateRecord(String currency, String dateStr, Object obj) {
-		ExchangeRateRecord record = new ExchangeRateRecord();
-		record.setCurrency(currency);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CodeConstants.DATE_FORMAT).withZone(CodeConstants.ZONE_TPE);
-		record.setDate(LocalDate.parse(dateStr, formatter).atStartOfDay());
-		if (obj instanceof List<?>) {
-			List<?> list = (List<?>) obj;
-			record.setCashBuy(AppUtil.toBigDecimal(list.get(0), null));
-			record.setCashSell(AppUtil.toBigDecimal(list.get(1), null));
-			record.setSpotBuy(AppUtil.toBigDecimal(list.get(2), null));
-			record.setSpotSell(AppUtil.toBigDecimal(list.get(3), null));
-		}
-		return record;
 	}
 
 	public void fetchStocks() {
