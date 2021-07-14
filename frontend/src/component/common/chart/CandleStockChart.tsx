@@ -51,7 +51,8 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
                                 {
                                     label: 'open and close',
                                     data: records.map((x: StockRecord) => [x.openPrice, x.closePrice]),
-                                    backgroundColor: records.map((x: StockRecord) => this.getStickColor(x))
+                                    backgroundColor: records.map((x: StockRecord) => this.getStickColor(x)),
+                                    minBarLength: 1
                                 },
                                 {
                                     label: 'high and low',
