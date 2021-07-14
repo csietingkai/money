@@ -20,7 +20,7 @@ export default class SidebarMinimizer extends React.Component<SidebarMinimizerPr
 
     render(): JSX.Element {
         return (
-            <button className='sidebar-minimizer' type='button' onClick={(event) => { this.sidebarMinimize(); this.brandMinimize(); }}></button>
+            <button className='sidebar-minimizer' type='button' onClick={() => { this.sidebarMinimize(); this.brandMinimize(); }}></button>
         );
     }
 }

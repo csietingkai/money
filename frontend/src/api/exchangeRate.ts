@@ -4,7 +4,6 @@ import { EXCHANGE_RATE_GET_ALL_PATH, EXCHANGE_RATE_GET_RECORDS_PATH, EXCHANGE_RA
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
-import { data } from 'jquery';
 
 export interface ExchangeRate {
     currency: string;

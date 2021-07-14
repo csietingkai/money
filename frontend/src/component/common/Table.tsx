@@ -4,11 +4,6 @@ import { Pagination, Table as RbTable } from 'react-bootstrap';
 /** pages before and after current page */
 const SHOW_ELLIPSIS_PAGE_COUNT: number = 2;
 
-// export interface TableHeader {
-//     key: string;
-//     text: string;
-// }
-
 export interface TableProps {
     id: string;
     striped?: boolean;

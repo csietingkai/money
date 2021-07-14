@@ -10,7 +10,6 @@ import Card from 'component/common/Card';
 import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
 
-import StockApi, { StockRecord } from 'api/stock';
 import ExchangeRateApi, { ExchangeRate, ExchangeRateRecord } from 'api/exchangeRate';
 
 import { toDateStr } from 'util/AppUtil';
@@ -32,7 +31,6 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
 
     constructor(props: ExchangeRateQuerierProps) {
         super(props);
-        console.log(props);
         this.state = {
             queryCondition: {
                 currency: 'USD',
