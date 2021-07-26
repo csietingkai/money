@@ -173,7 +173,7 @@ public class UserStockService {
 		this.syncTrackingCache(username);
 	}
 
-	public void cancelTrack(String username, String stockCode) throws QueryNotResultException, NotExistException {
+	public void untrack(String username, String stockCode) throws QueryNotResultException, NotExistException {
 		UserTrackingStock entity = this.userTrackingStockFacade.query(username, stockCode);
 		this.userTrackingStockFacade.delete(entity.getId());
 		this.syncTrackingCache(username);

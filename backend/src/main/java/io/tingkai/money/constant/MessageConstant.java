@@ -27,7 +27,7 @@ public class MessageConstant {
 	// stock
 	public static final String STOCK_GET_ALL_SUCCESS = "Get All Stocks Success";
 	public static final String STOCK_GET_SUCCESS = "Get Stock: {0} Success";
-	public static final String STOCK_REFRESH_SUCCESS = "Stock Fresh Success";
+	public static final String STOCK_REFRESH_SUCCESS = "Stock Refresh Success";
 	public static final String USER_STOCK_GET_TRACKING_LIST_SUCCESS = "User: {0} Tracking List Fetch Success";
 	public static final String STOCK_SHARE_AMOUNT_INVALID = "Stock Share: {0} is invalid";
 

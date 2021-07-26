@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.entity.UserTrackingStock;
+import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
+import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.StockVo;
@@ -28,6 +31,8 @@ public class StockController {
 	public static final String LATEST_RECORD_PATH = "/latestRecord";
 	public static final String REFRESH_PATH = "/refresh";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
+	public static final String TRACK_PATH = "/track";
+	public static final String UNTRACK_PATH = "/untrack";
 
 	@Autowired
 	private StockService stockService;
@@ -66,5 +71,17 @@ public class StockController {
 	public StockResponse<List<UserTrackingStock>> getAll(@RequestParam String username) throws QueryNotResultException {
 		List<UserTrackingStock> stocks = this.userStockService.getUserTrackingStockList(username);
 		return new StockResponse<List<UserTrackingStock>>(true, stocks, MessageConstant.USER_STOCK_GET_TRACKING_LIST_SUCCESS, username);
+	}
+
+	@RequestMapping(value = StockController.TRACK_PATH, method = RequestMethod.POST)
+	public StockResponse<Void> track(@RequestParam String username, @RequestParam String code) throws AlreadyExistException, FieldMissingException, QueryNotResultException {
+		this.userStockService.track(username, code);
+		return new StockResponse<Void>(true, null, MessageConstant.STOCK_REFRESH_SUCCESS);
+	}
+
+	@RequestMapping(value = StockController.UNTRACK_PATH, method = RequestMethod.POST)
+	public StockResponse<Void> untrack(@RequestParam String username, @RequestParam String code) throws QueryNotResultException, NotExistException {
+		this.userStockService.untrack(username, code);
+		return new StockResponse<Void>(true, null, MessageConstant.STOCK_REFRESH_SUCCESS);
 	}
 }
