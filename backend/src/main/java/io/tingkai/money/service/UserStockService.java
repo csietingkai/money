@@ -225,11 +225,14 @@ public class UserStockService {
 		return tax;
 	}
 
-	private void syncTrackingCache(String username) throws QueryNotResultException {
+	private void syncTrackingCache(String username) {
 		String cacheKey = CodeConstants.USER_TRACKING_STOCK_KEY + username;
 		List<UserTrackingStock> trackingList = new ArrayList<UserTrackingStock>();
-		Iterable<UserTrackingStock> iterable = this.userTrackingStockFacade.queryAll(username);
-		iterable.forEach(trackingList::add);
+		try {
+			Iterable<UserTrackingStock> iterable = this.userTrackingStockFacade.queryAll(username);
+			iterable.forEach(trackingList::add);
+		} catch (QueryNotResultException e) {
+		}
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}
 }
