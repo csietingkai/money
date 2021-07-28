@@ -16,7 +16,7 @@ import RegisterPage from 'view/RegisterPage';
 // reducer
 import { SetLoading } from 'reducer/Action';
 import { getAuthToken } from 'reducer/StateHolder';
-import store, { fetchAccountList, fetchExchangeRateList, validateToken } from 'reducer/Store';
+import store, { fetchAccountList, fetchExchangeRateList, fetchStockTrackingList, validateToken } from 'reducer/Store';
 
 // apis
 import { API_URL } from 'api/Constant';
@@ -47,11 +47,18 @@ axios.interceptors.request.use(
             return JSON.stringify(data);
         });
         return config;
+    }
+);
+axios.interceptors.response.use(
+    (response) => {
+        // system loading = false
+        SetLoading(false);
+        return response;
     },
     (error) => {
         const { status } = error.response.data;
         if (status === 403) {
-            Notify.warning('Maybe You Need to Login First.');
+            // Notify.warning('Maybe You Need to Login First.');
             window.location.replace('/#/login');
         } else if (status === 404) {
             window.location.replace('/#/404');
@@ -61,13 +68,6 @@ axios.interceptors.request.use(
         throw error;
     }
 );
-axios.interceptors.response.use(
-    (response) => {
-        // system loading = false
-        SetLoading(false);
-        return response;
-    }
-);
 
 // validate token on refresh
 store.dispatch(validateToken);
@@ -75,6 +75,8 @@ store.dispatch(validateToken);
 store.dispatch(fetchExchangeRateList);
 // get user's accounts
 store.dispatch(fetchAccountList);
+// get user's stock tracking list
+store.dispatch(fetchStockTrackingList);
 
 const ROOT = document.querySelector('#root');
 const app = (

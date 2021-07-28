@@ -3,7 +3,7 @@ import * as StateHolder from 'reducer/StateHolder';
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
-import { Stock } from 'api/stock';
+import { UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 
@@ -33,13 +33,13 @@ export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(
 
 // stockReducer
 export interface ReduxStockState {
-    tracking: Stock[];
+    tracking: UserTrackingStockVo[];
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
     tracking: []
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
-export const getStockTrackingList = (state: ReduxState): Stock[] => getStockState(state)?.tracking;
+export const getStockTrackingList = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.tracking;
 
 // exchangeReducer
 export interface ReduxExchangeRateState {

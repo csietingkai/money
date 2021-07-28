@@ -1,17 +1,19 @@
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST } from 'reducer/ActionType';
 
-import { AuthToken } from 'api/auth';
-
-import { Action } from 'util/Interface';
-import { ExchangeRate } from 'api/exchangeRate';
 import { Account } from 'api/account';
+import { AuthToken } from 'api/auth';
+import { ExchangeRate } from 'api/exchangeRate';
+import { UserTrackingStockVo } from 'api/stock';
+
 import { StockStyle } from 'util/Enum';
+import { Action } from 'util/Interface';
 
 // auth
 export const Login = (payload: AuthToken): Action<AuthToken> => ({ type: LOGIN, payload });
 export const Logout = (): Action<undefined> => ({ type: LOGOUT, payload: undefined });
 
 // stock
+export const SetStockTrackingList = (payload: UserTrackingStockVo[]): Action<UserTrackingStockVo[]> => ({ type: SET_STOCK_TRACKING_LIST, payload });
 
 // exchange rate
 export const SetExchangeRateList = (payload: ExchangeRate[]): Action<ExchangeRate[]> => ({ type: SET_EXCHANGE_RATE_LIST, payload });

@@ -5,22 +5,29 @@ import { connect } from 'react-redux';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
-import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
-import Loading from 'component/common/Loading';
+import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import StockApi, { StockVo } from 'api/stock';
+import { getAuthTokenName, getStockTrackingList, ReduxState } from 'reducer/Selector';
+
+import StockApi, { StockVo, UserTrackingStockVo } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import Notify from 'util/Notify';
+import { Action } from 'util/Interface';
+import { Dispatch } from 'react';
+import { SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
 
-export interface StockRecordUpdaterProps { }
+export interface StockRecordUpdaterProps {
+    username: string;
+    stockTrackingList: UserTrackingStockVo[];
+    setStockTrackingList: (stocks: UserTrackingStockVo[]) => void;
+}
 
 export interface StockRecordUpdaterState {
     queryCondition: { code: string, name: string; };
     stocks: StockVo[];
-    loaded: boolean;
 }
 
 class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockRecordUpdaterState> {
@@ -29,13 +36,11 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
         super(props);
         this.state = {
             queryCondition: { code: '', name: '' },
-            stocks: [],
-            loaded: true
+            stocks: []
         };
     }
 
     private onQueryBtnClick = async () => {
-        this.setState({ loaded: false });
         const { queryCondition } = this.state;
         const { success, data: stocks, message } = await StockApi.getAll(queryCondition.code, queryCondition.name);
         if (success) {
@@ -43,50 +48,78 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
         } else {
             Notify.warning(message);
         }
-        this.setState({ loaded: true });
     };
 
     private syncRecord = (code: string) => async () => {
-        const { queryCondition } = this.state;
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
         if (refreshSuccess) {
+            await this.reQuery();
             Notify.success(message);
-
-            const { success: fetchSuccess, data: vos } = await StockApi.getAll(queryCondition.code, queryCondition.name);
-            if (fetchSuccess) {
-                this.setState({ stocks: vos });
-            }
         } else {
             Notify.error(message);
         }
     };
 
-    render(): JSX.Element {
-        const { queryCondition, stocks, loaded } = this.state;
-        let table = <div className='text-center'><Loading /></div>;
-        if (loaded) {
-            const data = stocks.map(x => {
-                return { ...x, offeringDate: toDateStr(x.offeringDate), updateTime: toDateStr(x.updateTime) };
-            });
-            table = (
-                <Table
-                    id='stock-updater-table'
-                    header={['code', 'name', 'isinCode', 'offeringDate', 'marketType', 'industryType', 'cfiCode', 'description', 'updateTime', 'functions']}
-                    data={data}
-                    countPerPage={10}
-                    columnConverter={(header: string, rowData: any) => {
-                        if (header === 'functions') {
-                            return (
-                                <>
-                                    <Button size='sm' variant='info' outline onClick={this.syncRecord(rowData.code)}><SyncAltIcon /></Button>
-                                </>
-                            );
-                        }
-                        return rowData[header];
-                    }}
-                />
-            );
+    private track = (code: string) => async () => {
+        const { username } = this.props;
+        const { success, message } = await StockApi.track(username, code);
+        if (success) {
+            await this.reQuery();
+            Notify.success(message);
+        } else {
+            Notify.warning(message);
         }
+    };
+
+    private untrack = (code: string) => async () => {
+        const { username } = this.props;
+        const { success, message } = await StockApi.untrack(username, code);
+        if (success) {
+            await this.reQuery();
+            Notify.success(message);
+        } else {
+            Notify.warning(message);
+        }
+    };
+
+    private reQuery = async () => {
+        const { username } = this.props;
+        const { queryCondition } = this.state;
+        const { success, data: vos } = await StockApi.getAll(queryCondition.code, queryCondition.name);
+        if (success) {
+            const { data } = await StockApi.getTrackingList(username);
+            this.props.setStockTrackingList(data);
+            this.setState({ stocks: vos });
+        }
+    };
+
+    render(): JSX.Element {
+        const { stockTrackingList } = this.props;
+        const { queryCondition, stocks } = this.state;
+        const data = stocks.map(x => {
+            return { ...x, offeringDate: toDateStr(x.offeringDate), updateTime: toDateStr(x.updateTime) };
+        });
+        const table = (
+            <Table
+                id='stock-updater-table'
+                header={['code', 'name', 'isinCode', 'offeringDate', 'marketType', 'industryType', 'cfiCode', 'description', 'updateTime', 'functions']}
+                data={data}
+                countPerPage={10}
+                columnConverter={(header: string, rowData: any) => {
+                    if (header === 'functions') {
+                        const isTracking: boolean = stockTrackingList.findIndex(x => x.stockCode === rowData.code) >= 0;
+                        return (
+                            <>
+                                <Button size='sm' variant='info' outline onClick={this.syncRecord(rowData.code)}><SyncAltIcon /></Button>
+                                {!isTracking && <Button size='sm' variant='info' outline onClick={this.track(rowData.code)}><PlusIcon /></Button>}
+                                {isTracking && <Button size='sm' variant='info' outline onClick={this.untrack(rowData.code)}><MinusIcon /></Button>}
+                            </>
+                        );
+                    }
+                    return rowData[header];
+                }}
+            />
+        );
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -133,8 +166,17 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
     }
 }
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = (state: ReduxState) => {
+    return {
+        username: getAuthTokenName(state),
+        stockTrackingList: getStockTrackingList(state)
+    };
 };
 
-export default connect(mapStateToProps)(StockRecordUpdater);
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => {
+    return {
+        setStockTrackingList: SetStockTrackingListDispatcher(dispatch)
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(StockRecordUpdater);

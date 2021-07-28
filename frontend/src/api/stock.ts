@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_LATEST_RECORD_PATH, STOCK_REFRESH_PATH } from 'api/Constant';
+import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_LATEST_RECORD_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
@@ -38,10 +38,23 @@ export interface StockRecord {
     closePrice: number;
 }
 
+export interface UserTrackingStock {
+    id: string;
+    userName: string;
+    stockCode: string;
+}
+
+export interface UserTrackingStockVo extends UserTrackingStock {
+    stockName: string;
+    record: StockRecord;
+    amplitude: number;
+}
+
 export interface StockResponse extends ApiResponse<StockVo> { }
 export interface StockListResponse extends ApiResponse<StockVo[]> { }
 export interface StockRecordResponse extends ApiResponse<StockRecord> { }
 export interface StockRecordListResponse extends ApiResponse<StockRecord[]> { }
+export interface StockTrackingListResponse extends ApiResponse<UserTrackingStockVo[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
 
@@ -78,4 +91,22 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     return data;
 };
 
-export default { getAll, getRecords, latestRecord, refresh };
+const getTrackingList = async (username: string): Promise<StockTrackingListResponse> => {
+    const response = await axios.get(STOCK_GET_TRACKING_LIST_PATH, { params: { username } });
+    const data: StockTrackingListResponse = response.data;
+    return data;
+};
+
+const track = async (username: string, code: string): Promise<SimpleResponse> => {
+    const response = await axios.post(STOCK_TRACK_PATH, null, { params: { username, code } });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
+const untrack = async (username: string, code: string): Promise<SimpleResponse> => {
+    const response = await axios.post(STOCK_UNTRACK_PATH, null, { params: { username, code } });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
+export default { getAll, getRecords, latestRecord, refresh, getTrackingList, track, untrack };

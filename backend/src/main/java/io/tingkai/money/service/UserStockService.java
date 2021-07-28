@@ -14,11 +14,15 @@ import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.entity.Account;
+import io.tingkai.money.entity.Stock;
+import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.entity.UserStock;
 import io.tingkai.money.entity.UserStockRecord;
 import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.enumeration.DealType;
 import io.tingkai.money.facade.AccountFacade;
+import io.tingkai.money.facade.StockFacade;
+import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.facade.UserStockFacade;
 import io.tingkai.money.facade.UserStockRecordFacade;
 import io.tingkai.money.facade.UserTrackingStockFacade;
@@ -29,6 +33,7 @@ import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
+import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.util.AppUtil;
 
 @Service
@@ -37,6 +42,12 @@ public class UserStockService {
 
 	@Autowired
 	private AccountFacade accountFacade;
+
+	@Autowired
+	private StockFacade stockFacade;
+
+	@Autowired
+	private StockRecordFacade stockRecordFacade;
 
 	@Autowired
 	private UserStockFacade userStockFacade;
@@ -153,7 +164,7 @@ public class UserStockService {
 		return this.userStockRecordFacade.queryByAccountId(account.getId());
 	}
 
-	public List<UserTrackingStock> getUserTrackingStockList(String username) throws QueryNotResultException {
+	public List<UserTrackingStockVo> getUserTrackingStockList(String username) throws QueryNotResultException {
 		String cacheKey = CodeConstants.USER_TRACKING_STOCK_KEY + username;
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
@@ -162,7 +173,27 @@ public class UserStockService {
 			iterable.forEach(trackingList::add);
 			this.userCache.opsForValue().set(cacheKey, trackingList);
 		}
-		return trackingList;
+
+		List<UserTrackingStockVo> list = new ArrayList<UserTrackingStockVo>();
+		for (UserTrackingStock x : trackingList) {
+			UserTrackingStockVo vo = new UserTrackingStockVo();
+			vo.transform(x);
+
+			Stock info = this.stockFacade.query(x.getStockCode());
+			vo.setStockName(info.getName());
+
+			List<StockRecord> records = this.stockRecordFacade.queryAll(x.getStockCode());
+			if (records.size() > 0) {
+				StockRecord r0 = records.get(records.size() - 1);
+				vo.setRecord(r0);
+				if (records.size() > 1) {
+					StockRecord r1 = records.get(records.size() - 2);
+					vo.setAmplitude(r1.getClosePrice().subtract(r0.getClosePrice()));
+				}
+			}
+			list.add(vo);
+		}
+		return list;
 	}
 
 	public void track(String username, String stockCode) throws AlreadyExistException, FieldMissingException, QueryNotResultException {

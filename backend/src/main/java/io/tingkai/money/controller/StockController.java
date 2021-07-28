@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.StockRecord;
-import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.StockVo;
+import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.StockService;
 import io.tingkai.money.service.UserStockService;
@@ -68,9 +68,9 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)
-	public StockResponse<List<UserTrackingStock>> getAll(@RequestParam String username) throws QueryNotResultException {
-		List<UserTrackingStock> stocks = this.userStockService.getUserTrackingStockList(username);
-		return new StockResponse<List<UserTrackingStock>>(true, stocks, MessageConstant.USER_STOCK_GET_TRACKING_LIST_SUCCESS, username);
+	public StockResponse<List<UserTrackingStockVo>> getAll(@RequestParam String username) throws QueryNotResultException {
+		List<UserTrackingStockVo> stocks = this.userStockService.getUserTrackingStockList(username);
+		return new StockResponse<List<UserTrackingStockVo>>(true, stocks, MessageConstant.USER_STOCK_GET_TRACKING_LIST_SUCCESS, username);
 	}
 
 	@RequestMapping(value = StockController.TRACK_PATH, method = RequestMethod.POST)

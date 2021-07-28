@@ -16,6 +16,9 @@ export const STOCK_GET_ALL_PATH: string = STOCK_API_PREFIX + '/getAll';
 export const STOCK_GET_RECORDS_PATH: string = STOCK_API_PREFIX + '/getRecords';
 export const STOCK_LATEST_RECORD_PATH: string = STOCK_API_PREFIX + '/latestRecord';
 export const STOCK_REFRESH_PATH: string = STOCK_API_PREFIX + '/refresh';
+export const STOCK_GET_TRACKING_LIST_PATH: string = STOCK_API_PREFIX + '/getTrackingList';
+export const STOCK_TRACK_PATH: string = STOCK_API_PREFIX + '/track';
+export const STOCK_UNTRACK_PATH: string = STOCK_API_PREFIX + '/untrack';
 
 // api account
 const ACCOUNT_API_PREFIX: string = '/account';

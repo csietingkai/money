@@ -2,13 +2,14 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetLoading, SetStockStyle } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle, isLoading, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetLoading, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exchangeRate';
+import StockApi, { StockTrackingListResponse, UserTrackingStockVo } from 'api/stock';
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
@@ -30,6 +31,25 @@ export const validateToken = (dispatch: Dispatch<Action<AuthToken>>, getState: (
         });
     } else {
         dispatch(Logout());
+    }
+};
+
+export const fetchStockTrackingList = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>, getState: () => ReduxState): void => {
+    const tokenString: string = getAuthTokenString(getState());
+    const stockList: UserTrackingStockVo[] = getStockTrackingList(getState());
+    if (tokenString && isArrayEmpty(stockList)) {
+        const username = getAuthTokenName(getState());
+        StockApi.getTrackingList(username).then((response: StockTrackingListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetStockTrackingList(data));
+            } else {
+                dispatch(SetStockTrackingList([]));
+            }
+        }).catch(error => {
+            console.error(error);
+            dispatch(Logout());
+        });
     }
 };
 

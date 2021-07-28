@@ -8,9 +8,8 @@ import { LockIcon, UserIcon } from 'component/common/Icons';
 
 import { removeAuthToken } from 'reducer/StateHolder';
 import { LoginDispatcher } from 'reducer/PropsMapper';
-import store, { fetchAccountList, fetchExchangeRateList } from 'reducer/Store';
+import store, { fetchAccountList, fetchExchangeRateList, fetchStockTrackingList } from 'reducer/Store';
 
-import { Account } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
 import Notify from 'util/Notify';
@@ -18,7 +17,6 @@ import { Action } from 'util/Interface';
 
 export interface LoginPageProps extends RouteChildrenProps<any> {
     login: (authToken: AuthToken) => void;
-    setAccountList: (accounts: Account[]) => void;
 }
 
 export interface LoginPageState {
@@ -50,6 +48,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
             this.props.login(data);
             store.dispatch(fetchExchangeRateList);
             store.dispatch(fetchAccountList);
+            store.dispatch(fetchStockTrackingList);
             Notify.success(message);
         } else {
             removeAuthToken();
@@ -122,7 +121,7 @@ const mapStateToProps = () => {
     return {};
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<AuthToken | Account[]>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<AuthToken>>) => {
     return {
         login: LoginDispatcher(dispatch)
     };

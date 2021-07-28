@@ -1,9 +1,10 @@
 import { Dispatch } from 'react';
 
-import { Login, Logout, SetAccountList, SetLoading, SetStockStyle } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetLoading, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
+import { UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 import { Action } from 'util/Interface';
@@ -13,6 +14,7 @@ export const LoginDispatcher = (dispatch: Dispatch<Action<AuthToken>>) => (authT
 export const LogoutDispatcher = (dispatch: Dispatch<Action<undefined>>) => (): void => dispatch(Logout());
 
 // stock
+export const SetStockTrackingListDispatcher = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => (stocks: UserTrackingStockVo[]): void => dispatch(SetStockTrackingList(stocks));
 
 // account
 export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) => (accounts: Account[]): void => dispatch(SetAccountList(accounts));

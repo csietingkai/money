@@ -2,19 +2,25 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Card as RbCard, Row, Col, ProgressBar } from 'react-bootstrap';
 
-import { getAccountList, getAuthToken, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthToken, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
+
+import { PiggyBankIcon, StarIcon } from 'component/common/Icons';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
+import { UserTrackingStockVo } from 'api/stock';
 
-import { PiggyBankIcon } from 'component/common/Icons';
 import { numberComma, sum } from 'util/AppUtil';
+import { StockStyle } from 'util/Enum';
 
+const STOCK_CARD_AMOUNT_PER_ROW: number = 4;
 const ACCOUNT_CARD_AMOUNT_PER_ROW: number = 4;
 
 export interface DashBoardProps {
-    authToken?: AuthToken;
-    userAccounts?: Account[];
+    authToken: AuthToken;
+    stockTrackingList: UserTrackingStockVo[];
+    userAccounts: Account[];
+    stockStyle: StockStyle;
 }
 
 export interface DashBoardState { }
@@ -25,6 +31,53 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         super(props);
         this.state = {};
     }
+
+    private trackingStockCards = (stockTrackingList: UserTrackingStockVo[], style: StockStyle) => {
+        const cards: JSX.Element[] = stockTrackingList.map(x => {
+            let variant: string = 'secondary';
+            let sign: string = '+';
+            if (style === StockStyle.TW) {
+                if (x.amplitude > 0) {
+                    variant = 'danger';
+                } else if (x.amplitude < 0) {
+                    variant = 'success';
+                    sign = '';
+                }
+            } else {
+                if (x.amplitude > 0) {
+                    variant = 'success';
+                } else if (x.amplitude < 0) {
+                    variant = 'danger';
+                    sign = '';
+                }
+            }
+            return (
+                <RbCard key={`dashboard-tracking-card-${x.stockCode}`}>
+                    <RbCard.Body className='clearfix p-3'>
+                        <div className='clearfix'>
+                            <h1 className='float-left display-4 mr-4'><StarIcon className={`bg-info p-3`} /></h1>
+                            <h4 className='mb-0 text-info mt-2'>{x.stockCode}</h4>
+                            <p className='mb-0 text-secondary mt-2'>{x.stockName}</p>
+                            <h4 className={`mb-0 text-${variant} mt-2`}>{`${numberComma(x.record.closePrice)} (${sign}${numberComma(x.amplitude)})`}</h4>
+                        </div>
+                    </RbCard.Body>
+                </RbCard>
+            );
+        });
+
+        const cardGroups: JSX.Element[][] = [];
+        while (cards.length) cardGroups.push(cards.splice(0, STOCK_CARD_AMOUNT_PER_ROW));
+
+        return cardGroups.map((group, gIdx) => (
+            <Row key={`dashboard-account-row-${gIdx}`}>
+                {group.map((card, cIdx) => (
+                    <Col xs='12' sm='6' lg='3' key={`dashboard-account-col-${cIdx}`}>
+                        {card}
+                    </Col>
+                ))}
+            </Row>
+        ));
+    };
 
     private accountInfoCards = (accounts: Account[]) => {
         const allBalance: number = sum(accounts.map(x => x.balance));
@@ -67,9 +120,10 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     };
 
     render(): JSX.Element {
-        const { userAccounts } = this.props;
+        const { stockTrackingList, userAccounts, stockStyle } = this.props;
         return (
             <div className='animated fadeIn'>
+                {this.trackingStockCards(stockTrackingList, stockStyle)}
                 {this.accountInfoCards(userAccounts)}
             </div>
         );
@@ -79,7 +133,9 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
 const mapStateToProps = (state: ReduxState) => {
     return {
         authToken: getAuthToken(state),
-        userAccounts: getAccountList(state)
+        stockTrackingList: getStockTrackingList(state),
+        userAccounts: getAccountList(state),
+        stockStyle: getStockStyle(state)
     };
 };
 
