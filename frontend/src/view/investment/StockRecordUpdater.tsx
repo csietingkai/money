@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
@@ -8,7 +9,9 @@ import Form from 'component/common/Form';
 import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
+import { SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
 import { getAuthTokenName, getStockTrackingList, ReduxState } from 'reducer/Selector';
+import store, { fetchStockTrackingList } from 'reducer/Store';
 
 import StockApi, { StockVo, UserTrackingStockVo } from 'api/stock';
 
@@ -16,8 +19,6 @@ import { toDateStr } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import Notify from 'util/Notify';
 import { Action } from 'util/Interface';
-import { Dispatch } from 'react';
-import { SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
 
 export interface StockRecordUpdaterProps {
     username: string;
@@ -83,12 +84,10 @@ class StockRecordUpdater extends React.Component<StockRecordUpdaterProps, StockR
     };
 
     private reQuery = async () => {
-        const { username } = this.props;
         const { queryCondition } = this.state;
         const { success, data: vos } = await StockApi.getAll(queryCondition.code, queryCondition.name);
         if (success) {
-            const { data } = await StockApi.getTrackingList(username);
-            this.props.setStockTrackingList(data);
+            store.dispatch(fetchStockTrackingList);
             this.setState({ stocks: vos });
         }
     };
@@ -173,10 +172,4 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => {
-    return {
-        setStockTrackingList: SetStockTrackingListDispatcher(dispatch)
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockRecordUpdater);
+export default connect(mapStateToProps)(StockRecordUpdater);

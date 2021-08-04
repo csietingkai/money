@@ -32,7 +32,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         this.state = {};
     }
 
-    private trackingStockCards = (stockTrackingList: UserTrackingStockVo[], style: StockStyle) => {
+    private trackingStockCards = (stockTrackingList: UserTrackingStockVo[] = [], style: StockStyle = StockStyle.US) => {
         const cards: JSX.Element[] = stockTrackingList.map(x => {
             let variant: string = 'secondary';
             let sign: string = '+';
@@ -79,7 +79,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         ));
     };
 
-    private accountInfoCards = (accounts: Account[]) => {
+    private accountInfoCards = (accounts: Account[] = []) => {
         const allBalance: number = sum(accounts.map(x => x.balance));
         const cards: JSX.Element[] = accounts.map(x => {
             let variant: string = 'danger';
