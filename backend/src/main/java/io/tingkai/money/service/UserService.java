@@ -83,9 +83,14 @@ public class UserService {
 		return loginUser.getRole() == Role.ROOT;
 	}
 
-	public boolean isRootExist() throws QueryNotResultException {
-		List<User> entities = this.userFacade.queryByRole(Role.ROOT);
-		return entities.size() > 0;
+	public boolean isRootExist() {
+		List<User> entities;
+		try {
+			entities = this.userFacade.queryByRole(Role.ROOT);
+			return entities.size() > 0;
+		} catch (QueryNotResultException e) {
+		}
+		return false;
 	}
 
 	public User createRoot(String initRootPassword) throws AlreadyExistException, FieldMissingException {

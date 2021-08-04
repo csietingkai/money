@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+numpy = "*"
+flask-restful = "*"
+flask-sqlalchemy = "*"
+pandas = "*"
+psycopg2-binary = "*"
+requests = "*"
+sqlalchemy = "*"
+twder = "*"
+quandl = "*"
+matplotlib = "*"
+pytrends = "*"
+plotly = "*"
+pystan = "~=2.14"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"

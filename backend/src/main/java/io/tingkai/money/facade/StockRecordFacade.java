@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,9 +24,7 @@ public class StockRecordFacade {
 	private StockRecordDao stockRecordDao;
 
 	public List<StockRecord> queryAll(String code) throws QueryNotResultException {
-		List<StockRecord> entities = new ArrayList<StockRecord>();
-		Iterable<StockRecord> iterable = this.stockRecordDao.findByCodeOrderByDealDate(code);
-		iterable.forEach(entities::add);
+		List<StockRecord> entities = this.stockRecordDao.findByCodeOrderByDealDate(code);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
 		}
@@ -35,9 +32,7 @@ public class StockRecordFacade {
 	}
 
 	public List<StockRecord> queryAll(String code, long start, long end) throws QueryNotResultException {
-		List<StockRecord> entities = new ArrayList<StockRecord>();
-		Iterable<StockRecord> iterable = this.stockRecordDao.findByCodeAndDealDateBetweenOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
-		iterable.forEach(entities::add);
+		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBetweenOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
 		}

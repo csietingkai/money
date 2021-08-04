@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,9 +23,7 @@ public class UserStockRecordFacade {
 	private UserStockRecordDao userStockRecordDao;
 
 	public List<UserStockRecord> queryAll() throws QueryNotResultException {
-		List<UserStockRecord> entities = new ArrayList<UserStockRecord>();
-		Iterable<UserStockRecord> iterable = this.userStockRecordDao.findAll();
-		iterable.forEach(entities::add);
+		List<UserStockRecord> entities = this.userStockRecordDao.findAll();
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
 		}
@@ -34,9 +31,7 @@ public class UserStockRecordFacade {
 	}
 
 	public List<UserStockRecord> queryAll(List<UUID> userStockIds) throws QueryNotResultException {
-		List<UserStockRecord> entities = new ArrayList<UserStockRecord>();
-		Iterable<UserStockRecord> iterable = this.userStockRecordDao.findByUserStockIdIn(userStockIds);
-		iterable.forEach(entities::add);
+		List<UserStockRecord> entities = this.userStockRecordDao.findByUserStockIdIn(userStockIds);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
 		}
@@ -44,9 +39,7 @@ public class UserStockRecordFacade {
 	}
 
 	public List<UserStockRecord> queryByAccountId(UUID accountId) throws QueryNotResultException {
-		List<UserStockRecord> entities = new ArrayList<UserStockRecord>();
-		Iterable<UserStockRecord> iterable = this.userStockRecordDao.findByAccountId(accountId);
-		iterable.forEach(entities::add);
+		List<UserStockRecord> entities = this.userStockRecordDao.findByAccountId(accountId);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
 		}

@@ -9,51 +9,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.enumeration.BetType;
 import io.tingkai.money.enumeration.DealType;
-import io.tingkai.money.enumeration.LotteryResult;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.enumeration.Role;
-import io.tingkai.money.enumeration.SportType;
 import io.tingkai.money.logging.Loggable;
 
 @Service
 @Loggable
 public class EnumService {
-
-	public List<String> betTypeList() {
-		// @formatter:off
-		return Arrays.asList(BetType.values())
-				.stream()
-				.map(o -> o.toString())
-				.sorted()
-				.collect(Collectors.toList());
-		// @formatter:on
-	}
-
-	public Map<String, String> betTypeMap() {
-		// @formatter:off
-		return Arrays.asList(BetType.values())
-				.stream()
-				.map(o -> o.toString())
-				.collect(Collectors.toMap(str -> str, str -> str, (str1, str2) -> str1, TreeMap::new));
-		// @formatter:on
-	}
-
-	public List<Map<String, String>> betTypeListMap() {
-		// @formatter:off
-		return Arrays.asList(BetType.values())
-				.stream()
-				.sorted()
-				.map(o -> {
-					return Map.ofEntries(
-							new AbstractMap.SimpleEntry<String, String>("key", o.toString()),
-							new AbstractMap.SimpleEntry<String, String>("value", o.toString())
-					);
-				})
-				.collect(Collectors.toList());
-		// @formatter:on
-	}
 
 	public List<String> dealTypeList() {
 		// @formatter:off
@@ -77,40 +40,6 @@ public class EnumService {
 	public List<Map<String, String>> dealTypeListMap() {
 		// @formatter:off
 		return Arrays.asList(DealType.values())
-				.stream()
-				.sorted()
-				.map(o -> {
-					return Map.ofEntries(
-							new AbstractMap.SimpleEntry<String, String>("key", o.toString()),
-							new AbstractMap.SimpleEntry<String, String>("value", o.toString())
-					);
-				})
-				.collect(Collectors.toList());
-		// @formatter:on
-	}
-
-	public List<String> lotteryResultList() {
-		// @formatter:off
-		return Arrays.asList(LotteryResult.values())
-				.stream()
-				.map(o -> o.toString())
-				.sorted()
-				.collect(Collectors.toList());
-		// @formatter:on
-	}
-
-	public Map<String, String> lotteryResultMap() {
-		// @formatter:off
-		return Arrays.asList(LotteryResult.values())
-				.stream()
-				.map(o -> o.toString())
-				.collect(Collectors.toMap(str -> str, str -> str, (str1, str2) -> str1, TreeMap::new));
-		// @formatter:on
-	}
-
-	public List<Map<String, String>> lotteryResultListMap() {
-		// @formatter:off
-		return Arrays.asList(LotteryResult.values())
 				.stream()
 				.sorted()
 				.map(o -> {
@@ -179,40 +108,6 @@ public class EnumService {
 	public List<Map<String, String>> roleListMap() {
 		// @formatter:off
 		return Arrays.asList(Role.values())
-				.stream()
-				.sorted()
-				.map(o -> {
-					return Map.ofEntries(
-							new AbstractMap.SimpleEntry<String, String>("key", o.toString()),
-							new AbstractMap.SimpleEntry<String, String>("value", o.toString())
-					);
-				})
-				.collect(Collectors.toList());
-		// @formatter:on
-	}
-
-	public List<String> sportTypeList() {
-		// @formatter:off
-		return Arrays.asList(SportType.values())
-				.stream()
-				.map(o -> o.toString())
-				.sorted()
-				.collect(Collectors.toList());
-		// @formatter:on
-	}
-
-	public Map<String, String> sportTypeMap() {
-		// @formatter:off
-		return Arrays.asList(SportType.values())
-				.stream()
-				.map(o -> o.toString())
-				.collect(Collectors.toMap(str -> str, str -> str, (str1, str2) -> str1, TreeMap::new));
-		// @formatter:on
-	}
-
-	public List<Map<String, String>> sportTypeListMap() {
-		// @formatter:off
-		return Arrays.asList(SportType.values())
 				.stream()
 				.sorted()
 				.map(o -> {

@@ -57,12 +57,10 @@ public class ScheduleTaskService {
 	}
 
 	private List<String> getNoRecordCodes() {
-		List<String> distinctCodes = new ArrayList<String>();
-		Iterable<String> iterable = this.stockRecordDao.findDistinctCode();
-		iterable.forEach(distinctCodes::add);
-		Iterable<Stock> stockIterable = this.stockDao.findByCodeNotIn(distinctCodes);
+		List<String> distinctCodes = this.stockRecordDao.findDistinctCode();
+		List<Stock> stocks = this.stockDao.findByCodeNotIn(distinctCodes);
 		List<String> noRecordCodes = new ArrayList<String>();
-		stockIterable.forEach(x -> {
+		stocks.forEach(x -> {
 			noRecordCodes.add(x.getCode());
 		});
 		return noRecordCodes;

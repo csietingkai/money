@@ -28,10 +28,12 @@ public class Stock {
 	protected String name;
 	@Column(unique = true)
 	protected String isinCode;
+	protected String currency;
 	protected LocalDateTime offeringDate;
 	@Enumerated(EnumType.STRING)
 	protected MarketType marketType;
 	protected String industryType;
 	protected String cfiCode;
+	protected String symbol;
 	protected String description;
 }

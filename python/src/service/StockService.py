@@ -1,9 +1,14 @@
+import datetime
 import requests
 import pandas
-import math
-import json
 import csv
 import time
+from typing import Optional
+
+from entity.Stock import Stock
+from entity.StockRecord import StockRecord
+from facade import StockFacade, StockRecordFacade
+from util import AppUtil, CodeConstant
 
 MarketTypes = {
     'LSE': '2',
@@ -12,127 +17,291 @@ MarketTypes = {
 }
 
 def fetchStocks(marketType):
-    url='https://isin.twse.com.tw/isin/C_public.jsp?strMode=' + MarketTypes[marketType]
-    res = requests.get(url)
-    data = pandas.read_html(res.text)[0]
-    returnData = {}
-    length = len(data[0])
-    for row in range(length):
-        if row == 0 or len(data[0][row].split()) != 2:
-            continue
-        code = data[0][row].split()[0]
-        name = data[0][row].split()[1]
-        if len(code) < 6:
-            returnData[code] = {}
-            returnData[code]['name'] = name
-            returnData[code]['isinCode'] = data[1][row]
-            returnData[code]['offeringDate'] = data[2][row]
-            returnData[code]['marketType'] = data[3][row]
-            returnData[code]['industryType'] = toEmptyString(data[4][row])
-            returnData[code]['cfiCode'] = toEmptyString(data[5][row])
-            returnData[code]['description'] = toEmptyString(data[6][row])
-    return returnData
+    try:
+        print('[INFO] fetching stocks with marketType<{marketType}> data...'.format(marketType = marketType))
+        url = CodeConstant.STOCK_LIST_URL.format(mode = MarketTypes[marketType])
+        res = requests.get(url)
+        data = pandas.read_html(res.text)[0]
+        length = len(data[0])
+        print('[INFO] fetched {length} data, processing...'.format(length = length))
+        for row in range(length):
+            # skip csv title in first row
+            if row == 0 or len(data[0][row].split()) != 2:
+                continue
+            # skip if already exist
+            code = data[0][row].split()[0]
+            queryEntity = StockFacade.queryByCode(code)
+            if queryEntity:
+                print('[DEBUG] stock code<{code}> already exists, skipping...'.format(code = code))
+                continue
+            name = data[0][row].split()[1]
+            entity = Stock()
+            entity.code = code
+            entity.name = name
+            entity.isin_code = data[1][row]
+            entity.currency = 'TWD'
+            year = data[2][row].split('/')[0]
+            month = data[2][row].split('/')[1]
+            day = data[2][row].split('/')[2]
+            entity.offering_date = datetime.datetime(int(year), int(month), int(day))
+            entity.market_type = marketType
+            entity.industry_type = AppUtil.toString(data[4][row], None)
+            entity.cfi_code = AppUtil.toString(data[5][row], None)
+            entity.description = AppUtil.toString(data[6][row], None)
+            print('[INFO] fetching stock<{code}>\'s symbol...'.format(code = code))
+            response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = entity.isin_code), headers = CodeConstant.YAHOO_REQUEST_HEADER)
+            response = response.json()
+            if len(response['quotes']) > 0:
+                entity.symbol = response['quotes'][0]['symbol']
+            StockFacade.insert(entity)
+            time.sleep(3)
+        return 'SUCCESS'
+    except Exception as e:
+        return str(e)
 
-def fetchStock(code):
-    for idx, marketType in enumerate(['LSE', 'OTC', 'LES']):
-        datas = fetchStocks(marketType)
-        if (datas[code]):
-            datas[code]['marketType'] = marketType
-            return datas[code]
-    return {}
-
-def fetchAllStockRecord(code, start, end):
-    returnData = {}
-    urlFormat = 'https://query1.finance.yahoo.com/v7/finance/download/{code}?period1={start}&period2={end}&interval=1d&events=history&includeAdjustedClose=true'
-    url = urlFormat.format(code = code, start = start, end = end)
-    with requests.Session() as s:
-        noDataDates = []
-        try:
-            download = s.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'})
-
-            decoded_content = download.content.decode('utf-8')
-
-            cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-            my_list = list(cr)
-            firstRow = True
-            for row in my_list:
-                if firstRow:
-                    firstRow = False
+def fetchStock(targetCode):
+    try:
+        for idx, marketType in enumerate(['LES', 'OTC', 'LSE']):
+            print('[INFO] fetching stocks with marketType<{marketType}> data...'.format(marketType = marketType))
+            url = CodeConstant.STOCK_LIST_URL.format(mode = MarketTypes[marketType])
+            res = requests.get(url)
+            data = pandas.read_html(res.text)[0]
+            length = len(data[0])
+            print('[INFO] fetched {length} data, processing...'.format(length = length))
+            for row in range(length):
+                # skip csv title in first row
+                if row == 0 or len(data[0][row].split()) != 2:
                     continue
-                dealDate = row[0].replace('-', '/')
-                openPrice = toNumber(row[1])
-                highPrice = toNumber(row[2])
-                lowPrice = toNumber(row[3])
-                closePrice = toNumber(row[4])
-                dealShare = toNumber(row[6])
-                if openPrice == '0.00' or highPrice == '0.00' or lowPrice == '0.00' or closePrice == '0.00':
-                    print('{date} has openPrice: {openPrice}, highPrice: {highPrice}, lowPrice: {lowPrice}, closePrice: {closePrice}, fetch data from TWSE'.format(date=dealDate, openPrice=openPrice, highPrice=highPrice, lowPrice=lowPrice, closePrice=closePrice))
-                    noDataDates.append(dealDate)
-                else:
-                    returnData[dealDate] = [openPrice, highPrice, lowPrice, closePrice, dealShare]
-            for dealDate in noDataDates:
-                print('fetching {dealDate} date from TWSE'.format(dealDate=dealDate))
-                data = fetchSingleStockRecord(code.split('.')[0], dealDate.replace('/', ''), 'TWSE')
-                if len(data) > 0:
-                    returnData[dealDate] = data
-                else:
-                    data = fetchSingleStockRecord(code.split('.')[0], dealDate, 'TPEX')
-                time.sleep(3)
-        except Exception as e:
-            print(str(e))
-        s.close()
-    return returnData
 
-def fetchSingleStockRecord(code, date, source):
-    print(date)
-    urlFormat = ''
-    if source == 'TWSE':
-        urlFormat = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={date}&stockNo={code}'
-    elif source == 'TPEX':
-        urlFormat = 'https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?d={date}&stkno={code}'
+                code = data[0][row].split()[0]
+                if targetCode != code:
+                    continue
+                # skip if already exist
+                entity = Stock()
+                queryEntity = StockFacade.queryByCode(code)
+                if queryEntity:
+                    print('[DEBUG] stock code<{code}> already exists, skipping...'.format(code = code))
+                    entity.id = queryEntity.id
+                name = data[0][row].split()[1]
+                entity.code = code
+                entity.name = name
+                entity.isin_code = data[1][row]
+                year = data[2][row].split('/')[0]
+                month = data[2][row].split('/')[1]
+                day = data[2][row].split('/')[2]
+                entity.offering_date = datetime.datetime(int(year), int(month), int(day))
+                entity.market_type = marketType
+                entity.industry_type = AppUtil.toString(data[4][row], None)
+                entity.cfi_code = AppUtil.toString(data[5][row], None)
+                entity.description = AppUtil.toString(data[6][row], None)
+                print('[INFO] fetching stock<{code}>\'s symbol...'.format(code = code))
+                response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = entity.isin_code), headers = CodeConstant.YAHOO_REQUEST_HEADER)
+                response = response.json()
+                if len(response['quotes']) > 0:
+                    entity.symbol = response['quotes'][0]['symbol']
+                # entity has id means update
+                if entity.id:
+                    StockFacade.update(entity)
+                else:
+                    StockFacade.insert(entity)
+        return 'SUCCESS'
+    except Exception as e:
+        return str(e)
+
+def fetchStockRecord(code):
+    stock = StockFacade.queryByCode(code)
+    if not stock:
+        print('[INFO] find no code<{code}> int database'.format(code = code))
+        return 'NO_SUCH_CODE'
+
+    startDate = stock.offering_date
+    endDate = datetime.datetime.now()
+
+    records = StockRecordFacade.queryByCode(code)
+    if len(records) > 0:
+        record = records[-1]
+        startDate = record.deal_date
+        startDate += datetime.timedelta(days = 1)
+
+    if stock.symbol:
+        return fetchStockRecordFromYahoo(stock.symbol, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
     else:
-        return []
-    url = urlFormat.format(code = code, date = date)
-    response = requests.get(url)
-    jsonResponse = response.json()
-    response.close()
-    if source == 'TWSE':
-        if 'data' in jsonResponse and isinstance(jsonResponse['data'], list):
-            data = jsonResponse['data']
-            for item in data:
-                year = int(item[0].split('/')[0]) + 1911
-                jsonDate = str(year) + item[0].split('/')[1] + item[0].split('/')[2]
-                if jsonDate == date:
-                    openPrice = toNumber(item[3])
-                    highPrice = toNumber(item[4])
-                    lowPrice = toNumber(item[5])
-                    closePrice = toNumber(item[6])
-                    dealShare = toNumber(item[1])
-                    if openPrice == '0.00' and highPrice == '0.00' and lowPrice == '0.00' and closePrice == '0.00':
-                        return [ openPrice, highPrice, lowPrice, closePrice, dealShare ]
-    elif source == 'TPEX':
-        if 'aaData' in jsonResponse and isinstance(jsonResponse['data'], list):
-            data = jsonResponse['aaData']
-            for item in data:
-                year = int(item[0].split('/')[0]) + 1911
-                jsonDate = str(year) + item[0].split('/')[1] + item[0].split('/')[2]
-                if jsonDate == date.replace('/', ''):
-                    openPrice = toNumber(item[3])
-                    highPrice = toNumber(item[4])
-                    lowPrice = toNumber(item[5])
-                    closePrice = toNumber(item[6])
-                    dealShare = toNumber(item[1])
-                    if openPrice == '0.00' and highPrice == '0.00' and lowPrice == '0.00' and closePrice == '0.00':
-                        return [ openPrice, highPrice, lowPrice, closePrice, dealShare ]
-    return []
+        fetchStockRecordFromTwse(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
+        fetchStockRecordFromTpex(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
+        return 'SUCCESS'
 
-def toEmptyString(s):
-    if (not isinstance(s, str)) and math.isnan(s):
-        s = ''
-    return s
 
-def toNumber(s):
-    if s == 'null':
-        s = '0'
-    s = s.replace(',', '')
-    return format(float(s), '.2f')
+def fetchStockRecordFromYahoo(symbol: str, start: int, end: int):
+    try:
+        print('[INFO] fetching stocks<{symbol}>\'s records from yahoo...'.format(symbol = symbol))
+        code = StockFacade.queryCodeBySymbol(symbol)
+        url = CodeConstant.STOCK_RECORDS_URL.format(symbol = symbol, start = start, end = end)
+        with requests.Session() as s:
+            noDataDates = []
+            try:
+                download = s.get(url, headers = CodeConstant.YAHOO_REQUEST_HEADER)
+
+                decoded_content = download.content.decode('utf-8')
+
+                cr = csv.reader(decoded_content.splitlines(), delimiter = ',')
+                my_list = list(cr)
+                firstRow = True
+                for row in my_list:
+                    if firstRow:
+                        firstRow = False
+                        continue
+                    dealDate = datetime.datetime(int(row[0][0:4]), int(row[0][5:7]), int(row[0][8:10]))
+                    openPrice = AppUtil.toNumber(row[1])
+                    highPrice = AppUtil.toNumber(row[2])
+                    lowPrice = AppUtil.toNumber(row[3])
+                    closePrice = AppUtil.toNumber(row[4])
+                    dealShare = AppUtil.toNumber(row[6])
+                    if openPrice == '0.00' or highPrice == '0.00' or lowPrice == '0.00' or closePrice == '0.00':
+                        print('[WARN]: {date} has openPrice<{openPrice}> highPrice<{highPrice}> lowPrice<{lowPrice}> closePrice<{closePrice}>'.format(date = dealDate, openPrice = openPrice, highPrice = highPrice, lowPrice = lowPrice, closePrice = closePrice))
+                        noDataDates.append(dealDate)
+                    else:
+                        entity = StockRecord()
+                        queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
+                        if queryStockRecord:
+                            entity.id = queryStockRecord.id
+                        entity.code = code
+                        entity.deal_date = dealDate
+                        entity.deal_share = dealShare
+                        entity.open_price = openPrice
+                        entity.high_price = highPrice
+                        entity.low_price = lowPrice
+                        entity.close_price = closePrice
+                        # entity has id means update
+                        if entity.id:
+                            StockRecordFacade.update(entity)
+                        else:
+                            StockRecordFacade.insert(entity)
+                for dealDate in noDataDates:
+                    result, dataCnt = fetchStockRecordFromTwse(code, datetime.datetime.timestamp(dealDate))
+                    if result != 'SUCCESS' or dataCnt == 0:
+                        fetchStockRecordFromTpex(code, datetime.datetime.timestamp(dealDate))
+                    time.sleep(3)
+            except Exception as e:
+                print(str(e))
+            s.close()
+        return 'SUCCESS'
+    except Exception as e:
+        return str(e)
+
+def fetchStockRecordFromTwse(code: str, start: int, end: Optional[int]):
+    try:
+        print('[INFO] fetching stocks<{code}>\'s records with start = <{start}> and end = <{end}> from TWSE...'.format(code = code, start = start, end = end))
+        isSingleDay = False
+        if not end:
+            isSingleDay = True
+            end = start
+
+        startDate = datetime.datetime.fromtimestamp(start)
+        startYear, startMonth, startDay = startDate.year, startDate.month, startDate.day
+        endDate = datetime.datetime.fromtimestamp(end)
+        endYear, endMonth, endDay = endDate.year, endDate.month, endDate.day
+        currentYear, currentMonth = startYear, startMonth
+        currentClose = 0.0
+        dataCnt = 0
+        while currentYear * 12 + currentMonth <= endYear * 12 + endMonth:
+            print('[INFO] fetching stock code<{code}> from TWSE with {year}/{month} data'.format(code = code, year = currentYear, month = currentMonth))
+            url = CodeConstant.STOCK_TWSE_RECORD_URL.format(code = code, date = AppUtil.toDateStr(currentYear, currentMonth, 1))
+            response = requests.get(url)
+            jsonResponse = response.json()
+            response.close()
+            if 'data' in jsonResponse and isinstance(jsonResponse['data'], list):
+                data = jsonResponse['data']
+                for item in data:
+                    if (not isSingleDay) or (AppUtil.toDateStr(currentYear - 1911, currentMonth, startDay, '/') == item[0]):
+                        dealDate = datetime.datetime(currentYear, currentMonth, int(item[0][7:9]))
+                        if dealDate < startDate:
+                            continue
+                        elif dealDate > endDate:
+                            break
+
+                        entity = StockRecord()
+                        queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
+                        if queryStockRecord:
+                            entity = queryStockRecord
+                        entity.code = code
+                        entity.deal_date = dealDate
+                        entity.deal_share = AppUtil.toNumber(item[1])
+                        entity.open_price = AppUtil.toNumber(item[3], currentClose)
+                        entity.high_price = AppUtil.toNumber(item[4], currentClose)
+                        entity.low_price = AppUtil.toNumber(item[5], currentClose)
+                        entity.close_price = AppUtil.toNumber(item[6], currentClose)
+                        currentClose = entity.close_price
+                        # entity has id means update
+                        if entity.id:
+                            StockRecordFacade.update(entity)
+                            dataCnt += 1
+                        else:
+                            StockRecordFacade.insert(entity)
+                            dataCnt += 1
+            currentMonth += 1
+            if currentMonth > 12:
+                currentMonth = 1
+                currentYear += 1
+            time.sleep(3)
+        return 'SUCCESS', dataCnt
+    except Exception as e:
+        return str(e)
+
+def fetchStockRecordFromTpex(code: str, start: int, end: Optional[int]):
+    try:
+        print('[INFO] fetching stocks<{code}>\'s records with start = <{start}> and end = <{end}> from TPEX...'.format(code = code, start = start, end = end))
+        isSingleDay = False
+        if not end:
+            isSingleDay = True
+            end = start
+
+        startDate = datetime.datetime.fromtimestamp(start)
+        startYear, startMonth, startDay = startDate.year, startDate.month, startDate.day
+        endDate = datetime.datetime.fromtimestamp(end)
+        endYear, endMonth, endDay = endDate.year, endDate.month, endDate.day
+        currentYear, currentMonth = startYear, startMonth
+        currentClose = 0.0
+        dataCnt = 0
+        while currentYear * 12 + currentMonth <= endYear * 12 + endMonth:
+            print('[INFO] fetching stock code<{code}> from TPEX with {year}/{month} data'.format(code = code, year = currentYear, month = currentMonth))
+            url = CodeConstant.STOCK_TPEX_RECORD_URL.format(code = code, date = AppUtil.toDateStr(currentYear - 1911, currentMonth, 1, '/'))
+            response = requests.get(url)
+            jsonResponse = response.json()
+            response.close()
+            if 'aaData' in jsonResponse and isinstance(jsonResponse['aaData'], list):
+                data = jsonResponse['aaData']
+                for item in data:
+                    if (not isSingleDay) or (AppUtil.toDateStr(currentYear - 1911, currentMonth, startDay, '/') == item[0]):
+                        dealDate = datetime.datetime(currentYear, currentMonth, int(item[0][7:9]))
+                        if dealDate < startDate:
+                            continue
+                        elif dealDate > endDate:
+                            break
+
+                        entity = StockRecord()
+                        queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
+                        if queryStockRecord:
+                            entity = queryStockRecord
+                        entity.code = code
+                        entity.deal_date = dealDate
+                        entity.deal_share = AppUtil.toNumber(item[1])
+                        entity.open_price = AppUtil.toNumber(item[3], currentClose)
+                        entity.high_price = AppUtil.toNumber(item[4], currentClose)
+                        entity.low_price = AppUtil.toNumber(item[5], currentClose)
+                        entity.close_price = AppUtil.toNumber(item[6], currentClose)
+                        currentClose = entity.close_price
+                        # entity has id means update
+                        if entity.id:
+                            StockRecordFacade.update(entity)
+                            dataCnt += 1
+                        else:
+                            StockRecordFacade.insert(entity)
+                            dataCnt += 1
+            currentMonth += 1
+            if currentMonth > 12:
+                currentMonth = 1
+                currentYear += 1
+            time.sleep(3)
+        return 'SUCCESS', dataCnt
+    except Exception as e:
+        return str(e)

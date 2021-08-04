@@ -1,6 +1,7 @@
 package io.tingkai.money.dao;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,9 +15,9 @@ public interface ExchangeRateRecordDao extends JpaRepository<ExchangeRateRecord,
 
 	public Optional<ExchangeRateRecord> findByCurrencyAndDate(String currency, LocalDateTime date);
 
-	public Iterable<ExchangeRateRecord> findByCurrencyOrderByDate(String currency);
+	public List<ExchangeRateRecord> findByCurrencyOrderByDate(String currency);
 
-	public Iterable<ExchangeRateRecord> findByCurrencyAndDateBetweenOrderByDate(String currency, LocalDateTime start, LocalDateTime end);
+	public List<ExchangeRateRecord> findByCurrencyAndDateBetweenOrderByDate(String currency, LocalDateTime start, LocalDateTime end);
 
 	public Optional<ExchangeRateRecord> findFirstByCurrencyOrderByDateDesc(String currency);
 

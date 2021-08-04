@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +22,7 @@ public class AccountRecordFacade {
 	private AccountRecordDao accountRecordDao;
 
 	public List<AccountRecord> queryAll() throws QueryNotResultException {
-		List<AccountRecord> entities = new ArrayList<AccountRecord>();
-		Iterable<AccountRecord> iterable = this.accountRecordDao.findAll();
-		iterable.forEach(entities::add);
+		List<AccountRecord> entities = this.accountRecordDao.findAll();
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
 		}
@@ -33,9 +30,7 @@ public class AccountRecordFacade {
 	}
 
 	public List<AccountRecord> queryAll(UUID accountId) throws QueryNotResultException {
-		List<AccountRecord> entities = new ArrayList<AccountRecord>();
-		Iterable<AccountRecord> iterable = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
-		iterable.forEach(entities::add);
+		List<AccountRecord> entities = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
 		}

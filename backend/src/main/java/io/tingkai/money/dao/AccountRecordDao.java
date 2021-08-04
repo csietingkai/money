@@ -1,5 +1,6 @@
 package io.tingkai.money.dao;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,5 @@ import io.tingkai.money.entity.AccountRecord;
 @Repository
 public interface AccountRecordDao extends JpaRepository<AccountRecord, UUID> {
 
-	public Iterable<AccountRecord> findByTransFromOrTransTo(UUID transFrom, UUID transTo);
+	public List<AccountRecord> findByTransFromOrTransTo(UUID transFrom, UUID transTo);
 }

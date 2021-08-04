@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,9 +23,7 @@ public class ExchangeRateFacade {
 	private ExchangeRateDao exchangeRateDao;
 
 	public List<ExchangeRate> queryAll() throws QueryNotResultException {
-		List<ExchangeRate> entities = new ArrayList<ExchangeRate>();
-		Iterable<ExchangeRate> iterable = this.exchangeRateDao.findAll();
-		iterable.forEach(entities::add);
+		List<ExchangeRate> entities = this.exchangeRateDao.findAll();
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
 		}

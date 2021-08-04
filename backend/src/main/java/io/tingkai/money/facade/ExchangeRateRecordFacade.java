@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,9 +24,7 @@ public class ExchangeRateRecordFacade {
 	private ExchangeRateRecordDao exchangeRateRecordDao;
 
 	public List<ExchangeRateRecord> queryAll(String currency) throws QueryNotResultException {
-		List<ExchangeRateRecord> entities = new ArrayList<ExchangeRateRecord>();
-		Iterable<ExchangeRateRecord> iterable = this.exchangeRateRecordDao.findByCurrencyOrderByDate(currency);
-		iterable.forEach(entities::add);
+		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyOrderByDate(currency);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
 		}
@@ -35,9 +32,7 @@ public class ExchangeRateRecordFacade {
 	}
 
 	public List<ExchangeRateRecord> queryAll(String currency, long start, long end) throws QueryNotResultException {
-		List<ExchangeRateRecord> entities = new ArrayList<ExchangeRateRecord>();
-		Iterable<ExchangeRateRecord> iterable = this.exchangeRateRecordDao.findByCurrencyAndDateBetweenOrderByDate(currency, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
-		iterable.forEach(entities::add);
+		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBetweenOrderByDate(currency, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
 		}

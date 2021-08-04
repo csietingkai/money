@@ -54,7 +54,13 @@ public class CodeConstants {
 	public static final BigDecimal TAX_RATE = new BigDecimal(0.003d);
 
 	// === user tracking stock === //
-	public static final String USER_TRACKING_STOCK_KEY = "user:";
+	public static final String USER_TRACKING_STOCK_KEY = "track-stock-user:";
+
+	/// === fund list === //
+	public static final String FUND_UPDATE_TIME_KEY = "fund-update-time";
+
+	// === user tracking fund === //
+	public static final String USER_TRACKING_FUND_KEY = "track-fund-user:";
 
 	// === other === //
 	public static final char UNDERLINE = '_';

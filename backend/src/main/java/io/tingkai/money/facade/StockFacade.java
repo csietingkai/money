@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,14 +29,15 @@ public class StockFacade {
 	private DataFetcherService pythonFetcherService;
 
 	public List<Stock> queryAll(boolean sort) throws QueryNotResultException {
-		List<Stock> entities = new ArrayList<Stock>();
-		Iterable<Stock> iterable;
+		List<Stock> entities = this.stockDao.findAll();
 		if (sort) {
-			iterable = this.stockDao.findAllByOrderByCode();
-		} else {
-			iterable = this.stockDao.findAll();
+			entities.sort((a, b) -> {
+				if (a.getCode().length() != b.getCode().length()) {
+					return a.getCode().length() - b.getCode().length();
+				}
+				return a.getCode().compareTo(b.getCode());
+			});
 		}
-		iterable.forEach(entities::add);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);
 		}

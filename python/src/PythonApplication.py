@@ -1,16 +1,24 @@
 from flask import Flask
 from flask import request
-from flask import jsonify
-import twder
 
-from service import ExchangeRateService
-from service import StockService
+from entity import BaseEntity
+from service import FundService, ExchangeRateService, PredictService, StockService
+from util import Config
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(username)s:%(password)s@%(host)s:%(port)s/%(db)s' % Config.DATASOURCE
+# app.config['SQLALCHEMY_ECHO'] = True
 
-@app.route('/fetch/exchangeRate')
+BaseEntity.db.init_app(app)
+
+@app.route('/fetch/exchangeRates')
 def fetchExchangeRate():
     return ExchangeRateService.fetchExchangeRates()
+
+@app.route('/fetch/exchangeRateRecords')
+def fetchAllExchangeRateRecord():
+    currency = request.args.get('currency')
+    return ExchangeRateService.fetchAllExchangeRateRecord(currency)
 
 @app.route('/fetch/stocks')
 def fetchStocks():
@@ -22,12 +30,23 @@ def fetchStock():
     code = request.args.get('code')
     return StockService.fetchStock(code)
 
-@app.route('/fetch/allStockRecord')
-def fetchAllStockRecord():
+@app.route('/fetch/stockRecords')
+def fetchStockRecord():
     code = request.args.get('code')
-    start = int(request.args.get('start'))
-    end = int(request.args.get('end'))
-    return StockService.fetchAllStockRecord(code, start, end)
+    return StockService.fetchStockRecord(code)
+
+@app.route('/fetch/funds')
+def fetchFunds():
+    return FundService.fetchFunds()
+
+@app.route('/fetch/fundRecords')
+def fetchFundRecord():
+    code = request.args.get('code')
+    return FundService.fetchFundRecords(code)
+
+@app.route('/predict/stock/<stockCode>')
+def predictStock(stockCode):
+    return PredictService.predict(stockCode)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True)

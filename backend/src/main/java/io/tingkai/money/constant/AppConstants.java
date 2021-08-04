@@ -20,8 +20,6 @@ public class AppConstants {
 	public static String FRONTEND_URL;
 
 	public static String PYTHON_BASE_URL;
-	public static String PYTHON_FETCH_PATH;
-	public static String EXCHANGE_RATE_RECORD_URL;
 
 	@Value("${init-root-username}")
 	public void setInitRootUsername(String username) {
@@ -76,15 +74,5 @@ public class AppConstants {
 	@Value("${python-base-url}")
 	public void setPythonUrl(String pythonBaseUrl) {
 		AppConstants.PYTHON_BASE_URL = pythonBaseUrl;
-	}
-
-	@Value("${python-fetch-path}")
-	public void setFetchPath(String pythonFetchPath) {
-		AppConstants.PYTHON_FETCH_PATH = pythonFetchPath;
-	}
-
-	@Value("${exchange-rate-record-url}")
-	public void setExchangeRateRecordUrl(String url) {
-		AppConstants.EXCHANGE_RATE_RECORD_URL = url;
 	}
 }

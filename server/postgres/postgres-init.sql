@@ -10,17 +10,63 @@ CREATE TABLE IF NOT EXISTS users (
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS exchange_rate (
+	currency VARCHAR NOT NULL,
+	name VARCHAR NOT NULL,
+	PRIMARY KEY (currency)
+);
+
+CREATE TABLE IF NOT EXISTS exchange_rate_record (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	currency VARCHAR NOT NULL,
+	date TIMESTAMP NOT NULL,
+	cash_buy NUMERIC, --現金匯率_本行買入
+	cash_sell NUMERIC, --現金匯率_本行賣出
+	spot_buy NUMERIC, --即期匯率_本行買入
+	spot_sell NUMERIC, --即期匯率_本行賣出
+	PRIMARY KEY (id),
+	UNIQUE (currency, date),
+	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
+);
+
+CREATE TABLE IF NOT EXISTS account (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	name VARCHAR NOT NULL,
+	owner_name VARCHAR NOT NULL,
+	currency VARCHAR NOT NULL,
+	balance NUMERIC NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (name, owner_name),
+	CONSTRAINT fk_owner_name FOREIGN KEY (owner_name) REFERENCES users(name),
+	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
+);
+
+CREATE TABLE IF NOT EXISTS account_record (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	trans_date TIMESTAMP NOT NULL,
+	trans_amount NUMERIC NOT NULL,
+	trans_from uuid NOT NULL,
+	trans_to uuid NOT NULL,
+	description VARCHAR,
+	PRIMARY KEY (id),
+	CONSTRAINT fk_trans_from FOREIGN KEY (trans_from) REFERENCES account(id),
+	CONSTRAINT fk_trans_to FOREIGN KEY (trans_to) REFERENCES account(id)
+);
+
 CREATE TABLE IF NOT EXISTS stock (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	code VARCHAR NOT NULL UNIQUE,
 	name VARCHAR NOT NULL,
 	isin_code VARCHAR NOT NULL UNIQUE, --國際證券辨識號碼
+	currency VARCHAR NOT NULL,
 	offering_date TIMESTAMP NOT NULL, --上市日
 	market_type VARCHAR NOT NULL, --市場別
 	industry_type VARCHAR, --產業別
-	cfi_code VARCHAR NOT NULL,
+	cfi_code VARCHAR,
+	symbol VARCHAR, --yahoo finance symbol
 	description VARCHAR,
-	PRIMARY KEY (id)
+	PRIMARY KEY (id),
+	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
 );
 
 CREATE TABLE IF NOT EXISTS stock_record (
@@ -73,45 +119,35 @@ CREATE TABLE IF NOT EXISTS user_stock_record (
 	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id)
 );
 
-CREATE TABLE IF NOT EXISTS account (
+CREATE TABLE IF NOT EXISTS fund (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	code VARCHAR NOT NULL UNIQUE, -- 基富通基金 id
+	symbol VARCHAR, --yahoo finance symbol
 	name VARCHAR NOT NULL,
-	owner_name VARCHAR NOT NULL,
+	isin_code VARCHAR NOT NULL UNIQUE, --國際證券辨識號碼
+	offering_date TIMESTAMP NOT NULL, --上市日
 	currency VARCHAR NOT NULL,
-	balance NUMERIC NOT NULL,
-	PRIMARY KEY (id),
-	UNIQUE (name, owner_name),
-	CONSTRAINT fk_owner_name FOREIGN KEY (owner_name) REFERENCES users(name),
-	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
-);
-
-CREATE TABLE IF NOT EXISTS account_record (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	trans_date TIMESTAMP NOT NULL,
-	trans_amount NUMERIC NOT NULL,
-	trans_from uuid NOT NULL,
-	trans_to uuid NOT NULL,
 	description VARCHAR,
 	PRIMARY KEY (id),
-	CONSTRAINT fk_trans_from FOREIGN KEY (trans_from) REFERENCES account(id),
-	CONSTRAINT fk_trans_to FOREIGN KEY (trans_to) REFERENCES account(id)
-);
-
-CREATE TABLE IF NOT EXISTS exchange_rate (
-	currency VARCHAR NOT NULL,
-	name VARCHAR NOT NULL,
-	PRIMARY KEY (currency)
-);
-
-CREATE TABLE IF NOT EXISTS exchange_rate_record (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	currency VARCHAR NOT NULL,
-	date TIMESTAMP NOT NULL,
-	cash_buy NUMERIC, --現金匯率_本行買入
-	cash_sell NUMERIC, --現金匯率_本行賣出
-	spot_buy NUMERIC, --即期匯率_本行買入
-	spot_sell NUMERIC, --即期匯率_本行賣出
-	PRIMARY KEY (id),
-	UNIQUE (currency, date),
 	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
+);
+
+CREATE TABLE IF NOT EXISTS fund_record (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	code VARCHAR NOT NULL,
+	date TIMESTAMP NOT NULL,
+	price NUMERIC NOT NULL, 
+	PRIMARY KEY (id),
+	UNIQUE (code, date),
+	CONSTRAINT fk_code FOREIGN KEY (code) REFERENCES fund(code)
+);
+
+CREATE TABLE IF NOT EXISTS user_tracking_fund (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	user_name VARCHAR NOT NULL,
+	fund_code VARCHAR NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (user_name, fund_code),
+	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
+	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
 );

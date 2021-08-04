@@ -1,5 +1,6 @@
 package io.tingkai.money.dao;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,5 +17,5 @@ public interface UserDao extends JpaRepository<User, UUID> {
 
 	public Optional<User> findByEmail(String email);
 
-	public Iterable<User> findByRole(Role role);
+	public List<User> findByRole(Role role);
 }

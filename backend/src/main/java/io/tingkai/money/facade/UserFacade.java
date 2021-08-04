@@ -1,6 +1,5 @@
 package io.tingkai.money.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,9 +24,7 @@ public class UserFacade {
 	private UserDao userDao;
 
 	public List<User> queryAll() throws QueryNotResultException {
-		List<User> entities = new ArrayList<User>();
-		Iterable<User> iterable = this.userDao.findAll();
-		iterable.forEach(entities::add);
+		List<User> entities = this.userDao.findAll();
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
 		}
@@ -35,9 +32,7 @@ public class UserFacade {
 	}
 
 	public List<User> queryByRole(Role role) throws QueryNotResultException {
-		List<User> entities = new ArrayList<User>();
-		Iterable<User> iterable = this.userDao.findByRole(role);
-		iterable.forEach(entities::add);
+		List<User> entities = this.userDao.findByRole(role);
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
 		}

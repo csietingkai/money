@@ -16,9 +16,11 @@ import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.StockVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Loggable
+@Slf4j
 public class StockService {
 
 	@Autowired
@@ -74,7 +76,7 @@ public class StockService {
 			record = this.stockRecordFacade.latestRecord(code);
 			return record.getDealDate();
 		} catch (QueryNotResultException e) {
-			e.printStackTrace();
+			log.debug(e.getMessage());
 		}
 		return defaultTime;
 	}

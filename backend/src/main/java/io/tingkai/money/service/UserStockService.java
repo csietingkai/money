@@ -168,9 +168,7 @@ public class UserStockService {
 		String cacheKey = CodeConstants.USER_TRACKING_STOCK_KEY + username;
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
-			trackingList = new ArrayList<UserTrackingStock>();
-			Iterable<UserTrackingStock> iterable = this.userTrackingStockFacade.queryAll(username);
-			iterable.forEach(trackingList::add);
+			trackingList = this.userTrackingStockFacade.queryAll(username);
 			this.userCache.opsForValue().set(cacheKey, trackingList);
 		}
 
@@ -229,8 +227,7 @@ public class UserStockService {
 		String cacheKey = CodeConstants.USER_TRACKING_STOCK_KEY + username;
 		List<UserTrackingStock> trackingList = new ArrayList<UserTrackingStock>();
 		try {
-			Iterable<UserTrackingStock> iterable = this.userTrackingStockFacade.queryAll(username);
-			iterable.forEach(trackingList::add);
+			trackingList.addAll(this.userTrackingStockFacade.queryAll(username));
 		} catch (QueryNotResultException e) {
 		}
 		this.userCache.opsForValue().set(cacheKey, trackingList);

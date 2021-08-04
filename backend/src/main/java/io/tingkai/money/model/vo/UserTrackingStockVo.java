@@ -13,9 +13,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class UserTrackingStockVo extends UserTrackingStock implements Transformable<UserTrackingStock> {
 
-	private String stockName;
-	private StockRecord record;
-	private BigDecimal amplitude; // 漲跌幅
+	protected String stockName;
+	protected StockRecord record;
+	protected BigDecimal amplitude; // 漲跌幅
 
 	@Override
 	public void transform(UserTrackingStock entity) {

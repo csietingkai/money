@@ -13,11 +13,9 @@ import io.tingkai.money.enumeration.MarketType;
 @Repository
 public interface StockDao extends JpaRepository<Stock, UUID> {
 
-	public Iterable<Stock> findAllByOrderByCode();
-
 	public Optional<Stock> findByCode(String code);
 
 	public long countByMarketType(MarketType marketType);
 
-	public Iterable<Stock> findByCodeNotIn(List<String> codes);
+	public List<Stock> findByCodeNotIn(List<String> codes);
 }

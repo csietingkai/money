@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class StockVo extends Stock implements Transformable<Stock> {
 
-	private LocalDateTime updateTime;
+	protected LocalDateTime updateTime;
 
 	@Override
 	public void transform(Stock entity) {
