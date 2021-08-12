@@ -148,7 +148,7 @@ export default class Table extends React.Component<TableProps, TableState> {
                             showData.length ?
                                 showData.map((d, trIdx) => {
                                     return (
-                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(trIdx)} className={trIdx === this.state.selectedRow ? 'select-row' : ''}>
+                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(currentPage * countPerPage + trIdx)} className={currentPage * countPerPage + trIdx === this.state.selectedRow ? 'select-row' : ''}>
                                             {
                                                 header.map((h, tdIdx) => {
                                                     return (
