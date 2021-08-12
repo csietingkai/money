@@ -9,7 +9,6 @@ import { isArrayEmpty } from 'util/AppUtil';
 import { Record, SidebarItem } from 'util/Interface';
 import StockQuerier from 'view/investment/StockQuerier';
 import PersonalSettingPage from 'view/settings/PersonalSettingPage';
-import StockRecordUpdater from 'view/investment/StockRecordUpdater';
 import ExchangeRateQuerier from 'view/investment/ExchangeRateQuerier';
 
 
@@ -53,13 +52,6 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 url: '/stockQuerier',
                 icon: ChartLineIcon(),
                 component: StockQuerier
-            },
-            {
-                name: 'Stock Updater',
-                level: 1,
-                url: '/stockUpdater',
-                icon: CalendarAltIcon(),
-                component: StockRecordUpdater
             },
             {
                 name: 'Exchange Rate Querier',

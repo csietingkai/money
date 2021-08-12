@@ -1,29 +1,38 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { getStockStyle, ReduxState } from 'reducer/Selector';
+import { SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
+import { getAuthTokenName, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
+import CandleStickChart from 'component/common/chart/CandleStockChart';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
-import CandleStickChart from 'component/common/chart/CandleStockChart';
 import Form from 'component/common/Form';
-import { SearchIcon } from 'component/common/Icons';
+import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
+import Table from 'component/common/Table';
 
-import StockApi, { StockRecord } from 'api/stock';
+import StockApi, { Stock, StockRecord, UserTrackingStockVo } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
+import { Action } from 'util/Interface';
 
 export interface StockQuerierProps {
     stockStyle: StockStyle;
+    username: string;
+    stockTrackingList: UserTrackingStockVo[];
+    setStockTrackingList: (stocks: UserTrackingStockVo[]) => void;
 }
 
 export interface StockQuerierState {
-    queryCondition: { code: string, start: Date, end: Date; };
+    queryCondition: { code: string, name: string, start: Date, end: Date; };
     xAxis: string[];
-    data: StockRecord[];
+    stocks: Stock[];
+    selectedStockCode: string;
+    stockRecords: StockRecord[];
 }
 
 class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState> {
@@ -33,21 +42,55 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         this.state = {
             queryCondition: {
                 code: '',
+                name: '',
                 start: new Date(),
                 end: new Date()
             },
             xAxis: [],
-            data: []
+            stocks: [],
+            selectedStockCode: '',
+            stockRecords: []
         };
     }
 
     private onQueryBtnClick = async () => {
         const { queryCondition } = this.state;
-        if (!queryCondition.code || !queryCondition.start || !queryCondition.end) {
-            Notify.warning('Please fill all required Fields.');
+        const { code, name, start, end } = queryCondition;
+        if (!code && !name) {
+            Notify.warning('Please fill code or name at least.');
             return;
         }
-        const response = await StockApi.getRecords(queryCondition.code, queryCondition.start, queryCondition.end);
+        if (!start || !end) {
+            Notify.warning('Please fill start and end time.');
+            return;
+        }
+        const { success, data: stocks, message } = await StockApi.getAll(code, name);
+        if (success) {
+            this.setState({ stocks });
+        } else {
+            Notify.warning(message);
+            return;
+        }
+
+        if (stocks.length >= 1) {
+            this.getRecords(stocks[0].code);
+        } else {
+            this.setState({ xAxis: [], stockRecords: [] });
+        }
+    };
+
+    private onStockRowClick = async (selectedRow: number) => {
+        const { stocks, selectedStockCode } = this.state;
+        if (stocks[selectedRow].code === selectedStockCode) {
+            return;
+        }
+        this.setState({ selectedStockCode: stocks[selectedRow].code });
+        await this.getRecords(stocks[selectedRow].code);
+    };
+
+    private getRecords = async (code: string) => {
+        const { queryCondition: { start, end } } = this.state;
+        const response = await StockApi.getRecords(code, start, end);
         const { success, message } = response;
         let { data: records } = response;
         if (!success) {
@@ -55,12 +98,56 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         }
         records = records || [];
         const dealDates: string[] = records.map(x => toDateStr(x.dealDate));
-        this.setState({ xAxis: dealDates, data: records });
+        this.setState({ xAxis: dealDates, stockRecords: records });
+    };
+
+    private syncRecord = (code: string) => async () => {
+        const { success: refreshSuccess, message } = await StockApi.refresh(code);
+        if (refreshSuccess) {
+            const { code, name } = this.state.queryCondition;
+            const { data: stocks } = await StockApi.getAll(code, name);
+            this.setState({ stocks });
+            await this.getRecords(code);
+        } else {
+            Notify.error(message);
+        }
+    };
+
+    private track = (code: string) => async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        event.preventDefault();
+
+        const { username } = this.props;
+        const { success, message } = await StockApi.track(username, code);
+        if (success) {
+            await this.syncTrackingList();
+            Notify.success(message);
+        } else {
+            Notify.warning(message);
+        }
+    };
+
+    private untrack = (code: string) => async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        event.preventDefault();
+
+        const { username } = this.props;
+        const { success, message } = await StockApi.untrack(username, code);
+        if (success) {
+            await this.syncTrackingList();
+            Notify.success(message);
+        } else {
+            Notify.warning(message);
+        }
+    };
+
+    private syncTrackingList = async () => {
+        const { username, setStockTrackingList } = this.props;
+        const { data: trackingList } = await StockApi.getTrackingList(username);
+        setStockTrackingList(trackingList);
     };
 
     render() {
-        const { stockStyle } = this.props;
-        const { queryCondition, data } = this.state;
+        const { stockStyle, stockTrackingList } = this.props;
+        const { queryCondition, stocks, stockRecords } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -71,12 +158,14 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                             <Form
                                 singleRow
                                 inputs={[
-                                    { key: 'code', title: 'Stock Code', type: InputType.text, value: queryCondition?.code, width: 3, required: true },
+                                    { key: 'code', title: 'Stock Code', type: InputType.text, value: queryCondition?.code, width: 3 },
+                                    { key: 'name', title: 'Stock Name', type: InputType.text, value: queryCondition?.name, width: 3 },
                                     { key: 'start', title: 'Time From', type: InputType.date, value: queryCondition?.start, width: 3 },
                                     { key: 'end', title: 'Time To', type: InputType.date, value: queryCondition?.end, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
                                     queryCondition.code = formState.code;
+                                    queryCondition.name = formState.name;
                                     queryCondition.start = formState.start;
                                     queryCondition.end = formState.end;
                                     this.setState({ queryCondition });
@@ -94,6 +183,34 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                             </div>
                         </Card>
                     </Col>
+                    <Col>
+                        <Card
+                            title='Stock Info'
+                        >
+                            <Table
+                                id='stock-updater-table'
+                                header={['code', 'name', 'marketType', 'industryType', 'updateTime', 'functions']}
+                                data={stocks}
+                                countPerPage={3}
+                                onRowClick={this.onStockRowClick}
+                                columnConverter={(header: string, rowData: any) => {
+                                    if (['offeringDate', 'updateTime'].findIndex(x => x === header) >= 0) {
+                                        return <>{toDateStr(rowData[header])}</>;
+                                    } else if (header === 'functions') {
+                                        const isTracking: boolean = stockTrackingList.findIndex(x => x.stockCode === rowData.code) >= 0;
+                                        return (
+                                            <>
+                                                <Button size='sm' variant='info' outline onClick={this.syncRecord(rowData.code)}><SyncAltIcon /></Button>
+                                                {!isTracking && <Button size='sm' variant='info' outline onClick={this.track(rowData.code)}><PlusIcon /></Button>}
+                                                {isTracking && <Button size='sm' variant='info' outline onClick={this.untrack(rowData.code)}><MinusIcon /></Button>}
+                                            </>
+                                        );
+                                    }
+                                    return rowData[header];
+                                }}
+                            />
+                        </Card>
+                    </Col>
                 </Row>
                 <Row>
                     <Col>
@@ -102,7 +219,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                         >
                             <CandleStickChart
                                 stockStyle={stockStyle}
-                                data={data}
+                                data={stockRecords}
                             />
                         </Card>
                     </Col>
@@ -114,8 +231,16 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        stockStyle: getStockStyle(state)
+        stockStyle: getStockStyle(state),
+        username: getAuthTokenName(state),
+        stockTrackingList: getStockTrackingList(state),
     };
 };
 
-export default connect(mapStateToProps)(StockQuerier);
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => {
+    return {
+        setStockTrackingList: SetStockTrackingListDispatcher(dispatch)
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(StockQuerier);
