@@ -18,6 +18,7 @@ matplotlib = "*"
 pytrends = "*"
 plotly = "*"
 pystan = "~=2.14"
+fbprophet = "*"
 
 [dev-packages]
 
