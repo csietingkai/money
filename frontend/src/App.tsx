@@ -10,13 +10,13 @@ import { getAuthToken, getAuthTokenString, isLoading, ReduxState } from 'reducer
 import Breadcrumb from 'component/layout/Breadcrumb';
 import Footer from 'component/layout/Footer';
 import Header from 'component/layout/Header';
+import Loading from 'component/layout/Loading';
 import Sidebar from 'component/layout/Sidebar';
 
 import { AuthToken } from 'api/auth';
 
 import { APP_ROUTES } from 'util/Constant';
 import { Action } from 'util/Interface';
-import Loading from 'component/common/Loading';
 
 export interface AppProps extends RouteChildrenProps<any> {
     authToken?: AuthToken;
@@ -42,7 +42,6 @@ class App extends React.Component<AppProps, AppState> {
         const { loading } = this.props;
         const app = (
             <div className='app'>
-                {loading && <Loading />}
                 <Header {...this.props} authToken={this.props.authToken} onLogoutClick={this.onLogoutClick} />
                 <div className='app-body'>
                     <Sidebar {...this.props} authToken={this.props.authToken} />
@@ -63,7 +62,12 @@ class App extends React.Component<AppProps, AppState> {
                 <Footer {...this.props} />
             </div>
         );
-        return app;
+        return (
+            <>
+                {app}
+                {loading && <Loading />}
+            </>
+        );
     }
 }
 

@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
+import { SetLoadingDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
 import { getAuthTokenName, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
 import CandleStickChart from 'component/common/chart/CandleStockChart';
@@ -25,6 +25,7 @@ export interface StockQuerierProps {
     username: string;
     stockTrackingList: UserTrackingStockVo[];
     setStockTrackingList: (stocks: UserTrackingStockVo[]) => void;
+    setLoading: (loading: boolean) => void;
 }
 
 export interface StockQuerierState {
@@ -93,6 +94,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         const response = await StockApi.getRecords(code, start, end);
         const { success, message } = response;
         let { data: records } = response;
+        console.log(records);
         if (!success) {
             Notify.warning(message);
         }
@@ -102,15 +104,17 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     };
 
     private syncRecord = (code: string) => async () => {
+        this.props.setLoading(true);
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
         if (refreshSuccess) {
-            const { code, name } = this.state.queryCondition;
-            const { data: stocks } = await StockApi.getAll(code, name);
+            const { queryCondition } = this.state;
+            const { data: stocks } = await StockApi.getAll(queryCondition.code, queryCondition.name);
             this.setState({ stocks });
             await this.getRecords(code);
         } else {
             Notify.error(message);
         }
+        this.props.setLoading(false);
     };
 
     private track = (code: string) => async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -237,9 +241,10 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[] | boolean>>) => {
     return {
-        setStockTrackingList: SetStockTrackingListDispatcher(dispatch)
+        setStockTrackingList: SetStockTrackingListDispatcher(dispatch),
+        setLoading: SetLoadingDispatcher(dispatch)
     };
 };
 

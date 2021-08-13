@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { combineReducers } from 'redux';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING } from 'reducer/ActionType';
 import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxStockState, ReduxSystemSettingState } from 'reducer/Selector';
 import { getAuthToken, setAuthToken, removeAuthToken, setStockStyle } from 'reducer/StateHolder';
 
@@ -59,12 +59,14 @@ const accountReducer = (state: ReduxAccountState = DEFAULT_REDUX_ACCOUNT_STATE, 
     return newState;
 };
 
-const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SETTING_STATE, action: Action<StockStyle>): ReduxSystemSettingState => {
+const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SETTING_STATE, action: Action<StockStyle | boolean>): ReduxSystemSettingState => {
     const newState: ReduxSystemSettingState = { ...state };
     const { type, payload } = action;
     if (type === SET_STOCK_STYLE) {
-        setStockStyle(payload);
-        newState.stockStyle = payload;
+        setStockStyle(payload as StockStyle);
+        newState.stockStyle = payload as StockStyle;
+    } else if (type === SET_LOADING) {
+        newState.loading = payload as boolean;
     }
     return newState;
 };
