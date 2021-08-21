@@ -38,6 +38,16 @@ export interface StockRecord {
     closePrice: number;
 }
 
+export interface StockRecordVo extends StockRecord {
+    ma5: number;
+    ma10: number;
+    ma20: number;
+    ma40: number;
+    ma60: number;
+    bbup: number;
+    bbdown: number;
+}
+
 export interface UserTrackingStock {
     id: string;
     userName: string;
@@ -52,8 +62,8 @@ export interface UserTrackingStockVo extends UserTrackingStock {
 
 export interface StockResponse extends ApiResponse<StockVo> { }
 export interface StockListResponse extends ApiResponse<StockVo[]> { }
-export interface StockRecordResponse extends ApiResponse<StockRecord> { }
-export interface StockRecordListResponse extends ApiResponse<StockRecord[]> { }
+export interface StockRecordResponse extends ApiResponse<StockRecordVo> { }
+export interface StockRecordListResponse extends ApiResponse<StockRecordVo[]> { }
 export interface StockTrackingListResponse extends ApiResponse<UserTrackingStockVo[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins

@@ -1,6 +1,6 @@
 import { ToastOptions, ToastPosition } from 'react-toastify';
 
-import { CalendarAltIcon, ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
+import { ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';

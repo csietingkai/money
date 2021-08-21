@@ -9,7 +9,7 @@ check_tools () {
 	return 0
 }
 
-declare -a tools=( 'docker' 'git' 'mvn' 'redis-cli' 'mongodump' 'pg_dumpall')
+declare -a tools=( 'docker' 'git' 'mvn' 'redis-cli' 'mongodump' 'pg_dumpall' 'libpython3-dev')
 check_result=0
 for tool in "${tools[@]}" 
 do

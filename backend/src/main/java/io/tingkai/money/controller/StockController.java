@@ -15,6 +15,7 @@ import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.StockResponse;
+import io.tingkai.money.model.vo.StockRecordVo;
 import io.tingkai.money.model.vo.StockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.service.DataFetcherService;
@@ -50,9 +51,9 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<StockRecord>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) throws QueryNotResultException {
-		List<StockRecord> records = this.stockService.getAllRecords(code, start, end);
-		return new StockResponse<List<StockRecord>>(true, records, MessageConstant.STOCK_GET_SUCCESS, code);
+	public StockResponse<List<StockRecordVo>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) throws QueryNotResultException {
+		List<StockRecordVo> records = this.stockService.getAllRecords(code, start, end);
+		return new StockResponse<List<StockRecordVo>>(true, records, MessageConstant.STOCK_GET_SUCCESS, code);
 	}
 
 	@RequestMapping(value = StockController.LATEST_RECORD_PATH, method = RequestMethod.GET)

@@ -24,7 +24,6 @@ export default class LineChart extends React.Component<LineChartProps, LineChart
         return (
             <div className='chart-wrapper'>
                 <Line
-                    type='line'
                     data={
                         {
                             labels: records.map((x: Record<Date, number>) => toDateStr(x.key)),

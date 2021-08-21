@@ -4,6 +4,7 @@ import { Button as RbButton } from 'react-bootstrap';
 import { Variant } from 'util/Enum';
 
 export interface ButtonProps {
+    id?: string;
     className?: string;
     variant: Variant;
     outline?: boolean;

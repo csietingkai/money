@@ -1,10 +1,12 @@
 package io.tingkai.money.facade;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
@@ -36,6 +38,15 @@ public class StockRecordFacade {
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
 		}
+		return entities;
+	}
+
+	public List<StockRecord> queryDaysBefore(String code, int days, long date) throws QueryNotResultException {
+		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBeforeOrderByDealDateDesc(code, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+		}
+		Collections.reverse(entities);
 		return entities;
 	}
 

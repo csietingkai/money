@@ -13,7 +13,7 @@ import Form from 'component/common/Form';
 import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import StockApi, { Stock, StockRecord, UserTrackingStockVo } from 'api/stock';
+import StockApi, { Stock, StockRecordVo, UserTrackingStockVo } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
@@ -33,7 +33,7 @@ export interface StockQuerierState {
     xAxis: string[];
     stocks: Stock[];
     selectedStockCode: string;
-    stockRecords: StockRecord[];
+    stockRecords: StockRecordVo[];
 }
 
 class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState> {
@@ -94,7 +94,6 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         const response = await StockApi.getRecords(code, start, end);
         const { success, message } = response;
         let { data: records } = response;
-        console.log(records);
         if (!success) {
             Notify.warning(message);
         }

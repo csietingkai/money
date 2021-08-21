@@ -79,7 +79,7 @@ export const toDateStr = (date: Date): string => {
 };
 
 export const numberComma = (num: number): string => {
-    if (!num || parseFloat(num.toString()) === Number.NaN) {
+    if (!num || isNaN(num)) {
         num = 0;
     }
     const strNum = num.toString();

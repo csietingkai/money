@@ -24,7 +24,7 @@ export default class Loading extends React.Component<LoadingProps, LoadingState>
                 <div className='spinner-border' role='status'>
                     <span className='sr-only'>{text}</span>
                 </div>
-                <h3>{text}</h3>
+                <h2 className='ml-2'>{text}</h2>
             </div>
         );
     }
