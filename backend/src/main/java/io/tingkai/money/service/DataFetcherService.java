@@ -38,8 +38,9 @@ public class DataFetcherService {
 	private static final String PYTHON_FETCH_STOCKS_PATH = PYTHON_FETCH_PATH_PREFIX + "/stocks";
 	private static final String PYTHON_FETCH_STOCK_PATH = PYTHON_FETCH_PATH_PREFIX + "/stock";
 	private static final String PYTHON_FETCH_STOCK_RECORDS_PATH = PYTHON_FETCH_PATH_PREFIX + "/stockRecords";
-	private static final String PYTHON_FETCH_FUND_PATH = PYTHON_FETCH_PATH_PREFIX + "/funds";
-	private static final String PYTHON_FETCH_FUND_RECORDS_PATH = PYTHON_FETCH_PATH_PREFIX + "/fundReords";
+	private static final String PYTHON_FETCH_FUNDS_PATH = PYTHON_FETCH_PATH_PREFIX + "/funds";
+	private static final String PYTHON_FETCH_FUND_PATH = PYTHON_FETCH_PATH_PREFIX + "/fund";
+	private static final String PYTHON_FETCH_FUND_RECORDS_PATH = PYTHON_FETCH_PATH_PREFIX + "/fundRecords";
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -147,12 +148,24 @@ public class DataFetcherService {
 		if (this.fundFacade.count() == 0L) {
 			// @formatter:off
 			UriComponentsBuilder builder = UriComponentsBuilder
-					.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_FUND_PATH);
+					.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_FUNDS_PATH);
 			// @formatter:on
 			String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
 			if (!MessageConstant.SUCCESS.equals(result)) {
 				log.warn(result);
 			}
+		}
+	}
+
+	public void fetchFund(String code) {
+		// @formatter:off
+		UriComponentsBuilder builder = UriComponentsBuilder
+				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_FUND_PATH)
+				.queryParam("code", code);
+		// @formatter:on
+		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
+		if (!MessageConstant.SUCCESS.equals(result)) {
+			log.warn(result);
 		}
 	}
 

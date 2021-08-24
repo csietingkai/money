@@ -6,10 +6,12 @@ import { ExchangeRate } from 'api/exchangeRate';
 import { UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
+import { UserTrackingFundVo } from 'api/fund';
 
 export interface ReduxState {
     auth: ReduxAuthState;
     stock: ReduxStockState;
+    fund: ReduxFundState;
     exchangeRate: ReduxExchangeRateState;
     account: ReduxAccountState;
     setting: ReduxSystemSettingState;
@@ -40,6 +42,16 @@ export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
 export const getStockTrackingList = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.tracking;
+
+// fundReducer
+export interface ReduxFundState {
+    tracking: UserTrackingFundVo[];
+}
+export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
+    tracking: []
+};
+const getFundState = (state: ReduxState): ReduxFundState => state.fund;
+export const getFundTrackingList = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.tracking;
 
 // exchangeReducer
 export interface ReduxExchangeRateState {

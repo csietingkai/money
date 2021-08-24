@@ -1,55 +1,33 @@
 import * as React from 'react';
-import { Col, Dropdown, ListGroup, ListGroupItem, Row, SplitButton } from 'react-bootstrap';
-import { Bar } from 'react-chartjs-2';
+import { SplitButton, Dropdown, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Line } from 'react-chartjs-2';
 
-import { StockRecordVo } from 'api/stock';
+import { ExchangeRateRecordVo } from 'api/exchangeRate';
 
+import { SUPPORT_LINE_TYPE } from 'component/common/chart/Constants';
 import { CheckIcon, InfoCircleIcon } from 'component/common/Icons';
 
-import { toDateStr } from 'util/AppUtil';
+import { black, toDateStr } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
 
-export interface CandleStickChartProps {
-    stockStyle: StockStyle;
-    data: StockRecordVo[];
-    // TODO
-    // recommand: any;
+export interface FundChartProps {
+    stockStyle: StockStyle,
+    data: ExchangeRateRecordVo[];
 }
 
-export interface CandleStickChartState {
+export interface FundChartState {
     selectedLineType: {
         key: string,
         children: { [key: string]: string[]; };
     };
     hoveredIndex: number;
+    // TODO
+    // recommand: any;
 }
 
-const SUPPORT_LINE_TYPE = [
-    {
-        key: 'ma',
-        value: 'Moving Average',
-        children: [
-            { key: 'ma5', value: 'MA5', color: '#ebad10', isDefault: true },
-            { key: 'ma10', value: 'MA10', color: '#032526', isDefault: false },
-            { key: 'ma20', value: 'MA20', color: 'purple', isDefault: true },
-            { key: 'ma40', value: 'MA40', color: 'red', isDefault: false },
-            { key: 'ma60', value: 'MA60', color: '#ad0042', isDefault: false }
-        ]
-    },
-    {
-        key: 'bb',
-        value: 'Bollinger Bands',
-        children: [
-            { key: 'bbup', value: 'B.Brand Up: ', color: 'blue', isDefault: true },
-            { key: 'ma20', value: 'MA20', color: 'purple', isDefault: true },
-            { key: 'bbdown', value: 'B.Brand Down', color: 'red', isDefault: true }
-        ]
-    }
-];
+export default class FundChart extends React.Component<FundChartProps, FundChartState> {
 
-export default class CandleStickChart extends React.Component<CandleStickChartProps, CandleStickChartState> {
-
-    constructor(props: CandleStickChartProps) {
+    constructor(props: FundChartProps) {
         super(props);
         const children: { [key: string]: string[]; } = {};
         SUPPORT_LINE_TYPE.forEach((TYPE) => {
@@ -57,32 +35,17 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
         });
         this.state = {
             selectedLineType: {
-                key: SUPPORT_LINE_TYPE[0].key,
+                key: '',
                 children
             },
             hoveredIndex: -1
         };
     }
 
-    private getStickColor = (record: StockRecordVo, style: StockStyle = this.props.stockStyle) => {
-        let color: string = 'black';
-        if (style === StockStyle.TW) {
-            if (record.openPrice > record.closePrice) {
-                color = 'green';
-            } else if (record.openPrice < record.closePrice) {
-                color = 'red';
-            }
-        } else {
-            if (record.openPrice > record.closePrice) {
-                color = 'red';
-            } else if (record.openPrice < record.closePrice) {
-                color = 'green';
-            }
-        }
-        return color;
-    };
-
     private onLineTypeChange = (selectedLineType: string) => () => {
+        if (this.state.selectedLineType.key === selectedLineType) {
+            selectedLineType = '';
+        }
         this.setState({ selectedLineType: { key: selectedLineType, children: this.state.selectedLineType.children } });
     };
 
@@ -107,28 +70,18 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
         // make data sets for chart
         const datasets: any[] = [
             {
-                label: 'open and close',
-                type: 'bar',
-                data: records.map((x: StockRecordVo) => [x.openPrice, x.closePrice]),
-                backgroundColor: records.map((x: StockRecordVo) => this.getStickColor(x)),
-                minBarLength: 1
-            },
-            {
-                label: 'high and low',
-                type: 'bar',
-                barPercentage: 0.1,
-                data: records.map((x: StockRecordVo) => [x.highPrice, x.lowPrice]),
-                backgroundColor: records.map((x: StockRecordVo) => this.getStickColor(x))
+                label: 'price',
+                data: records.map((x: ExchangeRateRecordVo) => x.cashSell),
             }
         ];
 
         const LINE = SUPPORT_LINE_TYPE.find(x => x.key == selectedLineType.key);
-        LINE.children.forEach(l => {
+        LINE && LINE.children.forEach(l => {
             if (selectedLineType.children[selectedLineType.key].filter(x => x === l.key).length > 0) {
                 datasets.push({
                     label: l.key,
                     type: 'line',
-                    data: records.map((x: StockRecordVo) => (x as any)[l.key]),
+                    data: records.map((x: ExchangeRateRecordVo) => (x as any)[l.key]),
                     borderColor: LINE.children.find(x => x.key == l.key)?.color,
                     radius: 0,
                     borderWidth: 1
@@ -154,8 +107,10 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
                                             key={`chart-support-dropdown-${TYPE.key}-item-${C.key}`}
                                             onClick={this.onSupportLineDropdownClick(TYPE.key, C.key)}
                                         >
-                                            {selectedLineType.key === TYPE.key && selectedLineType.children[selectedLineType.key].findIndex(s => s === C.key) >= 0 && <CheckIcon />}
-                                            {C.value}
+                                            <span style={{ color: C.color }}>
+                                                {selectedLineType.key === TYPE.key && selectedLineType.children[selectedLineType.key].findIndex(s => s === C.key) >= 0 && <CheckIcon />}
+                                                {C.value}
+                                            </span>
                                         </Dropdown.Item>
                                     )
                                 }
@@ -166,15 +121,14 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
                 <Row>
                     <Col>
                         <div className='chart-wrapper'>
-                            <Bar
+                            <Line
                                 data={
-                                    { labels: records.map((x: StockRecordVo) => toDateStr(x.dealDate)), datasets }
+                                    { labels: records.map((x: ExchangeRateRecordVo) => toDateStr(x.date)), datasets }
                                 }
                                 options={{
                                     responsive: true,
-                                    scales: {
-                                        x: { stacked: true },
-                                        y: { beginAtZero: false }
+                                    animation: {
+                                        duration: 0
                                     },
                                     interaction: {
                                         intersect: false,
@@ -186,16 +140,18 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
                                             enabled: false,
                                             external: (context: any) => {
                                                 if (records.length) {
-                                                    const hoverDate = new Date(context.tooltip.title[0]);
-                                                    const mouseIndex = records.findIndex(x => x.dealDate.getTime() === hoverDate.getTime());
-                                                    if (hoveredIndex !== mouseIndex) {
-                                                        this.setState({ hoveredIndex: mouseIndex });
-                                                    }
+                                                    // const hoverDate = new Date(context.tooltip.title[0]);
+                                                    // const mouseIndex = records.findIndex(x => x.dealDate.getTime() === hoverDate.getTime());
+                                                    // if (hoveredIndex !== mouseIndex) {
+                                                    //     this.setState({ hoveredIndex: mouseIndex });
+                                                    // }
                                                 }
                                             }
                                         }
                                     },
-                                    animation: { duration: 0 }
+                                    borderColor: black(0.9),
+                                    radius: 0,
+                                    borderWidth: 1
                                 }}
                             />
                         </div>
@@ -208,17 +164,17 @@ export default class CandleStickChart extends React.Component<CandleStickChartPr
                                     <ListGroup>
                                         <ListGroupItem action variant='info'>
                                             <InfoCircleIcon />
-                                            <span className='h5'> {toDateStr(records[hoveredIndex].dealDate)}</span>
+                                            <span className='h3'> {toDateStr(records[hoveredIndex].date)}</span>
                                         </ListGroupItem>
                                         <ListGroupItem action variant='secondary'>
-                                            <h6>Open: {records[hoveredIndex].openPrice}</h6>
-                                            <h6>High: {records[hoveredIndex].highPrice}</h6>
-                                            <h6>Low: {records[hoveredIndex].lowPrice}</h6>
-                                            <h6>Close: {records[hoveredIndex].closePrice}</h6>
-                                            <h6>MA5: {records[hoveredIndex].ma5}</h6>
-                                            <h6>MA20: {records[hoveredIndex].ma20}</h6>
-                                            <h6>B.Brand Up: {records[hoveredIndex].bbup}</h6>
-                                            <h6>B.Brand Down: {records[hoveredIndex].bbdown}</h6>
+                                            <h5>Current Price: {records[hoveredIndex].cashSell}</h5>
+                                            <h5>MA5: {records[hoveredIndex].ma5}</h5>
+                                            <h5>MA10: {records[hoveredIndex].ma10}</h5>
+                                            <h5>MA20: {records[hoveredIndex].ma20}</h5>
+                                            <h5>MA40: {records[hoveredIndex].ma40}</h5>
+                                            <h5>MA60: {records[hoveredIndex].ma60}</h5>
+                                            <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
+                                            <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
                                         </ListGroupItem>
                                     </ListGroup>
                                 </Col>

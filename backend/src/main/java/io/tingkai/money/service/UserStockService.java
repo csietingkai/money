@@ -180,7 +180,11 @@ public class UserStockService {
 			Stock info = this.stockFacade.query(x.getStockCode());
 			vo.setStockName(info.getName());
 
-			List<StockRecord> records = this.stockRecordFacade.queryAll(x.getStockCode());
+			List<StockRecord> records = new ArrayList<StockRecord>();
+			try {
+				this.stockRecordFacade.queryAll(x.getStockCode());
+			} catch (QueryNotResultException e) {
+			}
 			if (records.size() > 0) {
 				StockRecord r0 = records.get(records.size() - 1);
 				vo.setRecord(r0);

@@ -43,7 +43,7 @@ public class FundFacade {
 	public Fund query(String code) throws QueryNotResultException {
 		Optional<Fund> optional = this.fundDao.findByCode(code);
 		if (optional.isEmpty()) {
-			this.pythonFetcherService.fetchStock(code);
+			this.pythonFetcherService.fetchFund(code);
 		}
 		optional = this.fundDao.findByCode(code);
 		if (optional.isEmpty()) {

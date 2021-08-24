@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
-import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
@@ -29,7 +28,6 @@ public class StockController {
 	public static final String CONROLLER_PREFIX = "/stock";
 	public static final String GET_ALL_PATH = "/getAll";
 	public static final String GET_RECORDS_PATH = "/getRecords";
-	public static final String LATEST_RECORD_PATH = "/latestRecord";
 	public static final String REFRESH_PATH = "/refresh";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
 	public static final String TRACK_PATH = "/track";
@@ -54,12 +52,6 @@ public class StockController {
 	public StockResponse<List<StockRecordVo>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) throws QueryNotResultException {
 		List<StockRecordVo> records = this.stockService.getAllRecords(code, start, end);
 		return new StockResponse<List<StockRecordVo>>(true, records, MessageConstant.STOCK_GET_SUCCESS, code);
-	}
-
-	@RequestMapping(value = StockController.LATEST_RECORD_PATH, method = RequestMethod.GET)
-	public StockResponse<StockRecord> latestRecord(@RequestParam String code) throws QueryNotResultException {
-		StockRecord record = this.stockService.latestRecord(code);
-		return new StockResponse<StockRecord>(true, record, MessageConstant.STOCK_GET_SUCCESS, code);
 	}
 
 	@RequestMapping(value = StockController.REFRESH_PATH, method = RequestMethod.POST)

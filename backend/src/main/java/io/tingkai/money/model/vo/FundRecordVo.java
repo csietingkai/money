@@ -2,13 +2,13 @@ package io.tingkai.money.model.vo;
 
 import java.math.BigDecimal;
 
-import io.tingkai.money.entity.StockRecord;
+import io.tingkai.money.entity.FundRecord;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class StockRecordVo extends StockRecord implements Transformable<StockRecord> {
+public class FundRecordVo extends FundRecord implements Transformable<FundRecord> {
 
 	protected BigDecimal ma5;
 	protected BigDecimal ma10;

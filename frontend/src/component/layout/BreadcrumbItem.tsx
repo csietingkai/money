@@ -2,8 +2,9 @@ import * as React from 'react';
 import { BreadcrumbItem as RbBreadcrumbItem } from 'react-bootstrap';
 import { Link, RouteChildrenProps } from 'react-router-dom';
 
+import { BREADCRUMBS_ROUTES } from 'component/layout/RouteSetting';
+
 import { convert, find } from 'util/AppUtil';
-import { BREADCRUMBS_ROUTES } from 'util/Constant';
 
 export interface BreadcrumbItemProps extends RouteChildrenProps<any> { }
 

@@ -14,11 +14,19 @@ export const FILE_DOWNLOAD_PATH: string = FILE_API_PREFIX + '/download';
 const STOCK_API_PREFIX: string = '/stock';
 export const STOCK_GET_ALL_PATH: string = STOCK_API_PREFIX + '/getAll';
 export const STOCK_GET_RECORDS_PATH: string = STOCK_API_PREFIX + '/getRecords';
-export const STOCK_LATEST_RECORD_PATH: string = STOCK_API_PREFIX + '/latestRecord';
 export const STOCK_REFRESH_PATH: string = STOCK_API_PREFIX + '/refresh';
 export const STOCK_GET_TRACKING_LIST_PATH: string = STOCK_API_PREFIX + '/getTrackingList';
 export const STOCK_TRACK_PATH: string = STOCK_API_PREFIX + '/track';
 export const STOCK_UNTRACK_PATH: string = STOCK_API_PREFIX + '/untrack';
+
+// api fund
+const FUND_API_PREFIX: string = '/fund';
+export const FUND_GET_ALL_PATH: string = FUND_API_PREFIX + '/getAll';
+export const FUND_GET_RECORDS_PATH: string = FUND_API_PREFIX + '/getRecords';
+export const FUND_REFRESH_PATH: string = FUND_API_PREFIX + '/refresh';
+export const FUND_GET_TRACKING_LIST_PATH: string = FUND_API_PREFIX + '/getTrackingList';
+export const FUND_TRACK_PATH: string = FUND_API_PREFIX + '/track';
+export const FUND_UNTRACK_PATH: string = FUND_API_PREFIX + '/untrack';
 
 // api account
 const ACCOUNT_API_PREFIX: string = '/account';

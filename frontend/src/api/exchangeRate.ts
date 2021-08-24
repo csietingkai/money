@@ -20,8 +20,18 @@ export interface ExchangeRateRecord {
     spotSell: number;
 }
 
+export interface ExchangeRateRecordVo extends ExchangeRateRecord {
+    ma5: number;
+    ma10: number;
+    ma20: number;
+    ma40: number;
+    ma60: number;
+    bbup: number;
+    bbdown: number;
+}
+
 export interface ExchangeRateListResponse extends ApiResponse<ExchangeRate[]> { }
-export interface ExchangeRateRecordListResponse extends ApiResponse<ExchangeRateRecord[]> { }
+export interface ExchangeRateRecordListResponse extends ApiResponse<ExchangeRateRecordVo[]> { }
 
 const getAll = async (): Promise<ExchangeRateListResponse> => {
     const response = await axios.get(EXCHANGE_RATE_GET_ALL_PATH);

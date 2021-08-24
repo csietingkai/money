@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_LATEST_RECORD_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH } from 'api/Constant';
+import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
@@ -86,15 +86,6 @@ const getRecords = async (code: string, start: Date, end: Date): Promise<StockRe
     return data;
 };
 
-const latestRecord = async (code: string): Promise<StockRecordResponse> => {
-    const response = await axios.get(STOCK_LATEST_RECORD_PATH, { params: { code } });
-    const data: StockRecordResponse = response.data;
-    if (data.success) {
-        data.data = { ...data.data, dealDate: toDate(data.data.dealDate) };
-    }
-    return data;
-};
-
 const refresh = async (code: string): Promise<SimpleResponse> => {
     const response = await axios.post(STOCK_REFRESH_PATH, null, { params: { code }, timeout: REFRESH_STOCK_MAX_TIME });
     const data: SimpleResponse = response.data;
@@ -119,4 +110,4 @@ const untrack = async (username: string, code: string): Promise<SimpleResponse> 
     return data;
 };
 
-export default { getAll, getRecords, latestRecord, refresh, getTrackingList, track, untrack };
+export default { getAll, getRecords, refresh, getTrackingList, track, untrack };

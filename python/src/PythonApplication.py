@@ -39,6 +39,11 @@ def fetchStockRecord():
 def fetchFunds():
     return FundService.fetchFunds()
 
+@app.route('/fetch/fund')
+def fetchFund():
+    code = request.args.get('code')
+    return FundService.fetchFund(code)
+
 @app.route('/fetch/fundRecords')
 def fetchFundRecord():
     code = request.args.get('code')

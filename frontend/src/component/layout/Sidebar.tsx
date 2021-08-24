@@ -3,11 +3,10 @@ import { NavLink, RouteChildrenProps } from 'react-router-dom';
 import { Nav, NavItem, NavLink as RbNavLink } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import { SIDEBAR_ITEMS } from 'component/layout/RouteSetting';
 import SidebarMinimizer from 'component/layout/SidebarMinimizer';
 
 import { AuthToken } from 'api/auth';
-
-import { SIDEBAR_ITEMS } from 'util/Constant';
 import { SidebarItem } from 'util/Interface';
 import { isArray, isArrayEmpty, isExternalUrl } from 'util/AppUtil';
 

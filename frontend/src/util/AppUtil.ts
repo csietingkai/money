@@ -1,4 +1,4 @@
-import { SortType } from 'util/Enum';
+import { SortType, StockStyle } from 'util/Enum';
 import { Record } from 'util/Interface';
 
 export const isNull = (obj: any): boolean => {
@@ -142,7 +142,7 @@ export const sortByKey = (list: any[], key: string, sortType: SortType = SortTyp
     return sort(list.map(x => x[key], sortType));
 };
 
-export const handleRequestDate = (data: any) => {
+export const handleRequestDate = (data: any): any => {
     if (!data || typeof data !== 'object') {
         return data;
     }
@@ -154,10 +154,20 @@ export const handleRequestDate = (data: any) => {
                 // TODO time zone in config?
                 date.setHours(date.getHours() + 8);
                 data[key] = date.toISOString();
-            } else if (typeof value === "object") {
+            } else if (typeof value === 'object') {
                 data[key] = handleRequestDate(data[key]);
             }
         }
     }
     return data;
 };
+
+export const rgba = (red: number, green: number, blue: number, alpha: number = 1): string => `rgba(${red},${green},${blue},${alpha})`;
+export const black = (alpha: number = 1): string => rgba(2, 2, 2, alpha);
+export const blue = (alpha: number = 1): string => rgba(32, 168, 216, alpha);
+export const purple = (alpha: number = 1): string => rgba(111, 66, 193, alpha);
+export const pink = (alpha: number = 1): string => rgba(232, 62, 140, alpha);
+export const red = (alpha: number = 1): string => rgba(248, 108, 107, alpha);
+export const yellow = (alpha: number = 1): string => rgba(255, 193, 7, alpha);
+export const green = (alpha: number = 1): string => rgba(77, 189, 116, alpha);
+export const cyan = (alpha: number = 1): string => rgba(99, 194, 222, alpha);

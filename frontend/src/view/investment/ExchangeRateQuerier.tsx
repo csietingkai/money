@@ -1,30 +1,34 @@
 import * as React from 'react';
+import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
+import { SetLoadingDispatcher } from 'reducer/PropsMapper';
 import { getExchangeRateList, getStockStyle, ReduxState } from 'reducer/Selector';
 
-import LineChart from 'component/common/chart/LineChart';
+import ExchangeRateChart from 'component/common/chart/ExchangeRateChart';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
 
-import ExchangeRateApi, { ExchangeRate, ExchangeRateRecord } from 'api/exchangeRate';
+import ExchangeRateApi, { ExchangeRate, ExchangeRateRecordVo } from 'api/exchangeRate';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
+import { Action } from 'util/Interface';
 
 export interface ExchangeRateQuerierProps {
     stockStyle: StockStyle;
     exchangeRateList: ExchangeRate[];
+    setLoading: (loading: boolean) => void;
 }
 
 export interface ExchangeRateQuerierState {
     queryCondition: { currency: string, start: Date, end: Date; };
     xAxis: string[];
-    data: ExchangeRateRecord[];
+    data: ExchangeRateRecordVo[];
 }
 
 class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, ExchangeRateQuerierState> {
@@ -43,6 +47,7 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
     }
 
     private onRefreshBtnClick = async () => {
+        this.props.setLoading(true);
         const { queryCondition } = this.state;
         if (!queryCondition.currency) {
             Notify.warning('Please fill all required Fields.');
@@ -55,6 +60,7 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
         } else {
             Notify.warning(message);
         }
+        this.props.setLoading(false);
     };
 
     private onQueryBtnClick = async () => {
@@ -124,10 +130,9 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
                         <Card
                             title='Candle Chart'
                         >
-                            <LineChart
+                            <ExchangeRateChart
                                 stockStyle={stockStyle}
-                                // TODO use cashSell?
-                                data={data.map((x: ExchangeRateRecord) => ({ key: x.date, value: x.cashSell }))}
+                                data={data}
                             />
                         </Card>
                     </Col>
@@ -144,4 +149,10 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-export default connect(mapStateToProps)(ExchangeRateQuerier);
+const mapDispatchToProps = (dispatch: Dispatch<Action<boolean>>) => {
+    return {
+        setLoading: SetLoadingDispatcher(dispatch)
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ExchangeRateQuerier);

@@ -31,6 +31,13 @@ public class MessageConstant {
 	public static final String USER_STOCK_GET_TRACKING_LIST_SUCCESS = "User: {0} Tracking List Fetch Success";
 	public static final String STOCK_SHARE_AMOUNT_INVALID = "Stock Share: {0} is invalid";
 
+	// fund
+	public static final String FUND_GET_ALL_SUCCESS = "Get All Funds Success";
+	public static final String FUND_GET_SUCCESS = "Get Fund: {0} Success";
+	public static final String FUND_REFRESH_SUCCESS = "Fund Refresh Success";
+	public static final String USER_FUND_GET_TRACKING_LIST_SUCCESS = "User: {0} Tracking List Fetch Success";
+	public static final String FUND_SHARE_AMOUNT_INVALID = "Fund Share: {0} is invalid";
+
 	// exchange rate
 	public static final String EXCHANGE_RATE_GET_ALL_SUCCESS = "Get All Exchange Rate Success";
 	public static final String EXCHANGE_RATE_GET_SUCCESS = "Get Exchange Rate: {0} Success";

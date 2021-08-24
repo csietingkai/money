@@ -11,11 +11,11 @@ import Breadcrumb from 'component/layout/Breadcrumb';
 import Footer from 'component/layout/Footer';
 import Header from 'component/layout/Header';
 import Loading from 'component/layout/Loading';
+import { APP_ROUTES } from 'component/layout/RouteSetting';
 import Sidebar from 'component/layout/Sidebar';
 
 import { AuthToken } from 'api/auth';
 
-import { APP_ROUTES } from 'util/Constant';
 import { Action } from 'util/Interface';
 
 export interface AppProps extends RouteChildrenProps<any> {

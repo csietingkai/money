@@ -16,14 +16,13 @@ import RegisterPage from 'view/RegisterPage';
 // reducer
 import { SetLoading } from 'reducer/Action';
 import { getAuthToken } from 'reducer/StateHolder';
-import store, { fetchAccountList, fetchExchangeRateList, fetchStockTrackingList, validateToken } from 'reducer/Store';
+import store, { fetchAccountList, fetchExchangeRateList, fetchFundTrackingList, fetchStockTrackingList, validateToken } from 'reducer/Store';
 
 // apis
 import { API_URL } from 'api/Constant';
 
 // utils
 import { handleRequestDate } from 'util/AppUtil';
-import Notify from 'util/Notify';
 
 // css
 import 'bootstrap/dist/css/bootstrap.css';
@@ -77,6 +76,8 @@ store.dispatch(fetchExchangeRateList);
 store.dispatch(fetchAccountList);
 // get user's stock tracking list
 store.dispatch(fetchStockTrackingList);
+// get user's fund tracking list
+store.dispatch(fetchFundTrackingList);
 
 const ROOT = document.querySelector('#root');
 const app = (

@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faBolt, faBoxes, faCalendarAlt, faChartLine, faChartPie, faCheck, faCog, faCogs, faEdit, faExclamationCircle, faHandHoldingUsd, faImages, faInfoCircle, faLightbulb, faLink, faListUl, faLock, faMagic, faMinus, faMoon, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faSkull, faStar, faSyncAlt, faTable, faTachometerAlt, faTextHeight, faTimes, faTint, faTrashAlt, faUser, faUserPlus, faVolleyballBall } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faChartLine, faCheck, faCog, faCogs, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
 library.add(faAngleUp, faAngleDown, faChartLine, faCheck, faCog, faCogs, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt,
-    faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser);
+    faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt,
+    faUser);
 
 const Icon = (icon: IconProp) => (props?: { className?: string; }) => <span className={`icon ${props?.className}`}><FontAwesomeIcon icon={icon} /></span>;
 export const AngleDownIcon = Icon('angle-down');

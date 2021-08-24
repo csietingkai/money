@@ -53,6 +53,41 @@ def fetchFunds():
             time.sleep(3)
     return 'SUCCESS'
 
+def fetchFund(targetCode):
+    response = requests.post(CodeConstant.FUND_LIST_URL, json={'order': 'isincode-asc', 'keyword': targetCode})
+    response = response.json()
+    hasResult = len(response['items']) > 0
+    if hasResult:
+        item = response['items'][0]
+        entity = Fund()
+        # skip if already exist
+        code = item['fundId']
+        queryEntity = FundFacade.queryByCode(code)
+        if queryEntity:
+            print('fund code<' + code + '> already exists, skipping...')
+            return 'CODE_EXIST'
+        entity.code = code
+        entity.name = item['name']['text']
+        isinCode = item['extent']['isincode']
+        # special condition, sometimes it has two different code but same isin code
+        queryEntity = FundFacade.queryByIsinCode(isinCode)
+        if queryEntity:
+            print('[WARN] fund isinCode<' + isinCode + '> already exists, skipping...')
+            return 'ISIN_CODE_EXIST'
+        entity.isin_code = isinCode
+        dateStr = item['hit']['interval']['beginning']
+        offeringDate = datetime.datetime(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:9]))
+        entity.offering_date = offeringDate
+        entity.currency = item['extent']['currency']
+        response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = item['extent']['isincode']), headers = CodeConstant.YAHOO_REQUEST_HEADER)
+        response = response.json()
+        if len(response['quotes']) > 0:
+            entity.symbol = response['quotes'][0]['symbol']
+        FundFacade.insert(entity)
+        return 'SUCCESS'
+    else:
+        return 'NO_DATA'
+
 def fetchFundRecords(code: str):
     try:
         fundEntity = FundFacade.queryByCode(code)

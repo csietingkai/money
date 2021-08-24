@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,6 +20,8 @@ public interface FundRecordDao extends JpaRepository<FundRecord, UUID> {
 	public List<FundRecord> findByCodeOrderByDate(String code);
 
 	public List<FundRecord> findByCodeAndDateBetweenOrderByDate(String code, LocalDateTime start, LocalDateTime end);
+
+	public List<FundRecord> findByCodeAndDateBeforeOrderByDateDesc(String code, LocalDateTime date, Pageable pageable);
 
 	public Optional<FundRecord> findByCodeAndDate(String code, LocalDateTime dealDate);
 

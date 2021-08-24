@@ -77,40 +77,40 @@ class RegisterPage extends React.Component<RegisterPageProps, RegisterPageState>
                         <Col md='8'>
                             <CardGroup>
                                 <Card>
-                                    <Card.Body className="p-4">
+                                    <Card.Body className='p-4'>
                                         <h1>Register</h1>
-                                        <p className="text-muted">Create your account</p>
-                                        <InputGroup className="mb-3">
+                                        <p className='text-muted'>Create your account</p>
+                                        <InputGroup className='mb-3'>
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>
                                                     <UserIcon />
                                                 </InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="text" placeholder="Username" value={username} onChange={this.onFormFieldChange('username')} />
+                                            <FormControl type='text' placeholder='Username' value={username} onChange={this.onFormFieldChange('username')} />
                                         </InputGroup>
-                                        <InputGroup className="mb-3">
+                                        <InputGroup className='mb-3'>
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>@</InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="text" placeholder="Email" value={email} onChange={this.onFormFieldChange('email')} />
+                                            <FormControl type='text' placeholder='Email' value={email} onChange={this.onFormFieldChange('email')} />
                                         </InputGroup>
-                                        <InputGroup className="mb-3">
+                                        <InputGroup className='mb-3'>
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>
                                                     <LockIcon />
                                                 </InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="password" placeholder="Password" value={password} onChange={this.onFormFieldChange('password')} />
+                                            <FormControl type='password' placeholder='Password' value={password} onChange={this.onFormFieldChange('password')} />
                                         </InputGroup>
-                                        <InputGroup className="mb-4">
+                                        <InputGroup className='mb-4'>
                                             <InputGroup.Prepend>
                                                 <InputGroup.Text>
                                                     <LockIcon />
                                                 </InputGroup.Text>
                                             </InputGroup.Prepend>
-                                            <FormControl type="password" placeholder="Repeat password" value={confirmPassword} onChange={this.onFormFieldChange('confirmPassword')} />
+                                            <FormControl type='password' placeholder='Repeat password' value={confirmPassword} onChange={this.onFormFieldChange('confirmPassword')} />
                                         </InputGroup>
-                                        <Button color="success" block onClick={this.onRegisterClick}>Create Account</Button>
+                                        <Button color='success' block onClick={this.onRegisterClick}>Create Account</Button>
                                     </Card.Body>
                                 </Card>
                             </CardGroup>

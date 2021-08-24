@@ -14,11 +14,11 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = DatabaseConstants.TABLE_USER_TRACKING_STOCK, uniqueConstraints = { @UniqueConstraint(columnNames = { "userName", "stockCode" }) })
+@Table(name = DatabaseConstants.TABLE_USER_TRACKING_FUND, uniqueConstraints = { @UniqueConstraint(columnNames = { "userName", "fundCode" }) })
 public class UserTrackingFund {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected UUID id;
 	protected String userName;
-	protected String stockCode;
+	protected String fundCode;
 }

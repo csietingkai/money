@@ -8,6 +8,9 @@ export const FILE_DOWNLOAD: string = 'FILE_DOWNLOAD';
 // stock
 export const SET_STOCK_TRACKING_LIST: string = 'SET_STOCK_TRACKING_LIST';
 
+// fund
+export const SET_FUND_TRACKING_LIST: string = 'SET_FUND_TRACKING_LIST';
+
 // exchange_rate
 export const SET_EXCHANGE_RATE_LIST: string = 'SET_EXCHANGE_RATE_LIST';
 

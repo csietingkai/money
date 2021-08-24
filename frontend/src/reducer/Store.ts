@@ -2,13 +2,14 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetLoading, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundTrackingList, SetLoading, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundTrackingList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exchangeRate';
+import FundApi, { FundTrackingListResponse, UserTrackingFundVo } from 'api/fund';
 import StockApi, { StockTrackingListResponse, UserTrackingStockVo } from 'api/stock';
 
 import { isArrayEmpty } from 'util/AppUtil';
@@ -45,6 +46,25 @@ export const fetchStockTrackingList = (dispatch: Dispatch<Action<UserTrackingSto
                 dispatch(SetStockTrackingList(data));
             } else {
                 dispatch(SetStockTrackingList([]));
+            }
+        }).catch(error => {
+            console.error(error);
+            dispatch(Logout());
+        });
+    }
+};
+
+export const fetchFundTrackingList = (dispatch: Dispatch<Action<UserTrackingFundVo[]>>, getState: () => ReduxState): void => {
+    const tokenString: string = getAuthTokenString(getState());
+    const fundList: UserTrackingFundVo[] = getFundTrackingList(getState());
+    if (tokenString && isArrayEmpty(fundList)) {
+        const username = getAuthTokenName(getState());
+        FundApi.getTrackingList(username).then((response: FundTrackingListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetFundTrackingList(data));
+            } else {
+                dispatch(SetFundTrackingList([]));
             }
         }).catch(error => {
             console.error(error);
