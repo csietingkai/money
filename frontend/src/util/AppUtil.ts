@@ -83,7 +83,7 @@ export const numberComma = (num: number): string => {
         num = 0;
     }
     const strNum = num.toString();
-    return strNum.replace(/(?<=\d)(?=(\d\d\d)+(?!\d))/g, ',');
+    return strNum.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 };
 
 export const convert = <K, V>(records: Record<K, V>[], key: K): K | V => {

@@ -190,7 +190,7 @@ public class UserStockService {
 				vo.setRecord(r0);
 				if (records.size() > 1) {
 					StockRecord r1 = records.get(records.size() - 2);
-					vo.setAmplitude(r1.getClosePrice().subtract(r0.getClosePrice()));
+					vo.setAmplitude(r0.getClosePrice().subtract(r1.getClosePrice()));
 				}
 			}
 			list.add(vo);

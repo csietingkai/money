@@ -69,7 +69,7 @@ public class UserFundService {
 				vo.setRecord(r0);
 				if (records.size() > 1) {
 					FundRecord r1 = records.get(records.size() - 2);
-					vo.setAmplitude(r1.getPrice().subtract(r0.getPrice()));
+					vo.setAmplitude(r0.getPrice().subtract(r1.getPrice()));
 				}
 			}
 			list.add(vo);
