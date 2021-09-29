@@ -10,6 +10,10 @@ export interface ExchangeRate {
     name: string;
 }
 
+export interface ExchangeRateVo extends ExchangeRate {
+    updateTime: Date;
+}
+
 export interface ExchangeRateRecord {
     id: string;
     currency: string;
@@ -30,12 +34,15 @@ export interface ExchangeRateRecordVo extends ExchangeRateRecord {
     bbdown: number;
 }
 
-export interface ExchangeRateListResponse extends ApiResponse<ExchangeRate[]> { }
+export interface ExchangeRateListResponse extends ApiResponse<ExchangeRateVo[]> { }
 export interface ExchangeRateRecordListResponse extends ApiResponse<ExchangeRateRecordVo[]> { }
 
 const getAll = async (): Promise<ExchangeRateListResponse> => {
     const response = await axios.get(EXCHANGE_RATE_GET_ALL_PATH);
     const data: ExchangeRateListResponse = response.data;
+    if (data.success) {
+        data.data = data.data.map(x => ({ ...x, updateTime: toDate(x.updateTime) }));
+    }
     return data;
 };
 

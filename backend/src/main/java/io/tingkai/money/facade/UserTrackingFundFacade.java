@@ -25,7 +25,7 @@ public class UserTrackingFundFacade {
 	public List<UserTrackingFund> queryAll() throws QueryNotResultException {
 		List<UserTrackingFund> entities = this.userTrackingFundDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
 		}
 		return entities;
 	}
@@ -33,7 +33,7 @@ public class UserTrackingFundFacade {
 	public List<UserTrackingFund> queryAll(String username) throws QueryNotResultException {
 		List<UserTrackingFund> entities = this.userTrackingFundDao.findByUserNameOrderByFundCode(username);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
 		}
 		return entities;
 	}
@@ -41,7 +41,7 @@ public class UserTrackingFundFacade {
 	public UserTrackingFund query(UUID id) throws QueryNotResultException {
 		Optional<UserTrackingFund> optional = this.userTrackingFundDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
 		}
 		return optional.get();
 	}
@@ -49,7 +49,7 @@ public class UserTrackingFundFacade {
 	public UserTrackingFund query(String username, String code) throws QueryNotResultException {
 		Optional<UserTrackingFund> optional = this.userTrackingFundDao.findByUserNameAndFundCode(username, code);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
 		}
 		return optional.get();
 	}

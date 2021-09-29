@@ -109,7 +109,7 @@ public class FundRecordFacade {
 		if (optional.isPresent()) {
 			return optional.get();
 		} else {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			throw new QueryNotResultException(DatabaseConstants.TABLE_FUND_RECORD);
 		}
 	}
 }

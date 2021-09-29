@@ -55,6 +55,7 @@ axios.interceptors.response.use(
         return response;
     },
     (error) => {
+        SetLoading(false);
         const { status } = error.response.data;
         if (status === 403) {
             // Notify.warning('Maybe You Need to Login First.');

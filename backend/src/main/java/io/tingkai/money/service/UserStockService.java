@@ -182,7 +182,7 @@ public class UserStockService {
 
 			List<StockRecord> records = new ArrayList<StockRecord>();
 			try {
-				this.stockRecordFacade.queryAll(x.getStockCode());
+				records = this.stockRecordFacade.queryAll(x.getStockCode());
 			} catch (QueryNotResultException e) {
 			}
 			if (records.size() > 0) {

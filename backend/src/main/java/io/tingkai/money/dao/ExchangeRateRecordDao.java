@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,8 @@ public interface ExchangeRateRecordDao extends JpaRepository<ExchangeRateRecord,
 	public List<ExchangeRateRecord> findByCurrencyOrderByDate(String currency);
 
 	public List<ExchangeRateRecord> findByCurrencyAndDateBetweenOrderByDate(String currency, LocalDateTime start, LocalDateTime end);
+
+	public List<ExchangeRateRecord> findByCurrencyAndDateBeforeOrderByDateDesc(String code, LocalDateTime date, Pageable pageable);
 
 	public Optional<ExchangeRateRecord> findFirstByCurrencyOrderByDateDesc(String currency);
 

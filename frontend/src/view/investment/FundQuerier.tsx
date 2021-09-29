@@ -13,7 +13,7 @@ import Form from 'component/common/Form';
 import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import FundApi, { Fund, FundRecordVo, UserTrackingFundVo } from 'api/fund';
+import FundApi, { FundRecordVo, FundVo, UserTrackingFundVo } from 'api/fund';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
@@ -31,7 +31,7 @@ export interface FundQuerierProps {
 export interface FundQuerierState {
     queryCondition: { code: string, name: string, start: Date, end: Date; };
     xAxis: string[];
-    funds: Fund[];
+    funds: FundVo[];
     selectedFundCode: string;
     fundRecords: FundRecordVo[];
 }
@@ -218,7 +218,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
                 <Row>
                     <Col>
                         <Card
-                            title='Line Chart'
+                            title='Fund Chart'
                         >
                             <FundChart
                                 stockStyle={stockStyle}

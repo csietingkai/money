@@ -12,23 +12,25 @@ import Card from 'component/common/Card';
 import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
 
-import ExchangeRateApi, { ExchangeRate, ExchangeRateRecordVo } from 'api/exchangeRate';
+import ExchangeRateApi, { ExchangeRateRecordVo, ExchangeRateVo } from 'api/exchangeRate';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
 import { Action } from 'util/Interface';
+import Table from 'component/common/Table';
 
 export interface ExchangeRateQuerierProps {
     stockStyle: StockStyle;
-    exchangeRateList: ExchangeRate[];
+    exchangeRateList: ExchangeRateVo[];
     setLoading: (loading: boolean) => void;
 }
 
 export interface ExchangeRateQuerierState {
-    queryCondition: { currency: string, start: Date, end: Date; };
+    queryCondition: { start: Date, end: Date; };
+    selectedExchangeRate: string;
     xAxis: string[];
-    data: ExchangeRateRecordVo[];
+    exchangeRateRecords: ExchangeRateRecordVo[];
 }
 
 class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, ExchangeRateQuerierState> {
@@ -37,39 +39,33 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
         super(props);
         this.state = {
             queryCondition: {
-                currency: 'USD',
                 start: new Date(),
                 end: new Date()
             },
+            selectedExchangeRate: props.exchangeRateList[0]?.currency,
             xAxis: [],
-            data: []
+            exchangeRateRecords: []
         };
     }
 
-    private onRefreshBtnClick = async () => {
-        this.props.setLoading(true);
-        const { queryCondition } = this.state;
-        if (!queryCondition.currency) {
-            Notify.warning('Please fill all required Fields.');
-            return;
-        }
-        const response = await ExchangeRateApi.refresh(queryCondition.currency);
-        const { success, message } = response;
-        if (success) {
-            Notify.success(message);
-        } else {
-            Notify.warning(message);
-        }
-        this.props.setLoading(false);
+    private onQueryBtnClick = async () => {
+        const { selectedExchangeRate } = this.state;
+        await this.getRecords(selectedExchangeRate);
     };
 
-    private onQueryBtnClick = async () => {
-        const { queryCondition } = this.state;
-        if (!queryCondition.currency || !queryCondition.start || !queryCondition.end) {
-            Notify.warning('Please fill all required Fields.');
+    private onExchangeRateRowClick = async (selectedRow: number) => {
+        const { exchangeRateList } = this.props;
+        const { selectedExchangeRate } = this.state;
+        if (exchangeRateList[selectedRow].currency === selectedExchangeRate) {
             return;
         }
-        const response = await ExchangeRateApi.getRecords(queryCondition.currency, queryCondition.start, queryCondition.end);
+        this.setState({ selectedExchangeRate: exchangeRateList[selectedRow].currency });
+        await this.getRecords(exchangeRateList[selectedRow].currency);
+    };
+
+    private getRecords = async (currency: string) => {
+        const { queryCondition } = this.state;
+        const response = await ExchangeRateApi.getRecords(currency, queryCondition.start, queryCondition.end);
         const { success, message } = response;
         let { data: records } = response;
         if (!success) {
@@ -77,12 +73,23 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
         }
         records = records || [];
         const date: string[] = records.map(x => toDateStr(x.date));
-        this.setState({ xAxis: date, data: records });
+        this.setState({ xAxis: date, exchangeRateRecords: records });
+    };
+
+    private syncRecord = (currency: string) => async () => {
+        this.props.setLoading(true);
+        const { success: refreshSuccess, message } = await ExchangeRateApi.refresh(currency);
+        if (refreshSuccess) {
+            await this.getRecords(currency);
+        } else {
+            Notify.error(message);
+        }
+        this.props.setLoading(false);
     };
 
     render() {
         const { stockStyle, exchangeRateList } = this.props;
-        const { queryCondition, data } = this.state;
+        const { queryCondition, exchangeRateRecords: data } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -93,26 +100,16 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
                             <Form
                                 singleRow
                                 inputs={[
-                                    { key: 'currency', title: 'Currency', type: InputType.select, options: exchangeRateList.map(x => ({ key: x.currency, value: x.name })), value: queryCondition?.currency, width: 3, required: true },
                                     { key: 'start', title: 'Time From', type: InputType.date, value: queryCondition?.start, width: 3 },
                                     { key: 'end', title: 'Time To', type: InputType.date, value: queryCondition?.end, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
-                                    queryCondition.currency = formState.currency;
                                     queryCondition.start = formState.start;
                                     queryCondition.end = formState.end;
                                     this.setState({ queryCondition });
                                 }}
                             />
                             <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
-                                <Button
-                                    variant='info'
-                                    outline
-                                    onClick={this.onRefreshBtnClick}
-                                >
-                                    <SyncAltIcon />
-                                    {' Refresh'}
-                                </Button>
                                 <Button
                                     variant='success'
                                     outline
@@ -122,6 +119,29 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
                                     {' Search'}
                                 </Button>
                             </div>
+                        </Card>
+                    </Col>
+                    <Col>
+                        <Card
+                            title='Exchange Rate Info'
+                        >
+                            <Table
+                                id='fund-updater-table'
+                                header={['currency', 'name', 'updateTime', 'functions']}
+                                data={exchangeRateList}
+                                countPerPage={3}
+                                onRowClick={this.onExchangeRateRowClick}
+                                columnConverter={(header: string, rowData: any) => {
+                                    if (['offeringDate', 'updateTime'].findIndex(x => x === header) >= 0) {
+                                        return <>{toDateStr(rowData[header])}</>;
+                                    } else if (header === 'functions') {
+                                        return (
+                                            <Button size='sm' variant='info' outline onClick={this.syncRecord(rowData.currency)}><SyncAltIcon /></Button>
+                                        );
+                                    }
+                                    return rowData[header];
+                                }}
+                            />
                         </Card>
                     </Col>
                 </Row>

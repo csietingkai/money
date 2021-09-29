@@ -140,11 +140,11 @@ export default class FundChart extends React.Component<FundChartProps, FundChart
                                             enabled: false,
                                             external: (context: any) => {
                                                 if (records.length) {
-                                                    // const hoverDate = new Date(context.tooltip.title[0]);
-                                                    // const mouseIndex = records.findIndex(x => x.dealDate.getTime() === hoverDate.getTime());
-                                                    // if (hoveredIndex !== mouseIndex) {
-                                                    //     this.setState({ hoveredIndex: mouseIndex });
-                                                    // }
+                                                    const hoverDate = new Date(context.tooltip.title[0]);
+                                                    const mouseIndex = records.findIndex(x => x.date.getTime() === hoverDate.getTime());
+                                                    if (hoveredIndex !== mouseIndex) {
+                                                        this.setState({ hoveredIndex: mouseIndex });
+                                                    }
                                                 }
                                             }
                                         }

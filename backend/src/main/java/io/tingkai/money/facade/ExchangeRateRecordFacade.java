@@ -1,10 +1,12 @@
 package io.tingkai.money.facade;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
@@ -55,6 +57,15 @@ public class ExchangeRateRecordFacade {
 		return optional.get();
 	}
 
+	public List<ExchangeRateRecord> queryDaysBefore(String currency, int days, long date) throws QueryNotResultException {
+		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBeforeOrderByDateDesc(currency, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
+		if (entities.size() == 0) {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+		}
+		Collections.reverse(entities);
+		return entities;
+	}
+
 	public ExchangeRateRecord insert(ExchangeRateRecord entity) throws AlreadyExistException, FieldMissingException {
 		if (!AppUtil.isAllPresent(entity, entity.getCurrency(), entity.getDate())) {
 			throw new FieldMissingException();
@@ -101,5 +112,14 @@ public class ExchangeRateRecordFacade {
 			throw new NotExistException();
 		}
 		this.exchangeRateRecordDao.delete(optional.get());
+	}
+
+	public ExchangeRateRecord latestRecord(String currency) throws QueryNotResultException {
+		Optional<ExchangeRateRecord> optional = this.exchangeRateRecordDao.findFirstByCurrencyOrderByDateDesc(currency);
+		if (optional.isPresent()) {
+			return optional.get();
+		} else {
+			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+		}
 	}
 }
