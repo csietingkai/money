@@ -3,8 +3,6 @@ from typing import Optional
 
 def toString(s, defaultVal: Optional[str] = ''):
     if (not isinstance(s, str)) and math.isnan(s):
-        s = ''
-    else:
         s = defaultVal
     return s
 
