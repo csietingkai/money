@@ -1,9 +1,7 @@
 package io.tingkai.money.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,17 +55,6 @@ public class DataFetcherService {
 	private RedisTemplate<String, Map<String, Long>> exchangeRateRecordCache;
 
 	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
-	private RedisTemplate<String, Set<String>> skipStockCache;
-
-	/**
-	 * save each stock update time
-	 */
-	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
-	private RedisTemplate<String, Map<String, Long>> stockRecordCache;
-
-	@Autowired
 	private ExchangeRateFacade exchangeRateFacade;
 
 	@Autowired
@@ -93,7 +80,7 @@ public class DataFetcherService {
 		}
 	}
 
-	public void fetechExchangeRateRecord(String currency) throws AlreadyExistException, FieldMissingException, IOException {
+	public void fetechExchangeRateRecord(String currency) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
 				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_EXCHANGE_RATE_RECORDS_PATH)
@@ -105,7 +92,7 @@ public class DataFetcherService {
 		}
 	}
 
-	public void fetchStocks() {
+	public void fetchStocks() throws FieldMissingException {
 		for (MarketType marketType : MarketType.values()) {
 			if (this.stockFacade.countByMarketType(marketType) == 0L) {
 				// @formatter:off

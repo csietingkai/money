@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,11 @@ import io.tingkai.money.util.TimeUtil;
 public final class AuthTokenService {
 
 	@Autowired
+	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Autowired
+	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, AuthToken> authTokenRedisTemplate;
 
 	@Autowired

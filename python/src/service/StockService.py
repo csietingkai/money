@@ -3,6 +3,7 @@ import requests
 import pandas
 import csv
 import time
+import re
 from typing import Optional
 
 from entity.Stock import Stock
@@ -30,6 +31,9 @@ def fetchStocks(marketType):
                 continue
             # skip if already exist
             code = data[0][row].split()[0]
+            if isWarrant(code):
+                print('[DEBUG] stock code<{code}> is warrant, skipping...'.format(code = code))
+                continue
             queryEntity = StockFacade.queryByCode(code)
             if queryEntity:
                 print('[DEBUG] stock code<{code}> already exists, skipping...'.format(code = code))
@@ -129,7 +133,6 @@ def fetchStockRecord(code):
         fetchStockRecordFromTwse(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
         fetchStockRecordFromTpex(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
         return 'SUCCESS'
-
 
 def fetchStockRecordFromYahoo(symbol: str, start: int, end: int):
     try:
@@ -305,3 +308,7 @@ def fetchStockRecordFromTpex(code: str, start: int, end: Optional[int]):
         return 'SUCCESS', dataCnt
     except Exception as e:
         return str(e)
+
+# 是否為權證
+def isWarrant(code: str) -> bool:
+    return re.search("[0-9]{6}", code) or re.search("[0-9]{5}[PFQCBXY]", code)

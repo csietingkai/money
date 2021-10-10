@@ -8,7 +8,6 @@ import java.time.ZoneId;
 public class CodeConstants {
 
 	// === init === //
-	public static final String DB_INIT_ROOT_USERNAME = "root";
 	public static final String APP_CACHE = "APP_CACHE";
 	public static final String PYTHON_CACHE = "PYTHON_CACHE";
 	public static final String USER_CACHE = "USER_CACHE";
@@ -35,19 +34,13 @@ public class CodeConstants {
 	public static final String CONFIRM_EMAIL_SUBJECT = "Money AP Confrim Email";
 	public static final String CONFIRM_EMAIL_CONTENT = "Click the following link to verify email:\n";
 
-	// === python === //
-	public static final int UPDATE_FREQUENCY_HOURS = 8;
 	/// === exchange rate === //
+	public static final String EXCHANGE_RATE_FETCHING_CURRENCY = "fetching-exchange-rate";
 	public static final String EXCHANGE_RATE_LIST_KEY = "exchange-rate-list";
-	public static final String EXCHANGE_RATE_UPDATE_TIME_KEY = "exchange-rate-update-time";
-	public static final String EXCHANGE_RATE_RECORD_UPDATE_TIME_KEY = "exchange-rate-record-update-time";
 	public static final LocalDateTime EXCHANGE_RATE_FETCH_START_DATETIME = LocalDateTime.of(LocalDateTime.now().getYear() - 1, Month.JANUARY, 1, 0, 0);
 
 	/// === stock list === //
-	public static final String STOCK_UPDATE_TIME_KEY = "stock-update-time";
-	public static final String STOCK_SKIP_FETCH_LIST_KEY = "stock-skip-fetch-list";
-	public static final String STOCK_RECORD_UPDATE_TIME_KEY = "stock-record-update-time";
-	public static final String STOCK_FETCHING_CODE = "fetching-stock-record";
+	public static final String STOCK_FETCHING_CODE = "fetching-stock-code";
 	public static final int[] MA_DAYS = { 5, 10, 20, 40, 60 };
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.001425d);
 	public static final BigDecimal FEE_DISCOUNT_RATE = new BigDecimal(0.28d);
@@ -58,7 +51,7 @@ public class CodeConstants {
 	public static final String USER_TRACKING_STOCK_KEY = "track-stock-user:";
 
 	/// === fund list === //
-	public static final String FUND_UPDATE_TIME_KEY = "fund-update-time";
+	public static final String FUND_FETCHING_CODE = "fetching-fund-code";
 
 	// === user tracking fund === //
 	public static final String USER_TRACKING_FUND_KEY = "track-fund-user:";

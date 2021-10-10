@@ -28,15 +28,14 @@ public class StockFacade {
 	@Autowired
 	private DataFetcherService pythonFetcherService;
 
+	public List<Stock> queryAll() throws QueryNotResultException {
+		return this.queryAll(true);
+	}
+
 	public List<Stock> queryAll(boolean sort) throws QueryNotResultException {
 		List<Stock> entities = this.stockDao.findAll();
 		if (sort) {
-			entities.sort((a, b) -> {
-				if (a.getCode().length() != b.getCode().length()) {
-					return a.getCode().length() - b.getCode().length();
-				}
-				return a.getCode().compareTo(b.getCode());
-			});
+			this.sort(entities);
 		}
 		if (entities.size() == 0) {
 			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);
@@ -112,5 +111,14 @@ public class StockFacade {
 
 	public long countByMarketType(MarketType marketType) {
 		return this.stockDao.countByMarketType(marketType);
+	}
+
+	private void sort(List<Stock> list) {
+		list.sort((a, b) -> {
+			if (a.getCode().length() != b.getCode().length()) {
+				return a.getCode().length() - b.getCode().length();
+			}
+			return a.getCode().compareTo(b.getCode());
+		});
 	}
 }
