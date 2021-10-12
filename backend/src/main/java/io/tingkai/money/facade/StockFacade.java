@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,17 +10,19 @@ import org.springframework.stereotype.Service;
 
 import io.netty.util.internal.StringUtil;
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.StockDao;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class StockFacade {
 
 	@Autowired
@@ -28,29 +31,29 @@ public class StockFacade {
 	@Autowired
 	private DataFetcherService pythonFetcherService;
 
-	public List<Stock> queryAll() throws QueryNotResultException {
+	public List<Stock> queryAll() {
 		return this.queryAll(true);
 	}
 
-	public List<Stock> queryAll(boolean sort) throws QueryNotResultException {
+	public List<Stock> queryAll(boolean sort) {
 		List<Stock> entities = this.stockDao.findAll();
 		if (sort) {
 			this.sort(entities);
 		}
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK));
 		}
 		return entities;
 	}
 
-	public Stock query(String code) throws QueryNotResultException {
+	public Stock query(String code) {
 		Optional<Stock> optional = this.stockDao.findByCode(code);
 		if (optional.isEmpty()) {
 			this.pythonFetcherService.fetchStock(code);
 		}
 		optional = this.stockDao.findByCode(code);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK));
 		}
 		return optional.get();
 	}

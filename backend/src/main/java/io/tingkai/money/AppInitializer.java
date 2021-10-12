@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.UserService;
 import io.tingkai.money.util.AppUtil;
@@ -26,7 +25,7 @@ public class AppInitializer {
 	private DataFetcherService dataFetcherService;
 
 	@EventListener(ApplicationReadyEvent.class)
-	public void onStarted() throws QueryNotResultException, AlreadyExistException, FieldMissingException {
+	public void onStarted() throws AlreadyExistException, FieldMissingException {
 		this.addRoot();
 		this.dataFetcherService.fetchExchangeRate();
 		log.info("Fetch Exchange Rate Completed.");
@@ -36,7 +35,7 @@ public class AppInitializer {
 		log.info("Fetch Fund Completed.");
 	}
 
-	private void addRoot() throws QueryNotResultException, AlreadyExistException, FieldMissingException {
+	private void addRoot() throws AlreadyExistException, FieldMissingException {
 		if (!this.userService.isRootExist()) {
 			String initRootPassword = AppConstants.INIT_ROOT_PASSWORD;
 			if (AppUtil.isEmpty(initRootPassword) && !StringUtil.isBlank(initRootPassword)) {

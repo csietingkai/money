@@ -18,15 +18,12 @@ import io.tingkai.money.facade.ExchangeRateFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
 import io.tingkai.money.util.AppUtil;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Loggable
-@Slf4j
 public class ExchangeRateService {
 
 	@Autowired
@@ -39,7 +36,7 @@ public class ExchangeRateService {
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> cache;
 
-	public List<ExchangeRateVo> getAll() throws QueryNotResultException {
+	public List<ExchangeRateVo> getAll() {
 		List<ExchangeRate> exchangeRates = cache.opsForValue().get(CodeConstants.EXCHANGE_RATE_LIST_KEY);
 		if (AppUtil.isEmpty(exchangeRates)) {
 			exchangeRates = this.exchangeRateFacade.queryAll();
@@ -55,13 +52,13 @@ public class ExchangeRateService {
 		return vos;
 	}
 
-	public List<ExchangeRateRecordVo> getAllRecords(String currency) throws QueryNotResultException {
+	public List<ExchangeRateRecordVo> getAllRecords(String currency) {
 		List<ExchangeRateRecord> records = this.exchangeRateRecordFacade.queryAll(currency);
 		List<ExchangeRateRecordVo> vos = this.handleRecordMas(records);
 		return vos;
 	}
 
-	public List<ExchangeRateRecordVo> getAllRecords(String currency, long start, long end) throws QueryNotResultException {
+	public List<ExchangeRateRecordVo> getAllRecords(String currency, long start, long end) {
 		List<ExchangeRateRecord> records = new ArrayList<ExchangeRateRecord>();
 		int removeSize = 0;
 		try {
@@ -131,12 +128,9 @@ public class ExchangeRateService {
 	}
 
 	private LocalDateTime getUpdateTime(String currency, LocalDateTime defaultTime) {
-		ExchangeRateRecord record = null;
-		try {
-			record = this.exchangeRateRecordFacade.latestRecord(currency);
+		ExchangeRateRecord record = this.exchangeRateRecordFacade.latestRecord(currency);
+		if (AppUtil.isPresent(record)) {
 			return record.getDate();
-		} catch (QueryNotResultException e) {
-			log.debug(e.getMessage());
 		}
 		return defaultTime;
 	}

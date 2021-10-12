@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,50 +11,52 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.StockRecordDao;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class StockRecordFacade {
 
 	@Autowired
 	private StockRecordDao stockRecordDao;
 
-	public List<StockRecord> queryAll(String code) throws QueryNotResultException {
+	public List<StockRecord> queryAll(String code) {
 		List<StockRecord> entities = this.stockRecordDao.findByCodeOrderByDealDate(code);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
 		}
 		return entities;
 	}
 
-	public List<StockRecord> queryAll(String code, long start, long end) throws QueryNotResultException {
+	public List<StockRecord> queryAll(String code, long start, long end) {
 		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBetweenOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
 		}
 		return entities;
 	}
 
-	public List<StockRecord> queryDaysBefore(String code, int days, long date) throws QueryNotResultException {
+	public List<StockRecord> queryDaysBefore(String code, int days, long date) {
 		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBeforeOrderByDealDateDesc(code, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
 		}
 		Collections.reverse(entities);
 		return entities;
 	}
 
-	public StockRecord query(UUID id) throws QueryNotResultException {
+	public StockRecord query(UUID id) {
 		Optional<StockRecord> optional = this.stockRecordDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
 		}
 		return optional.get();
 	}
@@ -110,12 +113,11 @@ public class StockRecordFacade {
 		return this.stockRecordDao.count();
 	}
 
-	public StockRecord latestRecord(String code) throws QueryNotResultException {
+	public StockRecord latestRecord(String code) {
 		Optional<StockRecord> optional = this.stockRecordDao.findFirstByCodeOrderByDealDateDesc(code);
 		if (optional.isPresent()) {
 			return optional.get();
-		} else {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
 		}
+		return null;
 	}
 }

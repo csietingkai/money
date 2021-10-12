@@ -15,16 +15,13 @@ import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.logging.Loggable;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.StockRecordVo;
 import io.tingkai.money.model.vo.StockVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Loggable
-@Slf4j
 public class StockService {
 
 	@Autowired
@@ -33,7 +30,7 @@ public class StockService {
 	@Autowired
 	private StockRecordFacade stockRecordFacade;
 
-	public List<StockVo> getAll(String code, String name, boolean sort) throws QueryNotResultException {
+	public List<StockVo> getAll(String code, String name, boolean sort) {
 		List<Stock> stocks = this.stockFacade.queryAll(sort);
 		List<StockVo> vos = new ArrayList<StockVo>();
 		for (Stock stock : stocks) {
@@ -54,7 +51,7 @@ public class StockService {
 		return vos;
 	}
 
-	public StockVo get(String code) throws QueryNotResultException {
+	public StockVo get(String code) {
 		Stock stock = this.stockFacade.query(code);
 		StockVo vo = new StockVo();
 		vo.transform(stock);
@@ -62,13 +59,13 @@ public class StockService {
 		return vo;
 	}
 
-	public List<StockRecordVo> getAllRecords(String code) throws QueryNotResultException {
+	public List<StockRecordVo> getAllRecords(String code) {
 		List<StockRecord> records = this.stockRecordFacade.queryAll(code);
 		List<StockRecordVo> vos = this.handleRecordMas(records);
 		return vos;
 	}
 
-	public List<StockRecordVo> getAllRecords(String code, long start, long end) throws QueryNotResultException {
+	public List<StockRecordVo> getAllRecords(String code, long start, long end) {
 		List<StockRecord> records = new ArrayList<StockRecord>();
 		int removeSize = 0;
 		try {
@@ -134,12 +131,9 @@ public class StockService {
 	}
 
 	private LocalDateTime getUpdateTime(String code, LocalDateTime defaultTime) {
-		StockRecord record = null;
-		try {
-			record = this.stockRecordFacade.latestRecord(code);
+		StockRecord record = this.stockRecordFacade.latestRecord(code);
+		if (AppUtil.isPresent(record)) {
 			return record.getDealDate();
-		} catch (QueryNotResultException e) {
-			log.debug(e.getMessage());
 		}
 		return defaultTime;
 	}

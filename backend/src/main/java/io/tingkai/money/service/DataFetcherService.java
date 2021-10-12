@@ -21,7 +21,6 @@ import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,7 +62,7 @@ public class DataFetcherService {
 	@Autowired
 	private FundFacade fundFacade;
 
-	public void fetchExchangeRate() throws AlreadyExistException, FieldMissingException, QueryNotResultException {
+	public void fetchExchangeRate() throws AlreadyExistException, FieldMissingException {
 		long exchangeRateCount = this.exchangeRateFacade.count();
 		if (exchangeRateCount == 0L) {
 			String result = this.restTemplate.getForObject(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_EXCHANGE_RATES_PATH, String.class);

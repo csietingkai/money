@@ -15,16 +15,13 @@ import io.tingkai.money.entity.FundRecord;
 import io.tingkai.money.facade.FundFacade;
 import io.tingkai.money.facade.FundRecordFacade;
 import io.tingkai.money.logging.Loggable;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.FundRecordVo;
 import io.tingkai.money.model.vo.FundVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Loggable
-@Slf4j
 public class FundService {
 
 	@Autowired
@@ -33,7 +30,7 @@ public class FundService {
 	@Autowired
 	private FundRecordFacade fundRecordFacade;
 
-	public List<FundVo> getAll(String code, String name, boolean sort) throws QueryNotResultException {
+	public List<FundVo> getAll(String code, String name, boolean sort) {
 		List<Fund> funds = this.fundFacade.queryAll(sort);
 		List<FundVo> vos = new ArrayList<FundVo>();
 		for (Fund fund : funds) {
@@ -54,7 +51,7 @@ public class FundService {
 		return vos;
 	}
 
-	public FundVo get(String code) throws QueryNotResultException {
+	public FundVo get(String code) {
 		Fund fund = this.fundFacade.query(code);
 		FundVo vo = new FundVo();
 		vo.transform(fund);
@@ -62,13 +59,13 @@ public class FundService {
 		return vo;
 	}
 
-	public List<FundRecordVo> getAllRecords(String code) throws QueryNotResultException {
+	public List<FundRecordVo> getAllRecords(String code) {
 		List<FundRecord> records = this.fundRecordFacade.queryAll(code);
 		List<FundRecordVo> vos = this.handleRecordMas(records);
 		return vos;
 	}
 
-	public List<FundRecordVo> getAllRecords(String code, long start, long end) throws QueryNotResultException {
+	public List<FundRecordVo> getAllRecords(String code, long start, long end) {
 		List<FundRecord> records = new ArrayList<FundRecord>();
 		int removeSize = 0;
 		try {
@@ -134,12 +131,9 @@ public class FundService {
 	}
 
 	private LocalDateTime getUpdateTime(String code, LocalDateTime defaultTime) {
-		FundRecord record = null;
-		try {
-			record = this.fundRecordFacade.latestRecord(code);
+		FundRecord record = this.fundRecordFacade.latestRecord(code);
+		if (AppUtil.isPresent(record)) {
 			return record.getDate();
-		} catch (QueryNotResultException e) {
-			log.debug(e.getMessage());
 		}
 		return defaultTime;
 	}

@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,48 +9,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.UserTrackingFundDao;
 import io.tingkai.money.entity.UserTrackingFund;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserTrackingFundFacade {
 
 	@Autowired
 	private UserTrackingFundDao userTrackingFundDao;
 
-	public List<UserTrackingFund> queryAll() throws QueryNotResultException {
+	public List<UserTrackingFund> queryAll() {
 		List<UserTrackingFund> entities = this.userTrackingFundDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_FUND));
 		}
 		return entities;
 	}
 
-	public List<UserTrackingFund> queryAll(String username) throws QueryNotResultException {
+	public List<UserTrackingFund> queryAll(String username) {
 		List<UserTrackingFund> entities = this.userTrackingFundDao.findByUserNameOrderByFundCode(username);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_FUND));
 		}
 		return entities;
 	}
 
-	public UserTrackingFund query(UUID id) throws QueryNotResultException {
+	public UserTrackingFund query(UUID id) {
 		Optional<UserTrackingFund> optional = this.userTrackingFundDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_FUND));
 		}
 		return optional.get();
 	}
 
-	public UserTrackingFund query(String username, String code) throws QueryNotResultException {
+	public UserTrackingFund query(String username, String code) {
 		Optional<UserTrackingFund> optional = this.userTrackingFundDao.findByUserNameAndFundCode(username, code);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_FUND);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_FUND));
 		}
 		return optional.get();
 	}

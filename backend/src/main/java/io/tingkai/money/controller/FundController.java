@@ -12,7 +12,6 @@ import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.FundRecordVo;
 import io.tingkai.money.model.vo.FundVo;
@@ -43,13 +42,13 @@ public class FundController {
 	private DataFetcherService pythonFetcherService;
 
 	@RequestMapping(value = FundController.GET_ALL_PATH, method = RequestMethod.GET)
-	public StockResponse<List<FundVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) throws QueryNotResultException {
+	public StockResponse<List<FundVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
 		List<FundVo> funds = this.fundService.getAll(code, name, sort);
 		return new StockResponse<List<FundVo>>(true, funds, MessageConstant.FUND_GET_ALL_SUCCESS);
 	}
 
 	@RequestMapping(value = FundController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<FundRecordVo>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) throws QueryNotResultException {
+	public StockResponse<List<FundRecordVo>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) {
 		List<FundRecordVo> records = this.fundService.getAllRecords(code, start, end);
 		return new StockResponse<List<FundRecordVo>>(true, records, MessageConstant.FUND_GET_SUCCESS, code);
 	}
@@ -61,19 +60,19 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)
-	public StockResponse<List<UserTrackingFundVo>> getAll(@RequestParam String username) throws QueryNotResultException {
+	public StockResponse<List<UserTrackingFundVo>> getAll(@RequestParam String username) {
 		List<UserTrackingFundVo> stocks = this.userFundService.getUserTrackingStockList(username);
 		return new StockResponse<List<UserTrackingFundVo>>(true, stocks, MessageConstant.USER_FUND_GET_TRACKING_LIST_SUCCESS, username);
 	}
 
 	@RequestMapping(value = FundController.TRACK_PATH, method = RequestMethod.POST)
-	public StockResponse<Void> track(@RequestParam String username, @RequestParam String code) throws AlreadyExistException, FieldMissingException, QueryNotResultException {
+	public StockResponse<Void> track(@RequestParam String username, @RequestParam String code) throws AlreadyExistException, FieldMissingException {
 		this.userFundService.track(username, code);
 		return new StockResponse<Void>(true, null, MessageConstant.FUND_REFRESH_SUCCESS);
 	}
 
 	@RequestMapping(value = FundController.UNTRACK_PATH, method = RequestMethod.POST)
-	public StockResponse<Void> untrack(@RequestParam String username, @RequestParam String code) throws QueryNotResultException, NotExistException {
+	public StockResponse<Void> untrack(@RequestParam String username, @RequestParam String code) throws NotExistException {
 		this.userFundService.untrack(username, code);
 		return new StockResponse<Void>(true, null, MessageConstant.FUND_REFRESH_SUCCESS);
 	}

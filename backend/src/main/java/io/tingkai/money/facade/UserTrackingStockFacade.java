@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,48 +9,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.UserTrackingStockDao;
 import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserTrackingStockFacade {
 
 	@Autowired
 	private UserTrackingStockDao userTrackingStockDao;
 
-	public List<UserTrackingStock> queryAll() throws QueryNotResultException {
+	public List<UserTrackingStock> queryAll() {
 		List<UserTrackingStock> entities = this.userTrackingStockDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_STOCK));
 		}
 		return entities;
 	}
 
-	public List<UserTrackingStock> queryAll(String username) throws QueryNotResultException {
+	public List<UserTrackingStock> queryAll(String username) {
 		List<UserTrackingStock> entities = this.userTrackingStockDao.findByUserNameOrderByStockCode(username);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_STOCK));
 		}
 		return entities;
 	}
 
-	public UserTrackingStock query(UUID id) throws QueryNotResultException {
+	public UserTrackingStock query(UUID id) {
 		Optional<UserTrackingStock> optional = this.userTrackingStockDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_STOCK));
 		}
 		return optional.get();
 	}
 
-	public UserTrackingStock query(String username, String stockCode) throws QueryNotResultException {
+	public UserTrackingStock query(String username, String stockCode) {
 		Optional<UserTrackingStock> optional = this.userTrackingStockDao.findByUserNameAndStockCode(username, stockCode);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_TRACKING_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_STOCK));
 		}
 		return optional.get();
 	}

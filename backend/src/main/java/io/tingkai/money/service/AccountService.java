@@ -18,7 +18,6 @@ import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 
 @Service
 @Loggable
@@ -30,7 +29,7 @@ public class AccountService {
 	@Autowired
 	private AccountRecordFacade accountRecordFacade;
 
-	public List<Account> getAll(String ownerName) throws QueryNotResultException {
+	public List<Account> getAll(String ownerName) {
 		List<Account> entities = this.accountFacade.queryAll(ownerName);
 		entities.sort((Account a, Account b) -> {
 			return a.getName().compareToIgnoreCase(b.getName());
@@ -38,7 +37,7 @@ public class AccountService {
 		return entities;
 	}
 
-	public Account get(String name, String ownerName) throws QueryNotResultException {
+	public Account get(String name, String ownerName) {
 		return this.accountFacade.query(name, ownerName);
 	}
 
@@ -57,7 +56,7 @@ public class AccountService {
 		this.accountFacade.delete(id);
 	}
 
-	public List<AccountRecord> getAllRecords(UUID accountId, boolean latestFirstOrder) throws QueryNotResultException {
+	public List<AccountRecord> getAllRecords(UUID accountId, boolean latestFirstOrder) {
 		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountId);
 		if (latestFirstOrder) {
 			entities.sort((AccountRecord a, AccountRecord b) -> {
@@ -67,7 +66,7 @@ public class AccountService {
 		return entities;
 	}
 
-	public AccountRecord income(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+	public AccountRecord income(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		Account account = this.accountFacade.query(accountId);
 		entity.setTransAmount(entity.getTransAmount().abs());
 		account.setBalance(account.getBalance().add(entity.getTransAmount()));
@@ -81,7 +80,7 @@ public class AccountService {
 		return this.accountRecordFacade.insert(entity);
 	}
 
-	public AccountRecord expend(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+	public AccountRecord expend(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		Account account = this.accountFacade.query(accountId);
 		entity.setTransAmount(BigDecimal.ZERO.subtract(entity.getTransAmount().abs()));
 		account.setBalance(account.getBalance().add(entity.getTransAmount()));

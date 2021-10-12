@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,57 +9,59 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.UserDao;
 import io.tingkai.money.entity.User;
 import io.tingkai.money.enumeration.Role;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserFacade {
 
 	@Autowired
 	private UserDao userDao;
 
-	public List<User> queryAll() throws QueryNotResultException {
+	public List<User> queryAll() {
 		List<User> entities = this.userDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER));
 		}
 		return entities;
 	}
 
-	public List<User> queryByRole(Role role) throws QueryNotResultException {
+	public List<User> queryByRole(Role role) {
 		List<User> entities = this.userDao.findByRole(role);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER));
 		}
 		return entities;
 	}
 
-	public User query(UUID id) throws QueryNotResultException {
+	public User query(UUID id) {
 		Optional<User> optional = this.userDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER));
 		}
 		return optional.get();
 	}
 
-	public User queryByName(String name) throws QueryNotResultException {
+	public User queryByName(String name) {
 		Optional<User> optional = this.userDao.findByName(name);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER));
 		}
 		return optional.get();
 	}
 
-	public User queryByEmail(String email) throws QueryNotResultException {
+	public User queryByEmail(String email) {
 		Optional<User> optional = this.userDao.findByEmail(email);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER));
 		}
 		return optional.get();
 	}

@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,16 +10,18 @@ import org.springframework.stereotype.Service;
 
 import io.netty.util.internal.StringUtil;
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.FundDao;
 import io.tingkai.money.entity.Fund;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class FundFacade {
 
 	@Autowired
@@ -27,7 +30,7 @@ public class FundFacade {
 	@Autowired
 	private DataFetcherService pythonFetcherService;
 
-	public List<Fund> queryAll(boolean sort) throws QueryNotResultException {
+	public List<Fund> queryAll(boolean sort) {
 		List<Fund> entities;
 		if (sort) {
 			entities = this.fundDao.findAllByOrderByCode();
@@ -35,19 +38,19 @@ public class FundFacade {
 			entities = this.fundDao.findAll();
 		}
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_FUND);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
 		}
 		return entities;
 	}
 
-	public Fund query(String code) throws QueryNotResultException {
+	public Fund query(String code) {
 		Optional<Fund> optional = this.fundDao.findByCode(code);
 		if (optional.isEmpty()) {
 			this.pythonFetcherService.fetchFund(code);
 		}
 		optional = this.fundDao.findByCode(code);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
 		}
 		return optional.get();
 	}

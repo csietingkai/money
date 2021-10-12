@@ -17,9 +17,9 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.IllegalRoleException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
+import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,20 +34,19 @@ public class UserService {
 	@Autowired
 	private PasswordEncoder bCryptPasswordEncoder;
 
-	public User get(String name) throws QueryNotResultException {
+	public User get(String name) {
 		return this.userFacade.queryByName(name);
 	}
 
 	public User login(String name, String pwd) throws UserNotFoundException, WrongPasswordException {
-		try {
-			User user = this.userFacade.queryByName(name);
-			if (!this.bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
-				throw new WrongPasswordException();
-			}
-			return user;
-		} catch (QueryNotResultException e) {
+		User user = this.userFacade.queryByName(name);
+		if (AppUtil.isEmpty(user)) {
 			throw new UserNotFoundException(name);
 		}
+		if (!this.bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
+			throw new WrongPasswordException();
+		}
+		return user;
 	}
 
 	public User create(User entity) throws AlreadyExistException, FieldMissingException {
@@ -59,13 +58,13 @@ public class UserService {
 		return this.userFacade.insert(entity);
 	}
 
-	public User confirm(String email) throws QueryNotResultException, NotExistException, FieldMissingException {
+	public User confirm(String email) throws NotExistException, FieldMissingException {
 		User entity = this.userFacade.queryByEmail(email);
 		entity.setConfirm(true);
 		return this.userFacade.update(entity);
 	}
 
-	public User setUserAsAdmin(User userToBeAdmin) throws NotExistException, FieldMissingException, IllegalRoleException, QueryNotResultException {
+	public User setUserAsAdmin(User userToBeAdmin) throws NotExistException, FieldMissingException, IllegalRoleException {
 		if (!isCurrentUserRoot()) {
 			throw new IllegalRoleException("Need Root Role");
 		}
@@ -73,24 +72,19 @@ public class UserService {
 		return this.userFacade.update(userToBeAdmin);
 	}
 
-	public boolean isCurrentUserRoot() throws QueryNotResultException {
+	public boolean isCurrentUserRoot() {
 		User loginUser = getCurrentLoginUser();
 		return loginUser.getRole() == Role.ROOT;
 	}
 
-	public boolean isCurrentUserConfirm() throws QueryNotResultException {
+	public boolean isCurrentUserConfirm() {
 		User loginUser = getCurrentLoginUser();
 		return loginUser.getRole() == Role.ROOT;
 	}
 
 	public boolean isRootExist() {
-		List<User> entities;
-		try {
-			entities = this.userFacade.queryByRole(Role.ROOT);
-			return entities.size() > 0;
-		} catch (QueryNotResultException e) {
-		}
-		return false;
+		List<User> entities = this.userFacade.queryByRole(Role.ROOT);
+		return entities.size() > 0;
 	}
 
 	public User createRoot(String initRootPassword) throws AlreadyExistException, FieldMissingException {
@@ -102,7 +96,7 @@ public class UserService {
 		return this.userFacade.insert(root);
 	}
 
-	private User getCurrentLoginUser() throws QueryNotResultException {
+	private User getCurrentLoginUser() {
 		String loginUsername = ContextUtil.getUserName();
 		return this.userFacade.queryByName(loginUsername);
 	}

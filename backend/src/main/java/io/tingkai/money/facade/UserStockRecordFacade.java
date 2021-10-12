@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,48 +9,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.UserStockRecordDao;
 import io.tingkai.money.entity.UserStockRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserStockRecordFacade {
 
 	@Autowired
 	private UserStockRecordDao userStockRecordDao;
 
-	public List<UserStockRecord> queryAll() throws QueryNotResultException {
+	public List<UserStockRecord> queryAll() {
 		List<UserStockRecord> entities = this.userStockRecordDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
 		}
 		return entities;
 	}
 
-	public List<UserStockRecord> queryAll(List<UUID> userStockIds) throws QueryNotResultException {
+	public List<UserStockRecord> queryAll(List<UUID> userStockIds) {
 		List<UserStockRecord> entities = this.userStockRecordDao.findByUserStockIdIn(userStockIds);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
 		}
 		return entities;
 	}
 
-	public List<UserStockRecord> queryByAccountId(UUID accountId) throws QueryNotResultException {
+	public List<UserStockRecord> queryByAccountId(UUID accountId) {
 		List<UserStockRecord> entities = this.userStockRecordDao.findByAccountId(accountId);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
 		}
 		return entities;
 	}
 
-	public UserStockRecord query(UUID id) throws QueryNotResultException {
+	public UserStockRecord query(UUID id) {
 		Optional<UserStockRecord> optional = this.userStockRecordDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_USER_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
 		}
 		return optional.get();
 	}

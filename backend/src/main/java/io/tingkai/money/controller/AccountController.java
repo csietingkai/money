@@ -19,7 +19,6 @@ import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.service.AccountService;
@@ -41,7 +40,7 @@ public class AccountController {
 	private AccountService accountService;
 
 	@RequestMapping(value = AccountController.GET_ALL_PATH, method = RequestMethod.GET)
-	public AccountResponse<List<Account>> getAccounts(@RequestParam String ownerName) throws QueryNotResultException {
+	public AccountResponse<List<Account>> getAccounts(@RequestParam String ownerName) {
 		List<Account> entities = this.accountService.getAll(ownerName);
 		return new AccountResponse<List<Account>>(true, entities, MessageConstant.ACCOUNT_GET_ALL_SUCCESS, ownerName);
 	}
@@ -65,19 +64,19 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public AccountResponse<List<AccountRecord>> getRecords(@RequestParam UUID accountId, @Nullable @RequestParam(defaultValue = "true") boolean latestFirstOrder) throws QueryNotResultException {
+	public AccountResponse<List<AccountRecord>> getRecords(@RequestParam UUID accountId, @Nullable @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
 		List<AccountRecord> entities = this.accountService.getAllRecords(accountId, latestFirstOrder);
 		return new AccountResponse<List<AccountRecord>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS, accountId.toString());
 	}
 
 	@RequestMapping(value = AccountController.INCOME_PATH, method = RequestMethod.POST)
-	public AccountResponse<AccountRecord> income(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+	public AccountResponse<AccountRecord> income(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.income(entity, accountId);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, entity.getId().toString());
 	}
 
 	@RequestMapping(value = AccountController.EXPEND_PATH, method = RequestMethod.POST)
-	public AccountResponse<AccountRecord> expend(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, QueryNotResultException, NotExistException, FieldMissingException {
+	public AccountResponse<AccountRecord> expend(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.expend(entity, accountId);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, entity.getId().toString());
 	}

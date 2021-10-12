@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,39 +9,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.AccountRecordDao;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class AccountRecordFacade {
 
 	@Autowired
 	private AccountRecordDao accountRecordDao;
 
-	public List<AccountRecord> queryAll() throws QueryNotResultException {
+	public List<AccountRecord> queryAll() {
 		List<AccountRecord> entities = this.accountRecordDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
 		}
 		return entities;
 	}
 
-	public List<AccountRecord> queryAll(UUID accountId) throws QueryNotResultException {
+	public List<AccountRecord> queryAll(UUID accountId) {
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
 		}
 		return entities;
 	}
 
-	public AccountRecord query(UUID id) throws QueryNotResultException {
+	public AccountRecord query(UUID id) {
 		Optional<AccountRecord> optional = this.accountRecordDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_ACCOUNT_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
 		}
 		return optional.get();
 	}

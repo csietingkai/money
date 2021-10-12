@@ -14,7 +14,6 @@ import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.IllegalRoleException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.model.response.AuthResponse;
@@ -59,7 +58,7 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = AuthController.CONFIRM_PATH, method = RequestMethod.POST)
-	public AuthResponse confirm(@RequestParam String email) throws QueryNotResultException, NotExistException, FieldMissingException {
+	public AuthResponse confirm(@RequestParam String email) throws NotExistException, FieldMissingException {
 		// TODO browser can not open, but postman can
 		this.userService.confirm(email);
 		return new AuthResponse(true, null, MessageConstant.SUCCESS);

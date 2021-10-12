@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,50 +11,52 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.FundRecordDao;
 import io.tingkai.money.entity.FundRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class FundRecordFacade {
 
 	@Autowired
 	private FundRecordDao fundRecordDao;
 
-	public List<FundRecord> queryAll(String code) throws QueryNotResultException {
+	public List<FundRecord> queryAll(String code) {
 		List<FundRecord> entities = this.fundRecordDao.findByCodeOrderByDate(code);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_FUND_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND_RECORD));
 		}
 		return entities;
 	}
 
-	public List<FundRecord> queryAll(String code, long start, long end) throws QueryNotResultException {
+	public List<FundRecord> queryAll(String code, long start, long end) {
 		List<FundRecord> entities = this.fundRecordDao.findByCodeAndDateBetweenOrderByDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_FUND_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND_RECORD));
 		}
 		return entities;
 	}
 
-	public List<FundRecord> queryDaysBefore(String code, int days, long date) throws QueryNotResultException {
+	public List<FundRecord> queryDaysBefore(String code, int days, long date) {
 		List<FundRecord> entities = this.fundRecordDao.findByCodeAndDateBeforeOrderByDateDesc(code, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND_RECORD));
 		}
 		Collections.reverse(entities);
 		return entities;
 	}
 
-	public FundRecord query(UUID id) throws QueryNotResultException {
+	public FundRecord query(UUID id) {
 		Optional<FundRecord> optional = this.fundRecordDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_FUND_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND_RECORD));
 		}
 		return optional.get();
 	}
@@ -104,12 +107,11 @@ public class FundRecordFacade {
 		return this.fundRecordDao.count();
 	}
 
-	public FundRecord latestRecord(String code) throws QueryNotResultException {
+	public FundRecord latestRecord(String code) {
 		Optional<FundRecord> optional = this.fundRecordDao.findFirstByCodeOrderByDateDesc(code);
-		if (optional.isPresent()) {
-			return optional.get();
-		} else {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_FUND_RECORD);
+		if (optional.isEmpty()) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND_RECORD));
 		}
+		return optional.get();
 	}
 }

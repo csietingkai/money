@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,32 +9,34 @@ import org.springframework.stereotype.Service;
 
 import io.netty.util.internal.StringUtil;
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.ExchangeRateDao;
 import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ExchangeRateFacade {
 
 	@Autowired
 	private ExchangeRateDao exchangeRateDao;
 
-	public List<ExchangeRate> queryAll() throws QueryNotResultException {
+	public List<ExchangeRate> queryAll() {
 		List<ExchangeRate> entities = this.exchangeRateDao.findAll();
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		return entities;
 	}
 
-	public ExchangeRate query(String id) throws QueryNotResultException {
+	public ExchangeRate query(String id) {
 		Optional<ExchangeRate> optional = this.exchangeRateDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		return optional.get();
 	}

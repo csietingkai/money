@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,57 +11,59 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.ExchangeRateRecordDao;
 import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ExchangeRateRecordFacade {
 
 	@Autowired
 	private ExchangeRateRecordDao exchangeRateRecordDao;
 
-	public List<ExchangeRateRecord> queryAll(String currency) throws QueryNotResultException {
+	public List<ExchangeRateRecord> queryAll(String currency) {
 		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyOrderByDate(currency);
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		return entities;
 	}
 
-	public List<ExchangeRateRecord> queryAll(String currency, long start, long end) throws QueryNotResultException {
+	public List<ExchangeRateRecord> queryAll(String currency, long start, long end) {
 		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBetweenOrderByDate(currency, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		return entities;
 	}
 
-	public ExchangeRateRecord query(UUID id) throws QueryNotResultException {
+	public ExchangeRateRecord query(UUID id) {
 		Optional<ExchangeRateRecord> optional = this.exchangeRateRecordDao.findById(id);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		return optional.get();
 	}
 
-	public ExchangeRateRecord queryNewestRecord(String currency) throws QueryNotResultException {
+	public ExchangeRateRecord queryNewestRecord(String currency) {
 		Optional<ExchangeRateRecord> optional = this.exchangeRateRecordDao.findFirstByCurrencyOrderByDateDesc(currency);
 		if (optional.isEmpty()) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		return optional.get();
 	}
 
-	public List<ExchangeRateRecord> queryDaysBefore(String currency, int days, long date) throws QueryNotResultException {
+	public List<ExchangeRateRecord> queryDaysBefore(String currency, int days, long date) {
 		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBeforeOrderByDateDesc(currency, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
 		if (entities.size() == 0) {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_STOCK_RECORD);
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
 		Collections.reverse(entities);
 		return entities;
@@ -114,12 +117,11 @@ public class ExchangeRateRecordFacade {
 		this.exchangeRateRecordDao.delete(optional.get());
 	}
 
-	public ExchangeRateRecord latestRecord(String currency) throws QueryNotResultException {
+	public ExchangeRateRecord latestRecord(String currency) {
 		Optional<ExchangeRateRecord> optional = this.exchangeRateRecordDao.findFirstByCurrencyOrderByDateDesc(currency);
-		if (optional.isPresent()) {
-			return optional.get();
-		} else {
-			throw new QueryNotResultException(DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD);
+		if (optional.isEmpty()) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
+		return null;
 	}
 }

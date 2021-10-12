@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.QueryNotResultException;
+
 import io.tingkai.money.model.response.ExchangeRateResponse;
 import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.model.response.StockResponse;
@@ -37,13 +37,13 @@ public class ExchangeRateController {
 	private DataFetcherService pythonFetcherService;
 
 	@RequestMapping(value = ExchangeRateController.GET_ALL_PATH, method = RequestMethod.GET)
-	public ExchangeRateResponse<List<ExchangeRateVo>> getAll() throws QueryNotResultException {
+	public ExchangeRateResponse<List<ExchangeRateVo>> getAll() {
 		List<ExchangeRateVo> list = this.exchangeRateService.getAll();
 		return new ExchangeRateResponse<List<ExchangeRateVo>>(true, list, MessageConstant.EXCHANGE_RATE_GET_ALL_SUCCESS);
 	}
 
 	@RequestMapping(value = ExchangeRateController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency, @RequestParam long start, @RequestParam long end) throws QueryNotResultException {
+	public StockResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency, @RequestParam long start, @RequestParam long end) {
 		List<ExchangeRateRecordVo> records = this.exchangeRateService.getAllRecords(currency, start, end);
 		return new StockResponse<List<ExchangeRateRecordVo>>(true, records, MessageConstant.EXCHANGE_RATE_GET_SUCCESS, currency);
 	}

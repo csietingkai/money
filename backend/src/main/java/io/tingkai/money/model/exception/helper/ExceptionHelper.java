@@ -9,7 +9,6 @@ import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.response.BaseResponse;
 import io.tingkai.money.model.response.SimpleResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 @Slf4j
 public class ExceptionHelper {
-
-	@ExceptionHandler(QueryNotResultException.class)
-	public ResponseEntity<BaseResponse<?>> handleQueryNotResultException(Exception e) {
-		if (AppConstants.DEBUG_MODE) {
-			log.debug(e.getMessage(), e);
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(new SimpleResponse(e));
-	}
 
 	@ExceptionHandler(AlreadyExistException.class)
 	public ResponseEntity<BaseResponse<?>> handleAlreadyExistException(Exception e) {

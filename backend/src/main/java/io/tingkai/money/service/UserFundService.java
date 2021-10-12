@@ -19,7 +19,6 @@ import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.model.exception.QueryNotResultException;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
 import io.tingkai.money.util.AppUtil;
 
@@ -43,7 +42,7 @@ public class UserFundService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<UserTrackingFund>> userCache;
 
-	public List<UserTrackingFundVo> getUserTrackingStockList(String username) throws QueryNotResultException {
+	public List<UserTrackingFundVo> getUserTrackingStockList(String username) {
 		String cacheKey = CodeConstants.USER_TRACKING_FUND_KEY + username;
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
@@ -59,11 +58,7 @@ public class UserFundService {
 			Fund info = this.fundFacade.query(x.getFundCode());
 			vo.setFundName(info.getName());
 
-			List<FundRecord> records = new ArrayList<FundRecord>();
-			try {
-				records = this.fundRecordFacade.queryAll(x.getFundCode());
-			} catch (QueryNotResultException e) {
-			}
+			List<FundRecord> records = this.fundRecordFacade.queryAll(x.getFundCode());
 			if (records.size() > 0) {
 				FundRecord r0 = records.get(records.size() - 1);
 				vo.setRecord(r0);
@@ -77,7 +72,7 @@ public class UserFundService {
 		return list;
 	}
 
-	public void track(String username, String fundCode) throws AlreadyExistException, FieldMissingException, QueryNotResultException {
+	public void track(String username, String fundCode) throws AlreadyExistException, FieldMissingException {
 		UserTrackingFund entity = new UserTrackingFund();
 		entity.setUserName(username);
 		entity.setFundCode(fundCode);
@@ -85,7 +80,7 @@ public class UserFundService {
 		this.syncTrackingCache(username);
 	}
 
-	public void untrack(String username, String fundCode) throws QueryNotResultException, NotExistException {
+	public void untrack(String username, String fundCode) throws NotExistException {
 		UserTrackingFund entity = this.userTrackingFundFacade.query(username, fundCode);
 		this.userTrackingFundFacade.delete(entity.getId());
 		this.syncTrackingCache(username);
@@ -93,11 +88,7 @@ public class UserFundService {
 
 	private void syncTrackingCache(String username) {
 		String cacheKey = CodeConstants.USER_TRACKING_FUND_KEY + username;
-		List<UserTrackingFund> trackingList = new ArrayList<UserTrackingFund>();
-		try {
-			trackingList.addAll(this.userTrackingFundFacade.queryAll(username));
-		} catch (QueryNotResultException e) {
-		}
+		List<UserTrackingFund> trackingList = this.userTrackingFundFacade.queryAll(username);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}
 }
