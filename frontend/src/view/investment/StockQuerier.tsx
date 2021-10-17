@@ -3,8 +3,8 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
-import { getAuthTokenName, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
+import { SetLoadingDispatcher, SetStockQueryConditionDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
+import { getAuthTokenName, getStockQueryCondition, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
 import StockChart from 'component/common/chart/StockChart';
 import Button from 'component/common/Button';
@@ -24,16 +24,24 @@ export interface StockQuerierProps {
     stockStyle: StockStyle;
     username: string;
     stockTrackingList: UserTrackingStockVo[];
+    stockQueryCondition: StockQueryCondition;
     setStockTrackingList: (stocks: UserTrackingStockVo[]) => void;
+    setStockQueryCondition: (condition: StockQueryCondition) => void;
     setLoading: (loading: boolean) => void;
 }
 
 export interface StockQuerierState {
-    queryCondition: { code: string, name: string, start: Date, end: Date; };
     xAxis: string[];
     stocks: Stock[];
     selectedStockCode: string;
     stockRecords: StockRecordVo[];
+}
+
+export interface StockQueryCondition {
+    code: string;
+    name: string;
+    start: Date;
+    end: Date;
 }
 
 class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState> {
@@ -41,12 +49,6 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     constructor(props: StockQuerierProps) {
         super(props);
         this.state = {
-            queryCondition: {
-                code: '',
-                name: '',
-                start: new Date(),
-                end: new Date()
-            },
             xAxis: [],
             stocks: [],
             selectedStockCode: '',
@@ -55,8 +57,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     }
 
     private onQueryBtnClick = async () => {
-        const { queryCondition } = this.state;
-        const { code, name, start, end } = queryCondition;
+        const { stockQueryCondition: { code, name, start, end } } = this.props;
         if (!code && !name) {
             Notify.warning('Please fill code or name at least.');
             return;
@@ -90,7 +91,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     };
 
     private getRecords = async (code: string) => {
-        const { queryCondition: { start, end } } = this.state;
+        const { stockQueryCondition: { start, end } } = this.props;
         const response = await StockApi.getRecords(code, start, end);
         const { success, message } = response;
         let { data: records } = response;
@@ -106,8 +107,8 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
         if (refreshSuccess) {
-            const { queryCondition } = this.state;
-            const { data: stocks } = await StockApi.getAll(queryCondition.code, queryCondition.name);
+            const { stockQueryCondition: { code, name } } = this.props;
+            const { data: stocks } = await StockApi.getAll(code, name);
             this.setState({ stocks });
             await this.getRecords(code);
         } else {
@@ -149,8 +150,8 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     };
 
     render() {
-        const { stockStyle, stockTrackingList } = this.props;
-        const { queryCondition, stocks, stockRecords } = this.state;
+        const { stockStyle, stockTrackingList, stockQueryCondition, setStockQueryCondition } = this.props;
+        const { stocks, stockRecords } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -161,17 +162,18 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                             <Form
                                 singleRow
                                 inputs={[
-                                    { key: 'code', title: 'Stock Code', type: InputType.text, value: queryCondition?.code, width: 3 },
-                                    { key: 'name', title: 'Stock Name', type: InputType.text, value: queryCondition?.name, width: 3 },
-                                    { key: 'start', title: 'Time From', type: InputType.date, value: queryCondition?.start, width: 3 },
-                                    { key: 'end', title: 'Time To', type: InputType.date, value: queryCondition?.end, width: 3 }
+                                    { key: 'stockCode', title: 'Stock Code', type: InputType.text, value: stockQueryCondition?.code, width: 3 },
+                                    { key: 'stockName', title: 'Stock Name', type: InputType.text, value: stockQueryCondition?.name, width: 3 },
+                                    { key: 'stockStart', title: 'Time From', type: InputType.date, value: stockQueryCondition?.start, width: 3 },
+                                    { key: 'stockEnd', title: 'Time To', type: InputType.date, value: stockQueryCondition?.end, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
-                                    queryCondition.code = formState.code;
-                                    queryCondition.name = formState.name;
-                                    queryCondition.start = formState.start;
-                                    queryCondition.end = formState.end;
-                                    this.setState({ queryCondition });
+                                    const newCondition = { ...stockQueryCondition };
+                                    newCondition.code = formState.stockCode;
+                                    newCondition.name = formState.stockName;
+                                    newCondition.start = formState.stockStart;
+                                    newCondition.end = formState.stockEnd;
+                                    setStockQueryCondition(newCondition);
                                 }}
                             />
                             <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
@@ -237,12 +239,14 @@ const mapStateToProps = (state: ReduxState) => {
         stockStyle: getStockStyle(state),
         username: getAuthTokenName(state),
         stockTrackingList: getStockTrackingList(state),
+        stockQueryCondition: getStockQueryCondition(state),
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[] | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[] | StockQueryCondition | boolean>>) => {
     return {
         setStockTrackingList: SetStockTrackingListDispatcher(dispatch),
+        setStockQueryCondition: SetStockQueryConditionDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };
 };

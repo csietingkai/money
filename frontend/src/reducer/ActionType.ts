@@ -7,12 +7,15 @@ export const FILE_DOWNLOAD: string = 'FILE_DOWNLOAD';
 
 // stock
 export const SET_STOCK_TRACKING_LIST: string = 'SET_STOCK_TRACKING_LIST';
+export const SET_STOCK_QUERY_CONDITION: string = 'SET_STOCK_QUERY_CONDITION';
 
 // fund
 export const SET_FUND_TRACKING_LIST: string = 'SET_FUND_TRACKING_LIST';
+export const SET_FUND_QUERY_CONDITION: string = 'SET_FUND_QUERY_CONDITION';
 
 // exchange_rate
 export const SET_EXCHANGE_RATE_LIST: string = 'SET_EXCHANGE_RATE_LIST';
+export const SET_EXCHANGE_RATE_QUERY_CONDITION: string = 'SET_EXCHANGE_RATE_QUERY_CONDITION';
 
 // account
 export const SET_ACCOUNT_LIST: string = 'SET_ACCOUNT_LIST';

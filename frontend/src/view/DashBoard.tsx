@@ -116,7 +116,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         });
 
         const cardGroups: JSX.Element[][] = [];
-        while (cards.length) cardGroups.push(cards.splice(0, STOCK_CARD_AMOUNT_PER_ROW));
+        while (cards.length) cardGroups.push(cards.splice(0, FUND_CARD_AMOUNT_PER_ROW));
 
         return cardGroups.map((group, gIdx) => (
             <Row key={`dashboard-account-row-${gIdx}`}>

@@ -150,6 +150,7 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                     <Col>
                         <div className='chart-wrapper'>
                             <Bar
+                                type='bar'
                                 data={
                                     { labels: records.map((x: StockRecordVo) => toDateStr(x.dealDate)), datasets }
                                 }

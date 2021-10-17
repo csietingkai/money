@@ -1,12 +1,16 @@
+import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
+
 import * as StateHolder from 'reducer/StateHolder';
 
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
+import { UserTrackingFundVo } from 'api/fund';
 import { UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
-import { UserTrackingFundVo } from 'api/fund';
+import { FundQueryCondition } from 'view/investment/FundQuerier';
+import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 export interface ReduxState {
     auth: ReduxAuthState;
@@ -36,29 +40,37 @@ export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(
 // stockReducer
 export interface ReduxStockState {
     tracking: UserTrackingStockVo[];
+    condition: StockQueryCondition;
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
-    tracking: []
+    tracking: [],
+    condition: { code: '', name: '', start: new Date(), end: new Date() }
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
 export const getStockTrackingList = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.tracking;
+export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.condition;
 
 // fundReducer
 export interface ReduxFundState {
     tracking: UserTrackingFundVo[];
+    condition: FundQueryCondition;
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
-    tracking: []
+    tracking: [],
+    condition: { code: '', name: '', start: new Date(), end: new Date() }
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
 export const getFundTrackingList = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.tracking;
+export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.condition;
 
 // exchangeReducer
 export interface ReduxExchangeRateState {
     list: ExchangeRate[];
+    condition: ExchangeRateQueryCondition;
 }
 export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
-    list: []
+    list: [],
+    condition: { start: new Date(), end: new Date() }
 };
 const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;
 export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRate[] => {
@@ -68,6 +80,7 @@ export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true):
     }
     return list;
 };
+export const getExchangeRateQueryCondition = (state: ReduxState): ExchangeRateQueryCondition => getExchangeRateState(state)?.condition;
 
 // accountReducer
 export interface ReduxAccountState {

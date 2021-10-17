@@ -3,14 +3,15 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher } from 'reducer/PropsMapper';
-import { getExchangeRateList, getStockStyle, ReduxState } from 'reducer/Selector';
+import { SetExchangeRateQueryConditionDispatcher, SetLoadingDispatcher } from 'reducer/PropsMapper';
+import { getExchangeRateList, getExchangeRateQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import ExchangeRateChart from 'component/common/chart/ExchangeRateChart';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
+import Table from 'component/common/Table';
 
 import ExchangeRateApi, { ExchangeRateRecordVo, ExchangeRateVo } from 'api/exchangeRate';
 
@@ -18,19 +19,24 @@ import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
 import { Action } from 'util/Interface';
-import Table from 'component/common/Table';
 
 export interface ExchangeRateQuerierProps {
     stockStyle: StockStyle;
     exchangeRateList: ExchangeRateVo[];
+    exchangeRateQueryCondition: ExchangeRateQueryCondition;
+    setExchangeRateQueryCondition: (condition: ExchangeRateQueryCondition) => void;
     setLoading: (loading: boolean) => void;
 }
 
 export interface ExchangeRateQuerierState {
-    queryCondition: { start: Date, end: Date; };
     selectedExchangeRate: string;
     xAxis: string[];
     exchangeRateRecords: ExchangeRateRecordVo[];
+}
+
+export interface ExchangeRateQueryCondition {
+    start: Date;
+    end: Date;
 }
 
 class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, ExchangeRateQuerierState> {
@@ -38,10 +44,6 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
     constructor(props: ExchangeRateQuerierProps) {
         super(props);
         this.state = {
-            queryCondition: {
-                start: new Date(),
-                end: new Date()
-            },
             selectedExchangeRate: props.exchangeRateList[0]?.currency,
             xAxis: [],
             exchangeRateRecords: []
@@ -64,8 +66,8 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
     };
 
     private getRecords = async (currency: string) => {
-        const { queryCondition } = this.state;
-        const response = await ExchangeRateApi.getRecords(currency, queryCondition.start, queryCondition.end);
+        const { exchangeRateQueryCondition: { start, end } } = this.props;
+        const response = await ExchangeRateApi.getRecords(currency, start, end);
         const { success, message } = response;
         let { data: records } = response;
         if (!success) {
@@ -88,8 +90,8 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
     };
 
     render() {
-        const { stockStyle, exchangeRateList } = this.props;
-        const { queryCondition, exchangeRateRecords: data } = this.state;
+        const { stockStyle, exchangeRateList, exchangeRateQueryCondition, setExchangeRateQueryCondition: setQueryCondition } = this.props;
+        const { exchangeRateRecords: data } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -99,14 +101,16 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
                         >
                             <Form
                                 singleRow
+                                formKey='exchangeRateQueryConditionForm'
                                 inputs={[
-                                    { key: 'start', title: 'Time From', type: InputType.date, value: queryCondition?.start, width: 3 },
-                                    { key: 'end', title: 'Time To', type: InputType.date, value: queryCondition?.end, width: 3 }
+                                    { key: 'exchangeRateStart', title: 'Time From', type: InputType.date, value: exchangeRateQueryCondition?.start, width: 3 },
+                                    { key: 'exchangeRateEnd', title: 'Time To', type: InputType.date, value: exchangeRateQueryCondition?.end, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
-                                    queryCondition.start = formState.start;
-                                    queryCondition.end = formState.end;
-                                    this.setState({ queryCondition });
+                                    const newCondition = { ...exchangeRateQueryCondition };
+                                    newCondition.start = formState.exchangeRateStart;
+                                    newCondition.end = formState.exchangeRateEnd;
+                                    setQueryCondition(newCondition);
                                 }}
                             />
                             <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
@@ -165,12 +169,14 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
 const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state),
-        exchangeRateList: getExchangeRateList(state, false)
+        exchangeRateList: getExchangeRateList(state, false),
+        exchangeRateQueryCondition: getExchangeRateQueryCondition(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<ExchangeRateQueryCondition | boolean>>) => {
     return {
+        setExchangeRateQueryCondition: SetExchangeRateQueryConditionDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };
 };

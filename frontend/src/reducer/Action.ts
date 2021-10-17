@@ -1,4 +1,8 @@
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST } from 'reducer/ActionType';
+import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
+import { FundQueryCondition } from 'view/investment/FundQuerier';
+import { StockQueryCondition } from 'view/investment/StockQuerier';
+
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION } from 'reducer/ActionType';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -15,12 +19,15 @@ export const Logout = (): Action<undefined> => ({ type: LOGOUT, payload: undefin
 
 // stock
 export const SetStockTrackingList = (payload: UserTrackingStockVo[]): Action<UserTrackingStockVo[]> => ({ type: SET_STOCK_TRACKING_LIST, payload });
+export const SetStockQueryCondition = (payload: StockQueryCondition): Action<StockQueryCondition> => ({ type: SET_STOCK_QUERY_CONDITION, payload });
 
 // fund
 export const SetFundTrackingList = (payload: UserTrackingFundVo[]): Action<UserTrackingFundVo[]> => ({ type: SET_FUND_TRACKING_LIST, payload });
+export const SetFundQueryCondition = (payload: FundQueryCondition): Action<FundQueryCondition> => ({ type: SET_FUND_QUERY_CONDITION, payload });
 
 // exchange rate
 export const SetExchangeRateList = (payload: ExchangeRate[]): Action<ExchangeRate[]> => ({ type: SET_EXCHANGE_RATE_LIST, payload });
+export const SetExchangeRateQueryCondition = (payload: ExchangeRateQueryCondition): Action<ExchangeRateQueryCondition> => ({ type: SET_EXCHANGE_RATE_QUERY_CONDITION, payload });
 
 // account
 export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type: SET_ACCOUNT_LIST, payload });

@@ -122,6 +122,7 @@ export default class FundChart extends React.Component<FundChartProps, FundChart
                     <Col>
                         <div className='chart-wrapper'>
                             <Line
+                                type='line'
                                 data={
                                     { labels: records.map((x: ExchangeRateRecordVo) => toDateStr(x.date)), datasets }
                                 }

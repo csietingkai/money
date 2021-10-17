@@ -1,18 +1,22 @@
 import axios from 'axios';
 import { combineReducers } from 'redux';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING, SET_FUND_TRACKING_LIST } from 'reducer/ActionType';
+import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
+
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION } from 'reducer/ActionType';
 import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxFundState, ReduxStockState, ReduxSystemSettingState } from 'reducer/Selector';
 import { getAuthToken, setAuthToken, removeAuthToken, setStockStyle } from 'reducer/StateHolder';
 
+import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
 import { ExchangeRate } from 'api/exchangeRate';
 import { UserTrackingFundVo } from 'api/fund';
 import { UserTrackingStockVo } from 'api/stock';
 
 import { Action } from 'util/Interface';
-import { Account } from 'api/account';
 import { StockStyle } from 'util/Enum';
+import { FundQueryCondition } from 'view/investment/FundQuerier';
+import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: Action<AuthToken>): ReduxAuthState => {
     const newState: ReduxAuthState = { ...state };
@@ -33,29 +37,35 @@ const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: A
     return newState;
 };
 
-const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<UserTrackingStockVo[]>): ReduxStockState => {
+const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<UserTrackingStockVo[] | StockQueryCondition>): ReduxStockState => {
     const newState: ReduxStockState = { ...state };
     const { type, payload } = action;
     if (type === SET_STOCK_TRACKING_LIST) {
-        newState.tracking = payload;
+        newState.tracking = payload as UserTrackingStockVo[];
+    } else if (type === SET_STOCK_QUERY_CONDITION) {
+        newState.condition = payload as StockQueryCondition;
     }
     return newState;
 };
 
-const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserTrackingFundVo[]>): ReduxFundState => {
+const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserTrackingFundVo[] | FundQueryCondition>): ReduxFundState => {
     const newState: ReduxFundState = { ...state };
     const { type, payload } = action;
     if (type === SET_FUND_TRACKING_LIST) {
-        newState.tracking = payload;
+        newState.tracking = payload as UserTrackingFundVo[];
+    } else if (type === SET_FUND_QUERY_CONDITION) {
+        newState.condition = payload as FundQueryCondition;
     }
     return newState;
 };
 
-const exchangeRateReducer = (state: ReduxExchangeRateState = DEFAULT_REDUX_EXCHANGE_RATE_STATE, action: Action<ExchangeRate[]>): ReduxExchangeRateState => {
+const exchangeRateReducer = (state: ReduxExchangeRateState = DEFAULT_REDUX_EXCHANGE_RATE_STATE, action: Action<ExchangeRate[] | ExchangeRateQueryCondition>): ReduxExchangeRateState => {
     const newState: ReduxExchangeRateState = { ...state };
     const { type, payload } = action;
     if (type === SET_EXCHANGE_RATE_LIST) {
-        newState.list = payload;
+        newState.list = payload as ExchangeRate[];
+    } else if (type === SET_EXCHANGE_RATE_QUERY_CONDITION) {
+        newState.condition = payload as ExchangeRateQueryCondition;
     }
     return newState;
 };

@@ -3,8 +3,8 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher, SetFundTrackingListDispatcher } from 'reducer/PropsMapper';
-import { getAuthTokenName, getFundTrackingList, getStockStyle, ReduxState } from 'reducer/Selector';
+import { SetLoadingDispatcher, SetFundTrackingListDispatcher, SetFundQueryConditionDispatcher } from 'reducer/PropsMapper';
+import { getAuthTokenName, getFundQueryCondition, getFundTrackingList, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import FundChart from 'component/common/chart/FundChart';
 import Button from 'component/common/Button';
@@ -24,16 +24,24 @@ export interface FundQuerierProps {
     stockStyle: StockStyle;
     username: string;
     fundTrackingList: UserTrackingFundVo[];
+    fundQueryCondition: FundQueryCondition;
     setFundTrackingList: (Funds: UserTrackingFundVo[]) => void;
+    setFundQueryCondition: (condition: FundQueryCondition) => void;
     setLoading: (loading: boolean) => void;
 }
 
 export interface FundQuerierState {
-    queryCondition: { code: string, name: string, start: Date, end: Date; };
     xAxis: string[];
     funds: FundVo[];
     selectedFundCode: string;
     fundRecords: FundRecordVo[];
+}
+
+export interface FundQueryCondition {
+    code: string;
+    name: string;
+    start: Date;
+    end: Date;
 }
 
 class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
@@ -41,12 +49,6 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     constructor(props: FundQuerierProps) {
         super(props);
         this.state = {
-            queryCondition: {
-                code: '',
-                name: '',
-                start: new Date(),
-                end: new Date()
-            },
             xAxis: [],
             funds: [],
             selectedFundCode: '',
@@ -55,8 +57,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     }
 
     private onQueryBtnClick = async () => {
-        const { queryCondition } = this.state;
-        const { code, name, start, end } = queryCondition;
+        const { fundQueryCondition: { code, name, start, end } } = this.props;
         if (!code && !name) {
             Notify.warning('Please fill code or name at least.');
             return;
@@ -90,7 +91,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     };
 
     private getRecords = async (code: string) => {
-        const { queryCondition: { start, end } } = this.state;
+        const { fundQueryCondition: { start, end } } = this.props;
         const response = await FundApi.getRecords(code, start, end);
         const { success, message } = response;
         let { data: records } = response;
@@ -106,8 +107,8 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await FundApi.refresh(code);
         if (refreshSuccess) {
-            const { queryCondition } = this.state;
-            const { data: funds } = await FundApi.getAll(queryCondition.code, queryCondition.name);
+            const { fundQueryCondition: { code, name } } = this.props;
+            const { data: funds } = await FundApi.getAll(code, name);
             this.setState({ funds });
             await this.getRecords(code);
         } else {
@@ -149,8 +150,8 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     };
 
     render() {
-        const { stockStyle, fundTrackingList } = this.props;
-        const { queryCondition, funds, fundRecords } = this.state;
+        const { stockStyle, fundTrackingList, fundQueryCondition, setFundQueryCondition } = this.props;
+        const { funds, fundRecords } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -160,18 +161,20 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
                         >
                             <Form
                                 singleRow
+                                formKey='fundQueryConditionForm'
                                 inputs={[
-                                    { key: 'code', title: 'Fund Code', type: InputType.text, value: queryCondition?.code, width: 3 },
-                                    { key: 'name', title: 'Fund Name', type: InputType.text, value: queryCondition?.name, width: 3 },
-                                    { key: 'start', title: 'Time From', type: InputType.date, value: queryCondition?.start, width: 3 },
-                                    { key: 'end', title: 'Time To', type: InputType.date, value: queryCondition?.end, width: 3 }
+                                    { key: 'fundCode', title: 'Fund Code', type: InputType.text, value: fundQueryCondition?.code, width: 3 },
+                                    { key: 'fundName', title: 'Fund Name', type: InputType.text, value: fundQueryCondition?.name, width: 3 },
+                                    { key: 'fundStart', title: 'Time From', type: InputType.date, value: fundQueryCondition?.start, width: 3 },
+                                    { key: 'fundEnd', title: 'Time To', type: InputType.date, value: fundQueryCondition?.end, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
-                                    queryCondition.code = formState.code;
-                                    queryCondition.name = formState.name;
-                                    queryCondition.start = formState.start;
-                                    queryCondition.end = formState.end;
-                                    this.setState({ queryCondition });
+                                    const newCondition = { ...fundQueryCondition };
+                                    newCondition.code = formState.fundCode;
+                                    newCondition.name = formState.fundName;
+                                    newCondition.start = formState.fundStart;
+                                    newCondition.end = formState.fundEnd;
+                                    setFundQueryCondition(newCondition);
                                 }}
                             />
                             <div className='mr-1' style={{ textAlign: 'right', marginBottom: '5px' }}>
@@ -237,12 +240,14 @@ const mapStateToProps = (state: ReduxState) => {
         stockStyle: getStockStyle(state),
         username: getAuthTokenName(state),
         fundTrackingList: getFundTrackingList(state),
+        fundQueryCondition: getFundQueryCondition(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingFundVo[] | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingFundVo[] | FundQueryCondition | boolean>>) => {
     return {
         setFundTrackingList: SetFundTrackingListDispatcher(dispatch),
+        setFundQueryCondition: SetFundQueryConditionDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };
 };

@@ -76,6 +76,7 @@ export type Input = TextInput | NumericInput | TextareaInput | SelectInput | Rad
 
 export interface FormProps {
     singleRow?: boolean;
+    formKey: string;
     inputs: Input[];
     onChange: (formState: any) => void;
 }
@@ -189,7 +190,7 @@ export default class Form extends React.Component<FormProps, FormState> {
     };
 
     render(): JSX.Element {
-        const { singleRow, inputs } = this.props;
+        const { singleRow, formKey, inputs } = this.props;
 
         const formGroups = inputs.map((input: Input) => {
             const { key, title, value, required, disabled } = input;
@@ -398,7 +399,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         });
 
         return (
-            <RbForm className='form-horizontal' ref={this.formRef}>
+            <RbForm className='form-horizontal' id={formKey} key={formKey} ref={this.formRef}>
                 {formGroups}
             </RbForm >
         );
