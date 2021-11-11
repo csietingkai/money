@@ -9,7 +9,7 @@ import { getAuthToken, setAuthToken, removeAuthToken, setStockStyle } from 'redu
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
-import { ExchangeRate } from 'api/exchangeRate';
+import { ExchangeRateVo } from 'api/exchangeRate';
 import { UserTrackingFundVo } from 'api/fund';
 import { UserTrackingStockVo } from 'api/stock';
 
@@ -59,11 +59,11 @@ const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: A
     return newState;
 };
 
-const exchangeRateReducer = (state: ReduxExchangeRateState = DEFAULT_REDUX_EXCHANGE_RATE_STATE, action: Action<ExchangeRate[] | ExchangeRateQueryCondition>): ReduxExchangeRateState => {
+const exchangeRateReducer = (state: ReduxExchangeRateState = DEFAULT_REDUX_EXCHANGE_RATE_STATE, action: Action<ExchangeRateVo[] | ExchangeRateQueryCondition>): ReduxExchangeRateState => {
     const newState: ReduxExchangeRateState = { ...state };
     const { type, payload } = action;
     if (type === SET_EXCHANGE_RATE_LIST) {
-        newState.list = payload as ExchangeRate[];
+        newState.list = payload as ExchangeRateVo[];
     } else if (type === SET_EXCHANGE_RATE_QUERY_CONDITION) {
         newState.condition = payload as ExchangeRateQueryCondition;
     }

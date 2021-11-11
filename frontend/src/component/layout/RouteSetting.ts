@@ -1,4 +1,4 @@
-import { ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
+import { ChartBarIcon, ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
@@ -30,7 +30,7 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 name: 'Stock Querier',
                 level: 1,
                 url: '/stockQuerier',
-                icon: ChartLineIcon(),
+                icon: ChartBarIcon(),
                 component: StockQuerier
             },
             {

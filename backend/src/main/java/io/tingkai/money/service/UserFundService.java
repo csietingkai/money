@@ -1,5 +1,6 @@
 package io.tingkai.money.service;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class UserFundService {
 	private RedisTemplate<String, List<UserTrackingFund>> userCache;
 
 	public List<UserTrackingFundVo> getUserTrackingStockList(String username) {
-		String cacheKey = CodeConstants.USER_TRACKING_FUND_KEY + username;
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, username);
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
 			trackingList = this.userTrackingFundFacade.queryAll(username);
@@ -87,7 +88,7 @@ public class UserFundService {
 	}
 
 	private void syncTrackingCache(String username) {
-		String cacheKey = CodeConstants.USER_TRACKING_FUND_KEY + username;
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, username);
 		List<UserTrackingFund> trackingList = this.userTrackingFundFacade.queryAll(username);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}

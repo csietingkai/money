@@ -2,6 +2,7 @@ package io.tingkai.money.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +165,7 @@ public class UserStockService {
 	}
 
 	public List<UserTrackingStockVo> getUserTrackingStockList(String username) {
-		String cacheKey = CodeConstants.USER_TRACKING_STOCK_KEY + username;
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, username);
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
 			trackingList = this.userTrackingStockFacade.queryAll(username);
@@ -223,7 +224,7 @@ public class UserStockService {
 	}
 
 	private void syncTrackingCache(String username) {
-		String cacheKey = CodeConstants.USER_TRACKING_STOCK_KEY + username;
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, username);
 		List<UserTrackingStock> trackingList = this.userTrackingStockFacade.queryAll(username);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}

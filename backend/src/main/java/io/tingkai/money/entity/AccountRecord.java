@@ -22,6 +22,7 @@ public class AccountRecord {
 	protected UUID id;
 	protected LocalDateTime transDate;
 	protected BigDecimal transAmount;
+	protected BigDecimal rate;
 	protected UUID transFrom;
 	protected UUID transTo;
 	protected String description;

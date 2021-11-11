@@ -1,5 +1,6 @@
 package io.tingkai.money.security;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -34,28 +35,28 @@ public final class AuthTokenService {
 	 * and return it.
 	 */
 	public AuthToken issue(User user) {
-		String existingAuthTokenString = this.stringRedisTemplate.opsForValue().get(CodeConstants.AUTH_USER_KEY + user.getId());
+		String existingAuthTokenString = this.stringRedisTemplate.opsForValue().get(MessageFormat.format(CodeConstants.AUTH_USER_KEY, user.getId()));
 
 		AuthToken authToken = this.generate(user);
 		if (AppUtil.isPresent(existingAuthTokenString)) {
-			authToken = this.authTokenRedisTemplate.opsForValue().get(CodeConstants.AUTH_TOKEN_KEY + existingAuthTokenString);
+			authToken = this.authTokenRedisTemplate.opsForValue().get(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, existingAuthTokenString));
 			if (authToken.getExpiryDate().before(new Date(TimeUtil.getCurrentDateTime()))) {
 				authToken.setExpiryDate(getExpiryDate());
 			}
 		}
-		this.stringRedisTemplate.opsForValue().set(CodeConstants.AUTH_USER_KEY + user.getId(), authToken.getTokenString(), CodeConstants.AUTH_TOKEN_VALID_HOURS, TimeUnit.HOURS);
-		this.authTokenRedisTemplate.opsForValue().set(CodeConstants.AUTH_TOKEN_KEY + authToken.getTokenString(), authToken, CodeConstants.AUTH_TOKEN_VALID_HOURS, TimeUnit.HOURS);
+		this.stringRedisTemplate.opsForValue().set(MessageFormat.format(CodeConstants.AUTH_USER_KEY, user.getId()), authToken.getTokenString(), CodeConstants.AUTH_TOKEN_VALID_HOURS, TimeUnit.HOURS);
+		this.authTokenRedisTemplate.opsForValue().set(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, authToken.getTokenString()), authToken, CodeConstants.AUTH_TOKEN_VALID_HOURS, TimeUnit.HOURS);
 
 		return authToken;
 	}
 
 	public void revoke(AuthToken authToken) {
-		this.stringRedisTemplate.delete(CodeConstants.AUTH_USER_KEY + authToken.getName());
-		this.authTokenRedisTemplate.delete(CodeConstants.AUTH_TOKEN_KEY + authToken.getTokenString());
+		this.stringRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_USER_KEY, authToken.getName()));
+		this.authTokenRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, authToken.getTokenString()));
 	}
 
 	public AuthToken validate(String tokenString) throws AuthTokenExpireException {
-		AuthToken token = this.authTokenRedisTemplate.opsForValue().get(CodeConstants.AUTH_TOKEN_KEY + tokenString);
+		AuthToken token = this.authTokenRedisTemplate.opsForValue().get(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, tokenString));
 		if (AppUtil.isEmpty(token) || token.getExpiryDate().before(new Date())) {
 			throw new AuthTokenExpireException();
 		}

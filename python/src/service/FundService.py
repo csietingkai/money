@@ -101,22 +101,24 @@ def fetchFundRecords(code: str):
             response = requests.get(url)
             richData = response.json()
             response.close()
-            for item in richData:
-                date = datetime.datetime(int(item['TransDate'][0:4]), int(item['TransDate'][4:6]), int(item['TransDate'][6:8]))
-                if targetDate > date:
-                    continue
-                entity = FundRecord()
-                queryEntity = FundRecordFacade.queryByCodeAndDate(code, date)
-                if queryEntity:
-                    entity.id = queryEntity.id
-                entity.code = code
-                entity.date = date
-                entity.price = item['Price']
-                if entity.id:
-                    FundRecordFacade.update(entity)
-                else:
-                    FundRecordFacade.insert(entity)
-            return 'SUCCESS'
+            if isinstance(richData, list):
+                for item in richData:
+                    date = datetime.datetime(int(item['TransDate'][0:4]), int(item['TransDate'][4:6]), int(item['TransDate'][6:8]))
+                    if targetDate > date:
+                        continue
+                    entity = FundRecord()
+                    queryEntity = FundRecordFacade.queryByCodeAndDate(code, date)
+                    if queryEntity:
+                        entity.id = queryEntity.id
+                    entity.code = code
+                    entity.date = date
+                    entity.price = item['Price']
+                    if entity.id:
+                        FundRecordFacade.update(entity)
+                    else:
+                        FundRecordFacade.insert(entity)
+                return 'SUCCESS'
+            return richData['Message']
         else:
             print('[INFO] find no fund with code<{code}>'.format(code = code))
             return 'NO_DATA'

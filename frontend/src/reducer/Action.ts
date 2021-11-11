@@ -6,7 +6,7 @@ import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYL
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
-import { ExchangeRate } from 'api/exchangeRate';
+import { ExchangeRateVo } from 'api/exchangeRate';
 import { UserTrackingFundVo } from 'api/fund';
 import { UserTrackingStockVo } from 'api/stock';
 
@@ -26,7 +26,7 @@ export const SetFundTrackingList = (payload: UserTrackingFundVo[]): Action<UserT
 export const SetFundQueryCondition = (payload: FundQueryCondition): Action<FundQueryCondition> => ({ type: SET_FUND_QUERY_CONDITION, payload });
 
 // exchange rate
-export const SetExchangeRateList = (payload: ExchangeRate[]): Action<ExchangeRate[]> => ({ type: SET_EXCHANGE_RATE_LIST, payload });
+export const SetExchangeRateList = (payload: ExchangeRateVo[]): Action<ExchangeRateVo[]> => ({ type: SET_EXCHANGE_RATE_LIST, payload });
 export const SetExchangeRateQueryCondition = (payload: ExchangeRateQueryCondition): Action<ExchangeRateQueryCondition> => ({ type: SET_EXCHANGE_RATE_QUERY_CONDITION, payload });
 
 // account

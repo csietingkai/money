@@ -8,7 +8,7 @@ import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
-import ExchangeRateApi, { ExchangeRate, ExchangeRateListResponse } from 'api/exchangeRate';
+import ExchangeRateApi, { ExchangeRateVo, ExchangeRateListResponse } from 'api/exchangeRate';
 import FundApi, { FundTrackingListResponse, UserTrackingFundVo } from 'api/fund';
 import StockApi, { StockTrackingListResponse, UserTrackingStockVo } from 'api/stock';
 
@@ -73,9 +73,9 @@ export const fetchFundTrackingList = (dispatch: Dispatch<Action<UserTrackingFund
     }
 };
 
-export const fetchExchangeRateList = (dispatch: Dispatch<Action<ExchangeRate[]>>, getState: () => ReduxState): void => {
+export const fetchExchangeRateList = (dispatch: Dispatch<Action<ExchangeRateVo[]>>, getState: () => ReduxState): void => {
     const tokenString: string = getAuthTokenString(getState());
-    const exchangeRateList: ExchangeRate[] = getExchangeRateList(getState());
+    const exchangeRateList: ExchangeRateVo[] = getExchangeRateList(getState());
     if (tokenString && isArrayEmpty(exchangeRateList)) {
         ExchangeRateApi.getAll().then((response: ExchangeRateListResponse) => {
             const { success, data } = response;

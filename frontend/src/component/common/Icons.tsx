@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faChartLine, faCheck, faCog, faCogs, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faAngleUp, faAngleDown, faChartLine, faCheck, faCog, faCogs, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt,
+library.add(faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt,
     faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt,
     faUser);
 
 const Icon = (icon: IconProp) => (props?: { className?: string; }) => <span className={`icon ${props?.className}`}><FontAwesomeIcon icon={icon} /></span>;
 export const AngleDownIcon = Icon('angle-down');
 export const AngleUpIcon = Icon('angle-up');
+export const ChartBarIcon = Icon('chart-bar');
 export const ChartLineIcon = Icon('chart-line');
 export const CheckIcon = Icon('check');
 export const CogIcon = Icon('cog');

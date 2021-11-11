@@ -4,7 +4,7 @@ import * as StateHolder from 'reducer/StateHolder';
 
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
-import { ExchangeRate } from 'api/exchangeRate';
+import { ExchangeRateVo } from 'api/exchangeRate';
 import { UserTrackingFundVo } from 'api/fund';
 import { UserTrackingStockVo } from 'api/stock';
 
@@ -65,7 +65,7 @@ export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => 
 
 // exchangeReducer
 export interface ReduxExchangeRateState {
-    list: ExchangeRate[];
+    list: ExchangeRateVo[];
     condition: ExchangeRateQueryCondition;
 }
 export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
@@ -73,7 +73,7 @@ export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
     condition: { start: new Date(), end: new Date() }
 };
 const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;
-export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRate[] => {
+export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRateVo[] => {
     let list = getExchangeRateState(state)?.list;
     if (list && !withNtd) {
         list = list.filter(x => x.currency !== 'TWD');

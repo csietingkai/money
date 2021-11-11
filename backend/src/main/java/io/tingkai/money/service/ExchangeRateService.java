@@ -46,6 +46,7 @@ public class ExchangeRateService {
 		for (ExchangeRate exchangeRate : exchangeRates) {
 			ExchangeRateVo vo = new ExchangeRateVo();
 			vo.transform(exchangeRate);
+			vo.setRecord(this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency()));
 			vo.setUpdateTime(this.getUpdateTime(exchangeRate.getCurrency(), CodeConstants.EXCHANGE_RATE_FETCH_START_DATETIME));
 			vos.add(vo);
 		}

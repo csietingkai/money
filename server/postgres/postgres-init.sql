@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS account_record (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	trans_date TIMESTAMP NOT NULL,
 	trans_amount NUMERIC NOT NULL,
+	rate NUMERIC NOT NULL DEFAULT 1, -- 換匯當時的匯率
 	trans_from uuid NOT NULL,
 	trans_to uuid NOT NULL,
 	description VARCHAR,

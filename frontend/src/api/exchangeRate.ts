@@ -11,6 +11,7 @@ export interface ExchangeRate {
 }
 
 export interface ExchangeRateVo extends ExchangeRate {
+    record: ExchangeRateRecord;
     updateTime: Date;
 }
 

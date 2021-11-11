@@ -121,7 +121,8 @@ public class ExchangeRateRecordFacade {
 		Optional<ExchangeRateRecord> optional = this.exchangeRateRecordDao.findFirstByCurrencyOrderByDateDesc(currency);
 		if (optional.isEmpty()) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
+			return null;
 		}
-		return null;
+		return optional.get();
 	}
 }

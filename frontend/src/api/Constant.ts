@@ -37,6 +37,7 @@ export const ACCOUNT_UPDATE_PATH: string = ACCOUNT_API_PREFIX + '/update';
 export const ACCOUNT_DELETE_PATH: string = ACCOUNT_API_PREFIX + '/delete';
 export const ACCOUNT_GET_RECORDS_PATH: string = ACCOUNT_API_PREFIX + '/getRecords';
 export const ACCOUNT_INCOME_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/income';
+export const ACCOUNT_TRANSFER_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/transfer';
 export const ACCOUNT_EXPEND_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/expend';
 
 // api exchange rate

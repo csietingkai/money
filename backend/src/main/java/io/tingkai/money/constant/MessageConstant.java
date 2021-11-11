@@ -51,5 +51,6 @@ public class MessageConstant {
 	public static final String ACCOUNT_BALANCE_NOT_ENOUGH = "Account: {0} doesn't have enough balance";
 	public static final String ACCOUNT_WRONG_AMOUNT = "Amount: {0} is invalid";
 	public static final String ACCOUNT_INCOME_DESC = "[Account<{0}>][INCOME] {1}";
+	public static final String ACCOUNT_TRANSFER_DESC = "[Account<{0} - {1}>][TRANSFER] {2}";
 	public static final String ACCOUNT_EXPEND_DESC = "[Account<{0}>][EXPEND] {1}";
 }

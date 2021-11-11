@@ -27,14 +27,18 @@ public class CodeConstants {
 	public static final String DIGEST_ALGORITHM_NAME = "SHA-256";
 	public static final int PRNG_PRODUCT_LENGTH = 32;
 	public static final int AUTH_TOKEN_VALID_HOURS = 12;
-	public static final String AUTH_TOKEN_KEY = "authToken:";
-	public static final String AUTH_USER_KEY = "authUser:";
+	public static final String AUTH_TOKEN_KEY = "authToken:{0}";
+	public static final String AUTH_USER_KEY = "authUser:{0}";
 
 	// === mail === //
 	public static final String CONFIRM_EMAIL_SUBJECT = "Money AP Confrim Email";
 	public static final String CONFIRM_EMAIL_CONTENT = "Click the following link to verify email:\n";
 
+	// === account === //
+	public static final String ACCOUNT_LIST = "account-list:{0}";
+
 	/// === exchange rate === //
+	public static final String BASE_EXCHANGE_RATE = "TWD";
 	public static final String EXCHANGE_RATE_FETCHING_CURRENCY = "fetching-exchange-rate";
 	public static final String EXCHANGE_RATE_LIST_KEY = "exchange-rate-list";
 	public static final LocalDateTime EXCHANGE_RATE_FETCH_START_DATETIME = LocalDateTime.of(LocalDateTime.now().getYear() - 1, Month.JANUARY, 1, 0, 0);
@@ -48,13 +52,13 @@ public class CodeConstants {
 	public static final BigDecimal TAX_RATE = new BigDecimal(0.003d);
 
 	// === user tracking stock === //
-	public static final String USER_TRACKING_STOCK_KEY = "track-stock-user:";
+	public static final String USER_TRACKING_STOCK_KEY = "track-stock-user:{0}";
 
 	/// === fund list === //
 	public static final String FUND_FETCHING_CODE = "fetching-fund-code";
 
 	// === user tracking fund === //
-	public static final String USER_TRACKING_FUND_KEY = "track-fund-user:";
+	public static final String USER_TRACKING_FUND_KEY = "track-fund-user:{0}";
 
 	// === other === //
 	public static final char UNDERLINE = '_';

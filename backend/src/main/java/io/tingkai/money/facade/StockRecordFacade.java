@@ -115,9 +115,10 @@ public class StockRecordFacade {
 
 	public StockRecord latestRecord(String code) {
 		Optional<StockRecord> optional = this.stockRecordDao.findFirstByCodeOrderByDealDateDesc(code);
-		if (optional.isPresent()) {
-			return optional.get();
+		if (optional.isEmpty()) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
+			return null;
 		}
-		return null;
+		return optional.get();
 	}
 }

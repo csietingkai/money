@@ -111,6 +111,7 @@ public class FundRecordFacade {
 		Optional<FundRecord> optional = this.fundRecordDao.findFirstByCodeOrderByDateDesc(code);
 		if (optional.isEmpty()) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND_RECORD));
+			return null;
 		}
 		return optional.get();
 	}
