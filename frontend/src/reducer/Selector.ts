@@ -5,8 +5,8 @@ import * as StateHolder from 'reducer/StateHolder';
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRateVo } from 'api/exchangeRate';
-import { UserTrackingFundVo } from 'api/fund';
-import { UserTrackingStockVo } from 'api/stock';
+import { FundVo, UserTrackingFundVo } from 'api/fund';
+import { StockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 import { FundQueryCondition } from 'view/investment/FundQuerier';
@@ -39,27 +39,33 @@ export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(
 
 // stockReducer
 export interface ReduxStockState {
+    list: StockVo[],
     tracking: UserTrackingStockVo[];
     condition: StockQueryCondition;
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
+    list: [],
     tracking: [],
     condition: { code: '', name: '', start: new Date(), end: new Date() }
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
+export const getStockList = (state: ReduxState): StockVo[] => getStockState(state)?.list;
 export const getStockTrackingList = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.tracking;
 export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.condition;
 
 // fundReducer
 export interface ReduxFundState {
+    list: FundVo[],
     tracking: UserTrackingFundVo[];
     condition: FundQueryCondition;
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
+    list: [],
     tracking: [],
     condition: { code: '', name: '', start: new Date(), end: new Date() }
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
+export const getFundList = (state: ReduxState): FundVo[] => getFundState(state)?.list;
 export const getFundTrackingList = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.tracking;
 export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.condition;
 

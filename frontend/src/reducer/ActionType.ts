@@ -6,10 +6,12 @@ export const LOGOUT: string = 'LOGOUT';
 export const FILE_DOWNLOAD: string = 'FILE_DOWNLOAD';
 
 // stock
+export const SET_STOCK_LIST: string = 'SET_STOCK_LIST';
 export const SET_STOCK_TRACKING_LIST: string = 'SET_STOCK_TRACKING_LIST';
 export const SET_STOCK_QUERY_CONDITION: string = 'SET_STOCK_QUERY_CONDITION';
 
 // fund
+export const SET_FUND_LIST: string = 'SET_FUND_LIST';
 export const SET_FUND_TRACKING_LIST: string = 'SET_FUND_TRACKING_LIST';
 export const SET_FUND_QUERY_CONDITION: string = 'SET_FUND_QUERY_CONDITION';
 

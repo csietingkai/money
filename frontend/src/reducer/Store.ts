@@ -2,15 +2,15 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundTrackingList, SetLoading, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundTrackingList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundTrackingList, SetLoading, SetStockList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundTrackingList, getStockList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountsResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRateVo, ExchangeRateListResponse } from 'api/exchangeRate';
-import FundApi, { FundTrackingListResponse, UserTrackingFundVo } from 'api/fund';
-import StockApi, { StockTrackingListResponse, UserTrackingStockVo } from 'api/stock';
+import FundApi, { FundListResponse, FundTrackingListResponse, FundVo, UserTrackingFundVo } from 'api/fund';
+import StockApi, { StockListResponse, StockTrackingListResponse, StockVo, UserTrackingStockVo } from 'api/stock';
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
@@ -35,6 +35,24 @@ export const validateToken = (dispatch: Dispatch<Action<AuthToken>>, getState: (
     }
 };
 
+export const fetchStockList = (dispatch: Dispatch<Action<StockVo[]>>, getState: () => ReduxState): void => {
+    const tokenString: string = getAuthTokenString(getState());
+    const stockList: StockVo[] = getStockList(getState());
+    if (tokenString && isArrayEmpty(stockList)) {
+        StockApi.getAll().then((response: StockListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetStockList(data));
+            } else {
+                dispatch(SetStockList([]));
+            }
+        }).catch(error => {
+            console.error(error);
+            dispatch(Logout());
+        });
+    }
+};
+
 export const fetchStockTrackingList = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>, getState: () => ReduxState): void => {
     const tokenString: string = getAuthTokenString(getState());
     const stockList: UserTrackingStockVo[] = getStockTrackingList(getState());
@@ -46,6 +64,24 @@ export const fetchStockTrackingList = (dispatch: Dispatch<Action<UserTrackingSto
                 dispatch(SetStockTrackingList(data));
             } else {
                 dispatch(SetStockTrackingList([]));
+            }
+        }).catch(error => {
+            console.error(error);
+            dispatch(Logout());
+        });
+    }
+};
+
+export const fetchFundList = (dispatch: Dispatch<Action<FundVo[]>>, getState: () => ReduxState): void => {
+    const tokenString: string = getAuthTokenString(getState());
+    const fundList: FundVo[] = getFundList(getState());
+    if (tokenString && isArrayEmpty(fundList)) {
+        FundApi.getAll().then((response: FundListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetFundList(data));
+            } else {
+                dispatch(SetFundList([]));
             }
         }).catch(error => {
             console.error(error);

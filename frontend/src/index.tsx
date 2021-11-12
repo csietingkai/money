@@ -16,7 +16,7 @@ import RegisterPage from 'view/RegisterPage';
 // reducer
 import { SetLoading } from 'reducer/Action';
 import { getAuthToken } from 'reducer/StateHolder';
-import store, { fetchAccountList, fetchExchangeRateList, fetchFundTrackingList, fetchStockTrackingList, validateToken } from 'reducer/Store';
+import store, { fetchAccountList, fetchExchangeRateList, fetchFundList, fetchFundTrackingList, fetchStockList, fetchStockTrackingList, validateToken } from 'reducer/Store';
 
 // apis
 import { API_URL } from 'api/Constant';
@@ -75,8 +75,12 @@ store.dispatch(validateToken);
 store.dispatch(fetchExchangeRateList);
 // get user's accounts
 store.dispatch(fetchAccountList);
+// get all stock
+store.dispatch(fetchStockList);
 // get user's stock tracking list
 store.dispatch(fetchStockTrackingList);
+// get all fund
+store.dispatch(fetchFundList);
 // get user's fund tracking list
 store.dispatch(fetchFundTrackingList);
 
