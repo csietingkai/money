@@ -168,6 +168,7 @@ export const blue = (alpha: number = 1): string => rgba(32, 168, 216, alpha);
 export const purple = (alpha: number = 1): string => rgba(111, 66, 193, alpha);
 export const pink = (alpha: number = 1): string => rgba(232, 62, 140, alpha);
 export const red = (alpha: number = 1): string => rgba(248, 108, 107, alpha);
+export const orange = (alpha: number = 1): string => rgba(248, 203, 0, alpha);
 export const yellow = (alpha: number = 1): string => rgba(255, 193, 7, alpha);
 export const green = (alpha: number = 1): string => rgba(77, 189, 116, alpha);
 export const cyan = (alpha: number = 1): string => rgba(99, 194, 222, alpha);
