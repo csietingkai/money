@@ -4,7 +4,7 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { Login, Logout, SetAccountList, SetExchangeRateQueryCondition, SetFundList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -13,6 +13,7 @@ import { StockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 import { Action } from 'util/Interface';
+import exchangeRate, { ExchangeRate, ExchangeRateVo } from 'api/exchangeRate';
 
 // auth
 export const LoginDispatcher = (dispatch: Dispatch<Action<AuthToken>>) => (authToken: AuthToken): void => dispatch(Login(authToken));
@@ -29,6 +30,7 @@ export const SetFundTrackingListDispatcher = (dispatch: Dispatch<Action<UserTrac
 export const SetFundQueryConditionDispatcher = (dispatch: Dispatch<Action<FundQueryCondition>>) => (condition: FundQueryCondition): void => dispatch(SetFundQueryCondition(condition));
 
 // exchange rate
+export const SetExchangeRateListDispatcher = (dispatch: Dispatch<Action<ExchangeRateVo[]>>) => (exchangeRateList: ExchangeRateVo[]): void => dispatch(SetExchangeRateList(exchangeRateList));
 export const SetExchangeRateQueryConditionDispatcher = (dispatch: Dispatch<Action<ExchangeRateQueryCondition>>) => (condition: ExchangeRateQueryCondition): void => dispatch(SetExchangeRateQueryCondition(condition));
 
 // account

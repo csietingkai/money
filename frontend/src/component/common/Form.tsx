@@ -78,7 +78,7 @@ export interface FormProps {
     singleRow?: boolean;
     formKey: string;
     inputs: Input[];
-    onChange: (formState: any) => void;
+    onChange: (formState: any, key: string) => void;
 }
 
 export interface FormState {
@@ -109,7 +109,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         const input = formRef.current.querySelector(`#form-${key}`);
         if (input) {
             form[key] = getValueByKeys(event, 'target', 'value');
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 
@@ -120,7 +120,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         if (input) {
             const value = toNumber(getValueByKeys(event, 'target', 'value'));
             form[key] = value;
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 
@@ -130,7 +130,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         const input = formRef.current.querySelector(`#form-${key}-${selection}`);
         if (input) {
             form[key] = selection;
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 
@@ -141,7 +141,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         if (input) {
             form[key] = form[key] ? form[key] : {};
             form[key][selection] = getValueByKeys(event, 'target', 'checked');
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 
@@ -156,7 +156,7 @@ export default class Form extends React.Component<FormProps, FormState> {
             } else {
                 form[key] = '';
             }
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 
@@ -172,7 +172,7 @@ export default class Form extends React.Component<FormProps, FormState> {
             date.setMonth(selectDate.getMonth());
             date.setDate(selectDate.getDate());
             form[key] = date;
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 
@@ -185,7 +185,7 @@ export default class Form extends React.Component<FormProps, FormState> {
             const date: Date = form[key];
             date.setHours(toNumber(timeStrs[0]), toNumber(timeStrs[1]), toNumber(timeStrs[2]));
             form[key] = date;
-            this.props.onChange(form);
+            this.props.onChange(form, key);
         }
     };
 

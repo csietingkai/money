@@ -164,6 +164,27 @@ public class AccountService {
 		return this.accountRecordFacade.insert(entity);
 	}
 
+	public void reverseRecord(UUID recordId) throws NotExistException, FieldMissingException {
+		AccountRecord record = this.accountRecordFacade.query(recordId);
+		UUID from = record.getTransFrom();
+		UUID to = record.getTransTo();
+		boolean isTransfer = from.compareTo(to) != 0;
+		if (!isTransfer) {
+			Account account = this.accountFacade.query(from);
+			account.setBalance(account.getBalance().subtract(record.getTransAmount()));
+			this.accountFacade.update(account);
+			this.accountRecordFacade.delete(recordId);
+		} else {
+			Account fromAcc = this.accountFacade.query(from);
+			Account toAcc = this.accountFacade.query(to);
+			fromAcc.setBalance(fromAcc.getBalance().add(record.getTransAmount()));
+			toAcc.setBalance(toAcc.getBalance().subtract(record.getTransAmount()));
+			this.accountFacade.update(fromAcc);
+			this.accountFacade.update(toAcc);
+			this.accountRecordFacade.delete(recordId);
+		}
+	}
+
 	private List<Account> syncCache(String name) {
 		List<Account> entities = this.accountFacade.queryAll(name);
 		entities.sort((Account a, Account b) -> {

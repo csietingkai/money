@@ -1,11 +1,12 @@
-import { ChartBarIcon, ChartLineIcon, CogIcon, CogsIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
+import { ChartBarIcon, ChartLineIcon, CogIcon, CogsIcon, CommentsDollarIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
-import AccountManagementPage from 'view/settings/AccountManagementPage';
 import DashBoard from 'view/DashBoard';
-import StockQuerier from 'view/investment/StockQuerier';
-import PersonalSettingPage from 'view/settings/PersonalSettingPage';
 import ExchangeRateQuerier from 'view/investment/ExchangeRateQuerier';
 import FundQuerier from 'view/investment/FundQuerier';
+import StockQuerier from 'view/investment/StockQuerier';
+import TradeStock from 'view/investment/TradeStock';
+import AccountManagementPage from 'view/settings/AccountManagementPage';
+import PersonalSettingPage from 'view/settings/PersonalSettingPage';
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { Record, SidebarItem } from 'util/Interface';
@@ -32,6 +33,13 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 url: '/stockQuerier',
                 icon: ChartBarIcon(),
                 component: StockQuerier
+            },
+            {
+                name: 'Trade Stock',
+                level: 1,
+                url: '/tradeStock',
+                icon: CommentsDollarIcon(),
+                component: TradeStock
             },
             {
                 name: 'Fund Querier',

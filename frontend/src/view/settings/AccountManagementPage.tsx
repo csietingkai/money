@@ -13,7 +13,7 @@ import Table from 'component/common/Table';
 import { SetAccountListDispatcher } from 'reducer/PropsMapper';
 import { getAccountList, getAuthTokenName, getExchangeRateList, ReduxState } from 'reducer/Selector';
 
-import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountRecordVo, AccountsResponse } from 'api/account';
+import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountsResponse } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
 
 import { numberComma, sum, sumByKey, toDateStr, toNumber } from 'util/AppUtil';
@@ -31,9 +31,10 @@ export interface AccountManagementProps {
 type Page = 'account-create' | 'account-edit' | 'record-income' | 'record-transfer' | 'record-expend';
 export interface AccountManagementState {
     currentAccount: Account;
-    accountRecords: AccountRecordVo[];
+    accountRecords: AccountRecord[];
     currentAccountRecord: AccountRecord;
     deleteAccountModalOpen: boolean;
+    deleteAccountRecordModalOpen: boolean;
     page?: Page;
 }
 
@@ -45,7 +46,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             currentAccount: undefined,
             accountRecords: [],
             currentAccountRecord: undefined,
-            deleteAccountModalOpen: false
+            deleteAccountModalOpen: false,
+            deleteAccountRecordModalOpen: false,
         };
         this.init();
     }
@@ -81,7 +83,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         const currentAccount: Account = accounts[selectedRow];
         const { id } = currentAccount;
         const resposne: AccountRecordsResponse = await AccountApi.getRecords(id);
-        const accountRecords: AccountRecordVo[] = resposne.data || [];
+        const accountRecords: AccountRecord[] = resposne.data || [];
         this.setState({ currentAccount, accountRecords });
     };
 
@@ -256,9 +258,31 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         this.setState({ currentAccountRecord }, () => this.toPage('record-expend'));
     };
 
+    private toggleDeleteAccountRecordModal = (rowData?: AccountRecord) => () => {
+        this.setState({ deleteAccountRecordModalOpen: !this.state.deleteAccountRecordModalOpen, currentAccountRecord: rowData });
+    };
+
+    private onAccountRecordDeleteClick = async () => {
+        const { accounts } = this.props;
+        const { currentAccount, currentAccountRecord } = this.state;
+        if (currentAccount?.id) {
+            const resposne: SimpleResponse = await AccountApi.deleteRecord(currentAccountRecord?.id);
+            const { success, message } = resposne;
+            if (success) {
+                Notify.success(message);
+            } else {
+                Notify.error(message);
+            }
+            this.toggleDeleteAccountRecordModal()();
+        }
+        await this.fetchAccounts();
+        const idx: number = accounts.findIndex(x => x.id === currentAccount.id);
+        await this.onAccountTableRowClick(idx);
+    };
+
     private renderMainPage = (): JSX.Element => {
         const { accounts, exchangeRateList } = this.props;
-        const { currentAccount, accountRecords, deleteAccountModalOpen } = this.state;
+        const { currentAccount, accountRecords, deleteAccountModalOpen, currentAccountRecord, deleteAccountRecordModalOpen } = this.state;
         const deleteAccountModal = (
             <Modal
                 headerText='Delete Account'
@@ -268,6 +292,17 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                 verticalCentered={true}
             >
                 Are you sure to <span style={{ color: 'red' }}>DELETE</span> the account: [{currentAccount?.name}]?
+            </Modal>
+        );
+        const deleteAccountRecordModal = (
+            <Modal
+                headerText='Delete Account'
+                isShow={deleteAccountRecordModalOpen}
+                onOkClick={this.onAccountRecordDeleteClick}
+                onCancelClick={this.toggleDeleteAccountRecordModal(currentAccountRecord)}
+                verticalCentered={true}
+            >
+                Are you sure to <span style={{ color: 'red' }}>DELETE</span> the account record: [{currentAccountRecord?.description}]?
             </Modal>
         );
         return (
@@ -348,7 +383,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 </div>
                                 <Table
                                     id='account-record'
-                                    header={['transDate', 'transAmount', 'rate', 'transFromName', 'transToName', 'description']}
+                                    header={['transDate', 'transAmount', 'rate', 'transFromName', 'transToName', 'description', 'functions']}
                                     data={accountRecords}
                                     columnConverter={(header: string, rowData: any) => {
                                         if (header === 'transDate') {
@@ -359,6 +394,12 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                             if (rowData.transFrom === rowData.transTo) {
                                                 return '';
                                             }
+                                        } else if (header === 'functions') {
+                                            return (
+                                                <>
+                                                    <Button className='mr-2' size='sm' variant='danger' outline onClick={this.toggleDeleteAccountRecordModal(rowData)}><TrashAltIcon /></Button>
+                                                </>
+                                            );
                                         }
                                         return rowData[header];
                                     }}
@@ -368,6 +409,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                     </Row>
                 }
                 {deleteAccountModal}
+                {deleteAccountRecordModal}
             </div>
         );
     };

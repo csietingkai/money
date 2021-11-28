@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetExchangeRateQueryConditionDispatcher, SetLoadingDispatcher } from 'reducer/PropsMapper';
+import { SetExchangeRateListDispatcher, SetExchangeRateQueryConditionDispatcher, SetLoadingDispatcher } from 'reducer/PropsMapper';
 import { getExchangeRateList, getExchangeRateQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import ExchangeRateChart from 'component/common/chart/ExchangeRateChart';
@@ -13,7 +13,7 @@ import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import ExchangeRateApi, { ExchangeRateRecordVo, ExchangeRateVo } from 'api/exchangeRate';
+import ExchangeRateApi, { ExchangeRateListResponse, ExchangeRateRecordVo, ExchangeRateVo } from 'api/exchangeRate';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
@@ -24,6 +24,7 @@ export interface ExchangeRateQuerierProps {
     stockStyle: StockStyle;
     exchangeRateList: ExchangeRateVo[];
     exchangeRateQueryCondition: ExchangeRateQueryCondition;
+    setExchangeRateList: (exchangeRateList: ExchangeRateVo[]) => void;
     setExchangeRateQueryCondition: (condition: ExchangeRateQueryCondition) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -82,6 +83,10 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await ExchangeRateApi.refresh(currency);
         if (refreshSuccess) {
+            const { success, data } = await ExchangeRateApi.getAll();
+            if (success) {
+                this.props.setExchangeRateList(data);
+            }
             await this.getRecords(currency);
         } else {
             Notify.error(message);
@@ -174,8 +179,9 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<ExchangeRateQueryCondition | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<ExchangeRateVo[] | ExchangeRateQueryCondition | boolean>>) => {
     return {
+        setExchangeRateList: SetExchangeRateListDispatcher(dispatch),
         setExchangeRateQueryCondition: SetExchangeRateQueryConditionDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };

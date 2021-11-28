@@ -37,6 +37,7 @@ public class AccountController {
 	public static final String INCOME_PATH = "/income";
 	public static final String TRANSFER_PATH = "/transfer";
 	public static final String EXPEND_PATH = "/expend";
+	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 
 	@Autowired
 	private AccountService accountService;
@@ -87,5 +88,11 @@ public class AccountController {
 	public AccountResponse<AccountRecord> expend(@RequestParam UUID accountId, @RequestBody AccountRecord entity) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.expend(entity, accountId);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, entity.getId().toString());
+	}
+
+	@RequestMapping(value = AccountController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
+	public AccountResponse<Void> deleteRecord(@RequestParam UUID recordId) throws NotExistException, FieldMissingException {
+		this.accountService.reverseRecord(recordId);
+		return new AccountResponse<Void>(true, null, MessageConstant.ACCOUNT_RECORD_DELETE_SUCCESS);
 	}
 }
