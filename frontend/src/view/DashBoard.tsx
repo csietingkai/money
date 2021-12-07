@@ -2,21 +2,23 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Row, Col, Badge } from 'react-bootstrap';
 
-import { getAccountList, getAuthToken, getFundTrackingList, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthToken, getFundTrackingList, getStockOwnList, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
-import account, { Account } from 'api/account';
+import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
-import { UserTrackingStockVo } from 'api/stock';
+import { UserStockVo, UserTrackingStockVo } from 'api/stock';
 import { UserTrackingFundVo } from 'api/fund';
 
 import AccountBalanceChart from 'component/common/chart/AccountBalanceChart';
+import StockOwnChart from 'component/common/chart/StockOwnChart';
 import Card from 'component/common/Card';
 
-import { numberComma, sumByKey } from 'util/AppUtil';
+import { numberComma, sum, sumByKey } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
 
 export interface DashBoardProps {
     authToken: AuthToken;
+    stockOwnList: UserStockVo[];
     stockTrackingList: UserTrackingStockVo[];
     fundTrackingList: UserTrackingFundVo[];
     userAccounts: Account[];
@@ -36,6 +38,10 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         return sumByKey(accounts, 'balance');
     };
 
+    private sumStockValue = (stockOwnList: UserStockVo[]): number => {
+        return sum(stockOwnList.map(x => x.price * x.amount));
+    };
+
     private accountChart = (accounts: Account[] = []): JSX.Element => {
         return (
             <div className="chart-wrapper">
@@ -53,15 +59,34 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         );
     };
 
+    private stockChart = (stockOwnList: UserStockVo[]): JSX.Element => {
+        return (
+            <div className="chart-wrapper">
+                <Card
+                    title={'Stocks'}
+                >
+                    <h2 className='text-center'>
+                        <Badge className='mb-2' variant='secondary' pill>
+                            Total Stock Value: ${numberComma(this.sumStockValue(stockOwnList))}
+                        </Badge>
+                    </h2>
+                    <StockOwnChart ownList={stockOwnList} />
+                </Card>
+            </div>
+        );
+    };
+
     render(): JSX.Element {
-        const { stockTrackingList, fundTrackingList, userAccounts, stockStyle } = this.props;
+        const { stockOwnList, userAccounts } = this.props;
         return (
             <div className='animated fadeIn'>
                 <Row>
                     <Col>
                         {this.accountChart(userAccounts)}
                     </Col>
-                    <Col></Col>
+                    <Col>
+                        {this.stockChart(stockOwnList)}
+                    </Col>
                     <Col></Col>
                 </Row>
             </div>
@@ -72,6 +97,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
 const mapStateToProps = (state: ReduxState) => {
     return {
         authToken: getAuthToken(state),
+        stockOwnList: getStockOwnList(state),
         stockTrackingList: getStockTrackingList(state),
         fundTrackingList: getFundTrackingList(state),
         userAccounts: getAccountList(state),

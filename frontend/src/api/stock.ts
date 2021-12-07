@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH } from 'api/Constant';
+import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
+import { DealType } from 'util/Enum';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
 
 export enum MarketType {
@@ -48,6 +49,34 @@ export interface StockRecordVo extends StockRecord {
     bbdown: number;
 }
 
+export interface UserStock {
+    id: string;
+    userName: string;
+    stockCode: string;
+    amount: number;
+}
+
+export interface UserStockVo extends UserStock {
+    stockName: string;
+    price: number;
+}
+
+export interface UserStockRecord {
+    id: string;
+    userStockId: string;
+    accountId: string;
+    type: DealType;
+    date: Date;
+    share: number;
+    price: number;
+    fee: number;
+    tax: number;
+}
+
+export interface UserStockRecordVo extends UserStockRecord {
+    accountName: string;
+}
+
 export interface UserTrackingStock {
     id: string;
     userName: string;
@@ -64,6 +93,10 @@ export interface StockResponse extends ApiResponse<StockVo> { }
 export interface StockListResponse extends ApiResponse<StockVo[]> { }
 export interface StockRecordResponse extends ApiResponse<StockRecordVo> { }
 export interface StockRecordListResponse extends ApiResponse<StockRecordVo[]> { }
+export interface UserStockResponse extends ApiResponse<UserStockVo> { }
+export interface UserStockListResponse extends ApiResponse<UserStockVo[]> { }
+export interface UserStockRecordResponse extends ApiResponse<UserStockRecordVo> { }
+export interface UserStockRecordListResponse extends ApiResponse<UserStockRecordVo[]> { }
 export interface StockTrackingListResponse extends ApiResponse<UserTrackingStockVo[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
@@ -92,6 +125,30 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     return data;
 };
 
+const precalc = async (dealType: DealType, share: number, price: number): Promise<UserStockRecordResponse> => {
+    const response = await axios.get(USER_STOCK_PRECALC_PATH, { params: { dealType, share, price } });
+    const data: UserStockRecordResponse = response.data;
+    return data;
+};
+
+const buy = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fix: number, fee: number): Promise<UserStockResponse> => {
+    const response = await axios.put(USER_STOCK_BUY_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fix, fee } });
+    const data: UserStockResponse = response.data;
+    return data;
+};
+
+const sell = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fix: number, fee: number, tax: number): Promise<UserStockResponse> => {
+    const response = await axios.put(USER_STOCK_SELL_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fix, fee, tax } });
+    const data: UserStockResponse = response.data;
+    return data;
+};
+
+const getOwn = async (username: string): Promise<UserStockListResponse> => {
+    const response = await axios.get(USER_STOCK_GET_OWN_PATH, { params: { username } });
+    const data: UserStockListResponse = response.data;
+    return data;
+};
+
 const getTrackingList = async (username: string): Promise<StockTrackingListResponse> => {
     const response = await axios.get(STOCK_GET_TRACKING_LIST_PATH, { params: { username } });
     const data: StockTrackingListResponse = response.data;
@@ -110,4 +167,4 @@ const untrack = async (username: string, code: string): Promise<SimpleResponse> 
     return data;
 };
 
-export default { getAll, getRecords, refresh, getTrackingList, track, untrack };
+export default { getAll, getRecords, refresh, precalc, buy, sell, getOwn, getTrackingList, track, untrack };

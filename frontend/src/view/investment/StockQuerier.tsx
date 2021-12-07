@@ -31,7 +31,6 @@ export interface StockQuerierProps {
 }
 
 export interface StockQuerierState {
-    xAxis: string[];
     stocks: Stock[];
     selectedStockCode: string;
     stockRecords: StockRecordVo[];
@@ -49,7 +48,6 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     constructor(props: StockQuerierProps) {
         super(props);
         this.state = {
-            xAxis: [],
             stocks: [],
             selectedStockCode: '',
             stockRecords: []
@@ -77,7 +75,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         if (stocks.length >= 1) {
             this.getRecords(stocks[0].code);
         } else {
-            this.setState({ xAxis: [], stockRecords: [] });
+            this.setState({ stockRecords: [] });
         }
     };
 
@@ -99,8 +97,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
             Notify.warning(message);
         }
         records = records || [];
-        const dealDates: string[] = records.map(x => toDateStr(x.dealDate));
-        this.setState({ xAxis: dealDates, stockRecords: records });
+        this.setState({ stockRecords: records });
     };
 
     private syncRecord = (code: string) => async () => {
@@ -225,6 +222,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                             <StockChart
                                 stockStyle={stockStyle}
                                 data={stockRecords}
+                                showInfo={true}
                             />
                         </Card>
                     </Col>
@@ -239,7 +237,7 @@ const mapStateToProps = (state: ReduxState) => {
         stockStyle: getStockStyle(state),
         username: getAuthTokenName(state),
         stockTrackingList: getStockTrackingList(state),
-        stockQueryCondition: getStockQueryCondition(state),
+        stockQueryCondition: getStockQueryCondition(state)
     };
 };
 

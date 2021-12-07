@@ -14,7 +14,7 @@ export default class Footer extends React.Component<FooterProps, FooterState> {
     render(): JSX.Element {
         return (
             <footer className='app-footer'>
-                <span><a href='https://github.com/csietingkai/prototype'>Prototype</a> &copy; 2021.</span>
+                <span><a href='https://github.com/csietingkai/money'>Tingkai Money</a> &copy; 2021.</span>
                 <span className='ml-auto'>Powered by <a href='http://coreui.io'>CoreUI</a></span>
             </footer>
         );

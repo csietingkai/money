@@ -4,12 +4,12 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
 import { FundVo, UserTrackingFundVo } from 'api/fund';
-import { StockVo, UserTrackingStockVo } from 'api/stock';
+import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 import { Action } from 'util/Interface';
@@ -21,6 +21,7 @@ export const LogoutDispatcher = (dispatch: Dispatch<Action<undefined>>) => (): v
 
 // stock
 export const SetStockListDispatcher = (dispatch: Dispatch<Action<StockVo[]>>) => (stocks: StockVo[]): void => dispatch(SetStockList(stocks));
+export const SetStockOwnListDispatcher = (dispatch: Dispatch<Action<UserStockVo[]>>) => (stocks: UserStockVo[]): void => dispatch(SetStockOwnList(stocks));
 export const SetStockTrackingListDispatcher = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => (stocks: UserTrackingStockVo[]): void => dispatch(SetStockTrackingList(stocks));
 export const SetStockQueryConditionDispatcher = (dispatch: Dispatch<Action<StockQueryCondition>>) => (condition: StockQueryCondition): void => dispatch(SetStockQueryCondition(condition));
 

@@ -2,15 +2,15 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundTrackingList, SetLoading, SetStockList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundTrackingList, getStockList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundTrackingList, getStockList, getStockOwnList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
-import AccountApi, { Account, AccountsResponse } from 'api/account';
+import AccountApi, { Account, AccountListResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRateVo, ExchangeRateListResponse } from 'api/exchangeRate';
 import FundApi, { FundListResponse, FundTrackingListResponse, FundVo, UserTrackingFundVo } from 'api/fund';
-import StockApi, { StockListResponse, StockTrackingListResponse, StockVo, UserTrackingStockVo } from 'api/stock';
+import StockApi, { StockListResponse, StockTrackingListResponse, StockVo, UserStockListResponse, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { isArrayEmpty } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
@@ -45,6 +45,24 @@ export const fetchStockList = (dispatch: Dispatch<Action<StockVo[]>>, getState: 
                 dispatch(SetStockList(data));
             } else {
                 dispatch(SetStockList([]));
+            }
+        }).catch(error => {
+            console.error(error);
+            dispatch(Logout());
+        });
+    }
+};
+
+export const fetchStockOwnList = (dispatch: Dispatch<Action<UserStockVo[]>>, getState: () => ReduxState): void => {
+    const tokenString: string = getAuthTokenString(getState());
+    const stockOwnList: UserStockVo[] = getStockOwnList(getState());
+    if (tokenString && isArrayEmpty(stockOwnList)) {
+        StockApi.getOwn(getAuthTokenName(getState())).then((response: UserStockListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetStockOwnList(data));
+            } else {
+                dispatch(SetStockOwnList([]));
             }
         }).catch(error => {
             console.error(error);
@@ -129,7 +147,7 @@ export const fetchAccountList = (dispatch: Dispatch<Action<Account[]>>, getState
     const accountList: Account[] = getAccountList(getState());
     if (tokenString && isArrayEmpty(accountList)) {
         const ownerName: string = getAuthTokenName(getState());
-        AccountApi.getAccounts(ownerName).then((response: AccountsResponse) => {
+        AccountApi.getAccounts(ownerName).then((response: AccountListResponse) => {
             const { success, data } = response;
             if (success) {
                 dispatch(SetAccountList(data));

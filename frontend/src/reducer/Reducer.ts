@@ -3,7 +3,7 @@ import { combineReducers } from 'redux';
 
 import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST } from 'reducer/ActionType';
 import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxFundState, ReduxStockState, ReduxSystemSettingState } from 'reducer/Selector';
 import { getAuthToken, setAuthToken, removeAuthToken, setStockStyle } from 'reducer/StateHolder';
 
@@ -11,7 +11,7 @@ import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
 import { ExchangeRateVo } from 'api/exchangeRate';
 import { FundVo, UserTrackingFundVo } from 'api/fund';
-import { StockVo, UserTrackingStockVo } from 'api/stock';
+import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { Action } from 'util/Interface';
 import { StockStyle } from 'util/Enum';
@@ -37,11 +37,13 @@ const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: A
     return newState;
 };
 
-const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<StockVo[] | UserTrackingStockVo[] | StockQueryCondition>): ReduxStockState => {
+const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<StockVo[] | UserStockVo[] | UserTrackingStockVo[] | StockQueryCondition>): ReduxStockState => {
     const newState: ReduxStockState = { ...state };
     const { type, payload } = action;
     if (type === SET_STOCK_LIST) {
         newState.list = payload as StockVo[];
+    } else if (type === SET_STOCK_OWN_LIST) {
+        newState.own = payload as UserStockVo[];
     } else if (type === SET_STOCK_TRACKING_LIST) {
         newState.tracking = payload as UserTrackingStockVo[];
     } else if (type === SET_STOCK_QUERY_CONDITION) {

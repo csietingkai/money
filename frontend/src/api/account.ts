@@ -24,12 +24,12 @@ export interface AccountRecord {
 }
 
 export interface AccountResponse extends ApiResponse<Account> { }
-export interface AccountsResponse extends ApiResponse<Account[]> { }
-export interface AccountRecordsResponse extends ApiResponse<AccountRecord[]> { }
+export interface AccountListResponse extends ApiResponse<Account[]> { }
+export interface AccountRecordListResponse extends ApiResponse<AccountRecord[]> { }
 
-const getAccounts = async (ownerName: string): Promise<AccountsResponse> => {
+const getAccounts = async (ownerName: string): Promise<AccountListResponse> => {
     const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { ownerName } });
-    const data: AccountsResponse = response.data;
+    const data: AccountListResponse = response.data;
     return data;
 };
 
@@ -53,9 +53,9 @@ const deleteAccount = async (id: string): Promise<SimpleResponse> => {
     return data;
 };
 
-const getRecords = async (accountId: string): Promise<AccountRecordsResponse> => {
+const getRecords = async (accountId: string): Promise<AccountRecordListResponse> => {
     const response = await axios.get(ACCOUNT_GET_RECORDS_PATH, { params: { accountId } });
-    const data: AccountRecordsResponse = response.data;
+    const data: AccountRecordListResponse = response.data;
     data.data = data.data?.map(x => {
         x.transDate = new Date(x.transDate);
         return x;

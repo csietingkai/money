@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS user_stock_record (
 	price NUMERIC NOT NULL, --交易價格
 	fee NUMERIC NOT NULL, --手續費
 	tax NUMERIC NOT NULL DEFAULT 0, --稅
+	total NUMERIC NOT NULL, -- 總額 可能與試算不同
 	PRIMARY KEY (id),
 	CONSTRAINT fk_user_stock_id FOREIGN KEY (user_stock_id) REFERENCES user_stock(id),
 	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id)

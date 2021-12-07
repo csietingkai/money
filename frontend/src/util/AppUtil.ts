@@ -1,4 +1,4 @@
-import { SortType, StockStyle } from 'util/Enum';
+import { SortType } from 'util/Enum';
 import { Record } from 'util/Interface';
 
 export const isNull = (obj: any): boolean => {
@@ -160,6 +160,10 @@ export const handleRequestDate = (data: any): any => {
         }
     }
     return data;
+};
+
+export const random = (min: number, max: number): number => {
+    return Math.random() * (max - min) + min;
 };
 
 export const rgba = (red: number, green: number, blue: number, alpha: number = 1): string => `rgba(${red},${green},${blue},${alpha})`;

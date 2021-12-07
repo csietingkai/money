@@ -13,6 +13,7 @@ import { StockStyle } from 'util/Enum';
 export interface StockChartProps {
     stockStyle: StockStyle;
     data: StockRecordVo[];
+    showInfo: boolean;
 }
 
 export interface StockChartState {
@@ -82,7 +83,7 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
     };
 
     render(): JSX.Element {
-        const { data: records } = this.props;
+        const { data: records, showInfo } = this.props;
         const { selectedLineType, hoveredIndex } = this.state;
 
         // make data sets for chart
@@ -184,34 +185,37 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                             />
                         </div>
                     </Col>
-                    <Col sm={2} md={2}>
-                        {
-                            hoveredIndex > 0 && hoveredIndex < records.length &&
-                            <Row>
-                                <Col>
-                                    <ListGroup>
-                                        <ListGroupItem action variant='info'>
-                                            <InfoCircleIcon />
-                                            <span className='h3'> {toDateStr(records[hoveredIndex].dealDate)}</span>
-                                        </ListGroupItem>
-                                        <ListGroupItem action variant='secondary'>
-                                            <h5>Open: {records[hoveredIndex].openPrice}</h5>
-                                            <h5>High: {records[hoveredIndex].highPrice}</h5>
-                                            <h5>Low: {records[hoveredIndex].lowPrice}</h5>
-                                            <h5>Close: {records[hoveredIndex].closePrice}</h5>
-                                            <h5>MA5: {records[hoveredIndex].ma5}</h5>
-                                            <h5>MA10: {records[hoveredIndex].ma10}</h5>
-                                            <h5>MA20: {records[hoveredIndex].ma20}</h5>
-                                            <h5>MA40: {records[hoveredIndex].ma40}</h5>
-                                            <h5>MA60: {records[hoveredIndex].ma60}</h5>
-                                            <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
-                                            <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
-                                        </ListGroupItem>
-                                    </ListGroup>
-                                </Col>
-                            </Row>
-                        }
-                    </Col>
+                    {
+                        showInfo &&
+                        <Col sm={2} md={2}>
+                            {
+                                hoveredIndex > 0 && hoveredIndex < records.length &&
+                                <Row>
+                                    <Col>
+                                        <ListGroup>
+                                            <ListGroupItem action variant='info'>
+                                                <InfoCircleIcon />
+                                                <span className='h3'> {toDateStr(records[hoveredIndex].dealDate)}</span>
+                                            </ListGroupItem>
+                                            <ListGroupItem action variant='secondary'>
+                                                <h5>Open: {records[hoveredIndex].openPrice}</h5>
+                                                <h5>High: {records[hoveredIndex].highPrice}</h5>
+                                                <h5>Low: {records[hoveredIndex].lowPrice}</h5>
+                                                <h5>Close: {records[hoveredIndex].closePrice}</h5>
+                                                <h5>MA5: {records[hoveredIndex].ma5}</h5>
+                                                <h5>MA10: {records[hoveredIndex].ma10}</h5>
+                                                <h5>MA20: {records[hoveredIndex].ma20}</h5>
+                                                <h5>MA40: {records[hoveredIndex].ma40}</h5>
+                                                <h5>MA60: {records[hoveredIndex].ma60}</h5>
+                                                <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
+                                                <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
+                                            </ListGroupItem>
+                                        </ListGroup>
+                                    </Col>
+                                </Row>
+                            }
+                        </Col>
+                    }
                 </Row>
             </>
         );

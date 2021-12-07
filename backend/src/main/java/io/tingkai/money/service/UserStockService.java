@@ -6,6 +6,8 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
+import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.entity.UserStock;
@@ -22,6 +26,7 @@ import io.tingkai.money.entity.UserStockRecord;
 import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.enumeration.DealType;
 import io.tingkai.money.facade.AccountFacade;
+import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.facade.UserStockFacade;
@@ -33,6 +38,7 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
+import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.util.AppUtil;
 
@@ -42,6 +48,9 @@ public class UserStockService {
 
 	@Autowired
 	private AccountFacade accountFacade;
+
+	@Autowired
+	private AccountRecordFacade accountRecordFacade;
 
 	@Autowired
 	private StockFacade stockFacade;
@@ -62,27 +71,50 @@ public class UserStockService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<UserTrackingStock>> userCache;
 
-	public List<UserStock> getAll(String username) {
+	public List<UserStockVo> getAll(String username) {
 		return getAll(username, true);
 	}
 
-	public List<UserStock> getAll(String username, boolean onlyShowHave) {
+	public List<UserStockVo> getAll(String username, boolean onlyShowHave) {
 		List<UserStock> entities = this.userStockFacade.queryByUsername(username);
 		if (onlyShowHave) {
 			entities = entities.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
-		return entities;
+		Map<String, String> stockNames = this.stockFacade.queryAll().stream().collect(Collectors.toMap(Stock::getCode, Stock::getName));
+		List<UserStockVo> vos = new ArrayList<UserStockVo>();
+		entities.forEach(e -> {
+			UserStockVo vo = new UserStockVo();
+			vo.transform(e);
+			vo.setStockName(stockNames.getOrDefault(vo.getStockCode(), CodeConstants.EMPTY_STRING));
+			StockRecord stockRecord = this.stockRecordFacade.latestRecord(vo.getStockCode());
+			vo.setPrice(stockRecord.getClosePrice());
+			vo.setPriceDate(stockRecord.getDealDate());
+			vos.add(vo);
+		});
+		return vos;
 	}
 
-	public UserStock buy(String username, String accountName, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		Account account = this.accountFacade.query(accountName, username);
-		BigDecimal total = price.multiply(share);
-		total = total.add(this.calcFee(price, share, CodeConstants.FEE_DISCOUNT_RATE));
-		if (account.getBalance().compareTo(total) < 0) {
-			throw new AccountBalanceNotEnoughException(accountName);
+	public UserStockRecord preCalc(DealType type, BigDecimal share, BigDecimal price) {
+		UserStockRecord temp = new UserStockRecord();
+		temp.setPrice(price);
+		temp.setShare(share);
+		temp.setFee(this.calcFee(price, share, CodeConstants.FEE_DISCOUNT_RATE));
+		if (type == DealType.BUY) {
+			temp.setTax(BigDecimal.ZERO);
+		} else if (type == DealType.SELL) {
+			temp.setTax(this.calcTax(price, share));
 		}
+		return temp;
+	}
+
+	public UserStock buy(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fix, BigDecimal fee) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
+		}
+		Account account = this.accountFacade.query(accountId);
+		BigDecimal total = price.multiply(share).add(fee).add(fix);
+		if (account.getBalance().compareTo(total) < 0) {
+			throw new AccountBalanceNotEnoughException(account.getName());
 		}
 
 		UserStock entity = null;
@@ -104,6 +136,14 @@ public class UserStockService {
 		account.setBalance(account.getBalance().subtract(total));
 		account = this.accountFacade.update(account);
 
+		AccountRecord accountRecord = new AccountRecord();
+		accountRecord.setTransDate(date);
+		accountRecord.setTransAmount(BigDecimal.ZERO.subtract(total));
+		accountRecord.setTransFrom(account.getId());
+		accountRecord.setTransTo(account.getId());
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, username, stockCode, share, price)));
+		this.accountRecordFacade.insert(accountRecord);
+
 		UserStockRecord record = new UserStockRecord();
 		record.setUserStockId(entity.getId());
 		record.setAccountId(account.getId());
@@ -111,39 +151,38 @@ public class UserStockService {
 		record.setDate(date);
 		record.setShare(share);
 		record.setPrice(price);
-		record.setFee(this.calcFee(price, share, CodeConstants.FEE_DISCOUNT_RATE));
+		record.setFee(fee);
 		record.setTax(BigDecimal.ZERO);
+		record.setTotal(total);
 		record = this.userStockRecordFacade.insert(record);
 
 		return entity;
 	}
 
-	public UserStock sell(String username, String accountName, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserStock sell(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fix, BigDecimal fee, BigDecimal tax) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
 		}
 
-		UserStock entity = null;
-		try {
-			entity = this.userStockFacade.queryByUsernameAndStockCode(username, stockCode);
-		} catch (Exception e) {
+		UserStock entity = this.userStockFacade.queryByUsernameAndStockCode(username, stockCode);
+		if (entity.getAmount().compareTo(share) < 0) {
+			throw new StockAmountInvalidException(share);
 		}
-		if (AppUtil.isPresent(entity)) {
-			entity.setAmount(entity.getAmount().subtract(share));
-			entity = this.userStockFacade.update(entity);
-		} else {
-			entity = new UserStock();
-			entity.setUserName(username);
-			entity.setStockCode(stockCode);
-			entity.setAmount(share);
-			entity = this.userStockFacade.insert(entity);
-		}
+		entity.setAmount(entity.getAmount().subtract(share));
+		entity = this.userStockFacade.update(entity);
 
-		Account account = this.accountFacade.query(accountName, username);
-		BigDecimal total = price.multiply(share);
-		total = total.add(this.calcFee(price, share, CodeConstants.FEE_DISCOUNT_RATE));
-		account.setBalance(account.getBalance().subtract(total));
+		Account account = this.accountFacade.query(accountId);
+		BigDecimal total = price.multiply(share).subtract(fee).subtract(tax).subtract(fix);
+		account.setBalance(account.getBalance().add(total));
 		account = this.accountFacade.update(account);
+
+		AccountRecord accountRecord = new AccountRecord();
+		accountRecord.setTransDate(date);
+		accountRecord.setTransAmount(total);
+		accountRecord.setTransFrom(account.getId());
+		accountRecord.setTransTo(account.getId());
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, username, stockCode, share, price)));
+		this.accountRecordFacade.insert(accountRecord);
 
 		UserStockRecord record = new UserStockRecord();
 		record.setUserStockId(entity.getId());
@@ -152,8 +191,9 @@ public class UserStockService {
 		record.setDate(date);
 		record.setShare(share);
 		record.setPrice(price);
-		record.setFee(this.calcFee(price, share, CodeConstants.FEE_DISCOUNT_RATE));
-		record.setTax(this.calcTax(price, share));
+		record.setFee(fee);
+		record.setTax(tax);
+		record.setTotal(total);
 		record = this.userStockRecordFacade.insert(record);
 
 		return entity;
@@ -210,8 +250,12 @@ public class UserStockService {
 
 	private BigDecimal calcFee(BigDecimal price, BigDecimal share, BigDecimal discount) {
 		BigDecimal fee = CodeConstants.FEE_RATE.multiply(price).multiply(share).multiply(discount);
-		if (CodeConstants.MIN_FEE.compareTo(fee) > 0) {
-			fee = CodeConstants.MIN_FEE;
+		BigDecimal minFee = CodeConstants.MIN_FEE;
+		if (!AppUtil.isMultipleNumber(share, BigDecimal.valueOf(1000))) {
+			minFee = CodeConstants.MIN_SMALL_FEE;
+		}
+		if (minFee.compareTo(fee) > 0 && BigDecimal.ZERO.compareTo(fee) != 0) {
+			fee = minFee;
 		}
 		fee = fee.setScale(0, RoundingMode.FLOOR);
 		return fee;

@@ -28,6 +28,9 @@ public class MessageConstant {
 	public static final String STOCK_GET_ALL_SUCCESS = "Get All Stocks Success";
 	public static final String STOCK_GET_SUCCESS = "Get Stock: {0} Success";
 	public static final String STOCK_REFRESH_SUCCESS = "Stock Refresh Success";
+	public static final String USER_STOCK_PRECALC_SUCCESS = "Pre Calc Success";
+	public static final String USER_STOCK_BUY_SUCCESS = "User: {0} Buy {1} {2} shares with Price: {3} Success";
+	public static final String USER_STOCK_SELL_SUCCESS = "User: {0} Sell {1} {2} shares with Price: {3} Success";
 	public static final String USER_STOCK_GET_TRACKING_LIST_SUCCESS = "User: {0} Tracking List Fetch Success";
 	public static final String STOCK_SHARE_AMOUNT_INVALID = "Stock Share: {0} is invalid";
 

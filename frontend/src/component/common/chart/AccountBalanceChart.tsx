@@ -41,6 +41,7 @@ export default class AccountBalanceChart extends React.Component<AccountBalanceC
     render(): JSX.Element {
         const { accounts } = this.props;
         const sortedAccounts = [...accounts].sort((a, b) => b.balance - a.balance);
+        const totalBalance = this.sumBalance(sortedAccounts);
         const data = {
             labels: this.convertLabel(sortedAccounts),
             datasets: this.convertData(sortedAccounts)
@@ -58,8 +59,7 @@ export default class AccountBalanceChart extends React.Component<AccountBalanceC
                                 callbacks: {
                                     label: (tooltipItem: any) => {
                                         const { label, formattedValue, raw: hoveredBalance } = tooltipItem;
-                                        const totalBalance = this.sumBalance(sortedAccounts);
-                                        const percent = Math.round((hoveredBalance / totalBalance) * 100);
+                                        const percent = ((hoveredBalance / totalBalance) * 100).toFixed(1);
                                         return `${label}: ${formattedValue} (${percent}%)`;
                                     }
                                 }

@@ -32,4 +32,5 @@ public class UserStockRecord {
 	protected BigDecimal price;
 	protected BigDecimal fee;
 	protected BigDecimal tax;
+	protected BigDecimal total;
 }

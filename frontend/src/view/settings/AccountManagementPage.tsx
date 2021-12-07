@@ -13,10 +13,10 @@ import Table from 'component/common/Table';
 import { SetAccountListDispatcher } from 'reducer/PropsMapper';
 import { getAccountList, getAuthTokenName, getExchangeRateList, ReduxState } from 'reducer/Selector';
 
-import AccountApi, { Account, AccountRecord, AccountRecordsResponse, AccountsResponse } from 'api/account';
+import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
 
-import { numberComma, sum, sumByKey, toDateStr, toNumber } from 'util/AppUtil';
+import { numberComma, sum, toDateStr, toNumber } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import { Action, Record, SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';
@@ -68,7 +68,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private fetchAccounts = async (username: string = this.props.username) => {
-        const response: AccountsResponse = await AccountApi.getAccounts(username);
+        const response: AccountListResponse = await AccountApi.getAccounts(username);
         const { success, data: accounts, message } = response;
         if (success) {
             const { setAccountList } = this.props;
@@ -82,7 +82,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         const { accounts } = this.props;
         const currentAccount: Account = accounts[selectedRow];
         const { id } = currentAccount;
-        const resposne: AccountRecordsResponse = await AccountApi.getRecords(id);
+        const resposne: AccountRecordListResponse = await AccountApi.getRecords(id);
         const accountRecords: AccountRecord[] = resposne.data || [];
         this.setState({ currentAccount, accountRecords });
     };

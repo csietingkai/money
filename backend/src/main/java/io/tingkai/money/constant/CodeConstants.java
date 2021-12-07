@@ -49,6 +49,7 @@ public class CodeConstants {
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.001425d);
 	public static final BigDecimal FEE_DISCOUNT_RATE = new BigDecimal(0.28d);
 	public static final BigDecimal MIN_FEE = new BigDecimal(20);
+	public static final BigDecimal MIN_SMALL_FEE = new BigDecimal(1);
 	public static final BigDecimal TAX_RATE = new BigDecimal(0.003d);
 
 	// === user tracking stock === //

@@ -7,6 +7,7 @@ export const FILE_DOWNLOAD: string = 'FILE_DOWNLOAD';
 
 // stock
 export const SET_STOCK_LIST: string = 'SET_STOCK_LIST';
+export const SET_STOCK_OWN_LIST: string = 'SET_STOCK_OWN_LIST';
 export const SET_STOCK_TRACKING_LIST: string = 'SET_STOCK_TRACKING_LIST';
 export const SET_STOCK_QUERY_CONDITION: string = 'SET_STOCK_QUERY_CONDITION';
 

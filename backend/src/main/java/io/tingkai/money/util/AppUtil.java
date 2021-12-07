@@ -1,6 +1,7 @@
 package io.tingkai.money.util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 import io.tingkai.money.constant.CodeConstants;
@@ -104,5 +105,10 @@ public class AppUtil {
 			}
 		}
 		return true;
+	}
+
+	public static boolean isMultipleNumber(BigDecimal big, BigDecimal small) {
+		BigDecimal result = big.divide(small, RoundingMode.CEILING);
+		return result.multiply(small).compareTo(big) == 0;
 	}
 }

@@ -1,4 +1,4 @@
-# Prototype Frontend App
+# Money Frontend App
 
 ## Coding Style
 + must add semicolon

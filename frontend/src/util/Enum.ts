@@ -24,3 +24,8 @@ export enum StockStyle {
     US = 'US',
     TW = 'TW'
 }
+
+export enum DealType {
+    BUY = 'BUY',
+    SELL = 'SELL'
+}

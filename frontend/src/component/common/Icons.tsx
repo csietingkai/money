@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faDollarSign, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt,
-    faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt,
-    faUser);
+library.add(faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faDollarSign, faHandHoldingUsd, faInfoCircle,
+    faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt,
+    faTimes, faTrashAlt, faUser);
 
 const Icon = (icon: IconProp) => (props?: { className?: string; }) => <span className={`icon ${props?.className}`}><FontAwesomeIcon icon={icon} /></span>;
 export const AngleDownIcon = Icon('angle-down');
@@ -16,6 +16,7 @@ export const CheckIcon = Icon('check');
 export const CogIcon = Icon('cog');
 export const CogsIcon = Icon('cogs');
 export const CommentsDollarIcon = Icon('comments-dollar');
+export const DollarSignIcon = Icon('dollar-sign');
 export const HandHoldingUsdIcon = Icon('hand-holding-usd');
 export const InfoCircleIcon = Icon('info-circle');
 export const LockIcon = Icon('lock');
