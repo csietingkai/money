@@ -4,6 +4,7 @@ import DashBoard from 'view/DashBoard';
 import ExchangeRateQuerier from 'view/investment/ExchangeRateQuerier';
 import FundQuerier from 'view/investment/FundQuerier';
 import StockQuerier from 'view/investment/StockQuerier';
+import TradeFund from 'view/investment/TradeFund';
 import TradeStock from 'view/investment/TradeStock';
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import PersonalSettingPage from 'view/settings/PersonalSettingPage';
@@ -47,6 +48,13 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 url: '/fundQuerier',
                 icon: ChartLineIcon(),
                 component: FundQuerier
+            },
+            {
+                name: 'Trade Fund',
+                level: 1,
+                url: '/tradeFund',
+                icon: CommentsDollarIcon(),
+                component: TradeFund
             },
             {
                 name: 'Exchange Rate Querier',

@@ -13,6 +13,7 @@ export const SET_STOCK_QUERY_CONDITION: string = 'SET_STOCK_QUERY_CONDITION';
 
 // fund
 export const SET_FUND_LIST: string = 'SET_FUND_LIST';
+export const SET_FUND_OWN_LIST: string = 'SET_FUND_OWN_LIST';
 export const SET_FUND_TRACKING_LIST: string = 'SET_FUND_TRACKING_LIST';
 export const SET_FUND_QUERY_CONDITION: string = 'SET_FUND_QUERY_CONDITION';
 

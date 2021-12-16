@@ -8,7 +8,7 @@ import { LockIcon, UserIcon } from 'component/common/Icons';
 
 import { removeAuthToken } from 'reducer/StateHolder';
 import { LoginDispatcher } from 'reducer/PropsMapper';
-import store, { fetchAccountList, fetchExchangeRateList, fetchFundList, fetchFundTrackingList, fetchStockList, fetchStockOwnList, fetchStockTrackingList } from 'reducer/Store';
+import store, { fetchAccountList, fetchExchangeRateList, fetchFundList, fetchFundOwnList, fetchFundTrackingList, fetchStockList, fetchStockOwnList, fetchStockTrackingList } from 'reducer/Store';
 
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
@@ -53,6 +53,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
             store.dispatch(fetchStockOwnList);
             store.dispatch(fetchStockTrackingList);
             store.dispatch(fetchFundList);
+            store.dispatch(fetchFundOwnList);
             store.dispatch(fetchFundTrackingList);
             Notify.success(message);
         } else {

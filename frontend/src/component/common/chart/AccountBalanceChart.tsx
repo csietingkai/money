@@ -64,7 +64,8 @@ export default class AccountBalanceChart extends React.Component<AccountBalanceC
                                     }
                                 }
                             }
-                        }
+                        },
+                        animation: { duration: 0 }
                     }}
                 />
             </div>

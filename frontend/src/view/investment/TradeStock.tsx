@@ -8,6 +8,7 @@ import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
 import { DollarSignIcon } from 'component/common/Icons';
+import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 import { SetAccountListDispatcher, SetStockOwnListDispatcher } from 'reducer/PropsMapper';
 import { getAccountList, getAuthTokenName, getStockList, getStockQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
@@ -19,7 +20,6 @@ import { numberComma } from 'util/AppUtil';
 import { InputType, StockStyle, DealType, Variant } from 'util/Enum';
 import { Action, Record } from 'util/Interface';
 import Notify from 'util/Notify';
-import { StockQueryCondition } from './StockQuerier';
 
 export interface TradeStockProps {
     stockStyle: StockStyle;
@@ -33,7 +33,6 @@ export interface TradeStockProps {
 
 export interface TradeStockState {
     values: StockTradeForm;
-    total: number;
     stockRecords: StockRecordVo[];
 }
 
@@ -72,7 +71,6 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
                 tax: 0,
                 total: '0'
             },
-            total: 0,
             stockRecords: []
         };
     }
@@ -85,6 +83,7 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
         } else if (name) {
             stock = stocks.find(x => x.name === name);
         }
+        this.fetchStockRecords(code);
         return stock;
     };
 
@@ -160,6 +159,10 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
     private onTradeBtnClick = async () => {
         const { username } = this.props;
         const { values: { usedAccount, code, dealType, date, share, price, fixTotal, fee, tax } } = this.state;
+        if (!code) {
+            Notify.warning('Please fill correct code.');
+            return;
+        }
         let success, message;
         if (dealType === DealType.BUY) {
             const response = await StockApi.buy(username, usedAccount, code, date, share, price, fixTotal, fee);
@@ -233,7 +236,7 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
                                     { key: 'tax', title: 'Tax', type: InputType.numeric, value: values?.tax, width: 3, disabled: true },
                                     { key: 'total', title: 'Total', type: InputType.text, value: values?.total, width: 3, disabled: true }
                                 ]}
-                                onChange={async (formState: any, key: string) => {
+                                onChange={(formState: any, key: string) => {
                                     const { values } = this.state;
                                     values.code = formState.code;
                                     values.usedAccount = formState.usedAccount;

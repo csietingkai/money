@@ -38,6 +38,8 @@ public class MessageConstant {
 	public static final String FUND_GET_ALL_SUCCESS = "Get All Funds Success";
 	public static final String FUND_GET_SUCCESS = "Get Fund: {0} Success";
 	public static final String FUND_REFRESH_SUCCESS = "Fund Refresh Success";
+	public static final String USER_FUND_BUY_SUCCESS = "User: {0} Buy {1} {2} shares with Price: {3} Success";
+	public static final String USER_FUND_SELL_SUCCESS = "User: {0} Sell {1} {2} shares with Price: {3} Success";
 	public static final String USER_FUND_GET_TRACKING_LIST_SUCCESS = "User: {0} Tracking List Fetch Success";
 	public static final String FUND_SHARE_AMOUNT_INVALID = "Fund Share: {0} is invalid";
 

@@ -191,16 +191,11 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     render(): JSX.Element {
         const { singleRow, formKey, inputs } = this.props;
-
         const formGroups = inputs.map((input: Input) => {
             const { key, title, value, required, disabled } = input;
             let { type, width } = input;
             width = input.width || 2;
             type = input.type || InputType.text;
-            // const placeholder = input.placeholder || '';
-            // const helpText = input.helpText || '';
-            // const rowSize = input.rowSize || 10;
-            // const options = input.options || [];
             const onFormChange = this.onFormChange(key);
             const onFormNumericChange = this.onFormNumericChange(key);
             const onFormRadioChange = this.onFormRadioChange(key);

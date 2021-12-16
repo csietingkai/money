@@ -153,3 +153,30 @@ CREATE TABLE IF NOT EXISTS user_tracking_fund (
 	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
 	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
 );
+
+CREATE TABLE IF NOT EXISTS user_fund (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	user_name VARCHAR NOT NULL,
+	fund_code VARCHAR NOT NULL,
+	amount NUMERIC NOT NULL DEFAULT 0, --持有股數
+	PRIMARY KEY (id),
+	UNIQUE (user_name, fund_code),
+	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
+	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
+);
+
+CREATE TABLE IF NOT EXISTS user_fund_record (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	user_fund_id uuid NOT NULL,
+	account_id uuid NOT NULL,
+	type VARCHAR NOT NULL, --買 or 賣
+	date TIMESTAMP NOT NULL,
+	share NUMERIC NOT NULL, --股數
+	price NUMERIC NOT NULL, --交易價格
+	rate numeric NOT NULL DEFAULT 1, --匯率
+	fee NUMERIC NOT NULL, --手續費
+	total NUMERIC NOT NULL, -- 總額
+	PRIMARY KEY (id),
+	CONSTRAINT fk_user_fund_id FOREIGN KEY (user_fund_id) REFERENCES user_fund(id),
+	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id)
+);

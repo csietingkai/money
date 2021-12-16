@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Pie } from 'react-chartjs-2';
 
-import { UserStock, UserStockVo } from 'api/stock';
+import { FundVo, UserFundVo } from 'api/fund';
 
 import { blue, green, numberComma, orange, pink, purple, red, sum, yellow } from 'util/AppUtil';
+import { ExchangeRateVo } from 'api/exchangeRate';
 
 const colors = [blue, purple, pink, red, orange, yellow, green];
 const getColor = (dataCnt: number, index: number): string => {
@@ -12,39 +13,63 @@ const getColor = (dataCnt: number, index: number): string => {
     return colors[index % colors.length](1 - currentRound / totalRound);
 };
 
-export interface StockOwnChartProps {
-    ownList: UserStockVo[];
+export interface FundOwnChartProps {
+    exchangeRateList: ExchangeRateVo[];
+    fundList: FundVo[];
+    ownList: UserFundVo[];
 }
 
-export interface StockOwnChartState { }
+export interface FundOwnChartState { }
 
-export default class StockOwnChart extends React.Component<StockOwnChartProps, StockOwnChartState> {
+export default class FundOwnChart extends React.Component<FundOwnChartProps, FundOwnChartState> {
 
-    constructor(props: StockOwnChartProps) {
+    constructor(props: FundOwnChartProps) {
         super(props);
         this.state = {};
     }
 
-    private getLegendStr = (vo: UserStockVo): string => {
-        return `${vo.stockName}(${vo.stockCode})`;
+    private getLegendStr = (vo: UserFundVo): string => {
+        return `${vo.fundName}(${vo.fundCode})`;
     };
 
-    private convertLabel = (data: UserStockVo[]): string[] => {
+    private convertLabel = (data: UserFundVo[]): string[] => {
         return data.map(this.getLegendStr);
     };
 
-    private sumBalance = (data: UserStockVo[]): number => {
-        return sum(data.map(x => x.price * x.amount));
+    private sumBalance = (data: UserFundVo[]): number => {
+        return sum(data.map(x => {
+            let rate: number = 1;
+            const fund = this.getFundInfo(x.fundCode);
+            const currency = this.getExchangeRate(fund?.currency);
+            if (currency) {
+                rate = currency.record.spotSell;
+            }
+            return x.price * x.amount * rate;
+        }));
     };
 
-    private convertData = (data: UserStockVo[]) => {
+    private convertData = (data: UserFundVo[]) => {
         const numberData: number[] = [];
         const colorData: string[] = [];
         data.forEach((x, i) => {
-            numberData.push(x.amount * x.price);
+            let rate: number = 1;
+            const fund = this.getFundInfo(x.fundCode);
+            const currency = this.getExchangeRate(fund?.currency);
+            if (currency) {
+                rate = currency.record.spotSell;
+            }
+            numberData.push(x.amount * x.price * rate);
             colorData.push(getColor(data.length, i));
         });
         return [{ data: numberData, backgroundColor: colorData }];
+    };
+
+    private getFundInfo = (fundCode: string): FundVo => {
+        return this.props.fundList.find(x => x.code === fundCode);
+    };
+
+    private getExchangeRate = (currency: string): ExchangeRateVo => {
+        return this.props.exchangeRateList.find(e => e.currency === currency);
     };
 
     render(): JSX.Element {

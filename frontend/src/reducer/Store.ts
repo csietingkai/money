@@ -2,14 +2,14 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundTrackingList, getStockList, getStockOwnList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundOwnList, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getStockList, getStockOwnList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountListResponse } from 'api/account';
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 import ExchangeRateApi, { ExchangeRateVo, ExchangeRateListResponse } from 'api/exchangeRate';
-import FundApi, { FundListResponse, FundTrackingListResponse, FundVo, UserTrackingFundVo } from 'api/fund';
+import FundApi, { FundListResponse, FundTrackingListResponse, FundVo, UserFundListResponse, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import StockApi, { StockListResponse, StockTrackingListResponse, StockVo, UserStockListResponse, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { isArrayEmpty } from 'util/AppUtil';
@@ -100,6 +100,24 @@ export const fetchFundList = (dispatch: Dispatch<Action<FundVo[]>>, getState: ()
                 dispatch(SetFundList(data));
             } else {
                 dispatch(SetFundList([]));
+            }
+        }).catch(error => {
+            console.error(error);
+            dispatch(Logout());
+        });
+    }
+};
+
+export const fetchFundOwnList = (dispatch: Dispatch<Action<UserFundVo[]>>, getState: () => ReduxState): void => {
+    const tokenString: string = getAuthTokenString(getState());
+    const fundOwnList: UserFundVo[] = getFundOwnList(getState());
+    if (tokenString && isArrayEmpty(fundOwnList)) {
+        FundApi.getOwn(getAuthTokenName(getState())).then((response: UserFundListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetFundOwnList(data));
+            } else {
+                dispatch(SetFundOwnList([]));
             }
         }).catch(error => {
             console.error(error);

@@ -10,12 +10,12 @@ import { CheckIcon, InfoCircleIcon } from 'component/common/Icons';
 import { black, toDateStr } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
 
-export interface FundChartProps {
+export interface ExchangeRateChartProps {
     stockStyle: StockStyle,
     data: ExchangeRateRecordVo[];
 }
 
-export interface FundChartState {
+export interface ExchangeRateChartState {
     selectedLineType: {
         key: string,
         children: { [key: string]: string[]; };
@@ -25,9 +25,9 @@ export interface FundChartState {
     // recommand: any;
 }
 
-export default class FundChart extends React.Component<FundChartProps, FundChartState> {
+export default class ExchangeRateChart extends React.Component<ExchangeRateChartProps, ExchangeRateChartState> {
 
-    constructor(props: FundChartProps) {
+    constructor(props: ExchangeRateChartProps) {
         super(props);
         const children: { [key: string]: string[]; } = {};
         SUPPORT_LINE_TYPE.forEach((TYPE) => {

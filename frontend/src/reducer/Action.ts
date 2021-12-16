@@ -2,12 +2,12 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST } from 'reducer/ActionType';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
 import { ExchangeRateVo } from 'api/exchangeRate';
-import { FundVo, UserTrackingFundVo } from 'api/fund';
+import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
@@ -25,6 +25,7 @@ export const SetStockQueryCondition = (payload: StockQueryCondition): Action<Sto
 
 // fund
 export const SetFundList = (payload: FundVo[]): Action<FundVo[]> => ({ type: SET_FUND_LIST, payload });
+export const SetFundOwnList = (payload: UserFundVo[]): Action<UserFundVo[]> => ({ type: SET_FUND_OWN_LIST, payload });
 export const SetFundTrackingList = (payload: UserTrackingFundVo[]): Action<UserTrackingFundVo[]> => ({ type: SET_FUND_TRACKING_LIST, payload });
 export const SetFundQueryCondition = (payload: FundQueryCondition): Action<FundQueryCondition> => ({ type: SET_FUND_QUERY_CONDITION, payload });
 

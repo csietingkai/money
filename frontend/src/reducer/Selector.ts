@@ -5,7 +5,7 @@ import * as StateHolder from 'reducer/StateHolder';
 import { Account } from 'api/account';
 import { AuthToken, Role } from 'api/auth';
 import { ExchangeRateVo } from 'api/exchangeRate';
-import { FundVo, UserTrackingFundVo } from 'api/fund';
+import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
@@ -39,8 +39,8 @@ export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(
 
 // stockReducer
 export interface ReduxStockState {
-    list: StockVo[],
-    own: UserStockVo[],
+    list: StockVo[];
+    own: UserStockVo[];
     tracking: UserTrackingStockVo[];
     condition: StockQueryCondition;
 }
@@ -58,17 +58,20 @@ export const getStockQueryCondition = (state: ReduxState): StockQueryCondition =
 
 // fundReducer
 export interface ReduxFundState {
-    list: FundVo[],
+    list: FundVo[];
+    own: UserFundVo[];
     tracking: UserTrackingFundVo[];
     condition: FundQueryCondition;
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     list: [],
+    own: [],
     tracking: [],
     condition: { code: '', name: '', start: new Date(), end: new Date() }
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
 export const getFundList = (state: ReduxState): FundVo[] => getFundState(state)?.list;
+export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
 export const getFundTrackingList = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.tracking;
 export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.condition;
 

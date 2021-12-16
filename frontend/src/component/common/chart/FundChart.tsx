@@ -13,6 +13,7 @@ import { StockStyle } from 'util/Enum';
 export interface FundChartProps {
     stockStyle: StockStyle,
     data: FundRecordVo[];
+    showInfo: boolean;
 }
 
 export interface FundChartState {
@@ -64,7 +65,7 @@ export default class FundChart extends React.Component<FundChartProps, FundChart
     };
 
     render(): JSX.Element {
-        const { data: records } = this.props;
+        const { data: records, showInfo } = this.props;
         const { selectedLineType, hoveredIndex } = this.state;
 
         // make data sets for chart
@@ -157,31 +158,34 @@ export default class FundChart extends React.Component<FundChartProps, FundChart
                             />
                         </div>
                     </Col>
-                    <Col sm={2} md={2}>
-                        {
-                            hoveredIndex > 0 && hoveredIndex < records.length &&
-                            <Row>
-                                <Col>
-                                    <ListGroup>
-                                        <ListGroupItem action variant='info'>
-                                            <span className='h3'><InfoCircleIcon /></span>
-                                            <span className='h3'> {toDateStr(records[hoveredIndex].date)}</span>
-                                        </ListGroupItem>
-                                        <ListGroupItem action variant='secondary'>
-                                            <h5>Current Price: {records[hoveredIndex].price}</h5>
-                                            <h5>MA5: {records[hoveredIndex].ma5}</h5>
-                                            <h5>MA10: {records[hoveredIndex].ma10}</h5>
-                                            <h5>MA20: {records[hoveredIndex].ma20}</h5>
-                                            <h5>MA40: {records[hoveredIndex].ma40}</h5>
-                                            <h5>MA60: {records[hoveredIndex].ma60}</h5>
-                                            <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
-                                            <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
-                                        </ListGroupItem>
-                                    </ListGroup>
-                                </Col>
-                            </Row>
-                        }
-                    </Col>
+                    {
+                        showInfo &&
+                        <Col sm={2} md={2}>
+                            {
+                                hoveredIndex > 0 && hoveredIndex < records.length &&
+                                <Row>
+                                    <Col>
+                                        <ListGroup>
+                                            <ListGroupItem action variant='info'>
+                                                <span className='h3'><InfoCircleIcon /></span>
+                                                <span className='h3'> {toDateStr(records[hoveredIndex].date)}</span>
+                                            </ListGroupItem>
+                                            <ListGroupItem action variant='secondary'>
+                                                <h5>Current Price: {records[hoveredIndex].price}</h5>
+                                                <h5>MA5: {records[hoveredIndex].ma5}</h5>
+                                                <h5>MA10: {records[hoveredIndex].ma10}</h5>
+                                                <h5>MA20: {records[hoveredIndex].ma20}</h5>
+                                                <h5>MA40: {records[hoveredIndex].ma40}</h5>
+                                                <h5>MA60: {records[hoveredIndex].ma60}</h5>
+                                                <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
+                                                <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
+                                            </ListGroupItem>
+                                        </ListGroup>
+                                    </Col>
+                                </Row>
+                            }
+                        </Col>
+                    }
                 </Row>
             </>
         );

@@ -104,10 +104,10 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
         if (refreshSuccess) {
-            const { stockQueryCondition: { code, name } } = this.props;
-            const { data: stocks } = await StockApi.getAll(code, name);
-            this.setState({ stocks });
+            const { stockQueryCondition: { code: queryCode, name: queryName } } = this.props;
+            const { data: stocks } = await StockApi.getAll(queryCode, queryName);
             await this.getRecords(code);
+            this.setState({ stocks });
         } else {
             Notify.error(message);
         }

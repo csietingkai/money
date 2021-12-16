@@ -73,10 +73,6 @@ export interface UserStockRecord {
     tax: number;
 }
 
-export interface UserStockRecordVo extends UserStockRecord {
-    accountName: string;
-}
-
 export interface UserTrackingStock {
     id: string;
     userName: string;
@@ -95,8 +91,7 @@ export interface StockRecordResponse extends ApiResponse<StockRecordVo> { }
 export interface StockRecordListResponse extends ApiResponse<StockRecordVo[]> { }
 export interface UserStockResponse extends ApiResponse<UserStockVo> { }
 export interface UserStockListResponse extends ApiResponse<UserStockVo[]> { }
-export interface UserStockRecordResponse extends ApiResponse<UserStockRecordVo> { }
-export interface UserStockRecordListResponse extends ApiResponse<UserStockRecordVo[]> { }
+export interface UserStockRecordResponse extends ApiResponse<UserStockRecord> { }
 export interface StockTrackingListResponse extends ApiResponse<UserTrackingStockVo[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins

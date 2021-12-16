@@ -30,6 +30,10 @@ public class FundFacade {
 	@Autowired
 	private DataFetcherService pythonFetcherService;
 
+	public List<Fund> queryAll() {
+		return this.queryAll(true);
+	}
+
 	public List<Fund> queryAll(boolean sort) {
 		List<Fund> entities;
 		if (sort) {

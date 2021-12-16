@@ -4,11 +4,11 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
-import { FundVo, UserTrackingFundVo } from 'api/fund';
+import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
@@ -26,7 +26,8 @@ export const SetStockTrackingListDispatcher = (dispatch: Dispatch<Action<UserTra
 export const SetStockQueryConditionDispatcher = (dispatch: Dispatch<Action<StockQueryCondition>>) => (condition: StockQueryCondition): void => dispatch(SetStockQueryCondition(condition));
 
 // fund
-export const SetFundListDispatcher = (dispatch: Dispatch<Action<FundVo[]>>) => (stocks: FundVo[]): void => dispatch(SetFundList(stocks));
+export const SetFundListDispatcher = (dispatch: Dispatch<Action<FundVo[]>>) => (funds: FundVo[]): void => dispatch(SetFundList(funds));
+export const SetFundOwnListDispatcher = (dispatch: Dispatch<Action<UserFundVo[]>>) => (funds: UserFundVo[]): void => dispatch(SetFundOwnList(funds));
 export const SetFundTrackingListDispatcher = (dispatch: Dispatch<Action<UserTrackingFundVo[]>>) => (funds: UserTrackingFundVo[]): void => dispatch(SetFundTrackingList(funds));
 export const SetFundQueryConditionDispatcher = (dispatch: Dispatch<Action<FundQueryCondition>>) => (condition: FundQueryCondition): void => dispatch(SetFundQueryCondition(condition));
 

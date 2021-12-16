@@ -107,10 +107,10 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await FundApi.refresh(code);
         if (refreshSuccess) {
-            const { fundQueryCondition: { code, name } } = this.props;
-            const { data: funds } = await FundApi.getAll(code, name);
-            this.setState({ funds });
+            const { fundQueryCondition: { code: queryCode, name: queryName } } = this.props;
+            const { data: funds } = await FundApi.getAll(queryCode, queryName);
             await this.getRecords(code);
+            this.setState({ funds });
         } else {
             Notify.error(message);
         }
@@ -226,6 +226,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
                             <FundChart
                                 stockStyle={stockStyle}
                                 data={fundRecords}
+                                showInfo={true}
                             />
                         </Card>
                     </Col>

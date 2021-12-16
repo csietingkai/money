@@ -181,7 +181,7 @@ public class UserStockService {
 		accountRecord.setTransAmount(total);
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, username, stockCode, share, price)));
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, username, stockCode, share, price)));
 		this.accountRecordFacade.insert(accountRecord);
 
 		UserStockRecord record = new UserStockRecord();

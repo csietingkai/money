@@ -78,12 +78,24 @@ export const toDateStr = (date: Date): string => {
     }).format(date);
 };
 
+export const isSameDate = (date1: Date, date2: Date): boolean => {
+    return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+};
+
 export const numberComma = (num: number): string => {
     if (!num || isNaN(num)) {
         num = 0;
     }
     const strNum = num.toString();
     return strNum.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export const reverseNumberComma = (str: string): number => {
+    const num: number = parseFloat(str.replace(/,/g, ''));
+    if (numberComma(num) === str) {
+        return num;
+    }
+    return 0;
 };
 
 export const convert = <K, V>(records: Record<K, V>[], key: K): K | V => {

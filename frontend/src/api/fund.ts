@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-import { FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH, FUND_UNTRACK_PATH } from 'api/Constant';
+import { FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH, FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_SELL_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
+import { DealType } from 'util/Enum';
 
 export interface Fund {
     id: string;
@@ -36,6 +37,29 @@ export interface FundRecordVo extends FundRecord {
     bbdown: number;
 }
 
+export interface UserFund {
+    id: string;
+    userName: string;
+    fundCode: string;
+    amount: number;
+}
+
+export interface UserFundVo extends UserFund {
+    fundName: string;
+    price: number;
+}
+
+export interface UserFundRecord {
+    id: string;
+    userFundId: string;
+    accountId: string;
+    type: DealType;
+    date: Date;
+    share: number;
+    price: number;
+    fee: number;
+}
+
 export interface UserTrackingFund {
     id: string;
     userName: string;
@@ -52,6 +76,9 @@ export interface FundResponse extends ApiResponse<FundVo> { }
 export interface FundListResponse extends ApiResponse<FundVo[]> { }
 export interface FundRecordResponse extends ApiResponse<FundRecordVo> { }
 export interface FundRecordListResponse extends ApiResponse<FundRecordVo[]> { }
+export interface UserFundResponse extends ApiResponse<UserFundVo> { }
+export interface UserFundListResponse extends ApiResponse<UserFundVo[]> { }
+export interface UserFundRecordResponse extends ApiResponse<UserFundRecord> { }
 export interface FundTrackingListResponse extends ApiResponse<UserTrackingFundVo[]> { }
 
 const REFRESH_FUND_MAX_TIME = 30 * 60 * 1000; // 30 mins
@@ -80,6 +107,24 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     return data;
 };
 
+const buy = async (username: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, payment: number, fee: number): Promise<UserFundResponse> => {
+    const response = await axios.put(USER_FUND_BUY_PATH, null, { params: { username, accountId, fundCode, date: date.getTime(), share, price, rate, payment, fee } });
+    const data: UserFundResponse = response.data;
+    return data;
+};
+
+const sell = async (username: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, priceFix: number): Promise<UserFundResponse> => {
+    const response = await axios.put(USER_FUND_SELL_PATH, null, { params: { username, accountId, fundCode, date: date.getTime(), share, price, rate, priceFix } });
+    const data: UserFundResponse = response.data;
+    return data;
+};
+
+const getOwn = async (username: string): Promise<UserFundListResponse> => {
+    const response = await axios.get(USER_FUND_GET_OWN_PATH, { params: { username } });
+    const data: UserFundListResponse = response.data;
+    return data;
+};
+
 const getTrackingList = async (username: string): Promise<FundTrackingListResponse> => {
     const response = await axios.get(FUND_GET_TRACKING_LIST_PATH, { params: { username } });
     const data: FundTrackingListResponse = response.data;
@@ -98,4 +143,4 @@ const untrack = async (username: string, code: string): Promise<SimpleResponse> 
     return data;
 };
 
-export default { getAll, getRecords, refresh, getTrackingList, track, untrack };
+export default { getAll, getRecords, buy, sell, getOwn, refresh, getTrackingList, track, untrack };
