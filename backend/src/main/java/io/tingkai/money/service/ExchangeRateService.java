@@ -107,10 +107,10 @@ public class ExchangeRateService {
 				for (int j = 0; j < CodeConstants.MA_DAYS[di]; j++) {
 					total = total.add(BigDecimal.valueOf(Math.pow(records.get(i - j).getCashSell().subtract(ma20).doubleValue(), 2)));
 				}
-				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]), 5, RoundingMode.HALF_UP).doubleValue());
+				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]), CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP).doubleValue());
 				vo.setMa20(ma20);
-				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(2, RoundingMode.HALF_UP));
-				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(2, RoundingMode.HALF_UP));
+				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
 				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getCashSell());
 			}
 			di++;

@@ -84,7 +84,7 @@ public class FundController {
 
 	@RequestMapping(value = FundController.GET_OWN_PATH, method = RequestMethod.GET)
 	public FundResponse<List<UserFundVo>> sell(@RequestParam String username) {
-		List<UserFundVo> result = this.userFundService.getAll(username, true);
+		List<UserFundVo> result = this.userFundService.getOwnFunds(username, true);
 		return new FundResponse<List<UserFundVo>>(true, result, MessageConstant.SUCCESS);
 	}
 

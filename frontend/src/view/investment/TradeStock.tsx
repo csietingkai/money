@@ -11,7 +11,7 @@ import { DollarSignIcon } from 'component/common/Icons';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 import { SetAccountListDispatcher, SetStockOwnListDispatcher } from 'reducer/PropsMapper';
-import { getAccountList, getAuthTokenName, getStockList, getStockQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getStockList, getStockOwnList, getStockQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import AccountApi, { Account, AccountListResponse } from 'api/account';
 import StockApi, { StockRecordVo, StockVo, UserStockListResponse, UserStockVo } from 'api/stock';
@@ -26,6 +26,7 @@ export interface TradeStockProps {
     username: string;
     accounts: Account[];
     stocks: StockVo[];
+    stockOwnList: UserStockVo[];
     stockQueryCondition: StockQueryCondition;
     setAccountList: (accounts: Account[]) => void;
     setStockOwnList: (ownList: UserStockVo[]) => void;
@@ -83,7 +84,7 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
         } else if (name) {
             stock = stocks.find(x => x.name === name);
         }
-        this.fetchStockRecords(code);
+        stock && this.fetchStockRecords(stock?.code);
         return stock;
     };
 
@@ -157,7 +158,7 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
     };
 
     private onTradeBtnClick = async () => {
-        const { username } = this.props;
+        const { username, stockOwnList } = this.props;
         const { values: { usedAccount, code, dealType, date, share, price, fixTotal, fee, tax } } = this.state;
         if (!code) {
             Notify.warning('Please fill correct code.');
@@ -176,7 +177,9 @@ class TradeStock extends React.Component<TradeStockProps, TradeStockState> {
         if (success) {
             Notify.success(message);
             await this.fetchAccounts(username);
-            await this.fetchStockOwnList(username);
+            if (stockOwnList.find(x => x.stockCode === code)) {
+                await this.fetchStockOwnList(username);
+            }
         } else {
             Notify.warning(message);
         }
@@ -287,6 +290,7 @@ const mapStateToProps = (state: ReduxState) => {
         username: getAuthTokenName(state),
         accounts: getAccountList(state),
         stocks: getStockList(state),
+        stockOwnList: getStockOwnList(state),
         stockQueryCondition: getStockQueryCondition(state)
     };
 };

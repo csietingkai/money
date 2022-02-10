@@ -71,24 +71,35 @@ public class UserStockService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<UserTrackingStock>> userCache;
 
-	public List<UserStockVo> getAll(String username) {
-		return getAll(username, true);
+	public List<UserStockVo> getOwnStocks(String username) {
+		return getOwnStocks(username, true);
 	}
 
-	public List<UserStockVo> getAll(String username, boolean onlyShowHave) {
-		List<UserStock> entities = this.userStockFacade.queryByUsername(username);
+	public List<UserStockVo> getOwnStocks(String username, boolean onlyShowHave) {
+		List<UserStock> ownList = this.userStockFacade.queryByUsername(username);
 		if (onlyShowHave) {
-			entities = entities.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
+			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
 		Map<String, String> stockNames = this.stockFacade.queryAll().stream().collect(Collectors.toMap(Stock::getCode, Stock::getName));
 		List<UserStockVo> vos = new ArrayList<UserStockVo>();
-		entities.forEach(e -> {
+		ownList.forEach(stock -> {
 			UserStockVo vo = new UserStockVo();
-			vo.transform(e);
+			vo.transform(stock);
 			vo.setStockName(stockNames.getOrDefault(vo.getStockCode(), CodeConstants.EMPTY_STRING));
 			StockRecord stockRecord = this.stockRecordFacade.latestRecord(vo.getStockCode());
-			vo.setPrice(stockRecord.getClosePrice());
-			vo.setPriceDate(stockRecord.getDealDate());
+			if (AppUtil.isPresent(stockRecord)) {
+				vo.setPrice(stockRecord.getClosePrice());
+				vo.setPriceDate(stockRecord.getDealDate());
+			}
+			vo.setCost(BigDecimal.ZERO);
+			List<UserStockRecord> tradeRecords = this.userStockRecordFacade.queryAll(stock.getId());
+			tradeRecords.forEach(tradeRecord -> {
+				if (tradeRecord.getType() == DealType.BUY) {
+					vo.setCost(vo.getCost().add(tradeRecord.getTotal()));
+				} else if (tradeRecord.getType() == DealType.SELL) {
+					vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+				}
+			});
 			vos.add(vo);
 		});
 		return vos;

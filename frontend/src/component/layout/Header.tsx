@@ -44,7 +44,7 @@ export default class Header extends React.Component<HeaderProps, HeaderState> {
                 <Navbar.Toggle className='d-lg-none' onClick={this.mobileSidebarToggle}>
                     <span className='navbar-toggler-icon'></span>
                 </Navbar.Toggle>
-                <NavbarBrand href='#'></NavbarBrand>
+                <NavbarBrand href='#/dashboard'></NavbarBrand>
                 <Navbar.Toggle className='d-md-down-none' onClick={this.sidebarToggle}>
                     <span className='navbar-toggler-icon'></span>
                 </Navbar.Toggle>

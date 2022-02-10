@@ -47,6 +47,8 @@ export interface UserFund {
 export interface UserFundVo extends UserFund {
     fundName: string;
     price: number;
+    priceDate: Date;
+    cost: number;
 }
 
 export interface UserFundRecord {

@@ -16,7 +16,8 @@ import StockOwnChart from 'component/common/chart/StockOwnChart';
 import Card from 'component/common/Card';
 
 import { isArrayEmpty, numberComma, sum, sumByKey, toNumber } from 'util/AppUtil';
-import { StockStyle } from 'util/Enum';
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
+import { StockStyle, Variant } from 'util/Enum';
 
 export interface DashBoardProps {
     authToken: AuthToken;
@@ -79,6 +80,8 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     };
 
     private stockChart = (stockOwnList: UserStockVo[]): JSX.Element => {
+        const value = this.sumStockValue(stockOwnList);
+        const cost = this.sumStockCost(stockOwnList);
         return (
             <div className="chart-wrapper">
                 <Card
@@ -86,19 +89,31 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
                 >
                     <h2 className='text-center'>
                         <Badge className='mb-2' variant='secondary' pill>
-                            Total Stock Value: ${numberComma(this.sumStockValue(stockOwnList))}
+                            Total Stock Value: ${numberComma(value)}
                         </Badge>
                     </h2>
+                    <h4 className='text-center'>
+                        <Badge className='mb-2' variant='secondary' pill>
+                            Total Stock Cost: ${numberComma(cost)}
+                        </Badge>
+                        <Badge className='mb-2' variant={this.getVariant(cost, value)} pill>
+                            ({numberComma(toNumber(((value - cost) * 100 / cost).toFixed(DEFAULT_DECIMAL_PRECISION)))}%)
+                        </Badge>
+                    </h4>
                     <StockOwnChart ownList={stockOwnList} />
                 </Card>
-            </div>
+            </div >
         );
     };
 
-
+    private sumStockCost = (data: UserStockVo[]): number => {
+        return sum(data.map(x => x.cost));
+    };
 
     private fundChart = (fundOwnList: UserFundVo[]): JSX.Element => {
         const { exchangeRateList, fundList } = this.props;
+        const value = toNumber(this.sumFundValue(fundOwnList).toFixed(DEFAULT_DECIMAL_PRECISION));
+        const cost = toNumber(this.sumFundCost(fundOwnList).toFixed(DEFAULT_DECIMAL_PRECISION));
         return (
             <div className="chart-wrapper">
                 <Card
@@ -106,13 +121,43 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
                 >
                     <h2 className='text-center'>
                         <Badge className='mb-2' variant='secondary' pill>
-                            Total Fund Value: ${numberComma(toNumber(this.sumFundValue(fundOwnList).toFixed(3)))}
+                            Total Fund Value: ${numberComma(value)}
                         </Badge>
                     </h2>
+                    <h4 className='text-center'>
+                        <Badge className='mb-2' variant='secondary' pill>
+                            Total Fund Cost: ${numberComma(cost)}
+                        </Badge>
+                        <Badge className='mb-2' variant={this.getVariant(cost, value)} pill>
+                            ({numberComma(toNumber(((value - cost) * 100 / cost).toFixed(DEFAULT_DECIMAL_PRECISION)))}%)
+                        </Badge>
+                    </h4>
                     <FundOwnChart exchangeRateList={exchangeRateList} fundList={fundList} ownList={fundOwnList} />
                 </Card>
             </div>
         );
+    };
+
+    private sumFundCost = (data: UserFundVo[]): number => {
+        return sum(data.map(x => x.cost));
+    };
+
+    private getVariant = (cost: number, value: number, stockStyle: StockStyle = this.props.stockStyle): Variant => {
+        let variant: Variant = 'secondary';
+        if (cost < value) {
+            if (stockStyle === StockStyle.TW) {
+                variant = 'danger';
+            } else if (stockStyle === StockStyle.US) {
+                variant = 'success';
+            }
+        } else if (cost > value) {
+            if (stockStyle === StockStyle.TW) {
+                variant = 'success';
+            } else if (stockStyle === StockStyle.US) {
+                variant = 'danger';
+            }
+        }
+        return variant;
     };
 
     render(): JSX.Element {

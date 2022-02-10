@@ -70,24 +70,35 @@ public class UserFundService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<UserTrackingFund>> userCache;
 
-	public List<UserFundVo> getAll(String username) {
-		return getAll(username, true);
+	public List<UserFundVo> getOwnFunds(String username) {
+		return getOwnFunds(username, true);
 	}
 
-	public List<UserFundVo> getAll(String username, boolean onlyShowHave) {
-		List<UserFund> entities = this.userFundFacade.queryByUsername(username);
+	public List<UserFundVo> getOwnFunds(String username, boolean onlyShowHave) {
+		List<UserFund> ownList = this.userFundFacade.queryByUsername(username);
 		if (onlyShowHave) {
-			entities = entities.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
+			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
 		Map<String, String> fundNames = this.fundFacade.queryAll().stream().collect(Collectors.toMap(Fund::getCode, Fund::getName));
 		List<UserFundVo> vos = new ArrayList<UserFundVo>();
-		entities.forEach(e -> {
+		ownList.forEach(fund -> {
 			UserFundVo vo = new UserFundVo();
-			vo.transform(e);
+			vo.transform(fund);
 			vo.setFundName(fundNames.getOrDefault(vo.getFundCode(), CodeConstants.EMPTY_STRING));
 			FundRecord fundRecord = this.fundRecordFacade.latestRecord(vo.getFundCode());
-			vo.setPrice(fundRecord.getPrice());
-			vo.setPriceDate(fundRecord.getDate());
+			if (AppUtil.isPresent(fundRecord)) {
+				vo.setPrice(fundRecord.getPrice());
+				vo.setPriceDate(fundRecord.getDate());
+			}
+			vo.setCost(BigDecimal.ZERO);
+			List<UserFundRecord> tradeRecords = this.userFundRecordFacade.queryAll(fund.getId());
+			tradeRecords.forEach(tradeRecord -> {
+				if (tradeRecord.getType() == DealType.BUY) {
+					vo.setCost(vo.getCost().add(tradeRecord.getTotal()));
+				} else if (tradeRecord.getType() == DealType.SELL) {
+					vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+				}
+			});
 			vos.add(vo);
 		});
 		return vos;

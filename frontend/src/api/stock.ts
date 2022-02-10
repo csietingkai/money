@@ -59,6 +59,8 @@ export interface UserStock {
 export interface UserStockVo extends UserStock {
     stockName: string;
     price: number;
+    priceDate: Date;
+    cost: number;
 }
 
 export interface UserStockRecord {

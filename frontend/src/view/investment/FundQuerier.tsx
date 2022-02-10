@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher, SetFundTrackingListDispatcher, SetFundQueryConditionDispatcher } from 'reducer/PropsMapper';
+import { SetLoadingDispatcher, SetFundTrackingListDispatcher, SetFundQueryConditionDispatcher, SetFundOwnListDispatcher } from 'reducer/PropsMapper';
 import { getAuthTokenName, getFundQueryCondition, getFundTrackingList, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import FundChart from 'component/common/chart/FundChart';
@@ -13,7 +13,7 @@ import Form from 'component/common/Form';
 import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import FundApi, { FundRecordVo, FundVo, UserTrackingFundVo } from 'api/fund';
+import FundApi, { FundRecordVo, FundVo, UserFundListResponse, UserFundVo, UserTrackingFundVo } from 'api/fund';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
@@ -25,7 +25,8 @@ export interface FundQuerierProps {
     username: string;
     fundTrackingList: UserTrackingFundVo[];
     fundQueryCondition: FundQueryCondition;
-    setFundTrackingList: (Funds: UserTrackingFundVo[]) => void;
+    setFundOwnList: (ownList: UserFundVo[]) => void;
+    setFundTrackingList: (trackingList: UserTrackingFundVo[]) => void;
     setFundQueryCondition: (condition: FundQueryCondition) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -103,6 +104,17 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
         this.setState({ xAxis: dates, fundRecords: records });
     };
 
+    private getFundOwnList = async (username: string = this.props.username) => {
+        const response: UserFundListResponse = await FundApi.getOwn(username);
+        const { success, data: ownList, message } = response;
+        if (success) {
+            const { setFundOwnList } = this.props;
+            setFundOwnList(ownList);
+        } else {
+            Notify.warning(message);
+        }
+    };
+
     private syncRecord = (code: string) => async () => {
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await FundApi.refresh(code);
@@ -110,6 +122,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
             const { fundQueryCondition: { code: queryCode, name: queryName } } = this.props;
             const { data: funds } = await FundApi.getAll(queryCode, queryName);
             await this.getRecords(code);
+            await this.getFundOwnList();
             this.setState({ funds });
         } else {
             Notify.error(message);
@@ -245,8 +258,9 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingFundVo[] | FundQueryCondition | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserFundVo[] | UserTrackingFundVo[] | FundQueryCondition | boolean>>) => {
     return {
+        setFundOwnList: SetFundOwnListDispatcher(dispatch),
         setFundTrackingList: SetFundTrackingListDispatcher(dispatch),
         setFundQueryCondition: SetFundQueryConditionDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)

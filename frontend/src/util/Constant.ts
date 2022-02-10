@@ -17,3 +17,6 @@ export const NOTIFICATION_DEFAULT_CONFIG: ToastOptions = {
     pauseOnHover: NOTIFICATION_PAUSE_ON_HOVER,
     autoClose: NOTIFICATION_CLOSE_DELAY_SECONDS * 2000
 };
+
+// system
+export const DEFAULT_DECIMAL_PRECISION: number = 2;

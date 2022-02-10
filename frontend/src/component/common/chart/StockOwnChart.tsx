@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Pie } from 'react-chartjs-2';
 
-import { UserStock, UserStockVo } from 'api/stock';
+import { UserStockVo } from 'api/stock';
 
 import { blue, green, numberComma, orange, pink, purple, red, sum, yellow } from 'util/AppUtil';
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
 
 const colors = [blue, purple, pink, red, orange, yellow, green];
 const getColor = (dataCnt: number, index: number): string => {
@@ -68,13 +69,12 @@ export default class StockOwnChart extends React.Component<StockOwnChartProps, S
                                     label: (tooltipItem: any) => {
                                         const { label, formattedValue, raw: hoveredBalance } = tooltipItem;
                                         const share = ownList.find(x => this.getLegendStr(x) === label)?.amount;
-                                        const percent = ((hoveredBalance / totalBalance) * 100).toFixed(1);
+                                        const percent = ((hoveredBalance / totalBalance) * 100).toFixed(DEFAULT_DECIMAL_PRECISION);
                                         return `${label}: ${formattedValue} (${numberComma(share)}s ${percent}%)`;
                                     }
                                 }
                             }
-                        },
-                        animation: { duration: 0 }
+                        }
                     }}
                 />
             </div>

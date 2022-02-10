@@ -93,7 +93,7 @@ public class StockController {
 
 	@RequestMapping(value = StockController.GET_OWN_PATH, method = RequestMethod.GET)
 	public StockResponse<List<UserStockVo>> sell(@RequestParam String username) {
-		List<UserStockVo> result = this.userStockService.getAll(username, true);
+		List<UserStockVo> result = this.userStockService.getOwnStocks(username, true);
 		return new StockResponse<List<UserStockVo>>(true, result, MessageConstant.SUCCESS);
 	}
 

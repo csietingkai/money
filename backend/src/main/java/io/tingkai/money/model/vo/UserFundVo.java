@@ -14,4 +14,5 @@ public class UserFundVo extends UserFund implements Transformable<UserFund> {
 	protected String fundName;
 	protected BigDecimal price;
 	protected LocalDateTime priceDate;
+	protected BigDecimal cost;
 }

@@ -56,15 +56,17 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         await this.fetchAccounts();
     };
 
-    private calcTotalInTwd = (accounts: Account[], exchangeRateList: ExchangeRateVo[]): number => {
-        const rateMap = exchangeRateList.filter(x => x.record).reduce((map, item) => {
-            map[item.currency] = item.record.cashSell;
+    private calcTotal = (accounts: Account[]): string[] => {
+        const ratesMap = accounts.map(acc => acc.currency).filter((curr, idx, self) => self.indexOf(curr) === idx).reduce((map, curr) => {
+            map[curr] = 0;
             return map;
         }, {} as { [key: string]: number; });
-        const allInTwd: number[] = accounts.map(acc => {
-            return toNumber((acc.balance / (rateMap[acc.currency] || 1)).toFixed(3));
-        });
-        return sum(allInTwd);
+        accounts.forEach(acc => ratesMap[acc.currency] += acc.balance);
+        const ratesSum: string[] = [];
+        for (const curr in ratesMap) {
+            ratesSum.push(`${numberComma(ratesMap[curr])} in ${curr}`);
+        }
+        return ratesSum;
     };
 
     private fetchAccounts = async (username: string = this.props.username) => {
@@ -310,7 +312,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                 <Row>
                     <Col>
                         <Card
-                            title={`Your Accounts (total: ${numberComma(this.calcTotalInTwd(accounts, exchangeRateList))} in TWD)`}
+                            title={`Your Accounts (total: ${this.calcTotal(accounts).join()})`}
                         >
                             <div className='text-right mb-2'>
                                 <Button

@@ -1,18 +1,19 @@
 from datetime import datetime
+from typing import List
 
 from entity.StockRecord import StockRecord
 from dao import StockRecordDao
 
-def queryByCode(code: str):
+def queryByCode(code: str) -> List[StockRecord]:
     entity = StockRecordDao.findByCode(code)
     if not entity:
         print('[DEBUG] find no code<{code}> in database'.format(code = code))
     return entity
 
-def queryByCodeAndDealDate(code: str, dealDate: datetime):
+def queryByCodeAndDealDate(code: str, dealDate: datetime) -> StockRecord:
     return StockRecordDao.findByCodeAndDealDate(code, dealDate)
 
-def insert(entity: StockRecord):
+def insert(entity: StockRecord) -> None:
     if isinstance(entity, StockRecord) and checkInsertColumn(entity):
         StockRecordDao.insert(entity)
     else:
@@ -21,7 +22,7 @@ def insert(entity: StockRecord):
 def checkInsertColumn(entity: StockRecord) -> bool:
     return entity and entity.code and entity.deal_date and isinstance(entity.deal_share, float) and isinstance(entity.open_price, float) and isinstance(entity.high_price, float) and isinstance(entity.low_price, float) and isinstance(entity.close_price, float)
 
-def update(entity: StockRecord):
+def update(entity: StockRecord) -> None:
     if isinstance(entity, StockRecord) and checkUpdateColumn(entity):
         queryEntity = StockRecordDao.findById(entity.id)
         queryEntity.deal_share = entity.deal_share

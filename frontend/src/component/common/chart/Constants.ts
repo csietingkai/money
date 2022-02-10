@@ -1,4 +1,4 @@
-import { blue, cyan, green, pink, purple, rgba, yellow } from 'util/AppUtil';
+import { blue, green, pink, purple, yellow } from 'util/AppUtil';
 
 export const SUPPORT_LINE_TYPE = [
     {

@@ -3,10 +3,15 @@ import { Pie } from 'react-chartjs-2';
 
 import { Account } from 'api/account';
 
-import { blue, green, orange, purple, red, sumByKey } from 'util/AppUtil';
+import { blue, green, orange, pink, purple, red, sumByKey, yellow } from 'util/AppUtil';
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
 
-const colors = [blue(), green(), orange(), red(), purple()];
-
+const colors = [blue, purple, pink, red, orange, yellow, green];
+const getColor = (dataCnt: number, index: number): string => {
+    const totalRound = (dataCnt - dataCnt % colors.length) / colors.length + 1;
+    const currentRound = (index - index % colors.length) / colors.length;
+    return colors[index % colors.length](1 - currentRound / totalRound);
+};
 export interface AccountBalanceChartProps {
     accounts: Account[];
 }
@@ -33,7 +38,7 @@ export default class AccountBalanceChart extends React.Component<AccountBalanceC
         const colorData: string[] = [];
         data.forEach((x, i) => {
             numberData.push(x.balance);
-            colorData.push(colors[i]);
+            colorData.push(getColor(data.length, i));
         });
         return [{ data: numberData, backgroundColor: colorData }];
     };
@@ -59,13 +64,12 @@ export default class AccountBalanceChart extends React.Component<AccountBalanceC
                                 callbacks: {
                                     label: (tooltipItem: any) => {
                                         const { label, formattedValue, raw: hoveredBalance } = tooltipItem;
-                                        const percent = ((hoveredBalance / totalBalance) * 100).toFixed(1);
+                                        const percent = ((hoveredBalance / totalBalance) * 100).toFixed(DEFAULT_DECIMAL_PRECISION);
                                         return `${label}: ${formattedValue} (${percent}%)`;
                                     }
                                 }
                             }
-                        },
-                        animation: { duration: 0 }
+                        }
                     }}
                 />
             </div>

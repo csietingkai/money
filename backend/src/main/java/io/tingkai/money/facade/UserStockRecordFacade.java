@@ -33,6 +33,14 @@ public class UserStockRecordFacade {
 		return entities;
 	}
 
+	public List<UserStockRecord> queryAll(UUID userStockId) {
+		List<UserStockRecord> entities = this.userStockRecordDao.findByUserStockId(userStockId);
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
+		}
+		return entities;
+	}
+
 	public List<UserStockRecord> queryAll(List<UUID> userStockIds) {
 		List<UserStockRecord> entities = this.userStockRecordDao.findByUserStockIdIn(userStockIds);
 		if (entities.size() == 0) {

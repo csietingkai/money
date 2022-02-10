@@ -33,6 +33,14 @@ public class UserFundRecordFacade {
 		return entities;
 	}
 
+	public List<UserFundRecord> queryAll(UUID userFundId) {
+		List<UserFundRecord> entities = this.userFundRecordDao.findByUserFundId(userFundId);
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND_RECORD));
+		}
+		return entities;
+	}
+
 	public List<UserFundRecord> queryAll(List<UUID> userFundIds) {
 		List<UserFundRecord> entities = this.userFundRecordDao.findByUserFundIdIn(userFundIds);
 		if (entities.size() == 0) {

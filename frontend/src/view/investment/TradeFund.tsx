@@ -10,7 +10,7 @@ import { DollarSignIcon } from 'component/common/Icons';
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 
 import { SetAccountListDispatcher, SetFundOwnListDispatcher } from 'reducer/PropsMapper';
-import { getAccountList, getAuthTokenName, getFundList, getFundQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getFundList, getFundOwnList, getFundQueryCondition, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import AccountApi, { Account, AccountListResponse } from 'api/account';
 import ExchangeRateApi from 'api/exchangeRate';
@@ -27,6 +27,7 @@ export interface TradeFundProps {
     username: string;
     accounts: Account[];
     funds: FundVo[];
+    fundOwnList: UserFundVo[];
     fundQueryCondition: FundQueryCondition;
     setAccountList: (accounts: Account[]) => void;
     setFundOwnList: (ownList: UserFundVo[]) => void;
@@ -91,6 +92,7 @@ class TradeFund extends React.Component<TradeFundProps, TradeFundState> {
         } else if (name) {
             fund = funds.find(x => x.name === name);
         }
+        fund && this.fetchFundRecords(fund?.code);
         return fund;
     };
 
@@ -193,7 +195,7 @@ class TradeFund extends React.Component<TradeFundProps, TradeFundState> {
     };
 
     private onTradeBtnClick = async () => {
-        const { username } = this.props;
+        const { username, fundOwnList } = this.props;
         const { values: { usedAccount, code, dealType, date, payment, price, rate, priceFix, fee, share, shareTxt } } = this.state;
         if (!code) {
             Notify.warning('Please fill correct code.');
@@ -212,7 +214,9 @@ class TradeFund extends React.Component<TradeFundProps, TradeFundState> {
         if (success) {
             Notify.success(message);
             await this.fetchAccounts(username);
-            await this.fetchFundOwnList(username);
+            if (fundOwnList.find(x => x.fundCode === code)) {
+                await this.fetchFundOwnList(username);
+            }
         } else {
             Notify.warning(message);
         }
@@ -348,6 +352,7 @@ const mapStateToProps = (state: ReduxState) => {
         username: getAuthTokenName(state),
         accounts: getAccountList(state),
         funds: getFundList(state),
+        fundOwnList: getFundOwnList(state),
         fundQueryCondition: getFundQueryCondition(state)
     };
 };

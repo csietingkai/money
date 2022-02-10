@@ -14,4 +14,5 @@ public class UserStockVo extends UserStock implements Transformable<UserStock> {
 	protected String stockName;
 	protected BigDecimal price;
 	protected LocalDateTime priceDate;
+	protected BigDecimal cost;
 }

@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher, SetStockQueryConditionDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
+import { SetLoadingDispatcher, SetStockOwnListDispatcher, SetStockQueryConditionDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
 import { getAuthTokenName, getStockQueryCondition, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
 import StockChart from 'component/common/chart/StockChart';
@@ -13,7 +13,7 @@ import Form from 'component/common/Form';
 import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import StockApi, { Stock, StockRecordVo, UserTrackingStockVo } from 'api/stock';
+import StockApi, { Stock, StockRecordVo, UserStockListResponse, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
@@ -25,6 +25,7 @@ export interface StockQuerierProps {
     username: string;
     stockTrackingList: UserTrackingStockVo[];
     stockQueryCondition: StockQueryCondition;
+    setStockOwnList: (stocks: UserStockVo[]) => void;
     setStockTrackingList: (stocks: UserTrackingStockVo[]) => void;
     setStockQueryCondition: (condition: StockQueryCondition) => void;
     setLoading: (loading: boolean) => void;
@@ -100,6 +101,17 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         this.setState({ stockRecords: records });
     };
 
+    private getStockOwnList = async (username: string = this.props.username) => {
+        const response: UserStockListResponse = await StockApi.getOwn(username);
+        const { success, data: ownList, message } = response;
+        if (success) {
+            const { setStockOwnList } = this.props;
+            setStockOwnList(ownList);
+        } else {
+            Notify.warning(message);
+        }
+    };
+
     private syncRecord = (code: string) => async () => {
         this.props.setLoading(true);
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
@@ -107,6 +119,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
             const { stockQueryCondition: { code: queryCode, name: queryName } } = this.props;
             const { data: stocks } = await StockApi.getAll(queryCode, queryName);
             await this.getRecords(code);
+            await this.getStockOwnList();
             this.setState({ stocks });
         } else {
             Notify.error(message);
@@ -241,8 +254,9 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserTrackingStockVo[] | StockQueryCondition | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserStockVo[] | UserTrackingStockVo[] | StockQueryCondition | boolean>>) => {
     return {
+        setStockOwnList: SetStockOwnListDispatcher(dispatch),
         setStockTrackingList: SetStockTrackingListDispatcher(dispatch),
         setStockQueryCondition: SetStockQueryConditionDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
