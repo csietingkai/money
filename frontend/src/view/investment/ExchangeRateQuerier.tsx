@@ -13,7 +13,7 @@ import Form from 'component/common/Form';
 import { SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import ExchangeRateApi, { ExchangeRateListResponse, ExchangeRateRecordVo, ExchangeRateVo } from 'api/exchangeRate';
+import ExchangeRateApi, { ExchangeRateRecordVo, ExchangeRateVo } from 'api/exchangeRate';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';

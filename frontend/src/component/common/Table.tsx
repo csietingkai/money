@@ -47,12 +47,12 @@ export default class Table extends React.Component<TableProps, TableState> {
         if (current < 0) {
             current = 0;
         }
-        this.setState({ current });
+        this.setState({ current, selectedRow: -1 });
     };
 
     private onPageNumClick = (page: number) => () => {
         const { countPerPage } = this.props;
-        this.setState({ current: this.getIndexByPage(page, countPerPage) });
+        this.setState({ current: this.getIndexByPage(page, countPerPage), selectedRow: -1 });
     };
 
     private onNextPageClick = (diffPage: number = 1) => () => {
@@ -62,7 +62,7 @@ export default class Table extends React.Component<TableProps, TableState> {
         if (current > data.length) {
             current = this.getIndexByPage(data.length - 1, countPerPage);
         }
-        this.setState({ current });
+        this.setState({ current, selectedRow: -1 });
     };
 
     private getPageByIndex = (index: number, dataCountPerPage: number): number => {
@@ -85,9 +85,19 @@ export default class Table extends React.Component<TableProps, TableState> {
     render(): JSX.Element {
         const { id, striped, condensed, bordered, header, data, countPerPage, columnConverter } = this.props;
 
+        const { selectedRow } = this.state;
         let { current } = this.state;
         if (current >= data.length) {
             current = 0;
+        }
+
+        // if has selected row, find which page it is
+        if (selectedRow >= 0) {
+            const selectedPage = this.getPageByIndex(selectedRow, countPerPage);
+            const currentPage = this.getPageByIndex(current, countPerPage);
+            if (selectedPage !== currentPage) {
+                current = this.getIndexByPage(selectedPage, countPerPage);
+            }
         }
 
         const showData: any[] = data.slice(current, current + countPerPage);
@@ -149,7 +159,7 @@ export default class Table extends React.Component<TableProps, TableState> {
                             showData.length ?
                                 showData.map((d, trIdx) => {
                                     return (
-                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(currentPage * countPerPage + trIdx)} className={currentPage * countPerPage + trIdx === this.state.selectedRow ? 'select-row' : ''}>
+                                        <tr key={`table-${id}-tr-${trIdx}`} onClick={this.onRowClick(currentPage * countPerPage + trIdx)} className={currentPage * countPerPage + trIdx === selectedRow ? 'select-row' : ''}>
                                             {
                                                 header.map((h, tdIdx) => {
                                                     return (

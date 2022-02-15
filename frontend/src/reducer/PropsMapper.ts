@@ -8,12 +8,12 @@ import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQuer
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
+import { ExchangeRateVo } from 'api/exchangeRate';
 import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 import { Action } from 'util/Interface';
-import exchangeRate, { ExchangeRate, ExchangeRateVo } from 'api/exchangeRate';
 
 // auth
 export const LoginDispatcher = (dispatch: Dispatch<Action<AuthToken>>) => (authToken: AuthToken): void => dispatch(Login(authToken));
