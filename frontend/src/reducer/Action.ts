@@ -2,7 +2,7 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST, SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT } from 'reducer/ActionType';
+import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST, SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT, SET_PREDICT_DAYS } from 'reducer/ActionType';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -40,4 +40,5 @@ export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type
 
 // system setting
 export const SetStockStyle = (payload: StockStyle): Action<StockStyle> => ({ type: SET_STOCK_STYLE, payload });
+export const SetPredictDays = (payload: number): Action<number> => ({ type: SET_PREDICT_DAYS, payload });
 export const SetLoading = (payload: boolean): Action<boolean> => ({ type: SET_LOADING, payload });

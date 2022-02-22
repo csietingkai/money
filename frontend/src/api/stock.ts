@@ -164,8 +164,8 @@ const untrack = async (username: string, code: string): Promise<SimpleResponse> 
     return data;
 };
 
-const predict = async (code: string): Promise<PredictResponse> => {
-    const response = await axios.get(STOCK_PREDICT_PATH, { params: { code } });
+const predict = async (code: string, days?: number): Promise<PredictResponse> => {
+    const response = await axios.get(STOCK_PREDICT_PATH, { params: { code, days } });
     const data: PredictResponse = response.data;
     return data;
 };

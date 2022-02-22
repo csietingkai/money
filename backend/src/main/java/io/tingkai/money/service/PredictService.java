@@ -29,22 +29,24 @@ public class PredictService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public List<PredictResultVo> predictStock(String code) {
+	public List<PredictResultVo> predictStock(String code, int days) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
 				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_PREDICT_STOCK_PATH)
-				.queryParam("code", code);
+				.queryParam("code", code)
+				.queryParam("days", days);
 		// @formatter:on
 		JSONObject response = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
 		List<PredictResultVo> vos = handlePredictResponse(response);
 		return vos;
 	}
 
-	public List<PredictResultVo> predictFund(String code) {
+	public List<PredictResultVo> predictFund(String code, int days) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
 				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_PREDICT_FUND_PATH)
-				.queryParam("code", code);
+				.queryParam("code", code)
+				.queryParam("days", days);
 		// @formatter:on
 		JSONObject response = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
 		List<PredictResultVo> vos = handlePredictResponse(response);

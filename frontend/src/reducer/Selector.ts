@@ -114,12 +114,15 @@ export const getAccountList = (state: ReduxState): Account[] => getAccountState(
 // system variable
 export interface ReduxSystemSettingState {
     stockStyle: StockStyle;
+    predictDays: number;
     loading: boolean;
 }
 export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
     stockStyle: StateHolder.getStockStyle(),
+    predictDays: StateHolder.getPredictDays(),
     loading: false
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
 export const getStockStyle = (state: ReduxState): StockStyle => getSystemSetting(state)?.stockStyle;
+export const getPredictDays = (state: ReduxState): number => getSystemSetting(state)?.predictDays;
 export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;

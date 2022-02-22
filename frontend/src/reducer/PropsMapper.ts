@@ -4,7 +4,7 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundPredictResult, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockPredictResult, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundPredictResult, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetPredictDays, SetStockList, SetStockOwnList, SetStockPredictResult, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -42,4 +42,5 @@ export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) 
 
 // system setting
 export const SetStockStyleDispatcher = (dispatch: Dispatch<Action<StockStyle>>) => (style: StockStyle): void => dispatch(SetStockStyle(style));
+export const SetPredictDaysDispatcher = (dispatch: Dispatch<Action<number>>) => (days: number): void => dispatch(SetPredictDays(days));
 export const SetLoadingDispatcher = (dispatch: Dispatch<Action<boolean>>) => (loading: boolean): void => dispatch(SetLoading(loading));

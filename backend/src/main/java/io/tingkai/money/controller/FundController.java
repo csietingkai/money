@@ -114,8 +114,8 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.PREDICT_PATH, method = RequestMethod.GET)
-	public StockResponse<List<PredictResultVo>> predict(@RequestParam String code) throws NotExistException {
-		List<PredictResultVo> result = predictService.predictFund(code);
+	public StockResponse<List<PredictResultVo>> predict(@RequestParam String code, @RequestParam(required = false) int days) throws NotExistException {
+		List<PredictResultVo> result = predictService.predictFund(code, days);
 		return new StockResponse<List<PredictResultVo>>(true, result, MessageConstant.SUCCESS);
 	}
 }

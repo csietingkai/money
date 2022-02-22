@@ -1,6 +1,7 @@
 import { AuthToken, Role } from 'api/auth';
+import { toNumber } from 'util/AppUtil';
 
-import { AUTH_TOKEN_KEY, STOCK_STYLE_KEY } from 'util/Constant';
+import { AUTH_TOKEN_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
 import { StockStyle } from 'util/Enum';
 
 const setState = (key: string, value: string) => {
@@ -50,6 +51,15 @@ export const getStockStyle = (): StockStyle => {
     }
 };
 
+export const getPredictDays = (): number => {
+    const days = getState(PREDICT_DAYS_KEY);
+    return toNumber(days);
+};
+
 export const setStockStyle = (style: StockStyle): void => {
     setState(STOCK_STYLE_KEY, style);
+};
+
+export const setPredictDays = (days: number): void => {
+    setState(PREDICT_DAYS_KEY, days.toString());
 };

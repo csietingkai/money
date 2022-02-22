@@ -2,8 +2,8 @@ import { Dispatch } from 'react';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundOwnList, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
-import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getStockList, getStockOwnList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetFundList, SetFundOwnList, SetFundTrackingList, SetLoading, SetPredictDays, SetStockList, SetStockOwnList, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { getAccountList, getAuthTokenName, getAuthTokenString, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getPredictDays, getStockList, getStockOwnList, getStockStyle, getStockTrackingList, isLoading, ReduxState } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
 
 import AccountApi, { Account, AccountListResponse } from 'api/account';
@@ -178,6 +178,10 @@ export const fetchAccountList = (dispatch: Dispatch<Action<Account[]>>, getState
 
 export const setStockStyle = (dispatch: Dispatch<Action<StockStyle>>, getState: () => ReduxState): void => {
     dispatch(SetStockStyle(getStockStyle(getState())));
+};
+
+export const setPredictDays = (dispatch: Dispatch<Action<number>>, getState: () => ReduxState): void => {
+    dispatch(SetPredictDays(getPredictDays(getState())));
 };
 
 export const setLoading = (dispatch: Dispatch<Action<boolean>>, getState: () => ReduxState): void => {

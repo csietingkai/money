@@ -4,7 +4,7 @@ import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import { SetLoadingDispatcher, SetFundTrackingListDispatcher, SetFundQueryConditionDispatcher, SetFundPredictResultDispatcher } from 'reducer/PropsMapper';
-import { getAuthTokenName, getFundPredictResult, getFundQueryCondition, getFundTrackingList, getStockStyle, ReduxState } from 'reducer/Selector';
+import { getAuthTokenName, getFundPredictResult, getFundQueryCondition, getFundTrackingList, getPredictDays, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import FundChart from 'component/common/chart/FundChart';
 import Button from 'component/common/Button';
@@ -22,6 +22,7 @@ import { Action, PredictResultVo } from 'util/Interface';
 
 export interface FundQuerierProps {
     stockStyle: StockStyle;
+    predictDays: number;
     username: string;
     fundTrackingList: UserTrackingFundVo[];
     fundQueryCondition: FundQueryCondition;
@@ -154,9 +155,9 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     };
 
     private predict = (code: string) => async () => {
-        const { setLoading, setFundPredictResult } = this.props;
+        const { predictDays, setLoading, setFundPredictResult } = this.props;
         setLoading(true);
-        const { data } = await FundApi.predict(code);
+        const { data } = await FundApi.predict(code, predictDays);
         setFundPredictResult(data);
         setLoading(false);
     };
@@ -254,6 +255,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
 const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state),
+        predictDays: getPredictDays(state),
         username: getAuthTokenName(state),
         fundTrackingList: getFundTrackingList(state),
         fundQueryCondition: getFundQueryCondition(state),

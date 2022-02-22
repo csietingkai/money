@@ -6,15 +6,19 @@ import { Col, Form, Row } from 'react-bootstrap';
 import Card from 'component/common/Card';
 import { TwFlag, UsFlag } from 'component/common/Icons';
 
-import { SetStockStyleDispatcher } from 'reducer/PropsMapper';
-import { getStockStyle, ReduxState } from 'reducer/Selector';
+import { SetPredictDaysDispatcher, SetStockStyleDispatcher } from 'reducer/PropsMapper';
+import { getPredictDays, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import { StockStyle } from 'util/Enum';
 import { Action, Record } from 'util/Interface';
+import { getValueByKeys } from 'util/AppUtil';
 
 export interface PersonalSettingPageProps {
     stockStyle: StockStyle;
+    predictDays: number;
     setStockStyle: (style: StockStyle) => void;
+    setPredictDays: (days: number) => void;
+
 }
 
 export interface PersonalSettingPageState { }
@@ -37,8 +41,13 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
         this.props.setStockStyle(selection as StockStyle);
     };
 
+    private onPredictDaysChange = (event: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const days = getValueByKeys(event, 'target', 'value');
+        this.props.setPredictDays(days);
+    };
+
     render(): JSX.Element {
-        const { stockStyle } = this.props;
+        const { stockStyle, predictDays } = this.props;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -85,6 +94,29 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
                             </Form>
                         </Card>
                     </Col>
+                    <Col md={4} sm={6} xs={12}>
+                        <Card
+                            title={'Preidct Config'}
+                        >
+                            <Form>
+                                <Form.Group as={Row}>
+                                    <Col md={4}>
+                                        <Form.Label>Predict Days</Form.Label>
+                                    </Col>
+                                    <Col>
+                                        <Form.Control
+                                            type='number'
+                                            step={1}
+                                            max={100}
+                                            min={1}
+                                            value={predictDays}
+                                            onChange={this.onPredictDaysChange}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                            </Form>
+                        </Card>
+                    </Col>
                 </Row>
             </div>
         );
@@ -93,13 +125,15 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        stockStyle: getStockStyle(state)
+        stockStyle: getStockStyle(state),
+        predictDays: getPredictDays(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle | number>>) => {
     return {
-        setStockStyle: SetStockStyleDispatcher(dispatch)
+        setStockStyle: SetStockStyleDispatcher(dispatch),
+        setPredictDays: SetPredictDaysDispatcher(dispatch)
     };
 };
 

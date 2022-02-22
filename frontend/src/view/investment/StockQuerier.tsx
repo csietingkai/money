@@ -4,7 +4,7 @@ import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import { SetLoadingDispatcher, SetStockPredictResultDispatcher, SetStockQueryConditionDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
-import { getAuthTokenName, getStockPredictResult, getStockQueryCondition, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
+import { getAuthTokenName, getPredictDays, getStockPredictResult, getStockQueryCondition, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
 import StockChart from 'component/common/chart/StockChart';
 import Button from 'component/common/Button';
@@ -22,6 +22,7 @@ import { Action, PredictResultVo } from 'util/Interface';
 
 export interface StockQuerierProps {
     stockStyle: StockStyle;
+    predictDays: number;
     username: string;
     stockTrackingList: UserTrackingStockVo[];
     stockQueryCondition: StockQueryCondition;
@@ -154,9 +155,9 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     };
 
     private predict = (code: string) => async () => {
-        const { setLoading, setStockPredictResult } = this.props;
+        const { predictDays, setLoading, setStockPredictResult } = this.props;
         setLoading(true);
-        const { data } = await StockApi.predict(code);
+        const { data } = await StockApi.predict(code, predictDays);
         setStockPredictResult(data);
         setLoading(false);
     };
@@ -252,6 +253,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
 const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state),
+        predictDays: getPredictDays(state),
         username: getAuthTokenName(state),
         stockTrackingList: getStockTrackingList(state),
         stockQueryCondition: getStockQueryCondition(state),

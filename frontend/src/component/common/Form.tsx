@@ -113,7 +113,7 @@ export default class Form extends React.Component<FormProps, FormState> {
         }
     };
 
-    private onFormNumericChange = (key: string) => (event: any) => {
+    private onFormNumericChange = (key: string) => (event: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { formRef } = this;
         const { values: form } = this.state;
         const input = formRef.current.querySelector(`#form-${key}`);

@@ -3,6 +3,7 @@ import { ToastOptions, ToastPosition } from 'react-toastify';
 // localStorage
 export const AUTH_TOKEN_KEY: string = 'AUTH_TOKEN';
 export const STOCK_STYLE_KEY: string = 'STOCK_STYLE';
+export const PREDICT_DAYS_KEY: string = 'PREDICT_DAYS';
 
 // notify position
 export const NOTIFICATION_POSTITION: ToastPosition = 'bottom-right';
