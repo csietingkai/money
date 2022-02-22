@@ -1,3 +1,5 @@
+import { ApiResponse } from 'util/Interface';
+
 export const API_URL: string = process.env.API_URL;
 
 // api auth
@@ -22,6 +24,7 @@ export const USER_STOCK_GET_OWN_PATH: string = STOCK_API_PREFIX + '/getOwn';
 export const STOCK_GET_TRACKING_LIST_PATH: string = STOCK_API_PREFIX + '/getTrackingList';
 export const STOCK_TRACK_PATH: string = STOCK_API_PREFIX + '/track';
 export const STOCK_UNTRACK_PATH: string = STOCK_API_PREFIX + '/untrack';
+export const STOCK_PREDICT_PATH: string = STOCK_API_PREFIX + '/predict';
 
 // api fund
 const FUND_API_PREFIX: string = '/fund';
@@ -34,6 +37,7 @@ export const USER_FUND_GET_OWN_PATH: string = FUND_API_PREFIX + '/getOwn';
 export const FUND_GET_TRACKING_LIST_PATH: string = FUND_API_PREFIX + '/getTrackingList';
 export const FUND_TRACK_PATH: string = FUND_API_PREFIX + '/track';
 export const FUND_UNTRACK_PATH: string = FUND_API_PREFIX + '/untrack';
+export const FUND_PREDICT_PATH: string = FUND_API_PREFIX + '/predict';
 
 // api account
 const ACCOUNT_API_PREFIX: string = '/account';

@@ -21,11 +21,13 @@ import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.response.StockResponse;
+import io.tingkai.money.model.vo.PredictResultVo;
 import io.tingkai.money.model.vo.StockRecordVo;
 import io.tingkai.money.model.vo.StockVo;
 import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.service.DataFetcherService;
+import io.tingkai.money.service.PredictService;
 import io.tingkai.money.service.StockService;
 import io.tingkai.money.service.UserStockService;
 import io.tingkai.money.util.TimeUtil;
@@ -45,6 +47,7 @@ public class StockController {
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
 	public static final String TRACK_PATH = "/track";
 	public static final String UNTRACK_PATH = "/untrack";
+	public static final String PREDICT_PATH = "/predict";
 
 	@Autowired
 	private StockService stockService;
@@ -54,6 +57,9 @@ public class StockController {
 
 	@Autowired
 	private DataFetcherService pythonFetcherService;
+
+	@Autowired
+	private PredictService predictService;
 
 	@RequestMapping(value = StockController.GET_ALL_PATH, method = RequestMethod.GET)
 	public StockResponse<List<StockVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
@@ -106,12 +112,18 @@ public class StockController {
 	@RequestMapping(value = StockController.TRACK_PATH, method = RequestMethod.POST)
 	public StockResponse<Void> track(@RequestParam String username, @RequestParam String code) throws AlreadyExistException, FieldMissingException {
 		this.userStockService.track(username, code);
-		return new StockResponse<Void>(true, null, MessageConstant.STOCK_REFRESH_SUCCESS);
+		return new StockResponse<Void>(true, null, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = StockController.UNTRACK_PATH, method = RequestMethod.POST)
 	public StockResponse<Void> untrack(@RequestParam String username, @RequestParam String code) throws NotExistException {
 		this.userStockService.untrack(username, code);
-		return new StockResponse<Void>(true, null, MessageConstant.STOCK_REFRESH_SUCCESS);
+		return new StockResponse<Void>(true, null, MessageConstant.SUCCESS);
+	}
+
+	@RequestMapping(value = StockController.PREDICT_PATH, method = RequestMethod.GET)
+	public StockResponse<List<PredictResultVo>> predict(@RequestParam String code) throws NotExistException {
+		List<PredictResultVo> result = predictService.predictStock(code);
+		return new StockResponse<List<PredictResultVo>>(true, result, MessageConstant.SUCCESS);
 	}
 }

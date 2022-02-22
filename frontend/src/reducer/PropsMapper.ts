@@ -4,7 +4,7 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import { Login, Logout, SetAccountList, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundPredictResult, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetStockList, SetStockOwnList, SetStockPredictResult, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -13,7 +13,7 @@ import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
-import { Action } from 'util/Interface';
+import { Action, PredictResultVo } from 'util/Interface';
 
 // auth
 export const LoginDispatcher = (dispatch: Dispatch<Action<AuthToken>>) => (authToken: AuthToken): void => dispatch(Login(authToken));
@@ -24,12 +24,14 @@ export const SetStockListDispatcher = (dispatch: Dispatch<Action<StockVo[]>>) =>
 export const SetStockOwnListDispatcher = (dispatch: Dispatch<Action<UserStockVo[]>>) => (stocks: UserStockVo[]): void => dispatch(SetStockOwnList(stocks));
 export const SetStockTrackingListDispatcher = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => (stocks: UserTrackingStockVo[]): void => dispatch(SetStockTrackingList(stocks));
 export const SetStockQueryConditionDispatcher = (dispatch: Dispatch<Action<StockQueryCondition>>) => (condition: StockQueryCondition): void => dispatch(SetStockQueryCondition(condition));
+export const SetStockPredictResultDispatcher = (dispatch: Dispatch<Action<PredictResultVo[]>>) => (result: PredictResultVo[]): void => dispatch(SetStockPredictResult(result));
 
 // fund
 export const SetFundListDispatcher = (dispatch: Dispatch<Action<FundVo[]>>) => (funds: FundVo[]): void => dispatch(SetFundList(funds));
 export const SetFundOwnListDispatcher = (dispatch: Dispatch<Action<UserFundVo[]>>) => (funds: UserFundVo[]): void => dispatch(SetFundOwnList(funds));
 export const SetFundTrackingListDispatcher = (dispatch: Dispatch<Action<UserTrackingFundVo[]>>) => (funds: UserTrackingFundVo[]): void => dispatch(SetFundTrackingList(funds));
 export const SetFundQueryConditionDispatcher = (dispatch: Dispatch<Action<FundQueryCondition>>) => (condition: FundQueryCondition): void => dispatch(SetFundQueryCondition(condition));
+export const SetFundPredictResultDispatcher = (dispatch: Dispatch<Action<PredictResultVo[]>>) => (result: PredictResultVo[]): void => dispatch(SetFundPredictResult(result));
 
 // exchange rate
 export const SetExchangeRateListDispatcher = (dispatch: Dispatch<Action<ExchangeRateVo[]>>) => (exchangeRateList: ExchangeRateVo[]): void => dispatch(SetExchangeRateList(exchangeRateList));

@@ -8,6 +8,7 @@ import { SUPPORT_LINE_TYPE } from 'component/common/chart/Constants';
 import { CheckIcon, InfoCircleIcon } from 'component/common/Icons';
 
 import { black, toDateStr } from 'util/AppUtil';
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
 import { StockStyle } from 'util/Enum';
 
 export interface ExchangeRateChartProps {
@@ -168,14 +169,14 @@ export default class ExchangeRateChart extends React.Component<ExchangeRateChart
                                             <span className='h3'> {toDateStr(records[hoveredIndex].date)}</span>
                                         </ListGroupItem>
                                         <ListGroupItem action variant='secondary'>
-                                            <h5>Current Price: {records[hoveredIndex].cashSell}</h5>
-                                            <h5>MA5: {records[hoveredIndex].ma5}</h5>
-                                            <h5>MA10: {records[hoveredIndex].ma10}</h5>
-                                            <h5>MA20: {records[hoveredIndex].ma20}</h5>
-                                            <h5>MA40: {records[hoveredIndex].ma40}</h5>
-                                            <h5>MA60: {records[hoveredIndex].ma60}</h5>
-                                            <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
-                                            <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
+                                            <h5>Current Price: {records[hoveredIndex].cashSell.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>MA5: {records[hoveredIndex].ma5.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>MA10: {records[hoveredIndex].ma10.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>MA20: {records[hoveredIndex].ma20.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>MA40: {records[hoveredIndex].ma40.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>MA60: {records[hoveredIndex].ma60.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>B.Brand Up: {records[hoveredIndex].bbup.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            <h5>B.Brand Down: {records[hoveredIndex].bbdown.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
                                         </ListGroupItem>
                                     </ListGroup>
                                 </Col>

@@ -22,6 +22,14 @@ export interface SimpleResponse {
     message: string;
 }
 
+export interface PredictResultVo {
+    lower: number;
+    price: number;
+    upper: number;
+}
+
+export interface PredictResponse extends ApiResponse<PredictResultVo[]> { }
+
 // component/layout
 export interface SidebarItem {
     name: string;

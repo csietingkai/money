@@ -3,31 +3,32 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher, SetStockOwnListDispatcher, SetStockQueryConditionDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
-import { getAuthTokenName, getStockQueryCondition, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
+import { SetLoadingDispatcher, SetStockPredictResultDispatcher, SetStockQueryConditionDispatcher, SetStockTrackingListDispatcher } from 'reducer/PropsMapper';
+import { getAuthTokenName, getStockPredictResult, getStockQueryCondition, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
 import StockChart from 'component/common/chart/StockChart';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
-import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
+import { MinusIcon, PlusIcon, RobotIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import StockApi, { Stock, StockRecordVo, UserStockListResponse, UserStockVo, UserTrackingStockVo } from 'api/stock';
+import StockApi, { Stock, StockRecordVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
-import { Action } from 'util/Interface';
+import { Action, PredictResultVo } from 'util/Interface';
 
 export interface StockQuerierProps {
     stockStyle: StockStyle;
     username: string;
     stockTrackingList: UserTrackingStockVo[];
     stockQueryCondition: StockQueryCondition;
-    setStockOwnList: (stocks: UserStockVo[]) => void;
+    stockPredictResult: PredictResultVo[];
     setStockTrackingList: (stocks: UserTrackingStockVo[]) => void;
     setStockQueryCondition: (condition: StockQueryCondition) => void;
+    setStockPredictResult: (result: PredictResultVo[]) => void;
     setLoading: (loading: boolean) => void;
 }
 
@@ -56,7 +57,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
     }
 
     private onQueryBtnClick = async () => {
-        const { stockQueryCondition: { code, name, start, end } } = this.props;
+        const { stockQueryCondition: { code, name, start, end }, setStockPredictResult } = this.props;
         if (!code && !name) {
             Notify.warning('Please fill code or name at least.');
             return;
@@ -78,15 +79,18 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         } else {
             this.setState({ stockRecords: [] });
         }
+        setStockPredictResult([]);
     };
 
     private onStockRowClick = async (selectedRow: number) => {
+        const { setStockPredictResult } = this.props;
         const { stocks, selectedStockCode } = this.state;
         if (stocks[selectedRow].code === selectedStockCode) {
             return;
         }
         this.setState({ selectedStockCode: stocks[selectedRow].code });
         await this.getRecords(stocks[selectedRow].code);
+        setStockPredictResult([]);
     };
 
     private getRecords = async (code: string) => {
@@ -101,30 +105,20 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         this.setState({ stockRecords: records });
     };
 
-    private getStockOwnList = async (username: string = this.props.username) => {
-        const response: UserStockListResponse = await StockApi.getOwn(username);
-        const { success, data: ownList, message } = response;
-        if (success) {
-            const { setStockOwnList } = this.props;
-            setStockOwnList(ownList);
-        } else {
-            Notify.warning(message);
-        }
-    };
-
     private syncRecord = (code: string) => async () => {
-        this.props.setLoading(true);
+        const { setLoading, setStockPredictResult } = this.props;
+        setLoading(true);
         const { success: refreshSuccess, message } = await StockApi.refresh(code);
         if (refreshSuccess) {
             const { stockQueryCondition: { code: queryCode, name: queryName } } = this.props;
             const { data: stocks } = await StockApi.getAll(queryCode, queryName);
             await this.getRecords(code);
-            await this.getStockOwnList();
             this.setState({ stocks });
+            setStockPredictResult([]);
         } else {
             Notify.error(message);
         }
-        this.props.setLoading(false);
+        setLoading(false);
     };
 
     private track = (code: string) => async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -159,8 +153,16 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
         setStockTrackingList(trackingList);
     };
 
+    private predict = (code: string) => async () => {
+        const { setLoading, setStockPredictResult } = this.props;
+        setLoading(true);
+        const { data } = await StockApi.predict(code);
+        setStockPredictResult(data);
+        setLoading(false);
+    };
+
     render() {
-        const { stockStyle, stockTrackingList, stockQueryCondition, setStockQueryCondition } = this.props;
+        const { stockStyle, stockTrackingList, stockQueryCondition, stockPredictResult, setStockQueryCondition } = this.props;
         const { stocks, stockRecords } = this.state;
         return (
             <div className='animated fadeIn'>
@@ -218,6 +220,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                                                 <Button size='sm' variant='info' outline onClick={this.syncRecord(rowData.code)}><SyncAltIcon /></Button>
                                                 {!isTracking && <Button size='sm' variant='info' outline onClick={this.track(rowData.code)}><PlusIcon /></Button>}
                                                 {isTracking && <Button size='sm' variant='info' outline onClick={this.untrack(rowData.code)}><MinusIcon /></Button>}
+                                                <Button size='sm' variant='info' outline onClick={this.predict(rowData.code)}><RobotIcon /></Button>
                                             </>
                                         );
                                     }
@@ -235,6 +238,7 @@ class StockQuerier extends React.Component<StockQuerierProps, StockQuerierState>
                             <StockChart
                                 stockStyle={stockStyle}
                                 data={stockRecords}
+                                predict={stockPredictResult}
                                 showInfo={true}
                             />
                         </Card>
@@ -250,15 +254,16 @@ const mapStateToProps = (state: ReduxState) => {
         stockStyle: getStockStyle(state),
         username: getAuthTokenName(state),
         stockTrackingList: getStockTrackingList(state),
-        stockQueryCondition: getStockQueryCondition(state)
+        stockQueryCondition: getStockQueryCondition(state),
+        stockPredictResult: getStockPredictResult(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserStockVo[] | UserTrackingStockVo[] | StockQueryCondition | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserStockVo[] | UserTrackingStockVo[] | StockQueryCondition | PredictResultVo[] | boolean>>) => {
     return {
-        setStockOwnList: SetStockOwnListDispatcher(dispatch),
         setStockTrackingList: SetStockTrackingListDispatcher(dispatch),
         setStockQueryCondition: SetStockQueryConditionDispatcher(dispatch),
+        setStockPredictResult: SetStockPredictResultDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };
 };

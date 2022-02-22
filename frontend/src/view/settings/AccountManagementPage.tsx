@@ -16,7 +16,7 @@ import { getAccountList, getAuthTokenName, getExchangeRateList, ReduxState } fro
 import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
 
-import { numberComma, sum, toDateStr, toNumber } from 'util/AppUtil';
+import { numberComma, toDateStr } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import { Action, Record, SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';

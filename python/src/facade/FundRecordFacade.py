@@ -1,18 +1,19 @@
 from datetime import datetime
+from typing import List
 
 from entity.FundRecord import FundRecord
 from dao import FundRecordDao
 
-def queryByCode(code: str):
+def queryByCode(code: str) -> List[FundRecord]:
     list = FundRecordDao.findByCode(code)
     if len(list) == 0:
         print('[DEBUG] code<{code}> has no record in database'.format(code = code))
     return list
 
-def queryByCodeAndDate(code: str, date: datetime):
+def queryByCodeAndDate(code: str, date: datetime) -> FundRecord:
     return FundRecordDao.findByCodeAndDate(code, date)
 
-def insert(entity: FundRecord):
+def insert(entity: FundRecord) -> None:
     if isinstance(entity, FundRecord) and checkInsertColumn(entity):
         FundRecordDao.insert(entity)
     else:
@@ -21,7 +22,7 @@ def insert(entity: FundRecord):
 def checkInsertColumn(entity: FundRecord) -> bool:
     return entity and entity.code and entity.date and isinstance(entity.price, float)
 
-def update(entity: FundRecord):
+def update(entity: FundRecord) -> None:
     if isinstance(entity, FundRecord) and checkUpdateColumn(entity):
         queryEntity = FundRecordDao.findById(entity.id)
         queryEntity.price = entity.price

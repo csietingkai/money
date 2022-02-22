@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH } from 'api/Constant';
+import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { DealType } from 'util/Enum';
-import { ApiResponse, SimpleResponse } from 'util/Interface';
+import { ApiResponse, PredictResponse, SimpleResponse } from 'util/Interface';
 
 export enum MarketType {
     LSE = 'LSE',
@@ -164,4 +164,10 @@ const untrack = async (username: string, code: string): Promise<SimpleResponse> 
     return data;
 };
 
-export default { getAll, getRecords, refresh, precalc, buy, sell, getOwn, getTrackingList, track, untrack };
+const predict = async (code: string): Promise<PredictResponse> => {
+    const response = await axios.get(STOCK_PREDICT_PATH, { params: { code } });
+    const data: PredictResponse = response.data;
+    return data;
+};
+
+export default { getAll, getRecords, refresh, precalc, buy, sell, getOwn, getTrackingList, track, untrack, predict };

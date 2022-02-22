@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Pagination, Table as RbTable } from 'react-bootstrap';
-import { isNull } from 'util/AppUtil';
 
 /** pages before and after current page */
 const SHOW_ELLIPSIS_PAGE_COUNT: number = 2;

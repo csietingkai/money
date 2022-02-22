@@ -49,9 +49,15 @@ def fetchFundRecord():
     code = request.args.get('code')
     return FundService.fetchFundRecords(code)
 
-@app.route('/predict/stock/<stockCode>')
-def predictStock(stockCode):
-    return PredictService.predict(stockCode)
+@app.route('/predict/stock')
+def predictStock():
+    code = request.args.get('code')
+    return PredictService.predictStock(code)
+
+@app.route('/predict/fund')
+def predictFund():
+    code = request.args.get('code')
+    return PredictService.predictFund(code)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True)

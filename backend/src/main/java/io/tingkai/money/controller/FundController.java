@@ -19,12 +19,15 @@ import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FundAmountInvalidException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.response.FundResponse;
+import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.FundRecordVo;
 import io.tingkai.money.model.vo.FundVo;
+import io.tingkai.money.model.vo.PredictResultVo;
 import io.tingkai.money.model.vo.UserFundVo;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.FundService;
+import io.tingkai.money.service.PredictService;
 import io.tingkai.money.service.UserFundService;
 import io.tingkai.money.util.TimeUtil;
 
@@ -42,6 +45,7 @@ public class FundController {
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
 	public static final String TRACK_PATH = "/track";
 	public static final String UNTRACK_PATH = "/untrack";
+	public static final String PREDICT_PATH = "/predict";
 
 	@Autowired
 	private FundService fundService;
@@ -51,6 +55,9 @@ public class FundController {
 
 	@Autowired
 	private DataFetcherService pythonFetcherService;
+
+	@Autowired
+	private PredictService predictService;
 
 	@RequestMapping(value = FundController.GET_ALL_PATH, method = RequestMethod.GET)
 	public FundResponse<List<FundVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
@@ -104,5 +111,11 @@ public class FundController {
 	public FundResponse<Void> untrack(@RequestParam String username, @RequestParam String code) throws NotExistException {
 		this.userFundService.untrack(username, code);
 		return new FundResponse<Void>(true, null, MessageConstant.FUND_REFRESH_SUCCESS);
+	}
+
+	@RequestMapping(value = FundController.PREDICT_PATH, method = RequestMethod.GET)
+	public StockResponse<List<PredictResultVo>> predict(@RequestParam String code) throws NotExistException {
+		List<PredictResultVo> result = predictService.predictFund(code);
+		return new StockResponse<List<PredictResultVo>>(true, result, MessageConstant.SUCCESS);
 	}
 }

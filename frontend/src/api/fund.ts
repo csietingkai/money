@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import { FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH, FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_SELL_PATH } from 'api/Constant';
+import { FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH, FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_SELL_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
-import { ApiResponse, SimpleResponse } from 'util/Interface';
+import { ApiResponse, PredictResponse, SimpleResponse } from 'util/Interface';
 import { DealType } from 'util/Enum';
 
 export interface Fund {
@@ -145,4 +145,10 @@ const untrack = async (username: string, code: string): Promise<SimpleResponse> 
     return data;
 };
 
-export default { getAll, getRecords, buy, sell, getOwn, refresh, getTrackingList, track, untrack };
+const predict = async (code: string): Promise<PredictResponse> => {
+    const response = await axios.get(FUND_PREDICT_PATH, { params: { code } });
+    const data: PredictResponse = response.data;
+    return data;
+};
+
+export default { getAll, getRecords, buy, sell, getOwn, refresh, getTrackingList, track, untrack, predict };

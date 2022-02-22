@@ -7,12 +7,15 @@ import { StockRecordVo } from 'api/stock';
 import { SUPPORT_LINE_TYPE } from 'component/common/chart/Constants';
 import { CheckIcon, InfoCircleIcon } from 'component/common/Icons';
 
-import { black, green, red, toDateStr } from 'util/AppUtil';
+import { black, blue, green, pink, purple, red, toDate, toDateStr } from 'util/AppUtil';
 import { StockStyle } from 'util/Enum';
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
+import { PredictResultVo } from 'util/Interface';
 
 export interface StockChartProps {
     stockStyle: StockStyle;
     data: StockRecordVo[];
+    predict?: PredictResultVo[];
     showInfo: boolean;
 }
 
@@ -83,7 +86,7 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
     };
 
     render(): JSX.Element {
-        const { data: records, showInfo } = this.props;
+        const { data: records, predict, showInfo } = this.props;
         const { selectedLineType, hoveredIndex } = this.state;
 
         // make data sets for chart
@@ -103,6 +106,7 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                 backgroundColor: records.map((x: StockRecordVo) => this.getStickColor(x))
             }
         ];
+        const labels = records.map((x: StockRecordVo) => toDateStr(x.dealDate));
 
         const LINE = SUPPORT_LINE_TYPE.find(x => x.key == selectedLineType.key);
         LINE && LINE.children.forEach(l => {
@@ -117,6 +121,44 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                 });
             }
         });
+
+        if (records.length && predict && predict.length) {
+            const lastDate = new Date(records[records.length - 1].dealDate);
+            for (let i = 0; i < predict.length; i++) {
+                lastDate.setDate(lastDate.getDate() + 1);
+                labels.push(toDateStr(lastDate));
+            }
+
+            const data: PredictResultVo[] = records.map(r => ({ lower: NaN, price: NaN, upper: NaN })).concat(predict);
+            datasets.push({
+                label: 'lower',
+                type: 'line',
+                data: data.map((x: PredictResultVo) => x.lower),
+                borderColor: pink(),
+                radius: 0,
+                borderWidth: 1,
+                borderDash: [5]
+            });
+            datasets.push({
+                label: 'price',
+                type: 'line',
+                data: data.map((x: PredictResultVo) => x.price),
+                borderColor: purple(),
+                radius: 0,
+                borderWidth: 1,
+                borderDash: [5]
+            });
+            datasets.push({
+                label: 'upper',
+                type: 'line',
+                data: data.map((x: PredictResultVo) => x.upper),
+                borderColor: blue(),
+                radius: 0,
+                borderWidth: 1,
+                borderDash: [5]
+            });
+        }
+
         return (
             <>
                 <div className='text-center'>
@@ -153,7 +195,7 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                             <Bar
                                 type='bar'
                                 data={
-                                    { labels: records.map((x: StockRecordVo) => toDateStr(x.dealDate)), datasets }
+                                    { labels, datasets }
                                 }
                                 options={{
                                     responsive: true,
@@ -171,8 +213,11 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                                             enabled: false,
                                             external: (context: any) => {
                                                 if (records.length) {
-                                                    const hoverDate = new Date(context.tooltip.title[0]);
-                                                    const mouseIndex = records.findIndex(x => x.dealDate.getTime() === hoverDate.getTime());
+                                                    const hoverDate = toDate(context.tooltip.title[0]);
+                                                    let mouseIndex = records.findIndex(x => x.dealDate.getTime() === hoverDate.getTime());
+                                                    if (mouseIndex === -1) {
+                                                        mouseIndex = (hoverDate.getTime() - records[records.length - 1].dealDate.getTime()) / (24 * 60 * 60 * 1000) + records.length - 1;
+                                                    }
                                                     if (hoveredIndex !== mouseIndex) {
                                                         this.setState({ hoveredIndex: mouseIndex });
                                                     }
@@ -198,17 +243,35 @@ export default class StockChart extends React.Component<StockChartProps, StockCh
                                                 <span className='h3'> {toDateStr(records[hoveredIndex].dealDate)}</span>
                                             </ListGroupItem>
                                             <ListGroupItem action variant='secondary'>
-                                                <h5>Open: {records[hoveredIndex].openPrice}</h5>
-                                                <h5>High: {records[hoveredIndex].highPrice}</h5>
-                                                <h5>Low: {records[hoveredIndex].lowPrice}</h5>
-                                                <h5>Close: {records[hoveredIndex].closePrice}</h5>
-                                                <h5>MA5: {records[hoveredIndex].ma5}</h5>
-                                                <h5>MA10: {records[hoveredIndex].ma10}</h5>
-                                                <h5>MA20: {records[hoveredIndex].ma20}</h5>
-                                                <h5>MA40: {records[hoveredIndex].ma40}</h5>
-                                                <h5>MA60: {records[hoveredIndex].ma60}</h5>
-                                                <h5>B.Brand Up: {records[hoveredIndex].bbup}</h5>
-                                                <h5>B.Brand Down: {records[hoveredIndex].bbdown}</h5>
+                                                <h5>Open: {records[hoveredIndex].openPrice.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>High: {records[hoveredIndex].highPrice.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>Low: {records[hoveredIndex].lowPrice.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>Close: {records[hoveredIndex].closePrice.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA5: {records[hoveredIndex].ma5.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA10: {records[hoveredIndex].ma10.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA20: {records[hoveredIndex].ma20.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA40: {records[hoveredIndex].ma40.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA60: {records[hoveredIndex].ma60.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>B.Brand Up: {records[hoveredIndex].bbup.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>B.Brand Down: {records[hoveredIndex].bbdown.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                            </ListGroupItem>
+                                        </ListGroup>
+                                    </Col>
+                                </Row>
+                            }
+                            {
+                                hoveredIndex >= records.length && hoveredIndex < records.length + predict.length &&
+                                <Row>
+                                    <Col>
+                                        <ListGroup>
+                                            <ListGroupItem action variant='info'>
+                                                <InfoCircleIcon />
+                                                <span className='h4'> {hoveredIndex - records.length + 1} Days Later Predict</span>
+                                            </ListGroupItem>
+                                            <ListGroupItem action variant='secondary'>
+                                                <h5>Lower: {predict[hoveredIndex - records.length].lower.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>Price: {predict[hoveredIndex - records.length].price.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>Upper: {predict[hoveredIndex - records.length].upper.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
                                             </ListGroupItem>
                                         </ListGroup>
                                     </Col>

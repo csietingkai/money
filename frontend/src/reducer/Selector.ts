@@ -11,6 +11,7 @@ import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 import { StockStyle } from 'util/Enum';
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
+import { PredictResultVo } from 'util/Interface';
 
 export interface ReduxState {
     auth: ReduxAuthState;
@@ -43,18 +44,21 @@ export interface ReduxStockState {
     own: UserStockVo[];
     tracking: UserTrackingStockVo[];
     condition: StockQueryCondition;
+    predict: PredictResultVo[];
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
     list: [],
     own: [],
     tracking: [],
-    condition: { code: '', name: '', start: new Date(), end: new Date() }
+    condition: { code: '', name: '', start: new Date(), end: new Date() },
+    predict: []
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
 export const getStockList = (state: ReduxState): StockVo[] => getStockState(state)?.list;
 export const getStockOwnList = (state: ReduxState): UserStockVo[] => getStockState(state)?.own;
 export const getStockTrackingList = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.tracking;
 export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.condition;
+export const getStockPredictResult = (state: ReduxState): PredictResultVo[] => getStockState(state)?.predict;
 
 // fundReducer
 export interface ReduxFundState {
@@ -62,18 +66,21 @@ export interface ReduxFundState {
     own: UserFundVo[];
     tracking: UserTrackingFundVo[];
     condition: FundQueryCondition;
+    predict: PredictResultVo[];
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     list: [],
     own: [],
     tracking: [],
-    condition: { code: '', name: '', start: new Date(), end: new Date() }
+    condition: { code: '', name: '', start: new Date(), end: new Date() },
+    predict: []
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
 export const getFundList = (state: ReduxState): FundVo[] => getFundState(state)?.list;
 export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
 export const getFundTrackingList = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.tracking;
 export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.condition;
+export const getFundPredictResult = (state: ReduxState): PredictResultVo[] => getFundState(state)?.predict;
 
 // exchangeReducer
 export interface ReduxExchangeRateState {

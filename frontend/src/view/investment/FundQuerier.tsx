@@ -3,36 +3,36 @@ import { Dispatch } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import { SetLoadingDispatcher, SetFundTrackingListDispatcher, SetFundQueryConditionDispatcher, SetFundOwnListDispatcher } from 'reducer/PropsMapper';
-import { getAuthTokenName, getFundQueryCondition, getFundTrackingList, getStockStyle, ReduxState } from 'reducer/Selector';
+import { SetLoadingDispatcher, SetFundTrackingListDispatcher, SetFundQueryConditionDispatcher, SetFundPredictResultDispatcher } from 'reducer/PropsMapper';
+import { getAuthTokenName, getFundPredictResult, getFundQueryCondition, getFundTrackingList, getStockStyle, ReduxState } from 'reducer/Selector';
 
 import FundChart from 'component/common/chart/FundChart';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
-import { MinusIcon, PlusIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
+import { MinusIcon, PlusIcon, RobotIcon, SearchIcon, SyncAltIcon } from 'component/common/Icons';
 import Table from 'component/common/Table';
 
-import FundApi, { FundRecordVo, FundVo, UserFundListResponse, UserFundVo, UserTrackingFundVo } from 'api/fund';
+import FundApi, { FundRecordVo, FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 
 import { toDateStr } from 'util/AppUtil';
 import { InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
-import { Action } from 'util/Interface';
+import { Action, PredictResultVo } from 'util/Interface';
 
 export interface FundQuerierProps {
     stockStyle: StockStyle;
     username: string;
     fundTrackingList: UserTrackingFundVo[];
     fundQueryCondition: FundQueryCondition;
-    setFundOwnList: (ownList: UserFundVo[]) => void;
+    fundPredictResult: PredictResultVo[];
     setFundTrackingList: (trackingList: UserTrackingFundVo[]) => void;
     setFundQueryCondition: (condition: FundQueryCondition) => void;
+    setFundPredictResult: (result: PredictResultVo[]) => void;
     setLoading: (loading: boolean) => void;
 }
 
 export interface FundQuerierState {
-    xAxis: string[];
     funds: FundVo[];
     selectedFundCode: string;
     fundRecords: FundRecordVo[];
@@ -50,7 +50,6 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     constructor(props: FundQuerierProps) {
         super(props);
         this.state = {
-            xAxis: [],
             funds: [],
             selectedFundCode: '',
             fundRecords: []
@@ -58,7 +57,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
     }
 
     private onQueryBtnClick = async () => {
-        const { fundQueryCondition: { code, name, start, end } } = this.props;
+        const { fundQueryCondition: { code, name, start, end }, setFundPredictResult } = this.props;
         if (!code && !name) {
             Notify.warning('Please fill code or name at least.');
             return;
@@ -78,17 +77,20 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
         if (funds.length >= 1) {
             this.getRecords(funds[0].code);
         } else {
-            this.setState({ xAxis: [], fundRecords: [] });
+            this.setState({ fundRecords: [] });
         }
+        setFundPredictResult([]);
     };
 
     private onFundRowClick = async (selectedRow: number) => {
+        const { setFundPredictResult } = this.props;
         const { funds, selectedFundCode } = this.state;
         if (funds[selectedRow].code === selectedFundCode) {
             return;
         }
         this.setState({ selectedFundCode: funds[selectedRow].code });
         await this.getRecords(funds[selectedRow].code);
+        setFundPredictResult([]);
     };
 
     private getRecords = async (code: string) => {
@@ -100,34 +102,23 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
             Notify.warning(message);
         }
         records = records || [];
-        const dates: string[] = records.map(x => toDateStr(x.date));
-        this.setState({ xAxis: dates, fundRecords: records });
-    };
-
-    private getFundOwnList = async (username: string = this.props.username) => {
-        const response: UserFundListResponse = await FundApi.getOwn(username);
-        const { success, data: ownList, message } = response;
-        if (success) {
-            const { setFundOwnList } = this.props;
-            setFundOwnList(ownList);
-        } else {
-            Notify.warning(message);
-        }
+        this.setState({ fundRecords: records });
     };
 
     private syncRecord = (code: string) => async () => {
-        this.props.setLoading(true);
+        const { setLoading, setFundPredictResult } = this.props;
+        setLoading(true);
         const { success: refreshSuccess, message } = await FundApi.refresh(code);
         if (refreshSuccess) {
             const { fundQueryCondition: { code: queryCode, name: queryName } } = this.props;
             const { data: funds } = await FundApi.getAll(queryCode, queryName);
             await this.getRecords(code);
-            await this.getFundOwnList();
             this.setState({ funds });
+            setFundPredictResult([]);
         } else {
             Notify.error(message);
         }
-        this.props.setLoading(false);
+        setLoading(false);
     };
 
     private track = (code: string) => async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -162,8 +153,17 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
         setFundTrackingList(trackingList);
     };
 
+    private predict = (code: string) => async () => {
+        const { setLoading, setFundPredictResult } = this.props;
+        setLoading(true);
+        const { data } = await FundApi.predict(code);
+        setFundPredictResult(data);
+        setLoading(false);
+    };
+
+
     render() {
-        const { stockStyle, fundTrackingList, fundQueryCondition, setFundQueryCondition } = this.props;
+        const { stockStyle, fundTrackingList, fundQueryCondition, fundPredictResult, setFundQueryCondition } = this.props;
         const { funds, fundRecords } = this.state;
         return (
             <div className='animated fadeIn'>
@@ -222,6 +222,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
                                                 <Button size='sm' variant='info' outline onClick={this.syncRecord(rowData.code)}><SyncAltIcon /></Button>
                                                 {!isTracking && <Button size='sm' variant='info' outline onClick={this.track(rowData.code)}><PlusIcon /></Button>}
                                                 {isTracking && <Button size='sm' variant='info' outline onClick={this.untrack(rowData.code)}><MinusIcon /></Button>}
+                                                <Button size='sm' variant='info' outline onClick={this.predict(rowData.code)}><RobotIcon /></Button>
                                             </>
                                         );
                                     }
@@ -239,6 +240,7 @@ class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
                             <FundChart
                                 stockStyle={stockStyle}
                                 data={fundRecords}
+                                predict={fundPredictResult}
                                 showInfo={true}
                             />
                         </Card>
@@ -254,15 +256,16 @@ const mapStateToProps = (state: ReduxState) => {
         stockStyle: getStockStyle(state),
         username: getAuthTokenName(state),
         fundTrackingList: getFundTrackingList(state),
-        fundQueryCondition: getFundQueryCondition(state)
+        fundQueryCondition: getFundQueryCondition(state),
+        fundPredictResult: getFundPredictResult(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserFundVo[] | UserTrackingFundVo[] | FundQueryCondition | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserFundVo[] | UserTrackingFundVo[] | FundQueryCondition | PredictResultVo[] | boolean>>) => {
     return {
-        setFundOwnList: SetFundOwnListDispatcher(dispatch),
         setFundTrackingList: SetFundTrackingListDispatcher(dispatch),
         setFundQueryCondition: SetFundQueryConditionDispatcher(dispatch),
+        setFundPredictResult: SetFundPredictResultDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };
 };

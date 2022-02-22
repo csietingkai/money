@@ -9,9 +9,6 @@ import fbprophet
 import pytrends
 from pytrends.request import TrendReq
 
-# matplotlib pyplot for plotting
-import matplotlib.pyplot as plt
-
 import matplotlib
 
 # Class for analyzing and (attempting) to predict future prices
@@ -252,54 +249,6 @@ class Stocker:
                 )
             )
 
-            # Percentage y-axis
-            if plot_type == "pct":
-                # Simple Plot
-                plt.style.use("fivethirtyeight")
-                if stat == "Daily Change":
-                    plt.plot(
-                        stock_plot["Date"],
-                        100 * stock_plot[stat],
-                        color=colors[i],
-                        linewidth=2.4,
-                        alpha=0.9,
-                        label=stat,
-                    )
-                else:
-                    plt.plot(
-                        stock_plot["Date"],
-                        100 * (stock_plot[stat] - stat_avg) / stat_avg,
-                        color=colors[i],
-                        linewidth=2.4,
-                        alpha=0.9,
-                        label=stat,
-                    )
-
-                plt.xlabel("Date")
-                plt.ylabel("Change Relative to Average (%)")
-                plt.title("%s Stock History" % self.symbol)
-                plt.legend(prop={"size": 10})
-                plt.grid(color="k", alpha=0.4)
-
-            # Stat y-axis
-            elif plot_type == "basic":
-                plt.style.use("fivethirtyeight")
-                plt.plot(
-                    stock_plot["Date"],
-                    stock_plot[stat],
-                    color=colors[i],
-                    linewidth=3,
-                    label=stat,
-                    alpha=0.8,
-                )
-                plt.xlabel("Date")
-                plt.ylabel("US $")
-                plt.title("%s Stock History" % self.symbol)
-                plt.legend(prop={"size": 10})
-                plt.grid(color="k", alpha=0.4)
-
-        plt.show()
-
     # Reset the plotting parameters to clear style formatting
     # Not sure if this should be a static method
     @staticmethod
@@ -368,34 +317,6 @@ class Stocker:
             )
         )
 
-        # Plot the total profits
-        plt.style.use("dark_background")
-
-        # Location for number of profit
-        text_location = end_date - pd.DateOffset(months=1)
-
-        # Plot the profits over time
-        plt.plot(profits["Date"], profits["hold_profit"], "b", linewidth=3)
-        plt.ylabel("Profit ($)")
-        plt.xlabel("Date")
-        plt.title(
-            "Buy and Hold Profits for {} {} to {}".format(
-                self.symbol, start_date, end_date
-            )
-        )
-
-        # Display final value on graph
-        plt.text(
-            x=text_location,
-            y=total_hold_profit + (total_hold_profit / 40),
-            s="$%d" % total_hold_profit,
-            color="g" if total_hold_profit > 0 else "r",
-            size=14,
-        )
-
-        plt.grid(alpha=0.2)
-        plt.show()
-
     # Create a prophet model without training
     def create_model(self):
 
@@ -453,44 +374,6 @@ class Stocker:
         # Remove the weekends
         predictions = self.remove_weekends(predictions)
 
-        # Plot set-up
-        self.reset_plot()
-        plt.style.use("fivethirtyeight")
-        fig, ax = plt.subplots(1, 1)
-
-        # Actual observations
-        ax.plot(train["ds"], train["y"], "ko", ms=4, label="Observations")
-        color_dict = {prior: color for prior, color in zip(changepoint_priors, colors)}
-
-        # Plot each of the changepoint predictions
-        for prior in changepoint_priors:
-            # Plot the predictions themselves
-            ax.plot(
-                predictions["ds"],
-                predictions["%.3f_yhat" % prior],
-                linewidth=1.2,
-                color=color_dict[prior],
-                label="%.3f prior scale" % prior,
-            )
-
-            # Plot the uncertainty interval
-            ax.fill_between(
-                predictions["ds"].dt.to_pydatetime(),
-                predictions["%.3f_yhat_upper" % prior],
-                predictions["%.3f_yhat_lower" % prior],
-                facecolor=color_dict[prior],
-                alpha=0.3,
-                edgecolor="k",
-                linewidth=0.6,
-            )
-
-        # Plot labels
-        plt.legend(loc=2, prop={"size": 10})
-        plt.xlabel("Date")
-        plt.ylabel("Stock Price ($)")
-        plt.title("Effect of Changepoint Prior Scale")
-        plt.show()
-
     # Basic prophet model for specified number of days
     def create_prophet_model(self, days=0, resample=False):
 
@@ -521,49 +404,6 @@ class Stocker:
                     future.loc[future.index[-1], "yhat"],
                 )
             )
-
-            title = "%s Historical and Predicted Stock Price" % self.symbol
-        else:
-            title = "%s Historical and Modeled Stock Price" % self.symbol
-
-        # Set up the plot
-        fig, ax = plt.subplots(1, 1)
-
-        # Plot the actual values
-        ax.plot(
-            stock_history["ds"],
-            stock_history["y"],
-            "ko-",
-            linewidth=1.4,
-            alpha=0.8,
-            ms=1.8,
-            label="Observations",
-        )
-
-        # Plot the predicted values
-        ax.plot(
-            future["ds"], future["yhat"], "forestgreen", linewidth=2.4, label="Modeled"
-        )
-
-        # Plot the uncertainty interval as ribbon
-        ax.fill_between(
-            future["ds"].dt.to_pydatetime(),
-            future["yhat_upper"],
-            future["yhat_lower"],
-            alpha=0.3,
-            facecolor="g",
-            edgecolor="k",
-            linewidth=1.4,
-            label="Confidence Interval",
-        )
-
-        # Plot formatting
-        plt.legend(loc=2, prop={"size": 10})
-        plt.xlabel("Date")
-        plt.ylabel("Price $")
-        plt.grid(linewidth=0.6, alpha=0.6)
-        plt.title(title)
-        plt.show()
 
         return model, future
 
@@ -686,69 +526,6 @@ class Stocker:
             # Reset the plot
             self.reset_plot()
 
-            # Set up the plot
-            fig, ax = plt.subplots(1, 1)
-
-            # Plot the actual values
-            ax.plot(
-                train["ds"],
-                train["y"],
-                "ko-",
-                linewidth=1.4,
-                alpha=0.8,
-                ms=1.8,
-                label="Observations",
-            )
-            ax.plot(
-                test["ds"],
-                test["y"],
-                "ko-",
-                linewidth=1.4,
-                alpha=0.8,
-                ms=1.8,
-                label="Observations",
-            )
-
-            # Plot the predicted values
-            ax.plot(
-                future["ds"], future["yhat"], "navy", linewidth=2.4, label="Predicted"
-            )
-
-            # Plot the uncertainty interval as ribbon
-            ax.fill_between(
-                future["ds"].dt.to_pydatetime(),
-                future["yhat_upper"],
-                future["yhat_lower"],
-                alpha=0.6,
-                facecolor="gold",
-                edgecolor="k",
-                linewidth=1.4,
-                label="Confidence Interval",
-            )
-
-            # Put a vertical line at the start of predictions
-            plt.vlines(
-                x=min(test["ds"]),
-                ymin=min(future["yhat_lower"]),
-                ymax=max(future["yhat_upper"]),
-                colors="r",
-                linestyles="dashed",
-                label="Prediction Start",
-            )
-
-            # Plot formatting
-            plt.legend(loc=2, prop={"size": 8})
-            plt.xlabel("Date")
-            plt.ylabel("Price $")
-            plt.grid(linewidth=0.6, alpha=0.6)
-
-            plt.title(
-                "{} Model Evaluation from {} to {}.".format(
-                    self.symbol, start_date, end_date
-                )
-            )
-            plt.show()
-
         # If a number of shares is specified, play the game
         elif nshares:
 
@@ -818,59 +595,6 @@ class Stocker:
             # Plot the predicted and actual profits over time
             self.reset_plot()
 
-            # Final profit and final smart used for locating text
-            final_profit = test.loc[test.index[-1], "pred_profit"]
-            final_smart = test.loc[test.index[-1], "hold_profit"]
-
-            # text location
-            last_date = test.loc[test.index[-1], "ds"]
-            text_location = last_date - pd.DateOffset(months=1)
-
-            plt.style.use("dark_background")
-
-            # Plot smart profits
-            plt.plot(
-                test["ds"],
-                test["hold_profit"],
-                "b",
-                linewidth=1.8,
-                label="Buy and Hold Strategy",
-            )
-
-            # Plot prediction profits
-            plt.plot(
-                test["ds"],
-                test["pred_profit"],
-                color="g" if final_profit > 0 else "r",
-                linewidth=1.8,
-                label="Prediction Strategy",
-            )
-
-            # Display final values on graph
-            plt.text(
-                x=text_location,
-                y=final_profit + (final_profit / 40),
-                s="$%d" % final_profit,
-                color="g" if final_profit > 0 else "r",
-                size=18,
-            )
-
-            plt.text(
-                x=text_location,
-                y=final_smart + (final_smart / 40),
-                s="$%d" % final_smart,
-                color="g" if final_smart > 0 else "r",
-                size=18,
-            )
-
-            # Plot formatting
-            plt.ylabel("Profit  (US $)")
-            plt.xlabel("Date")
-            plt.title("Predicted versus Buy and Hold Profits")
-            plt.legend(loc=2, prop={"size": 10})
-            plt.grid(alpha=0.2)
-            plt.show()
-
     def retrieve_google_trends(self, search, date_range):
 
         # Set up the trend fetching object
@@ -878,7 +602,6 @@ class Stocker:
         kw_list = [search]
 
         try:
-
             # Create the search object
             pytrends.build_payload(
                 kw_list, cat=0, timeframe=date_range[0], geo="", gprop="news"
@@ -947,43 +670,6 @@ class Stocker:
             # Line plot showing actual values, estimated values, and changepoints
             self.reset_plot()
 
-            # Set up line plot
-            plt.plot(train["ds"], train["y"], "ko", ms=4, label="Stock Price")
-            plt.plot(
-                future["ds"],
-                future["yhat"],
-                color="navy",
-                linewidth=2.0,
-                label="Modeled",
-            )
-
-            # Changepoints as vertical lines
-            plt.vlines(
-                cpos_data["ds"].dt.to_pydatetime(),
-                ymin=min(train["y"]),
-                ymax=max(train["y"]),
-                linestyles="dashed",
-                color="r",
-                linewidth=1.2,
-                label="Negative Changepoints",
-            )
-
-            plt.vlines(
-                cneg_data["ds"].dt.to_pydatetime(),
-                ymin=min(train["y"]),
-                ymax=max(train["y"]),
-                linestyles="dashed",
-                color="darkgreen",
-                linewidth=1.2,
-                label="Positive Changepoints",
-            )
-
-            plt.legend(prop={"size": 10})
-            plt.xlabel("Date")
-            plt.ylabel("Price ($)")
-            plt.title("Stock Price with Changepoints")
-            plt.show()
-
         # Search for search term in google news
         # Show related queries, rising related queries
         # Graph changepoints, search frequency, stock price
@@ -1020,45 +706,6 @@ class Stocker:
             train["freq_norm"] = train["freq"] / max(train["freq"])
 
             self.reset_plot()
-
-            # Plot the normalized stock price and normalize search frequency
-            plt.plot(train["ds"], train["y_norm"], "k-", label="Stock Price")
-            plt.plot(
-                train["ds"],
-                train["freq_norm"],
-                color="goldenrod",
-                label="Search Frequency",
-            )
-
-            # Changepoints as vertical lines
-            plt.vlines(
-                cpos_data["ds"].dt.to_pydatetime(),
-                ymin=0,
-                ymax=1,
-                linestyles="dashed",
-                color="r",
-                linewidth=1.2,
-                label="Negative Changepoints",
-            )
-
-            plt.vlines(
-                cneg_data["ds"].dt.to_pydatetime(),
-                ymin=0,
-                ymax=1,
-                linestyles="dashed",
-                color="darkgreen",
-                linewidth=1.2,
-                label="Positive Changepoints",
-            )
-
-            # Plot formatting
-            plt.legend(prop={"size": 10})
-            plt.xlabel("Date")
-            plt.ylabel("Normalized Values")
-            plt.title(
-                "%s Stock Price and Search Frequency for %s" % (self.symbol, search)
-            )
-            plt.show()
 
     # Predict the future price for a given range of days
     def predict_future(self, days=30):
@@ -1115,52 +762,10 @@ class Stocker:
         self.reset_plot()
 
         # Set up plot
-        plt.style.use("fivethirtyeight")
         matplotlib.rcParams["axes.labelsize"] = 10
         matplotlib.rcParams["xtick.labelsize"] = 8
         matplotlib.rcParams["ytick.labelsize"] = 8
         matplotlib.rcParams["axes.titlesize"] = 12
-
-        # Plot the predictions and indicate if increase or decrease
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-
-        # Plot the estimates
-        ax.plot(
-            future_increase["Date"],
-            future_increase["estimate"],
-            "g^",
-            ms=12,
-            label="Pred. Increase",
-        )
-        ax.plot(
-            future_decrease["Date"],
-            future_decrease["estimate"],
-            "rv",
-            ms=12,
-            label="Pred. Decrease",
-        )
-
-        # Plot errorbars
-        ax.errorbar(
-            future["Date"].dt.to_pydatetime(),
-            future["estimate"],
-            yerr=future["upper"] - future["lower"],
-            capthick=1.4,
-            color="k",
-            linewidth=2,
-            ecolor="darkblue",
-            capsize=4,
-            elinewidth=1,
-            label="Pred with Range",
-        )
-
-        # Plot formatting
-        plt.legend(loc=2, prop={"size": 10})
-        plt.xticks(rotation="45")
-        plt.ylabel("Predicted Stock Price (US $)")
-        plt.xlabel("Date")
-        plt.title("Predictions for %s" % self.symbol)
-        plt.show()
 
     def changepoint_prior_validation(
         self, start_date=None, end_date=None, changepoint_priors=[0.001, 0.05, 0.1, 0.2]
@@ -1255,28 +860,3 @@ class Stocker:
 
         # Plot of training and testing average errors
         self.reset_plot()
-
-        plt.plot(results["cps"], results["train_err"], "bo-", ms=8, label="Train Error")
-        plt.plot(results["cps"], results["test_err"], "r*-", ms=8, label="Test Error")
-        plt.xlabel("Changepoint Prior Scale")
-        plt.ylabel("Avg. Absolute Error ($)")
-        plt.title("Training and Testing Curves as Function of CPS")
-        plt.grid(color="k", alpha=0.3)
-        plt.xticks(results["cps"], results["cps"])
-        plt.legend(prop={"size": 10})
-        plt.show()
-
-        # Plot of training and testing average uncertainty
-        self.reset_plot()
-
-        plt.plot(
-            results["cps"], results["train_range"], "bo-", ms=8, label="Train Range"
-        )
-        plt.plot(results["cps"], results["test_range"], "r*-", ms=8, label="Test Range")
-        plt.xlabel("Changepoint Prior Scale")
-        plt.ylabel("Avg. Uncertainty ($)")
-        plt.title("Uncertainty in Estimate as Function of CPS")
-        plt.grid(color="k", alpha=0.3)
-        plt.xticks(results["cps"], results["cps"])
-        plt.legend(prop={"size": 10})
-        plt.show()
