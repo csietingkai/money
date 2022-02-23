@@ -115,14 +115,17 @@ export const getAccountList = (state: ReduxState): Account[] => getAccountState(
 export interface ReduxSystemSettingState {
     stockStyle: StockStyle;
     predictDays: number;
+    accountRecordDeletable: boolean;
     loading: boolean;
 }
 export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
     stockStyle: StateHolder.getStockStyle(),
     predictDays: StateHolder.getPredictDays(),
+    accountRecordDeletable: false,
     loading: false
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
 export const getStockStyle = (state: ReduxState): StockStyle => getSystemSetting(state)?.stockStyle;
 export const getPredictDays = (state: ReduxState): number => getSystemSetting(state)?.predictDays;
+export const isAccountRecordDeletable = (state: ReduxState): boolean => getSystemSetting(state)?.accountRecordDeletable;
 export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faDollarSign, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faRobot, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faDollarSign, faExclamationTriangle, faHandHoldingUsd, faInfoCircle, faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faRobot, faSearch, faShieldAlt, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt, faTimes, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { IconProp, library } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faDollarSign, faHandHoldingUsd, faInfoCircle,
-    faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faRobot, faSearch, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt,
+library.add(faAngleDown, faAngleUp, faChartBar, faChartLine, faCheck, faCog, faCogs, faCommentsDollar, faDollarSign, faExclamationTriangle, faHandHoldingUsd, faInfoCircle,
+    faLock, faMinus, faPencilAlt, faPiggyBank, faPlayCircle, faPlus, faRobot, faSearch, faShieldAlt, faSignInAlt, faSignOutAlt, faStar, faSyncAlt, faTable, faTachometerAlt,
     faTimes, faTrashAlt, faUser);
 
 const Icon = (icon: IconProp) => (props?: { className?: string; }) => <span className={`icon ${props?.className}`}><FontAwesomeIcon icon={icon} /></span>;
@@ -17,6 +17,7 @@ export const CogIcon = Icon('cog');
 export const CogsIcon = Icon('cogs');
 export const CommentsDollarIcon = Icon('comments-dollar');
 export const DollarSignIcon = Icon('dollar-sign');
+export const ExclamationTriangleIcon = Icon('exclamation-triangle');
 export const HandHoldingUsdIcon = Icon('hand-holding-usd');
 export const InfoCircleIcon = Icon('info-circle');
 export const LockIcon = Icon('lock');
@@ -26,6 +27,7 @@ export const PiggyBankIcon = Icon('piggy-bank');
 export const PlusIcon = Icon('plus');
 export const RobotIcon = Icon('robot');
 export const SearchIcon = Icon('search');
+export const ShieldAltIcon = Icon('shield-alt');
 export const SignInAltIcon = Icon('sign-in-alt');
 export const SignOutAltIcon = Icon('sign-out-alt');
 export const StarIcon = Icon('star');

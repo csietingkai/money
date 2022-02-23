@@ -4,10 +4,10 @@ import { connect } from 'react-redux';
 import { Col, Form, Row } from 'react-bootstrap';
 
 import Card from 'component/common/Card';
-import { TwFlag, UsFlag } from 'component/common/Icons';
+import { ExclamationTriangleIcon, ShieldAltIcon, TwFlag, UsFlag } from 'component/common/Icons';
 
-import { SetPredictDaysDispatcher, SetStockStyleDispatcher } from 'reducer/PropsMapper';
-import { getPredictDays, getStockStyle, ReduxState } from 'reducer/Selector';
+import { SetAccountRecordDeletableDispatcher, SetPredictDaysDispatcher, SetStockStyleDispatcher } from 'reducer/PropsMapper';
+import { getPredictDays, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
 
 import { StockStyle } from 'util/Enum';
 import { Action, Record } from 'util/Interface';
@@ -16,8 +16,10 @@ import { getValueByKeys } from 'util/AppUtil';
 export interface PersonalSettingPageProps {
     stockStyle: StockStyle;
     predictDays: number;
+    accountRecordDeletable: boolean;
     setStockStyle: (style: StockStyle) => void;
     setPredictDays: (days: number) => void;
+    setAccountRecordDeletable: (deletable: boolean) => void;
 
 }
 
@@ -46,8 +48,19 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
         this.props.setPredictDays(days);
     };
 
+    private getAccountRecordDeletableOptions = (): Record<boolean, JSX.Element>[] => {
+        return [
+            { key: true, value: <span className='text-danger'>{ExclamationTriangleIcon()} YES</span> },
+            { key: false, value: <span className='text-info'>{ShieldAltIcon()} NO</span> }
+        ];
+    };
+
+    private onAccountRecordDeletableChange = (selection: boolean) => () => {
+        this.props.setAccountRecordDeletable(selection);
+    };
+
     render(): JSX.Element {
-        const { stockStyle, predictDays } = this.props;
+        const { stockStyle, predictDays, accountRecordDeletable } = this.props;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -117,6 +130,49 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
                             </Form>
                         </Card>
                     </Col>
+                    <Col md={4} sm={6} xs={12}>
+                        <Card
+                            title={'Account Record Deletable'}
+                        >
+                            <Form>
+                                <Row>
+                                    {
+                                        this.getAccountRecordDeletableOptions().map(option => {
+                                            return (
+                                                <Col
+                                                    key={`radio-deletable-${option.key}`}
+                                                    md={6}
+                                                    xs={12}
+                                                >
+                                                    <Form.Check
+                                                        inline
+                                                        label={option.key}
+                                                        name='stockStyle'
+                                                        type='radio'
+                                                        className='md-3'
+                                                        id={`radio-deletable-${option.key}`}
+                                                    >
+                                                        <Form.Check.Input
+                                                            type='radio'
+                                                            name='deletable'
+                                                            checked={option.key === accountRecordDeletable}
+                                                            onChange={this.onAccountRecordDeletableChange(option.key)}
+                                                            style={{ width: '16px', height: '16px' }}
+                                                        />
+                                                        <Form.Check.Label
+                                                            style={{ fontSize: '16px' }}
+                                                        >
+                                                            {option.value}
+                                                        </Form.Check.Label>
+                                                    </Form.Check>
+                                                </Col>
+                                            );
+                                        })
+                                    }
+                                </Row>
+                            </Form>
+                        </Card>
+                    </Col>
                 </Row>
             </div>
         );
@@ -126,14 +182,16 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
 const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state),
-        predictDays: getPredictDays(state)
+        predictDays: getPredictDays(state),
+        accountRecordDeletable: isAccountRecordDeletable(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle | number>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle | number | boolean>>) => {
     return {
         setStockStyle: SetStockStyleDispatcher(dispatch),
-        setPredictDays: SetPredictDaysDispatcher(dispatch)
+        setPredictDays: SetPredictDaysDispatcher(dispatch),
+        setAccountRecordDeletable: SetAccountRecordDeletableDispatcher(dispatch)
     };
 };
 

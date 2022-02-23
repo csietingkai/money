@@ -13,7 +13,6 @@ import FundApi, { FundListResponse, FundTrackingListResponse, FundVo, UserFundLi
 import StockApi, { StockListResponse, StockTrackingListResponse, StockVo, UserStockListResponse, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { isArrayEmpty } from 'util/AppUtil';
-import { StockStyle } from 'util/Enum';
 import { Action } from 'util/Interface';
 
 export const validateToken = (dispatch: Dispatch<Action<AuthToken>>, getState: () => ReduxState): void => {
@@ -174,14 +173,6 @@ export const fetchAccountList = (dispatch: Dispatch<Action<Account[]>>, getState
             }
         });
     }
-};
-
-export const setStockStyle = (dispatch: Dispatch<Action<StockStyle>>, getState: () => ReduxState): void => {
-    dispatch(SetStockStyle(getStockStyle(getState())));
-};
-
-export const setPredictDays = (dispatch: Dispatch<Action<number>>, getState: () => ReduxState): void => {
-    dispatch(SetPredictDays(getPredictDays(getState())));
 };
 
 export const setLoading = (dispatch: Dispatch<Action<boolean>>, getState: () => ReduxState): void => {

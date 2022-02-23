@@ -4,6 +4,7 @@ import { ToastOptions, ToastPosition } from 'react-toastify';
 export const AUTH_TOKEN_KEY: string = 'AUTH_TOKEN';
 export const STOCK_STYLE_KEY: string = 'STOCK_STYLE';
 export const PREDICT_DAYS_KEY: string = 'PREDICT_DAYS';
+export const ACCOUNT_RECORD_DELETABLE_KEY: string = 'ACCOUNT_RECORD_DELETABLE';
 
 // notify position
 export const NOTIFICATION_POSTITION: ToastPosition = 'bottom-right';

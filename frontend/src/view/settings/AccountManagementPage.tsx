@@ -11,7 +11,7 @@ import Modal from 'component/common/Modal';
 import Table from 'component/common/Table';
 
 import { SetAccountListDispatcher } from 'reducer/PropsMapper';
-import { getAccountList, getAuthTokenName, getExchangeRateList, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getExchangeRateList, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
 
 import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
@@ -25,6 +25,7 @@ export interface AccountManagementProps {
     username: string;
     exchangeRateList: ExchangeRateVo[];
     accounts: Account[];
+    accountRecordDeletable: boolean;
     setAccountList: (accounts: Account[]) => void;
 }
 
@@ -283,7 +284,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderMainPage = (): JSX.Element => {
-        const { accounts, exchangeRateList } = this.props;
+        const { accounts, accountRecordDeletable } = this.props;
         const { currentAccount, accountRecords, deleteAccountModalOpen, currentAccountRecord, deleteAccountRecordModalOpen } = this.state;
         const deleteAccountModal = (
             <Modal
@@ -399,7 +400,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                         } else if (header === 'functions') {
                                             return (
                                                 <>
-                                                    <Button className='mr-2' size='sm' variant='danger' outline onClick={this.toggleDeleteAccountRecordModal(rowData)}><TrashAltIcon /></Button>
+                                                    {accountRecordDeletable && <Button className='mr-2' size='sm' variant='danger' outline onClick={this.toggleDeleteAccountRecordModal(rowData)}><TrashAltIcon /></Button>}
                                                 </>
                                             );
                                         }
@@ -665,7 +666,8 @@ const mapStateToProps = (state: ReduxState) => {
     return {
         username: getAuthTokenName(state),
         exchangeRateList: getExchangeRateList(state),
-        accounts: getAccountList(state)
+        accounts: getAccountList(state),
+        accountRecordDeletable: isAccountRecordDeletable(state)
     };
 };
 

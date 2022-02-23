@@ -29,4 +29,5 @@ export const SET_ACCOUNT_LIST: string = 'SET_ACCOUNT_LIST';
 // system setting
 export const SET_STOCK_STYLE: string = 'SET_STOCK_STYLE';
 export const SET_PREDICT_DAYS: string = 'SET_PREDICT_DAYS';
+export const SET_ACCOUNT_RECORD_DELETABLE: string = 'SET_ACCOUNT_RECORD_DELETABLE';
 export const SET_LOADING: string = 'SET_LOADING';

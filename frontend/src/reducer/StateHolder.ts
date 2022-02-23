@@ -1,7 +1,7 @@
 import { AuthToken, Role } from 'api/auth';
 import { toNumber } from 'util/AppUtil';
 
-import { AUTH_TOKEN_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
+import { ACCOUNT_RECORD_DELETABLE_KEY, AUTH_TOKEN_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
 import { StockStyle } from 'util/Enum';
 
 const setState = (key: string, value: string) => {
@@ -56,10 +56,24 @@ export const getPredictDays = (): number => {
     return toNumber(days);
 };
 
+export const isAccountRecordDeletable = (): boolean => {
+    const deletable = getState(ACCOUNT_RECORD_DELETABLE_KEY);
+    if (deletable === 'true') {
+        return true;
+    } else if (deletable === 'false') {
+        return false;
+    }
+    return false;
+};
+
 export const setStockStyle = (style: StockStyle): void => {
     setState(STOCK_STYLE_KEY, style);
 };
 
 export const setPredictDays = (days: number): void => {
     setState(PREDICT_DAYS_KEY, days.toString());
+};
+
+export const setAccountRecordDeletable = (deletable: boolean): void => {
+    setState(ACCOUNT_RECORD_DELETABLE_KEY, `${deletable}`);
 };
