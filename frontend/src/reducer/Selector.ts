@@ -121,7 +121,7 @@ export interface ReduxSystemSettingState {
 export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
     stockStyle: StateHolder.getStockStyle(),
     predictDays: StateHolder.getPredictDays(),
-    accountRecordDeletable: false,
+    accountRecordDeletable: StateHolder.isAccountRecordDeletable(),
     loading: false
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;

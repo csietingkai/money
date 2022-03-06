@@ -71,7 +71,7 @@ export const setStockStyle = (style: StockStyle): void => {
 };
 
 export const setPredictDays = (days: number): void => {
-    setState(PREDICT_DAYS_KEY, days.toString());
+    setState(PREDICT_DAYS_KEY, `${days}`);
 };
 
 export const setAccountRecordDeletable = (deletable: boolean): void => {
