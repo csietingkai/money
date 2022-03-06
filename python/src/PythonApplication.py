@@ -52,7 +52,7 @@ def fetchFundRecord():
 @app.route('/predict/stock')
 def predictStock():
     code = request.args.get('code')
-    days = request.args.get('days')
+    days = int(request.args.get('days'))
     return PredictService.predictStock(code, days)
 
 @app.route('/predict/fund')
