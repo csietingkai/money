@@ -16,10 +16,11 @@ import { getAccountList, getAuthTokenName, getExchangeRateList, isAccountRecordD
 import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
 
-import { numberComma, toDateStr } from 'util/AppUtil';
+import { numberComma, sumMoney, toDateStr, toNumber } from 'util/AppUtil';
 import { InputType } from 'util/Enum';
 import { Action, Record, SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
 
 export interface AccountManagementProps {
     username: string;
@@ -57,17 +58,9 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         await this.fetchAccounts();
     };
 
-    private calcTotal = (accounts: Account[]): string[] => {
-        const ratesMap = accounts.map(acc => acc.currency).filter((curr, idx, self) => self.indexOf(curr) === idx).reduce((map, curr) => {
-            map[curr] = 0;
-            return map;
-        }, {} as { [key: string]: number; });
-        accounts.forEach(acc => ratesMap[acc.currency] += acc.balance);
-        const ratesSum: string[] = [];
-        for (const curr in ratesMap) {
-            ratesSum.push(`${numberComma(ratesMap[curr])} in ${curr}`);
-        }
-        return ratesSum;
+    private calcTotal = (accounts: Account[]): number => {
+        const { exchangeRateList } = this.props;
+        return sumMoney(accounts.map(acc => ({ num: acc.balance, currency: acc.currency })), exchangeRateList);
     };
 
     private fetchAccounts = async (username: string = this.props.username) => {
@@ -313,7 +306,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                 <Row>
                     <Col>
                         <Card
-                            title={`Your Accounts (total: ${this.calcTotal(accounts).join()})`}
+                            title={`Your Accounts (total: ${numberComma(toNumber(this.calcTotal(accounts).toFixed(DEFAULT_DECIMAL_PRECISION)))} in TWD)`}
                         >
                             <div className='text-right mb-2'>
                                 <Button

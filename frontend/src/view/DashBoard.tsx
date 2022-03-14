@@ -15,7 +15,7 @@ import FundOwnChart from 'component/common/chart/FundOwnChart';
 import StockOwnChart from 'component/common/chart/StockOwnChart';
 import Card from 'component/common/Card';
 
-import { isArrayEmpty, numberComma, sum, sumByKey, toNumber } from 'util/AppUtil';
+import { isArrayEmpty, numberComma, sumMoney, toNumber } from 'util/AppUtil';
 import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
 import { StockStyle, Variant } from 'util/Enum';
 
@@ -41,30 +41,24 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     }
 
     private sumBalance = (accounts: Account[]): number => {
-        return sumByKey(accounts, 'balance');
+        const { exchangeRateList } = this.props;
+        return sumMoney(accounts.map(acc => ({ num: acc.balance, currency: acc.currency })), exchangeRateList);
     };
 
     private sumStockValue = (stockOwnList: UserStockVo[]): number => {
-        return sum(stockOwnList.map(x => x.price * x.amount));
+        const { exchangeRateList } = this.props;
+        return sumMoney(stockOwnList.map(x => ({ num: x.price * x.amount, currency: 'TWD' })), exchangeRateList);
     };
 
     private sumFundValue = (fundOwnList: UserFundVo[]): number => {
-        const getFundInfo = (fundCode: string): FundVo => this.props.fundList.find(x => x.code === fundCode);
-        const getExchangeRate = (currency: string): ExchangeRateVo => this.props.exchangeRateList.find(e => e.currency === currency);
-        return sum(fundOwnList.map(x => {
-            let rate: number = 1;
-            const fund = getFundInfo(x.fundCode);
-            const currency = getExchangeRate(fund?.currency);
-            if (currency) {
-                rate = currency.record.spotSell;
-            }
-            return x.price * x.amount * rate;
-        }));
+        const { fundList, exchangeRateList } = this.props;
+        const getFundInfo = (fundCode: string): FundVo => fundList.find(x => x.code === fundCode);
+        return sumMoney(fundOwnList.map(x => ({ num: x.price * x.amount, currency: getFundInfo(x.fundCode)?.currency })), exchangeRateList);
     };
 
     private accountChart = (accounts: Account[] = []): JSX.Element => {
         return (
-            <div className="chart-wrapper">
+            <div className='chart-wrapper'>
                 <Card
                     title={'Accounts'}
                 >
@@ -83,7 +77,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         const value = this.sumStockValue(stockOwnList);
         const cost = this.sumStockCost(stockOwnList);
         return (
-            <div className="chart-wrapper">
+            <div className='chart-wrapper'>
                 <Card
                     title={'Stocks'}
                 >
@@ -107,7 +101,8 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     };
 
     private sumStockCost = (data: UserStockVo[]): number => {
-        return sum(data.map(x => x.cost));
+        const { exchangeRateList } = this.props;
+        return sumMoney(data.map(x => ({ num: x.cost, currency: 'TWD' })), exchangeRateList);
     };
 
     private fundChart = (fundOwnList: UserFundVo[]): JSX.Element => {
@@ -115,7 +110,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         const value = toNumber(this.sumFundValue(fundOwnList).toFixed(DEFAULT_DECIMAL_PRECISION));
         const cost = toNumber(this.sumFundCost(fundOwnList).toFixed(DEFAULT_DECIMAL_PRECISION));
         return (
-            <div className="chart-wrapper">
+            <div className='chart-wrapper'>
                 <Card
                     title={'Funds'}
                 >
@@ -139,7 +134,8 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     };
 
     private sumFundCost = (data: UserFundVo[]): number => {
-        return sum(data.map(x => x.cost));
+        const { exchangeRateList } = this.props;
+        return sumMoney(data.map(x => ({ num: x.cost, currency: 'TWD' })), exchangeRateList);
     };
 
     private getVariant = (cost: number, value: number, stockStyle: StockStyle = this.props.stockStyle): Variant => {

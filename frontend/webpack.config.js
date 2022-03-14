@@ -32,6 +32,7 @@ module.exports = () => {
                 src: SRC_DIR
             }
         },
+        devtool: 'source-map',
         module: {
             rules: [
                 { test: /\.tsx?$/, loader: 'ts-loader' },

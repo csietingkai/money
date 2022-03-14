@@ -1,3 +1,5 @@
+import { ExchangeRateVo } from 'api/exchangeRate';
+
 import { SortType } from 'util/Enum';
 import { Record } from 'util/Interface';
 
@@ -136,6 +138,19 @@ export const sum = (list: number[]): number => {
 
 export const sumByKey = (list: any[], key: string): number => {
     return sum(list.map(item => parseFloat(item[key]) || 0));
+};
+
+export const sumMoney = (amounts: { num: number, currency: string; }[], exchangeRateList: ExchangeRateVo[]): number => {
+    let sum: number = 0;
+    amounts.forEach(m => {
+        let rate = 1;
+        const c = exchangeRateList.find(e => e.currency === m.currency);
+        if (c?.record) {
+            rate = c.record.spotSell;
+        }
+        sum += m.num * rate;
+    });
+    return sum;
 };
 
 export const Comparator = (sortType: SortType = SortType.ASC) => <T>(a: T, b: T): number => {
