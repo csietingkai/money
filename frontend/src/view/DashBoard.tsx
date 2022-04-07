@@ -57,6 +57,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
     };
 
     private accountChart = (accounts: Account[] = []): JSX.Element => {
+        const { exchangeRateList } = this.props;
         return (
             <div className='chart-wrapper'>
                 <Card
@@ -67,7 +68,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
                             Total Balance: ${numberComma(this.sumBalance(accounts))}
                         </Badge>
                     </h2>
-                    <AccountBalanceChart accounts={accounts} />
+                    <AccountBalanceChart exchangeRateList={exchangeRateList} accounts={accounts} />
                 </Card>
             </div>
         );

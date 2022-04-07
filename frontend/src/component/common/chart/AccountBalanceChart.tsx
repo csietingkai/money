@@ -5,6 +5,7 @@ import { Account } from 'api/account';
 
 import { blue, green, orange, pink, purple, red, sumByKey, yellow } from 'util/AppUtil';
 import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
+import { ExchangeRateVo } from 'api/exchangeRate';
 
 const colors = [blue, purple, pink, red, orange, yellow, green];
 const getColor = (dataCnt: number, index: number): string => {
@@ -13,6 +14,7 @@ const getColor = (dataCnt: number, index: number): string => {
     return colors[index % colors.length](1 - currentRound / totalRound);
 };
 export interface AccountBalanceChartProps {
+    exchangeRateList: ExchangeRateVo[];
     accounts: Account[];
 }
 
@@ -37,15 +39,36 @@ export default class AccountBalanceChart extends React.Component<AccountBalanceC
         const numberData: number[] = [];
         const colorData: string[] = [];
         data.forEach((x, i) => {
-            numberData.push(x.balance);
+            let rate: number = 1;
+            const currency = this.getExchangeRate(x.currency);
+            if (currency) {
+                rate = currency.record.spotSell;
+            }
+            numberData.push(x.balance * rate);
             colorData.push(getColor(data.length, i));
         });
         return [{ data: numberData, backgroundColor: colorData }];
     };
 
+    private getExchangeRate = (currency: string): ExchangeRateVo => {
+        return this.props.exchangeRateList.find(e => e.currency === currency);
+    };
+
     render(): JSX.Element {
         const { accounts } = this.props;
-        const sortedAccounts = [...accounts].sort((a, b) => b.balance - a.balance);
+        const sortedAccounts = [...accounts].sort((a, b) => {
+            let rateA: number = 1;
+            const currencyA = this.getExchangeRate(a.currency);
+            if (currencyA) {
+                rateA = currencyA.record.spotSell;
+            }
+            let rateB: number = 1;
+            const currencyB = this.getExchangeRate(b.currency);
+            if (currencyB) {
+                rateB = currencyB.record.spotSell;
+            }
+            return b.balance * rateB - a.balance * rateA;
+        });
         const totalBalance = this.sumBalance(sortedAccounts);
         const data = {
             labels: this.convertLabel(sortedAccounts),
