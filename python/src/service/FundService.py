@@ -11,7 +11,7 @@ def fetchFunds():
     hasData = True
     page = 1
     while hasData:
-        print('fetching page ' + str(page) + ' data...')
+        print('[INFO] fetching page ' + str(page) + ' data...')
         response = requests.post(CodeConstant.FUND_LIST_URL, json={'page': str(page), 'order': 'isincode-asc'})
         response = response.json()
         items = response['items']
@@ -22,7 +22,7 @@ def fetchFunds():
             code = item['fundId']
             queryEntity = FundFacade.queryByCode(code)
             if queryEntity:
-                print('fund code<' + code + '> already exists, skipping...')
+                print('[INFO] fund code<' + code + '> already exists, skipping...')
                 skipCnt += 1
                 continue
             entity.code = code
@@ -64,7 +64,7 @@ def fetchFund(targetCode):
         code = item['fundId']
         queryEntity = FundFacade.queryByCode(code)
         if queryEntity:
-            print('fund code<' + code + '> already exists, skipping...')
+            print('[INFO] fund code<' + code + '> already exists, skipping...')
             return 'CODE_EXIST'
         entity.code = code
         entity.name = item['name']['text']
@@ -96,7 +96,6 @@ def fetchFundRecords(code: str):
             records = FundRecordFacade.queryByCode(code)
             if len(records) > 0:
                 targetDate = records[-1].date
-            print(targetDate)
             url = CodeConstant.FUND_RICH_RECORDS_URL.format(code = code)
             response = requests.get(url)
             richData = response.json()

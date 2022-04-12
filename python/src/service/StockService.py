@@ -185,7 +185,7 @@ def fetchStockRecordFromYahoo(symbol: str, start: int, end: int):
                         fetchStockRecordFromTpex(code, datetime.datetime.timestamp(dealDate))
                     time.sleep(3)
             except Exception as e:
-                print(str(e))
+                print('[ERROR] ' + str(e))
             s.close()
         return 'SUCCESS'
     except Exception as e:

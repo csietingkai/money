@@ -1,7 +1,9 @@
+import os
+
 DATASOURCE = {
-    'host': 'localhost',
-    'port': 1150,
-    'db': 'postgres',
-    'username': 'postgres',
-    'password': 'nx6pRwLFZD8hs8'
+    'host': os.getenv('DATASOURCE_HOST'),
+    'port': int(os.getenv('DATASOURCE_PORT')),
+    'db': os.getenv('DATASOURCE_DB'),
+    'username': os.getenv('DATASOURCE_USERNAME'),
+    'password': os.getenv('DATASOURCE_PASSWORD')
 }

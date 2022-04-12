@@ -13,7 +13,7 @@ def toNumber(s: Optional[str], defaultVal: Optional[float] = 0.0) -> float:
         s = s.replace(',', '')
         return float(format(float(s), '.2f'))
     except Exception as e:
-        print(e)
+        print('[ERROR] ' + str(e))
         return defaultVal
 
 def toDateStr(year: int, month: int, day: int, appender = ''):

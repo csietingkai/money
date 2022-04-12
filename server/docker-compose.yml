@@ -4,7 +4,7 @@ version: "3"
 
 services:
   postgres:
-    image: postgres:${POSTGRES_VERSION}
+    image: ${POSTGRES_SERVICE}:${POSTGRES_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${POSTGRES_SERVICE}
     restart: always
     ports:
@@ -44,6 +44,12 @@ services:
       - postgres
       - mongo
       - redis
+    environment:
+      - DATASOURCE_HOST=${POSTGRES_SERVICE}
+      - DATASOURCE_PORT=${POSTGRES_INTERNEL_PORT}
+      - DATASOURCE_DB=postgres
+      - DATASOURCE_USERNAME=postgres
+      - DATASOURCE_PASSWORD=${POSTGRES_ROOT_PASSWORD}
   backend:
     image: tingkai/money-backend:${BACKEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${BACKEND_SERVICE}
