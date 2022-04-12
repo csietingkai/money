@@ -75,7 +75,7 @@ public class ScheduleTaskService {
 			return;
 		}
 
-		List<ExchangeRate> exchangeRates = this.exchangeRateFacade.queryAll();
+		List<ExchangeRate> exchangeRates = this.exchangeRateFacade.queryByAccountExist();
 		for (ExchangeRate exchangeRate : exchangeRates) {
 			ExchangeRateRecord lastRecord = this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency());
 			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
@@ -99,7 +99,7 @@ public class ScheduleTaskService {
 			return;
 		}
 
-		List<Stock> stocks = this.stockFacade.queryAll(true);
+		List<Stock> stocks = this.stockFacade.queryByUserStockExist();
 		for (Stock stock : stocks) {
 			StockRecord lastRecord = this.stockRecordFacade.latestRecord(stock.getCode());
 			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDealDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
@@ -123,7 +123,7 @@ public class ScheduleTaskService {
 			return;
 		}
 
-		List<Fund> funds = this.fundFacade.queryAll(true);
+		List<Fund> funds = this.fundFacade.queryByUserFundExist(true);
 		for (Fund fund : funds) {
 			FundRecord lastRecord = this.fundRecordFacade.latestRecord(fund.getCode());
 			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {

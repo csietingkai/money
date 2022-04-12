@@ -1,9 +1,11 @@
 package io.tingkai.money.facade;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import io.netty.util.internal.StringUtil;
 import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.StockDao;
+import io.tingkai.money.dao.UserStockDao;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.model.exception.AlreadyExistException;
@@ -29,6 +32,9 @@ public class StockFacade {
 	private StockDao stockDao;
 
 	@Autowired
+	private UserStockDao userStockDao;
+
+	@Autowired
 	private DataFetcherService pythonFetcherService;
 
 	public List<Stock> queryAll() {
@@ -37,6 +43,22 @@ public class StockFacade {
 
 	public List<Stock> queryAll(boolean sort) {
 		List<Stock> entities = this.stockDao.findAll();
+		if (sort) {
+			this.sort(entities);
+		}
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK));
+		}
+		return entities;
+	}
+
+	public List<Stock> queryByUserStockExist() {
+		return this.queryByUserStockExist(true);
+	}
+
+	public List<Stock> queryByUserStockExist(boolean sort) {
+		List<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).distinct().collect(Collectors.toList());
+		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.indexOf(s.getCode()) >= 0).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);
 		}

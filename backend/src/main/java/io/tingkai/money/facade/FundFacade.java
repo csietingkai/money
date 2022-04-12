@@ -1,9 +1,11 @@
 package io.tingkai.money.facade;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import io.netty.util.internal.StringUtil;
 import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.FundDao;
+import io.tingkai.money.dao.UserFundDao;
 import io.tingkai.money.entity.Fund;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
@@ -28,6 +31,9 @@ public class FundFacade {
 	private FundDao fundDao;
 
 	@Autowired
+	private UserFundDao userFundDao;
+
+	@Autowired
 	private DataFetcherService pythonFetcherService;
 
 	public List<Fund> queryAll() {
@@ -35,11 +41,25 @@ public class FundFacade {
 	}
 
 	public List<Fund> queryAll(boolean sort) {
-		List<Fund> entities;
+		List<Fund> entities = this.fundDao.findAll();
 		if (sort) {
-			entities = this.fundDao.findAllByOrderByCode();
-		} else {
-			entities = this.fundDao.findAll();
+			this.sort(entities);
+		}
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
+		}
+		return entities;
+	}
+
+	public List<Fund> queryByUserFundExist() {
+		return this.queryByUserFundExist(true);
+	}
+
+	public List<Fund> queryByUserFundExist(boolean sort) {
+		List<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).distinct().collect(Collectors.toList());
+		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.indexOf(f.getCode()) >= 0).collect(Collectors.toList());
+		if (sort) {
+			this.sort(entities);
 		}
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
@@ -108,5 +128,14 @@ public class FundFacade {
 
 	public long count() {
 		return this.fundDao.count();
+	}
+
+	private void sort(List<Fund> list) {
+		list.sort((a, b) -> {
+			if (a.getCode().length() != b.getCode().length()) {
+				return a.getCode().length() - b.getCode().length();
+			}
+			return a.getCode().compareTo(b.getCode());
+		});
 	}
 }
