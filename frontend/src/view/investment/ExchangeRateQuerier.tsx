@@ -96,7 +96,7 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
 
     render() {
         const { stockStyle, exchangeRateList, exchangeRateQueryCondition, setExchangeRateQueryCondition: setQueryCondition } = this.props;
-        const { exchangeRateRecords: data } = this.state;
+        const { selectedExchangeRate, exchangeRateRecords: data } = this.state;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -160,6 +160,7 @@ class ExchangeRateQuerier extends React.Component<ExchangeRateQuerierProps, Exch
                             title='Candle Chart'
                         >
                             <ExchangeRateChart
+                                exchangeRate={selectedExchangeRate}
                                 stockStyle={stockStyle}
                                 data={data}
                             />

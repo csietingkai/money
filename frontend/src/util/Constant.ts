@@ -22,3 +22,4 @@ export const NOTIFICATION_DEFAULT_CONFIG: ToastOptions = {
 
 // system
 export const DEFAULT_DECIMAL_PRECISION: number = 2;
+export const EXCHANGE_RATE_PRECISION: { [rateName: string]: number; } = { JPY: 4 };
