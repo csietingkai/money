@@ -1,5 +1,3 @@
-import { ApiResponse } from 'util/Interface';
-
 export const API_URL: string = process.env.API_URL;
 
 // api auth
@@ -47,6 +45,7 @@ export const ACCOUNT_CREATE_PATH: string = ACCOUNT_API_PREFIX + '/insert';
 export const ACCOUNT_UPDATE_PATH: string = ACCOUNT_API_PREFIX + '/update';
 export const ACCOUNT_DELETE_PATH: string = ACCOUNT_API_PREFIX + '/delete';
 export const ACCOUNT_GET_RECORDS_PATH: string = ACCOUNT_API_PREFIX + '/getRecords';
+export const ACCOUNT_MONTH_BALANCE_PATH: string = ACCOUNT_API_PREFIX + '/monthBalance';
 export const ACCOUNT_INCOME_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/income';
 export const ACCOUNT_TRANSFER_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/transfer';
 export const ACCOUNT_EXPEND_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/expend';

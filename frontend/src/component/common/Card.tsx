@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import * as React from 'react';
-import { Card as RbCard, Collapse } from 'react-bootstrap';
+import { Card as RbCard, Collapse, Form } from 'react-bootstrap';
 
 import Button from 'component/common/Button';
 import { AngleDownIcon, AngleUpIcon } from 'component/common/Icons';
@@ -16,6 +16,7 @@ export interface CardProps {
     textCenter?: boolean;
     collapsable?: boolean;
     footer?: string;
+    switchable?: () => void;
 }
 
 export interface CardState {
@@ -59,7 +60,7 @@ export default class Card extends React.Component<CardProps, CardState> {
     };
 
     render(): JSX.Element {
-        const { icon, title, accent, border, background, textCenter, collapsable, footer, children } = this.props;
+        const { icon, title, accent, border, background, textCenter, collapsable, footer, switchable, children } = this.props;
         const { collapseOpen } = this.state;
         const cardClassName = classNames(
             (accent ? `card-accent-${accent}` : ''),
@@ -79,6 +80,15 @@ export default class Card extends React.Component<CardProps, CardState> {
                     {icon}
                     <strong>{title}</strong>
                     {collapsable && <div className='card-actions' onClick={this.toggle}><Button variant='link'>{collapseIcon}</Button></div>}
+                    {
+                        switchable &&
+                        <Form.Check
+                            type='switch'
+                            label='Diff Mode'
+                            id={`${title}-switch`}
+                            onClick={switchable}
+                        />
+                    }
                 </RbCard.Header>
                 {
                     collapsable ?

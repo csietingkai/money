@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_RECORD_DELETE_PATH } from 'api/Constant';
+import { ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_RECORD_DELETE_PATH, ACCOUNT_MONTH_BALANCE_PATH } from 'api/Constant';
 
 import { ApiResponse, SimpleResponse } from 'util/Interface';
 import { handleRequestDate } from 'util/AppUtil';
@@ -23,9 +23,22 @@ export interface AccountRecord {
     description: string | null;
 }
 
+export interface MonthBalanceVo {
+    year: number;
+    month: number;
+    income: BalancePairVo[];
+    expend: BalancePairVo[];
+}
+
+export interface BalancePairVo {
+    currency: string;
+    amount: number;
+}
+
 export interface AccountResponse extends ApiResponse<Account> { }
 export interface AccountListResponse extends ApiResponse<Account[]> { }
 export interface AccountRecordListResponse extends ApiResponse<AccountRecord[]> { }
+export interface AccountMonthBalanceResponse extends ApiResponse<MonthBalanceVo> { }
 
 const getAccounts = async (ownerName: string): Promise<AccountListResponse> => {
     const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { ownerName } });
@@ -63,6 +76,12 @@ const getRecords = async (accountId: string): Promise<AccountRecordListResponse>
     return data;
 };
 
+const getMonthBalance = async (ownerName: string, year: number, month: number): Promise<AccountMonthBalanceResponse> => {
+    const response = await axios.get(ACCOUNT_MONTH_BALANCE_PATH, { params: { ownerName, year, month } });
+    const data: AccountMonthBalanceResponse = response.data;
+    return data;
+};
+
 const income = async (accountId: string, entity: AccountRecord): Promise<SimpleResponse> => {
     if (!entity.transDate) {
         entity.transDate = new Date();
@@ -96,4 +115,4 @@ const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
     return data;
 };
 
-export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, income, transfer, expend, deleteRecord };
+export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, getMonthBalance, income, transfer, expend, deleteRecord };

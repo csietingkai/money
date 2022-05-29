@@ -4,7 +4,7 @@ import { Row, Col, Badge } from 'react-bootstrap';
 
 import { getAccountList, getAuthToken, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getStockOwnList, getStockStyle, getStockTrackingList, ReduxState } from 'reducer/Selector';
 
-import { Account } from 'api/account';
+import AccountApi, { Account, MonthBalanceVo } from 'api/account';
 import { AuthToken } from 'api/auth';
 import { ExchangeRateVo } from 'api/exchangeRate';
 import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
@@ -31,13 +31,18 @@ export interface DashBoardProps {
     stockStyle: StockStyle;
 }
 
-export interface DashBoardState { }
+export interface DashBoardState {
+    monthBalanceVo: MonthBalanceVo;
+}
 
 class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
 
     constructor(props: DashBoardProps) {
         super(props);
-        this.state = {};
+        this.state = {
+            monthBalanceVo: undefined
+        };
+        this.getMonthBalances();
     }
 
     private sumBalance = (accounts: Account[]): number => {
@@ -56,8 +61,47 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
         return sumMoney(fundOwnList.map(x => ({ num: x.price * x.amount, currency: getFundInfo(x.fundCode)?.currency })), exchangeRateList);
     };
 
+    private getMonthBalances = async () => {
+        const { authToken: { name } } = this.props;
+        const currentMonth: Date = new Date();
+        const res1 = await AccountApi.getMonthBalance(name, currentMonth.getFullYear(), currentMonth.getMonth() + 1);
+        this.setState({ monthBalanceVo: res1.data });
+    };
+
     private accountChart = (accounts: Account[] = []): JSX.Element => {
         const { exchangeRateList } = this.props;
+        const { monthBalanceVo } = this.state;
+        let balanceStatus: JSX.Element = null;
+        if (monthBalanceVo) {
+            balanceStatus = (
+                <>
+                    {
+                        <h4 className='text-center'>
+                            {
+                                monthBalanceVo.income.map(incomePair => {
+                                    const { currency, amount } = incomePair;
+                                    return (
+                                        <Badge className='mb-2' variant={this.getVariant(0, amount)} pill key={`income-${currency}`}>
+                                            +${numberComma(amount)}({currency})
+                                        </Badge>
+                                    );
+                                })
+                            }
+                            {
+                                monthBalanceVo.expend.map(expendPair => {
+                                    const { currency, amount } = expendPair;
+                                    return (
+                                        <Badge className='mb-2' variant={this.getVariant(0, amount)} pill key={`expend-${currency}`}>
+                                            -${numberComma(Math.abs(amount))}({currency})
+                                        </Badge>
+                                    );
+                                })
+                            }
+                        </h4>
+                    }
+                </>
+            );
+        }
         return (
             <div className='chart-wrapper'>
                 <Card
@@ -68,6 +112,7 @@ class DashBoard extends React.Component<DashBoardProps, DashBoardState> {
                             Total Balance: ${numberComma(this.sumBalance(accounts))}
                         </Badge>
                     </h2>
+                    {balanceStatus}
                     <AccountBalanceChart exchangeRateList={exchangeRateList} accounts={accounts} />
                 </Card>
             </div>

@@ -100,6 +100,17 @@ export const reverseNumberComma = (str: string): number => {
     return 0;
 };
 
+export const prefixZero = (num: number, digit: number, comma: boolean = false): string => {
+    let strNum = num.toString();
+    for (let i = strNum.length; i < digit; i++) {
+        strNum = '0' + strNum;
+    }
+    if (comma) {
+        return strNum.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+    }
+    return strNum;
+};
+
 export const convert = <K, V>(records: Record<K, V>[], key: K): K | V => {
     const record = records.find(x => x.key === key);
     return record ? record.value : key;

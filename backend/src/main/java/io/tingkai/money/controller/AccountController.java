@@ -22,6 +22,7 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.model.vo.AccountRecordVo;
+import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.service.AccountService;
 
 @RestController
@@ -34,6 +35,7 @@ public class AccountController {
 	public static final String UPDATE_PATH = "/update";
 	public static final String DELETE_PATH = "/delete";
 	public static final String GET_RECORDS_PATH = "/getRecords";
+	public static final String MONTH_BALANCE = "/monthBalance";
 	public static final String INCOME_PATH = "/income";
 	public static final String TRANSFER_PATH = "/transfer";
 	public static final String EXPEND_PATH = "/expend";
@@ -70,6 +72,12 @@ public class AccountController {
 	public AccountResponse<List<AccountRecordVo>> getRecords(@RequestParam UUID accountId, @Nullable @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
 		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, latestFirstOrder);
 		return new AccountResponse<List<AccountRecordVo>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS, accountId.toString());
+	}
+
+	@RequestMapping(value = AccountController.MONTH_BALANCE, method = RequestMethod.GET)
+	public AccountResponse<MonthBalanceVo> getMonthBalance(@RequestParam String ownerName, @RequestParam int year, @RequestParam int month) {
+		MonthBalanceVo vo = this.accountService.getAllRecordInMonth(ownerName, year, month);
+		return new AccountResponse<MonthBalanceVo>(true, vo, MessageConstant.ACCOUNT_GET_MONTH_BALANCE_SUCCESS, ownerName);
 	}
 
 	@RequestMapping(value = AccountController.INCOME_PATH, method = RequestMethod.POST)

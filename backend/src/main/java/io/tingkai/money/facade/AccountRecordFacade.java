@@ -1,6 +1,8 @@
 package io.tingkai.money.facade;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -24,8 +27,15 @@ public class AccountRecordFacade {
 	@Autowired
 	private AccountRecordDao accountRecordDao;
 
-	public List<AccountRecord> queryAll() {
-		List<AccountRecord> entities = this.accountRecordDao.findAll();
+	public List<AccountRecord> queryAllInMonth(List<UUID> accountIds, int year, int month) {
+		LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
+		LocalDateTime endOfMonth = null;
+		if (month == 12) {
+			endOfMonth = TimeUtil.minus(LocalDateTime.of(year + 1, 1, 1, 0, 0), 1, ChronoUnit.MILLIS);
+		} else {
+			endOfMonth = TimeUtil.minus(LocalDateTime.of(year, month + 1, 1, 0, 0), 1, ChronoUnit.MILLIS);
+		}
+		List<AccountRecord> entities = this.accountRecordDao.findByTransFromInAndTransToInAndTransDateBetween(accountIds, accountIds, startOfMonth, endOfMonth);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
 		}

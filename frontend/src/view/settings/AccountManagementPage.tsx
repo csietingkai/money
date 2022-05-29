@@ -3,6 +3,7 @@ import { Dispatch } from 'react';
 import { Badge, Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
+import AccountMonthlyBalanceChart from 'component/common/chart/AccountMonthlyBalanceChart';
 import Button from 'component/common/Button';
 import Card from 'component/common/Card';
 import Form from 'component/common/Form';
@@ -11,13 +12,13 @@ import Modal from 'component/common/Modal';
 import Table from 'component/common/Table';
 
 import { SetAccountListDispatcher } from 'reducer/PropsMapper';
-import { getAccountList, getAuthTokenName, getExchangeRateList, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getExchangeRateList, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
 
-import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse } from 'api/account';
+import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse, MonthBalanceVo } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
 
 import { numberComma, sumMoney, toDateStr, toNumber } from 'util/AppUtil';
-import { InputType } from 'util/Enum';
+import { InputType, StockStyle } from 'util/Enum';
 import { Action, Record, SimpleResponse } from 'util/Interface';
 import Notify from 'util/Notify';
 import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
@@ -27,6 +28,7 @@ export interface AccountManagementProps {
     exchangeRateList: ExchangeRateVo[];
     accounts: Account[];
     accountRecordDeletable: boolean;
+    stockStyle: StockStyle;
     setAccountList: (accounts: Account[]) => void;
 }
 
@@ -38,6 +40,8 @@ export interface AccountManagementState {
     deleteAccountModalOpen: boolean;
     deleteAccountRecordModalOpen: boolean;
     page?: Page;
+    monthBalanceList: MonthBalanceVo[];
+    diffMode: boolean;
 }
 
 class AccountManagement extends React.Component<AccountManagementProps, AccountManagementState> {
@@ -50,12 +54,15 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             currentAccountRecord: undefined,
             deleteAccountModalOpen: false,
             deleteAccountRecordModalOpen: false,
+            monthBalanceList: [],
+            diffMode: false
         };
         this.init();
     }
 
     private init = async () => {
         await this.fetchAccounts();
+        await this.fethcMonthBalance();
     };
 
     private calcTotal = (accounts: Account[]): number => {
@@ -72,6 +79,24 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         } else {
             Notify.warning(message);
         }
+    };
+
+    private fethcMonthBalance = async () => {
+        const { username, exchangeRateList } = this.props;
+        const yearMonths = [-4, -3, -2, -1, 0, 1];
+        const requests = yearMonths.map(diff => {
+            const now = new Date();
+            let year = now.getFullYear();
+            let month = now.getMonth() + diff;
+            if (month <= 0) {
+                month += 12;
+                year -= 1;
+            }
+            return AccountApi.getMonthBalance(username, year, month);
+        });
+        const responses = await Promise.all(requests);
+        const monthBalanceList = responses.map(x => x.data);
+        this.setState({ monthBalanceList });
     };
 
     private onAccountTableRowClick = async (selectedRow: number) => {
@@ -277,8 +302,8 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderMainPage = (): JSX.Element => {
-        const { accounts, accountRecordDeletable } = this.props;
-        const { currentAccount, accountRecords, deleteAccountModalOpen, currentAccountRecord, deleteAccountRecordModalOpen } = this.state;
+        const { accounts, exchangeRateList, accountRecordDeletable, stockStyle } = this.props;
+        const { currentAccount, accountRecords, deleteAccountModalOpen, currentAccountRecord, deleteAccountRecordModalOpen, monthBalanceList, diffMode } = this.state;
         const deleteAccountModal = (
             <Modal
                 headerText='Delete Account'
@@ -337,6 +362,16 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                     }
                                     return rowData[header];
                                 }}
+                            />
+                        </Card>
+                    </Col>
+                    <Col md={5}>
+                        <Card switchable={() => this.setState({ diffMode: !this.state.diffMode })}>
+                            <AccountMonthlyBalanceChart
+                                exchangeRateList={exchangeRateList}
+                                monthBalanceList={monthBalanceList}
+                                diffMode={diffMode}
+                                stockStyle={stockStyle}
                             />
                         </Card>
                     </Col>
@@ -660,7 +695,8 @@ const mapStateToProps = (state: ReduxState) => {
         username: getAuthTokenName(state),
         exchangeRateList: getExchangeRateList(state),
         accounts: getAccountList(state),
-        accountRecordDeletable: isAccountRecordDeletable(state)
+        accountRecordDeletable: isAccountRecordDeletable(state),
+        stockStyle: getStockStyle(state)
     };
 };
 

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +29,8 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.vo.AccountRecordVo;
+import io.tingkai.money.model.vo.BalancePairVo;
+import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.util.AppUtil;
 
 @Service
@@ -73,6 +76,65 @@ public class AccountService {
 			this.accountRecordFacade.delete(record.getId());
 		}
 		this.accountFacade.delete(id);
+	}
+
+	public MonthBalanceVo getAllRecordInMonth(String ownerName, int year, int month) {
+		MonthBalanceVo vo = new MonthBalanceVo();
+		vo.setYear(year);
+		vo.setMonth(month);
+
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, ownerName));
+		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
+		Map<UUID, String> accountCurrency = accounts.stream().collect(Collectors.toMap(Account::getId, Account::getCurrency));
+		List<AccountRecord> records = this.accountRecordFacade.queryAllInMonth(accountIds, year, month);
+		// @formatter:off
+		records = records.stream()
+				.filter(x -> x.getTransFrom().compareTo(x.getTransTo()) == 0)
+				.collect(Collectors.toList());
+		Map<String, List<AccountRecord>> incomes = records.stream()
+				.filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0)
+				.collect(
+						() -> new HashMap<String, List<AccountRecord>>(),
+						(map, record) -> {
+							String currency = accountCurrency.get(record.getTransFrom());
+							if (!map.containsKey(currency)) {
+								map.put(currency, new ArrayList<AccountRecord>());
+							}
+							map.get(currency).add(record);
+						},
+						(map1, map2) -> map1.putAll(map2)
+				);
+		Map<String, List<AccountRecord>> expends = records.stream()
+				.filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) > 0)
+				.collect(
+						() -> new HashMap<String, List<AccountRecord>>(),
+						(map, record) -> {
+							String currency = accountCurrency.get(record.getTransFrom());
+							if (!map.containsKey(currency)) {
+								map.put(currency, new ArrayList<AccountRecord>());
+							}
+							map.get(currency).add(record);
+						},
+						(map1, map2) -> map1.putAll(map2)
+				);
+		// @formatter:on
+
+		incomes.forEach((currency, incomeRecords) -> {
+			BalancePairVo pair = new BalancePairVo();
+			pair.setCurrency(currency);
+			BigDecimal sum = incomeRecords.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			pair.setAmount(sum);
+			vo.getIncome().add(pair);
+		});
+		expends.forEach((currency, expendRecords) -> {
+			BalancePairVo pair = new BalancePairVo();
+			pair.setCurrency(currency);
+			BigDecimal sum = expendRecords.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			pair.setAmount(sum);
+			vo.getExpend().add(pair);
+		});
+
+		return vo;
 	}
 
 	public List<AccountRecordVo> getAllRecords(UUID accountId, boolean latestFirstOrder) {
