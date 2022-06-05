@@ -82,7 +82,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private fethcMonthBalance = async () => {
-        const { username, exchangeRateList } = this.props;
+        const { username } = this.props;
         const yearMonths = [-4, -3, -2, -1, 0, 1];
         const requests = yearMonths.map(diff => {
             const now = new Date();
@@ -191,6 +191,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         if (success) {
             Notify.success(message);
             await this.fetchAccounts();
+            await this.fethcMonthBalance();
             await this.onAccountTableRowClick(accounts.findIndex(x => x.id === currentAccount.id));
             this.toPage();
         } else {
@@ -229,6 +230,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
         if (success) {
             Notify.success(message);
             await this.fetchAccounts();
+            await this.fethcMonthBalance();
             await this.onAccountTableRowClick(accounts.findIndex(x => x.id === currentAccount.id));
             this.toPage();
         } else {
@@ -291,6 +293,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             const { success, message } = resposne;
             if (success) {
                 Notify.success(message);
+                await this.fethcMonthBalance();
             } else {
                 Notify.error(message);
             }
@@ -366,7 +369,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                         </Card>
                     </Col>
                     <Col md={5}>
-                        <Card switchable={() => this.setState({ diffMode: !this.state.diffMode })}>
+                        <Card switchable={{ current: diffMode, onchange: () => this.setState({ diffMode: !this.state.diffMode }) }}>
                             <AccountMonthlyBalanceChart
                                 exchangeRateList={exchangeRateList}
                                 monthBalanceList={monthBalanceList}
@@ -420,7 +423,11 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                         if (header === 'transDate') {
                                             return toDateStr(rowData[header]);
                                         } else if (header === 'transAmount') {
-                                            return numberComma(rowData[header]);
+                                            let amount = rowData[header];
+                                            if (rowData.transFrom === currentAccount.id && rowData.transFrom !== rowData.transTo) {
+                                                amount = -amount;
+                                            }
+                                            return numberComma(amount);
                                         } else if (['transFromName', 'transToName'].indexOf(header) >= 0) {
                                             if (rowData.transFrom === rowData.transTo) {
                                                 return '';

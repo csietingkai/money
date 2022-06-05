@@ -16,7 +16,7 @@ export interface CardProps {
     textCenter?: boolean;
     collapsable?: boolean;
     footer?: string;
-    switchable?: () => void;
+    switchable?: { current: boolean, onchange: () => void; };
 }
 
 export interface CardState {
@@ -86,7 +86,8 @@ export default class Card extends React.Component<CardProps, CardState> {
                             type='switch'
                             label='Diff Mode'
                             id={`${title}-switch`}
-                            onClick={switchable}
+                            checked={switchable.current}
+                            onChange={switchable.onchange}
                         />
                     }
                 </RbCard.Header>
