@@ -16,7 +16,7 @@ import RegisterPage from 'view/RegisterPage';
 // reducer
 import { SetLoading } from 'reducer/Action';
 import { getAuthToken } from 'reducer/StateHolder';
-import store, { fetchAccountList, fetchExchangeRateList, fetchFundList, fetchFundOwnList, fetchFundTrackingList, fetchStockList, fetchStockOwnList, fetchStockTrackingList, validateToken } from 'reducer/Store';
+import store, { init, validateToken } from 'reducer/Store';
 
 // apis
 import { API_URL } from 'api/Constant';
@@ -71,22 +71,7 @@ axios.interceptors.response.use(
 
 // validate token on refresh
 store.dispatch(validateToken);
-// get exchange rate list on refresh
-store.dispatch(fetchExchangeRateList);
-// get user's accounts
-store.dispatch(fetchAccountList);
-// get all stock
-store.dispatch(fetchStockList);
-// get all own stock
-store.dispatch(fetchStockOwnList);
-// get user's stock tracking list
-store.dispatch(fetchStockTrackingList);
-// get all fund
-store.dispatch(fetchFundList);
-// get all own fund
-store.dispatch(fetchFundOwnList);
-// get user's fund tracking list
-store.dispatch(fetchFundTrackingList);
+store.dispatch(init);
 
 const ROOT = document.querySelector('#root');
 const app = (

@@ -8,7 +8,7 @@ import { LockIcon, UserIcon } from 'component/common/Icons';
 
 import { removeAuthToken } from 'reducer/StateHolder';
 import { LoginDispatcher } from 'reducer/PropsMapper';
-import store, { fetchAccountList, fetchExchangeRateList, fetchFundList, fetchFundOwnList, fetchFundTrackingList, fetchStockList, fetchStockOwnList, fetchStockTrackingList } from 'reducer/Store';
+import store, { init } from 'reducer/Store';
 
 import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
@@ -47,14 +47,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
         if (success) {
             this.props.login(data);
             // validate token on refresh
-            store.dispatch(fetchExchangeRateList);
-            store.dispatch(fetchAccountList);
-            store.dispatch(fetchStockList);
-            store.dispatch(fetchStockOwnList);
-            store.dispatch(fetchStockTrackingList);
-            store.dispatch(fetchFundList);
-            store.dispatch(fetchFundOwnList);
-            store.dispatch(fetchFundTrackingList);
+            store.dispatch(init);
             Notify.success(message);
         } else {
             removeAuthToken();

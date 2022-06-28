@@ -13,8 +13,10 @@ import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
 
 import Notify from 'util/Notify';
 import { Action } from 'util/Interface';
+import { getDefaultRole, ReduxState } from 'reducer/Selector';
 
 export interface RegisterPageProps extends RouteChildrenProps<any> {
+    DEFAULT_ROLE: string;
     login: (authToken: AuthToken) => void;
 }
 
@@ -44,12 +46,13 @@ class RegisterPage extends React.Component<RegisterPageProps, RegisterPageState>
     };
 
     private onRegisterClick = async () => {
+        const { DEFAULT_ROLE } = this.props;
         const { username, password, confirmPassword, email } = this.state;
         if (password !== confirmPassword) {
             Notify.warning('Passwords are NOT same.');
             return;
         }
-        let response: AuthResponse = await AuthApi.register(username, email, password, false);
+        let response: AuthResponse = await AuthApi.register(username, email, password, DEFAULT_ROLE, false);
         const { message } = response;
         if (response.success) {
             response = await AuthApi.login(username, password);
@@ -122,8 +125,10 @@ class RegisterPage extends React.Component<RegisterPageProps, RegisterPageState>
     }
 }
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = (state: ReduxState) => {
+    return {
+        DEFAULT_ROLE: getDefaultRole(state)
+    };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<Action<AuthToken>>) => {

@@ -12,7 +12,7 @@ import Modal from 'component/common/Modal';
 import Table from 'component/common/Table';
 
 import { SetAccountListDispatcher } from 'reducer/PropsMapper';
-import { getAccountList, getAuthTokenName, getExchangeRateList, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
+import { getAccountList, getAuthTokenName, getDefaultRecordType, getExchangeRateList, getRecordTypes, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
 
 import AccountApi, { Account, AccountRecord, AccountRecordListResponse, AccountListResponse, MonthBalanceVo } from 'api/account';
 import { ExchangeRateVo } from 'api/exchangeRate';
@@ -29,6 +29,8 @@ export interface AccountManagementProps {
     accounts: Account[];
     accountRecordDeletable: boolean;
     stockStyle: StockStyle;
+    recordTypes: string[];
+    DEFAULT_RECORD_TYPE: string;
     setAccountList: (accounts: Account[]) => void;
 }
 
@@ -239,6 +241,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private createAccountRecordIncome = () => {
+        const { DEFAULT_RECORD_TYPE } = this.props;
         const { currentAccount } = this.state;
         const currentAccountRecord: AccountRecord = {
             id: '',
@@ -247,13 +250,14 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             rate: 1,
             transFrom: currentAccount.id,
             transTo: currentAccount.id,
+            recordType: DEFAULT_RECORD_TYPE,
             description: ''
         };
         this.setState({ currentAccountRecord }, () => this.toPage('record-income'));
     };
 
     private createAccountRecordTransfer = () => {
-        const { accounts } = this.props;
+        const { accounts, DEFAULT_RECORD_TYPE } = this.props;
         const { currentAccount } = this.state;
         const currentAccountRecord: AccountRecord = {
             id: '',
@@ -262,12 +266,14 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             rate: 1,
             transFrom: currentAccount.id,
             transTo: accounts.filter(x => x.id !== currentAccount.id)[0]?.id,
+            recordType: DEFAULT_RECORD_TYPE,
             description: ''
         };
         this.setState({ currentAccountRecord }, () => this.toPage('record-transfer'));
     };
 
     private createAccountRecordExpend = () => {
+        const { DEFAULT_RECORD_TYPE } = this.props;
         const { currentAccount } = this.state;
         const currentAccountRecord: AccountRecord = {
             id: '',
@@ -276,6 +282,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             rate: 1,
             transFrom: currentAccount.id,
             transTo: currentAccount.id,
+            recordType: DEFAULT_RECORD_TYPE,
             description: ''
         };
         this.setState({ currentAccountRecord }, () => this.toPage('record-expend'));
@@ -417,7 +424,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 </div>
                                 <Table
                                     id='account-record'
-                                    header={['transDate', 'transAmount', 'rate', 'transFromName', 'transToName', 'description', 'functions']}
+                                    header={['transDate', 'transAmount', 'rate', 'transFromName', 'transToName', 'recordType', 'description', 'functions']}
                                     data={accountRecords}
                                     columnConverter={(header: string, rowData: any) => {
                                         if (header === 'transDate') {
@@ -503,6 +510,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderAccountRecordIncomePage = (): JSX.Element => {
+        const { recordTypes } = this.props;
         const { currentAccount, currentAccountRecord } = this.state;
         return (
             <div className='animated fadeIn'>
@@ -520,11 +528,13 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 singleRow
                                 inputs={[
                                     { key: 'transDate', title: 'Transaction Date', type: InputType.date, value: currentAccountRecord?.transDate, width: 3 },
+                                    { key: 'recordType', title: 'Record Type', type: InputType.select, value: currentAccountRecord?.recordType, width: 3, options: recordTypes.map(x => ({ key: x, value: x })) },
                                     { key: 'transAmount', title: 'Transaction Amount', type: InputType.numeric, value: currentAccountRecord?.transAmount, width: 3 },
                                     { key: 'description', title: 'Description', type: InputType.text, value: currentAccountRecord?.description, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
                                     currentAccountRecord.transDate = formState.transDate;
+                                    currentAccountRecord.recordType = formState.recordType;
                                     currentAccountRecord.transAmount = formState.transAmount;
                                     currentAccountRecord.description = formState.description;
                                     this.setState({ currentAccountRecord });
@@ -557,7 +567,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderAccountRecordTransferPage = (): JSX.Element => {
-        const { accounts } = this.props;
+        const { accounts, recordTypes } = this.props;
         const { currentAccount, currentAccountRecord } = this.state;
         // only same currency
         const accountOptions: Record<string, string>[] = accounts.filter(x => x.id !== currentAccount.id).filter(x => x.currency === currentAccount.currency).map(x => ({ key: x.id, value: x.name }));
@@ -578,6 +588,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 inputs={[
                                     { key: 'transDate', title: 'Transaction Date', type: InputType.date, value: currentAccountRecord?.transDate, width: 3 },
                                     { key: 'transTo', title: 'Transfer To', type: InputType.select, value: currentAccountRecord?.transTo, width: 3, options: accountOptions },
+                                    { key: 'recordType', title: 'Record Type', type: InputType.select, value: currentAccountRecord?.recordType, width: 3, options: recordTypes.map(x => ({ key: x, value: x })) },
                                     { key: 'transAmount', title: 'Transaction Amount', type: InputType.numeric, value: currentAccountRecord?.transAmount, width: 3 },
                                     { key: 'description', title: 'Description', type: InputType.text, value: currentAccountRecord?.description, width: 3 }
 
@@ -585,6 +596,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 onChange={(formState: any) => {
                                     currentAccountRecord.transDate = formState.transDate;
                                     currentAccountRecord.transTo = formState.transTo;
+                                    currentAccountRecord.recordType = formState.recordType;
                                     currentAccountRecord.transAmount = formState.transAmount;
                                     currentAccountRecord.description = formState.description;
                                     this.setState({ currentAccountRecord });
@@ -617,6 +629,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
     };
 
     private renderAccountRecordExpendPage = (): JSX.Element => {
+        const { recordTypes } = this.props;
         const { currentAccount, currentAccountRecord } = this.state;
         return (
             <div className='animated fadeIn'>
@@ -634,11 +647,13 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 singleRow
                                 inputs={[
                                     { key: 'transDate', title: 'Transaction Date', type: InputType.date, value: currentAccountRecord?.transDate, width: 3 },
+                                    { key: 'recordType', title: 'Record Type', type: InputType.select, value: currentAccountRecord?.recordType, width: 3, options: recordTypes.map(x => ({ key: x, value: x })) },
                                     { key: 'transAmount', title: 'Transaction Amount', type: InputType.numeric, value: currentAccountRecord?.transAmount, width: 3 },
                                     { key: 'description', title: 'Description', type: InputType.text, value: currentAccountRecord?.description, width: 3 }
                                 ]}
                                 onChange={(formState: any) => {
                                     currentAccountRecord.transDate = formState.transDate;
+                                    currentAccountRecord.recordType = formState.recordType;
                                     currentAccountRecord.transAmount = formState.transAmount;
                                     currentAccountRecord.description = formState.description;
                                     this.setState({ currentAccountRecord });
@@ -703,7 +718,9 @@ const mapStateToProps = (state: ReduxState) => {
         exchangeRateList: getExchangeRateList(state),
         accounts: getAccountList(state),
         accountRecordDeletable: isAccountRecordDeletable(state),
-        stockStyle: getStockStyle(state)
+        stockStyle: getStockStyle(state),
+        recordTypes: getRecordTypes(state),
+        DEFAULT_RECORD_TYPE: getDefaultRecordType(state)
     };
 };
 

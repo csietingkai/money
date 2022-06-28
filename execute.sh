@@ -79,14 +79,14 @@ elif [ "$1" = 'build' ]; then
 #		docker image rm $frontend_image_name:$version
 		cd ..
 	elif [ "$2" = 'python' ]; then
-		cd server
 		docker container stop $python_container_name
 		docker container rm $python_container_name
-		cd ..
 		cd python
+		pipenv lock -r > requirements.txt
 		docker build --cpu-period="1000" --cpu-quota="2000000" --cpuset-cpus="0-8" --rm --tag=$python_image_name:$version .
 #		docker push $python_image_name:$version
 #		docker image rm $python_image_name:$version
+		rm requirements.txt
 		cd ..
 	fi
 

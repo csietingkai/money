@@ -4,15 +4,9 @@ import { AUTH_LOGIN_PATH, AUTH_REGISTER_PATH, AUTH_VALIDATE_PATH } from 'api/Con
 
 import { ApiResponse } from 'util/Interface';
 
-export enum Role {
-    ROOT = 'ROOT',
-    ADMIN = 'ADMIN',
-    USER = 'USER'
-}
-
 export interface AuthToken {
     name: string;
-    role: Role;
+    role: string;
     tokenString: string;
     expiryDate: Date;
 }
@@ -25,12 +19,12 @@ const login = async (username: string, password: string): Promise<AuthResponse> 
     return data;
 };
 
-const register = async (username: string, email: string, password: string, sendMail?: boolean): Promise<AuthResponse> => {
+const register = async (username: string, email: string, password: string, role: string, sendMail?: boolean): Promise<AuthResponse> => {
     const response = await axios.post(AUTH_REGISTER_PATH, {
         name: username,
         email,
         pwd: password,
-        role: Role.USER
+        role
     }, { params: { sendMail } });
     const data: AuthResponse = response.data;
     return data;

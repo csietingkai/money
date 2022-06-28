@@ -1,10 +1,12 @@
 import axios from 'axios';
 
-import { FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH, FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_SELL_PATH } from 'api/Constant';
+import {
+    FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH,
+    FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_SELL_PATH
+} from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, PredictResponse, SimpleResponse } from 'util/Interface';
-import { DealType } from 'util/Enum';
 
 export interface Fund {
     id: string;
@@ -55,7 +57,7 @@ export interface UserFundRecord {
     id: string;
     userFundId: string;
     accountId: string;
-    type: DealType;
+    type: string;
     date: Date;
     share: number;
     price: number;

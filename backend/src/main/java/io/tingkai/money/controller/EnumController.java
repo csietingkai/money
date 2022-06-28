@@ -1,13 +1,15 @@
 package io.tingkai.money.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
+import io.tingkai.money.enumeration.DealType;
+import io.tingkai.money.enumeration.MarketType;
+import io.tingkai.money.enumeration.RecordType;
+import io.tingkai.money.enumeration.Role;
 import io.tingkai.money.model.response.EnumResponse;
-import io.tingkai.money.service.EnumService;
 
 @RestController
 @RequestMapping(value = EnumController.CONTROLLER_PREFIX)
@@ -17,22 +19,25 @@ public class EnumController {
 	public static final String DEAL_TYPES = "/dealTypes";
 	public static final String MARKET_TYPES = "/marketTypes";
 	public static final String ROLES = "/roles";
-
-	@Autowired
-	private EnumService enumService;
+	public static final String RECORD_TYPES = "/recordTypes";
 
 	@RequestMapping(value = EnumController.DEAL_TYPES, method = RequestMethod.GET)
-	public EnumResponse dealTypes() {
-		return new EnumResponse(true, this.enumService.dealTypeListMap(), MessageConstant.SUCCESS);
+	public EnumResponse<DealType[]> dealTypes() {
+		return new EnumResponse<DealType[]>(true, DealType.values(), MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = EnumController.MARKET_TYPES, method = RequestMethod.GET)
-	public EnumResponse marketTypes() {
-		return new EnumResponse(true, this.enumService.marketTypeListMap(), MessageConstant.SUCCESS);
+	public EnumResponse<MarketType[]> marketTypes() {
+		return new EnumResponse<MarketType[]>(true, MarketType.values(), MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = EnumController.ROLES, method = RequestMethod.GET)
-	public EnumResponse roles() {
-		return new EnumResponse(true, this.enumService.roleListMap(), MessageConstant.SUCCESS);
+	public EnumResponse<Role[]> roles() {
+		return new EnumResponse<Role[]>(true, Role.values(), MessageConstant.SUCCESS);
+	}
+
+	@RequestMapping(value = EnumController.RECORD_TYPES, method = RequestMethod.GET)
+	public EnumResponse<RecordType[]> recordTypes() {
+		return new EnumResponse<RecordType[]>(true, RecordType.values(), MessageConstant.SUCCESS);
 	}
 }

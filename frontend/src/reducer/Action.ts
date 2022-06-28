@@ -2,7 +2,12 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST, SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT, SET_PREDICT_DAYS, SET_ACCOUNT_RECORD_DELETABLE } from 'reducer/ActionType';
+import {
+    SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST,
+    SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST,
+    SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT, SET_PREDICT_DAYS, SET_ACCOUNT_RECORD_DELETABLE, SET_DEFAULT_MARKET_TYPE, SET_DEFAULT_RECORD_TYPE,
+    SET_DEFAULT_ROLE, SET_MARKET_TYPES, SET_RECORD_TYPES, SET_ROLES
+} from 'reducer/ActionType';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -43,3 +48,9 @@ export const SetStockStyle = (payload: StockStyle): Action<StockStyle> => ({ typ
 export const SetPredictDays = (payload: number): Action<number> => ({ type: SET_PREDICT_DAYS, payload });
 export const SetAccountRecordDeletable = (payload: boolean): Action<boolean> => ({ type: SET_ACCOUNT_RECORD_DELETABLE, payload });
 export const SetLoading = (payload: boolean): Action<boolean> => ({ type: SET_LOADING, payload });
+export const SetMarketTypes = (payload: string[]): Action<string[]> => ({ type: SET_MARKET_TYPES, payload });
+export const SetDefaultMarketType = (payload: string): Action<string> => ({ type: SET_DEFAULT_MARKET_TYPE, payload });
+export const SetRoles = (payload: string[]): Action<string[]> => ({ type: SET_ROLES, payload });
+export const SetDefaultRole = (payload: string): Action<string> => ({ type: SET_DEFAULT_ROLE, payload });
+export const SetRecordTypes = (payload: string[]): Action<string[]> => ({ type: SET_RECORD_TYPES, payload });
+export const SetDefaultRecordType = (payload: string): Action<string> => ({ type: SET_DEFAULT_RECORD_TYPE, payload });

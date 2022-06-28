@@ -3,7 +3,7 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import * as StateHolder from 'reducer/StateHolder';
 
 import { Account } from 'api/account';
-import { AuthToken, Role } from 'api/auth';
+import { AuthToken } from 'api/auth';
 import { ExchangeRateVo } from 'api/exchangeRate';
 import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
@@ -34,7 +34,7 @@ export const DEFAULT_REDUX_AUTH_STATE: ReduxAuthState = {
 const getAuthState = (state: ReduxState): ReduxAuthState => state.auth;
 export const getAuthToken = (state: ReduxState): AuthToken => getAuthState(state)?.authToken;
 export const getAuthTokenName = (state: ReduxState): string => getAuthToken(state)?.name;
-export const getAuthTokenRole = (state: ReduxState): Role => getAuthToken(state)?.role;
+export const getAuthTokenRole = (state: ReduxState): string => getAuthToken(state)?.role;
 export const getAuthTokenString = (state: ReduxState): string => getAuthToken(state)?.tokenString;
 export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(state)?.expiryDate;
 
@@ -117,15 +117,27 @@ export interface ReduxSystemSettingState {
     predictDays: number;
     accountRecordDeletable: boolean;
     loading: boolean;
+    roles: string[];
+    defaultRole: string;
+    recordTypes: string[];
+    defaultRecordType: string;
 }
 export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
     stockStyle: StateHolder.getStockStyle(),
     predictDays: StateHolder.getPredictDays(),
     accountRecordDeletable: StateHolder.isAccountRecordDeletable(),
-    loading: false
+    loading: false,
+    roles: [],
+    defaultRole: StateHolder.getDefaultRole(),
+    recordTypes: [],
+    defaultRecordType: StateHolder.getDefaultRecordType()
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
 export const getStockStyle = (state: ReduxState): StockStyle => getSystemSetting(state)?.stockStyle;
 export const getPredictDays = (state: ReduxState): number => getSystemSetting(state)?.predictDays;
 export const isAccountRecordDeletable = (state: ReduxState): boolean => getSystemSetting(state)?.accountRecordDeletable;
 export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;
+export const getRoles = (state: ReduxState): string[] => getSystemSetting(state)?.roles;
+export const getDefaultRole = (state: ReduxState): string => getSystemSetting(state)?.defaultRole;
+export const getRecordTypes = (state: ReduxState): string[] => getSystemSetting(state)?.recordTypes;
+export const getDefaultRecordType = (state: ReduxState): string => getSystemSetting(state)?.defaultRecordType;

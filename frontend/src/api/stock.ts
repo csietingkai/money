@@ -1,16 +1,12 @@
 import axios from 'axios';
 
-import { STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH, STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH } from 'api/Constant';
+import {
+    STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH,
+    STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH
+} from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
-import { DealType } from 'util/Enum';
 import { ApiResponse, PredictResponse, SimpleResponse } from 'util/Interface';
-
-export enum MarketType {
-    LSE = 'LSE',
-    OTC = 'OTC',
-    LES = 'LES'
-}
 
 export interface Stock {
     id: string;
@@ -18,7 +14,7 @@ export interface Stock {
     name: string;
     isinCode: string;
     offeringDate: Date;
-    marketType: MarketType;
+    marketType: string;
     industryType: string;
     cfiCode: string;
     description: string;
@@ -67,7 +63,7 @@ export interface UserStockRecord {
     id: string;
     userStockId: string;
     accountId: string;
-    type: DealType;
+    type: string;
     date: Date;
     share: number;
     price: number;
@@ -122,7 +118,7 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     return data;
 };
 
-const precalc = async (dealType: DealType, share: number, price: number): Promise<UserStockRecordResponse> => {
+const precalc = async (dealType: string, share: number, price: number): Promise<UserStockRecordResponse> => {
     const response = await axios.get(USER_STOCK_PRECALC_PATH, { params: { dealType, share, price } });
     const data: UserStockRecordResponse = response.data;
     return data;

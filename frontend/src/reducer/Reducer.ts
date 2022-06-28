@@ -3,9 +3,17 @@ import { combineReducers } from 'redux';
 
 import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
 
-import { SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING, SET_FUND_TRACKING_LIST, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST, SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT, SET_PREDICT_DAYS, SET_ACCOUNT_RECORD_DELETABLE } from 'reducer/ActionType';
-import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxFundState, ReduxStockState, ReduxSystemSettingState } from 'reducer/Selector';
-import { getAuthToken, setAuthToken, removeAuthToken, setStockStyle, setPredictDays, setAccountRecordDeletable } from 'reducer/StateHolder';
+import {
+    SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_STOCK_TRACKING_LIST, SET_LOADING, SET_FUND_TRACKING_LIST,
+    SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST,
+    SET_FUND_OWN_LIST, SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT, SET_PREDICT_DAYS, SET_ACCOUNT_RECORD_DELETABLE, SET_DEFAULT_MARKET_TYPE,
+    SET_DEFAULT_RECORD_TYPE, SET_DEFAULT_ROLE, SET_RECORD_TYPES, SET_ROLES
+} from 'reducer/ActionType';
+import {
+    DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_STOCK_STATE,
+    DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxFundState, ReduxStockState, ReduxSystemSettingState
+} from 'reducer/Selector';
+import { getAuthToken, setAuthToken, removeAuthToken, setStockStyle, setPredictDays, setAccountRecordDeletable, setDefaultRole, setDefaultRecordType } from 'reducer/StateHolder';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -91,7 +99,7 @@ const accountReducer = (state: ReduxAccountState = DEFAULT_REDUX_ACCOUNT_STATE, 
     return newState;
 };
 
-const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SETTING_STATE, action: Action<StockStyle | number | boolean>): ReduxSystemSettingState => {
+const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SETTING_STATE, action: Action<StockStyle | number | boolean | string[] | string>): ReduxSystemSettingState => {
     const newState: ReduxSystemSettingState = { ...state };
     const { type, payload } = action;
     if (type === SET_STOCK_STYLE) {
@@ -105,6 +113,16 @@ const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SET
         newState.accountRecordDeletable = payload as boolean;
     } else if (type === SET_LOADING) {
         newState.loading = payload as boolean;
+    } else if (type === SET_ROLES) {
+        newState.roles = payload as string[];
+    } else if (type === SET_DEFAULT_ROLE) {
+        setDefaultRole(payload as string);
+        newState.defaultRole = payload as string;
+    } else if (type === SET_RECORD_TYPES) {
+        newState.recordTypes = payload as string[];
+    } else if (type === SET_DEFAULT_RECORD_TYPE) {
+        setDefaultRecordType(payload as string);
+        newState.defaultRecordType = payload as string;
     }
     return newState;
 };

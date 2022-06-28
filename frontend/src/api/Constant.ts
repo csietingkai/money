@@ -56,3 +56,10 @@ const EXCHANGE_RATE_API_PREFIX: string = '/exchangeRate';
 export const EXCHANGE_RATE_GET_ALL_PATH: string = EXCHANGE_RATE_API_PREFIX + '/getAll';
 export const EXCHANGE_RATE_GET_RECORDS_PATH: string = EXCHANGE_RATE_API_PREFIX + '/getRecords';
 export const EXCHANGE_RATE_REFRESH_PATH: string = EXCHANGE_RATE_API_PREFIX + '/refresh';
+
+// api enum
+const ENUM_API_PREFIX: string = '/enum';
+export const ENUM_GET_DEAL_TYPES: string = ENUM_API_PREFIX + '/dealTypes';
+export const ENUM_GET_MARKET_TYPES: string = ENUM_API_PREFIX + '/marketTypes';
+export const ENUM_GET_ROLES: string = ENUM_API_PREFIX + '/roles';
+export const ENUM_GET_RECORD_TYPES: string = ENUM_API_PREFIX + '/recordTypes';

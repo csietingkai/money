@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.constant.MessageConstant;
@@ -25,6 +26,7 @@ import io.tingkai.money.entity.UserStock;
 import io.tingkai.money.entity.UserStockRecord;
 import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.enumeration.DealType;
+import io.tingkai.money.enumeration.RecordType;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.StockFacade;
@@ -118,6 +120,7 @@ public class UserStockService {
 		return temp;
 	}
 
+	@Transactional
 	public UserStock buy(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fix, BigDecimal fee) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
@@ -152,6 +155,7 @@ public class UserStockService {
 		accountRecord.setTransAmount(BigDecimal.ZERO.subtract(total));
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
+		accountRecord.setRecordType(RecordType.INVEST);
 		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, username, stockCode, share, price)));
 		this.accountRecordFacade.insert(accountRecord);
 
@@ -170,6 +174,7 @@ public class UserStockService {
 		return entity;
 	}
 
+	@Transactional
 	public UserStock sell(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fix, BigDecimal fee, BigDecimal tax) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
@@ -192,6 +197,7 @@ public class UserStockService {
 		accountRecord.setTransAmount(total);
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
+		accountRecord.setRecordType(RecordType.INVEST);
 		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, username, stockCode, share, price)));
 		this.accountRecordFacade.insert(accountRecord);
 

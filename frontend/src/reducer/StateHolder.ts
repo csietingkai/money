@@ -1,7 +1,7 @@
-import { AuthToken, Role } from 'api/auth';
+import { AuthToken } from 'api/auth';
 import { toNumber } from 'util/AppUtil';
 
-import { ACCOUNT_RECORD_DELETABLE_KEY, AUTH_TOKEN_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
+import { ACCOUNT_RECORD_DELETABLE_KEY, AUTH_TOKEN_KEY, DEFAULT_RECORD_TYPE_KEY, DEFAULT_ROLE_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
 import { StockStyle } from 'util/Enum';
 
 const setState = (key: string, value: string) => {
@@ -28,7 +28,7 @@ export const getAuthToken = (): AuthToken => {
     const parseObj = JSON.parse(authTokenStr);
     const authToken: AuthToken = {
         name: parseObj.name,
-        role: parseObj.role as Role,
+        role: parseObj.role,
         tokenString: parseObj.tokenString,
         expiryDate: new Date(parseObj.expiryDate)
     };
@@ -66,6 +66,14 @@ export const isAccountRecordDeletable = (): boolean => {
     return false;
 };
 
+export const getDefaultRole = (): string => {
+    return getState(DEFAULT_ROLE_KEY);
+};
+
+export const getDefaultRecordType = (): string => {
+    return getState(DEFAULT_RECORD_TYPE_KEY);
+};
+
 export const setStockStyle = (style: StockStyle): void => {
     setState(STOCK_STYLE_KEY, style);
 };
@@ -76,4 +84,12 @@ export const setPredictDays = (days: number): void => {
 
 export const setAccountRecordDeletable = (deletable: boolean): void => {
     setState(ACCOUNT_RECORD_DELETABLE_KEY, `${deletable}`);
+};
+
+export const setDefaultRole = (role: string): void => {
+    setState(DEFAULT_ROLE_KEY, role);
+};
+
+export const setDefaultRecordType = (recordType: string): void => {
+    setState(DEFAULT_RECORD_TYPE_KEY, recordType);
 };

@@ -6,8 +6,8 @@ import { Col, Form, Row } from 'react-bootstrap';
 import Card from 'component/common/Card';
 import { ExclamationTriangleIcon, ShieldAltIcon, TwFlag, UsFlag } from 'component/common/Icons';
 
-import { SetAccountRecordDeletableDispatcher, SetPredictDaysDispatcher, SetStockStyleDispatcher } from 'reducer/PropsMapper';
-import { getPredictDays, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
+import { SetAccountRecordDeletableDispatcher, SetDefaultRecordTypeDispatcher, SetDefaultRoleDispatcher, SetPredictDaysDispatcher, SetStockStyleDispatcher } from 'reducer/PropsMapper';
+import { getDefaultRecordType, getDefaultRole, getPredictDays, getRecordTypes, getRoles, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
 
 import { StockStyle } from 'util/Enum';
 import { Action, Record } from 'util/Interface';
@@ -17,10 +17,16 @@ export interface PersonalSettingPageProps {
     stockStyle: StockStyle;
     predictDays: number;
     accountRecordDeletable: boolean;
+    roles: string[];
+    DEFAULT_ROLE: string;
+    recordTypes: string[];
+    DEFAULT_RECORD_TYPES: string;
     setStockStyle: (style: StockStyle) => void;
     setPredictDays: (days: number) => void;
     setAccountRecordDeletable: (deletable: boolean) => void;
-
+    setDefaultMarketType: (defaultMarketType: string) => void;
+    setDefaultRole: (defaultRole: string) => void;
+    setDefaultRecordType: (defaultRecordType: string) => void;
 }
 
 export interface PersonalSettingPageState { }
@@ -59,8 +65,28 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
         this.props.setAccountRecordDeletable(selection);
     };
 
+    private getRoleOptions = (): Record<string, string>[] => {
+        const { roles } = this.props;
+        return roles.map(x => ({ key: x, value: x }));
+    };
+
+    private onRoleChange = (event: any) => {
+        const role = getValueByKeys(event, 'target', 'value');
+        this.props.setDefaultRole(role);
+    };
+
+    private getRecordTypeOptions = (): Record<string, string>[] => {
+        const { recordTypes } = this.props;
+        return recordTypes.map(x => ({ key: x, value: x }));
+    };
+
+    private onRecordTypeChange = (event: any) => {
+        const recordType = getValueByKeys(event, 'target', 'value');
+        this.props.setDefaultRecordType(recordType);
+    };
+
     render(): JSX.Element {
-        const { stockStyle, predictDays, accountRecordDeletable } = this.props;
+        const { stockStyle, predictDays, accountRecordDeletable, DEFAULT_ROLE, DEFAULT_RECORD_TYPES } = this.props;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -174,6 +200,62 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
                         </Card>
                     </Col>
                 </Row>
+                <Row>
+                    <Col md={4} sm={6} xs={12}>
+                        <Card
+                            title={'Default Selections'}
+                        >
+                            <Form>
+                                <Form.Group as={Row}>
+                                    <Col md={5}>
+                                        <Form.Label>Default Role</Form.Label>
+                                    </Col>
+                                    <Col xs={12} md={7}>
+                                        <Form.Control
+                                            as='select'
+                                            value={DEFAULT_ROLE}
+                                            onChange={this.onRoleChange}
+                                        >
+                                            {
+                                                this.getRoleOptions().map((record: Record<string, string>) =>
+                                                    <option
+                                                        key={`select-role-option-${record.key}`}
+                                                        value={record.key}
+                                                    >
+                                                        {record.value}
+                                                    </option>
+                                                )
+                                            }
+                                        </Form.Control>
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row}>
+                                    <Col md={5}>
+                                        <Form.Label>Default Record Type</Form.Label>
+                                    </Col>
+                                    <Col xs={12} md={7}>
+                                        <Form.Control
+                                            as='select'
+                                            value={DEFAULT_RECORD_TYPES}
+                                            onChange={this.onRecordTypeChange}
+                                        >
+                                            {
+                                                this.getRecordTypeOptions().map((record: Record<string, string>) =>
+                                                    <option
+                                                        key={`select-record-type-option-${record.key}`}
+                                                        value={record.key}
+                                                    >
+                                                        {record.value}
+                                                    </option>
+                                                )
+                                            }
+                                        </Form.Control>
+                                    </Col>
+                                </Form.Group>
+                            </Form>
+                        </Card>
+                    </Col>
+                </Row>
             </div>
         );
     }
@@ -183,15 +265,21 @@ const mapStateToProps = (state: ReduxState) => {
     return {
         stockStyle: getStockStyle(state),
         predictDays: getPredictDays(state),
-        accountRecordDeletable: isAccountRecordDeletable(state)
+        accountRecordDeletable: isAccountRecordDeletable(state),
+        roles: getRoles(state),
+        DEFAULT_ROLE: getDefaultRole(state),
+        recordTypes: getRecordTypes(state),
+        DEFAULT_RECORD_TYPES: getDefaultRecordType(state),
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle | number | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle | number | boolean | string>>) => {
     return {
         setStockStyle: SetStockStyleDispatcher(dispatch),
         setPredictDays: SetPredictDaysDispatcher(dispatch),
-        setAccountRecordDeletable: SetAccountRecordDeletableDispatcher(dispatch)
+        setAccountRecordDeletable: SetAccountRecordDeletableDispatcher(dispatch),
+        setDefaultRole: SetDefaultRoleDispatcher(dispatch),
+        setDefaultRecordType: SetDefaultRecordTypeDispatcher(dispatch)
     };
 };
 

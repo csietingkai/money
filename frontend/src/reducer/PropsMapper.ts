@@ -4,7 +4,12 @@ import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier'
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
-import { Login, Logout, SetAccountList, SetAccountRecordDeletable, SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundPredictResult, SetFundQueryCondition, SetFundTrackingList, SetLoading, SetPredictDays, SetStockList, SetStockOwnList, SetStockPredictResult, SetStockQueryCondition, SetStockStyle, SetStockTrackingList } from 'reducer/Action';
+import {
+    Login, Logout, SetAccountList, SetAccountRecordDeletable, SetDefaultMarketType, SetDefaultRecordType, SetDefaultRole,
+    SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundPredictResult, SetFundQueryCondition,
+    SetFundTrackingList, SetLoading, SetMarketTypes, SetPredictDays, SetRecordTypes, SetRoles, SetStockList, SetStockOwnList,
+    SetStockPredictResult, SetStockQueryCondition, SetStockStyle, SetStockTrackingList
+} from 'reducer/Action';
 
 import { Account } from 'api/account';
 import { AuthToken } from 'api/auth';
@@ -45,3 +50,9 @@ export const SetStockStyleDispatcher = (dispatch: Dispatch<Action<StockStyle>>) 
 export const SetPredictDaysDispatcher = (dispatch: Dispatch<Action<number>>) => (days: number): void => dispatch(SetPredictDays(days));
 export const SetAccountRecordDeletableDispatcher = (dispatch: Dispatch<Action<boolean>>) => (deletable: boolean): void => dispatch(SetAccountRecordDeletable(deletable));
 export const SetLoadingDispatcher = (dispatch: Dispatch<Action<boolean>>) => (loading: boolean): void => dispatch(SetLoading(loading));
+export const SetMarketTypesDispatcher = (dispatch: Dispatch<Action<string[]>>) => (marketTypes: string[]): void => dispatch(SetMarketTypes(marketTypes));
+export const SetDefaultMarketTypeDispatcher = (dispatch: Dispatch<Action<string>>) => (defaultMarketType: string): void => dispatch(SetDefaultMarketType(defaultMarketType));
+export const SetRolesDispatcher = (dispatch: Dispatch<Action<string[]>>) => (roles: string[]): void => dispatch(SetRoles(roles));
+export const SetDefaultRoleDispatcher = (dispatch: Dispatch<Action<string>>) => (defaultRole: string): void => dispatch(SetDefaultRole(defaultRole));
+export const SetRecordTypesDispatcher = (dispatch: Dispatch<Action<string[]>>) => (recordTypes: string[]): void => dispatch(SetRecordTypes(recordTypes));
+export const SetDefaultRecordTypeDispatcher = (dispatch: Dispatch<Action<string>>) => (defaultRecordType: string): void => dispatch(SetDefaultRecordType(defaultRecordType));

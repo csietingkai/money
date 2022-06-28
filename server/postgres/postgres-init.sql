@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS account_record (
 	rate NUMERIC NOT NULL DEFAULT 1, -- 換匯當時的匯率
 	trans_from uuid NOT NULL,
 	trans_to uuid NOT NULL,
+	record_type VARCHAR NOT NULL,
 	description VARCHAR,
 	PRIMARY KEY (id),
 	CONSTRAINT fk_trans_from FOREIGN KEY (trans_from) REFERENCES account(id),
@@ -138,7 +139,7 @@ CREATE TABLE IF NOT EXISTS fund_record (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	code VARCHAR NOT NULL,
 	date TIMESTAMP NOT NULL,
-	price NUMERIC NOT NULL, 
+	price NUMERIC NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE (code, date),
 	CONSTRAINT fk_code FOREIGN KEY (code) REFERENCES fund(code)

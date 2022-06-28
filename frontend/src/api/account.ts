@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-import { ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH, ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_RECORD_DELETE_PATH, ACCOUNT_MONTH_BALANCE_PATH } from 'api/Constant';
+import {
+    ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH,
+    ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_RECORD_DELETE_PATH, ACCOUNT_MONTH_BALANCE_PATH
+} from 'api/Constant';
 
 import { ApiResponse, SimpleResponse } from 'util/Interface';
 import { handleRequestDate } from 'util/AppUtil';
@@ -20,6 +23,7 @@ export interface AccountRecord {
     rate: number;
     transFrom: string;
     transTo: string;
+    recordType: string;
     description: string | null;
 }
 
