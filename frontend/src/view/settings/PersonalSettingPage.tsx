@@ -6,8 +6,16 @@ import { Col, Form, Row } from 'react-bootstrap';
 import Card from 'component/common/Card';
 import { ExclamationTriangleIcon, ShieldAltIcon, TwFlag, UsFlag } from 'component/common/Icons';
 
-import { SetAccountRecordDeletableDispatcher, SetDefaultRecordTypeDispatcher, SetDefaultRoleDispatcher, SetPredictDaysDispatcher, SetStockStyleDispatcher } from 'reducer/PropsMapper';
-import { getDefaultRecordType, getDefaultRole, getPredictDays, getRecordTypes, getRoles, getStockStyle, isAccountRecordDeletable, ReduxState } from 'reducer/Selector';
+import {
+    SetAccountRecordDeletableDispatcher, SetExchangeRateDefaultForeignerCurrencyDispatcher, SetDefaultRecordTypeDispatcher, SetDefaultRoleDispatcher,
+    SetPredictDaysDispatcher, SetStockStyleDispatcher
+} from 'reducer/PropsMapper';
+import {
+    getDefaultRecordType, getDefaultRole, getExchangeRateDefaultForeignerCurrency, getExchangeRateList, getPredictDays, getRecordTypes, getRoles,
+    getStockStyle, isAccountRecordDeletable, ReduxState
+} from 'reducer/Selector';
+
+import { ExchangeRateVo } from 'api/exchangeRate';
 
 import { StockStyle } from 'util/Enum';
 import { Action, Record } from 'util/Interface';
@@ -21,12 +29,15 @@ export interface PersonalSettingPageProps {
     DEFAULT_ROLE: string;
     recordTypes: string[];
     DEFAULT_RECORD_TYPES: string;
+    exchangeRateList: ExchangeRateVo[];
+    DEFAULT_FOREIGNER_CURRENCY: string;
     setStockStyle: (style: StockStyle) => void;
     setPredictDays: (days: number) => void;
     setAccountRecordDeletable: (deletable: boolean) => void;
     setDefaultMarketType: (defaultMarketType: string) => void;
     setDefaultRole: (defaultRole: string) => void;
     setDefaultRecordType: (defaultRecordType: string) => void;
+    setDefaultForeignerCurrency: (defaultForeignerCurrency: string) => void;
 }
 
 export interface PersonalSettingPageState { }
@@ -85,8 +96,18 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
         this.props.setDefaultRecordType(recordType);
     };
 
+    private getCurrencyOptions = (): Record<string, string>[] => {
+        const { exchangeRateList } = this.props;
+        return exchangeRateList.map(x => ({ key: x.currency, value: x.name }));
+    };
+
+    private onDefaultForeignerCurrencyChange = (event: any) => {
+        const defaultForeignerCurrency = getValueByKeys(event, 'target', 'value');
+        this.props.setDefaultForeignerCurrency(defaultForeignerCurrency);
+    };
+
     render(): JSX.Element {
-        const { stockStyle, predictDays, accountRecordDeletable, DEFAULT_ROLE, DEFAULT_RECORD_TYPES } = this.props;
+        const { stockStyle, predictDays, accountRecordDeletable, DEFAULT_ROLE, DEFAULT_RECORD_TYPES, DEFAULT_FOREIGNER_CURRENCY } = this.props;
         return (
             <div className='animated fadeIn'>
                 <Row>
@@ -252,6 +273,29 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
                                         </Form.Control>
                                     </Col>
                                 </Form.Group>
+                                <Form.Group as={Row}>
+                                    <Col md={5}>
+                                        <Form.Label>Default Foreigner Currency</Form.Label>
+                                    </Col>
+                                    <Col xs={12} md={7}>
+                                        <Form.Control
+                                            as='select'
+                                            value={DEFAULT_FOREIGNER_CURRENCY}
+                                            onChange={this.onDefaultForeignerCurrencyChange}
+                                        >
+                                            {
+                                                this.getCurrencyOptions().map((record: Record<string, string>) =>
+                                                    <option
+                                                        key={`select-default-currency-option-${record.key}`}
+                                                        value={record.key}
+                                                    >
+                                                        {record.value}
+                                                    </option>
+                                                )
+                                            }
+                                        </Form.Control>
+                                    </Col>
+                                </Form.Group>
                             </Form>
                         </Card>
                     </Col>
@@ -270,6 +314,8 @@ const mapStateToProps = (state: ReduxState) => {
         DEFAULT_ROLE: getDefaultRole(state),
         recordTypes: getRecordTypes(state),
         DEFAULT_RECORD_TYPES: getDefaultRecordType(state),
+        exchangeRateList: getExchangeRateList(state, false),
+        DEFAULT_FOREIGNER_CURRENCY: getExchangeRateDefaultForeignerCurrency(state)
     };
 };
 
@@ -279,7 +325,8 @@ const mapDispatchToProps = (dispatch: Dispatch<Action<StockStyle | number | bool
         setPredictDays: SetPredictDaysDispatcher(dispatch),
         setAccountRecordDeletable: SetAccountRecordDeletableDispatcher(dispatch),
         setDefaultRole: SetDefaultRoleDispatcher(dispatch),
-        setDefaultRecordType: SetDefaultRecordTypeDispatcher(dispatch)
+        setDefaultRecordType: SetDefaultRecordTypeDispatcher(dispatch),
+        setDefaultForeignerCurrency: SetExchangeRateDefaultForeignerCurrencyDispatcher(dispatch)
     };
 };
 

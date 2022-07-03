@@ -2,6 +2,7 @@ import { ToastOptions, ToastPosition } from 'react-toastify';
 
 // localStorage
 export const AUTH_TOKEN_KEY: string = 'AUTH_TOKEN';
+export const DEFAULT_FOREIGNER_CURRENCY_KEY: string = 'DEFAULT_FOREIGNER_CURRENCY';
 export const STOCK_STYLE_KEY: string = 'STOCK_STYLE';
 export const PREDICT_DAYS_KEY: string = 'PREDICT_DAYS';
 export const ACCOUNT_RECORD_DELETABLE_KEY: string = 'ACCOUNT_RECORD_DELETABLE';

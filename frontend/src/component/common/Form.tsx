@@ -13,13 +13,13 @@ interface BaseInput {
     type?: InputType; // default text
     required?: boolean;
     disabled?: boolean;
+    note?: string;
 }
 
 export interface TextInput extends BaseInput {
     type?: InputType.text | InputType.email | InputType.password;
     value: string;
     placeholder?: string;
-    helpText?: string;
 }
 
 export interface NumericInput extends BaseInput {
@@ -192,7 +192,7 @@ export default class Form extends React.Component<FormProps, FormState> {
     render(): JSX.Element {
         const { singleRow, formKey, inputs } = this.props;
         const formGroups = inputs.map((input: Input) => {
-            const { key, title, value, required, disabled } = input;
+            const { key, title, value, required, disabled, note } = input;
             let { type, width } = input;
             width = input.width || 2;
             type = input.type || InputType.text;
@@ -362,23 +362,15 @@ export default class Form extends React.Component<FormProps, FormState> {
             } else {
                 const textInput: TextInput = input as TextInput;
                 const placeholder = textInput.placeholder || '';
-                const helpText = textInput.helpText || '';
                 inputElement = (
-                    <>
-                        <RbForm.Control
-                            id={`form-${key}`}
-                            type={type}
-                            placeholder={placeholder}
-                            value={value}
-                            onChange={onFormChange}
-                            disabled={disabled}
-                        />
-                        {
-                            helpText ?
-                                <RbForm.Text className='help-block'>{helpText}</RbForm.Text>
-                                : null
-                        }
-                    </>
+                    <RbForm.Control
+                        id={`form-${key}`}
+                        type={type}
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={onFormChange}
+                        disabled={disabled}
+                    />
                 );
             }
             return (
@@ -386,9 +378,13 @@ export default class Form extends React.Component<FormProps, FormState> {
                     <Col md={width}>
                         <RbForm.Label>{required ? <span style={{ color: 'red' }}>* </span> : null}{title}</RbForm.Label>
                     </Col>
-                    <Col xs={12} md={12 - width}>
+                    <Col xs={12 - (note ? 4 : 0)} md={12 - width - (note ? 2 : 0)}>
                         {inputElement}
                     </Col>
+                    {
+                        note &&
+                        <Col xs={4} md={2}> {note}</Col>
+                    }
                 </RbForm.Group >
             );
         });

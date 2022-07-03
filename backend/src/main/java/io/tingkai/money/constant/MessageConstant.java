@@ -46,6 +46,7 @@ public class MessageConstant {
 	// exchange rate
 	public static final String EXCHANGE_RATE_GET_ALL_SUCCESS = "Get All Exchange Rate Success";
 	public static final String EXCHANGE_RATE_GET_SUCCESS = "Get Exchange Rate: {0} Success";
+	public static final String EXCHANGE_RATE_TRADE = "Trade {0}({1}) to {2}({3}) with rate {4}";
 
 	// account
 	public static final String ACCOUNT_GET_ALL_SUCCESS = "Get {0}'s Accounts Success";

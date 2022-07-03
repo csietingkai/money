@@ -1,7 +1,7 @@
 import { AuthToken } from 'api/auth';
 import { toNumber } from 'util/AppUtil';
 
-import { ACCOUNT_RECORD_DELETABLE_KEY, AUTH_TOKEN_KEY, DEFAULT_RECORD_TYPE_KEY, DEFAULT_ROLE_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
+import { ACCOUNT_RECORD_DELETABLE_KEY, AUTH_TOKEN_KEY, DEFAULT_FOREIGNER_CURRENCY_KEY, DEFAULT_RECORD_TYPE_KEY, DEFAULT_ROLE_KEY, PREDICT_DAYS_KEY, STOCK_STYLE_KEY } from 'util/Constant';
 import { StockStyle } from 'util/Enum';
 
 const setState = (key: string, value: string) => {
@@ -37,6 +37,10 @@ export const getAuthToken = (): AuthToken => {
 
 export const removeAuthToken = (): void => {
     removeState(AUTH_TOKEN_KEY);
+};
+
+export const getDefaultForeignerCurrency = (): string => {
+    return getState(DEFAULT_FOREIGNER_CURRENCY_KEY);
 };
 
 export const getStockStyle = (): StockStyle => {
@@ -76,6 +80,10 @@ export const getDefaultRecordType = (): string => {
 
 export const setStockStyle = (style: StockStyle): void => {
     setState(STOCK_STYLE_KEY, style);
+};
+
+export const setDefaultForeignerCurrency = (defaultForeignerCurrency: string): void => {
+    setState(DEFAULT_FOREIGNER_CURRENCY_KEY, defaultForeignerCurrency);
 };
 
 export const setPredictDays = (days: number): void => {

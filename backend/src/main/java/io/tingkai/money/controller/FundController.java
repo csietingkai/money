@@ -60,7 +60,7 @@ public class FundController {
 	private PredictService predictService;
 
 	@RequestMapping(value = FundController.GET_ALL_PATH, method = RequestMethod.GET)
-	public FundResponse<List<FundVo>> getAll(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
+	public FundResponse<List<FundVo>> getAllFunds(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
 		List<FundVo> funds = this.fundService.getAll(code, name, sort);
 		return new FundResponse<List<FundVo>>(true, funds, MessageConstant.FUND_GET_ALL_SUCCESS);
 	}
@@ -90,7 +90,7 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.GET_OWN_PATH, method = RequestMethod.GET)
-	public FundResponse<List<UserFundVo>> sell(@RequestParam String username) {
+	public FundResponse<List<UserFundVo>> getOwnFunds(@RequestParam String username) {
 		List<UserFundVo> result = this.userFundService.getOwnFunds(username, true);
 		return new FundResponse<List<UserFundVo>>(true, result, MessageConstant.SUCCESS);
 	}

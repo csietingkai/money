@@ -12,7 +12,7 @@ import { DEFAULT_DECIMAL_PRECISION, EXCHANGE_RATE_PRECISION } from 'util/Constan
 import { StockStyle } from 'util/Enum';
 
 export interface ExchangeRateChartProps {
-    exchangeRate: string,
+    currency: string,
     stockStyle: StockStyle,
     data: ExchangeRateRecordVo[];
 }
@@ -66,12 +66,12 @@ export default class ExchangeRateChart extends React.Component<ExchangeRateChart
     };
 
     render(): JSX.Element {
-        const { data: records, exchangeRate } = this.props;
+        const { data: records, currency } = this.props;
         const { selectedLineType, hoveredIndex } = this.state;
 
         let numberPrecision: number = DEFAULT_DECIMAL_PRECISION;
-        if (isNumber(EXCHANGE_RATE_PRECISION[exchangeRate])) {
-            numberPrecision = EXCHANGE_RATE_PRECISION[exchangeRate];
+        if (isNumber(EXCHANGE_RATE_PRECISION[currency])) {
+            numberPrecision = EXCHANGE_RATE_PRECISION[currency];
         }
 
         // make data sets for chart

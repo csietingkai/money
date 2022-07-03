@@ -3,11 +3,11 @@ import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
 import {
-    Login, Logout, SetAccountList, SetDefaultMarketType, SetDefaultRecordType, SetDefaultRole, SetExchangeRateList, SetFundList, SetFundOwnList,
-    SetFundTrackingList, SetLoading, SetMarketTypes, SetRecordTypes, SetRoles, SetStockList, SetStockOwnList, SetStockTrackingList
+    Login, Logout, SetAccountList, SetExchangeRateDefaultForeignerCurrency, SetDefaultRecordType, SetDefaultRole, SetExchangeRateList, SetFundList, SetFundOwnList, SetFundTrackingList,
+    SetLoading, SetRecordTypes, SetRoles, SetStockList, SetStockOwnList, SetStockTrackingList
 } from 'reducer/Action';
 import {
-    getAccountList, getAuthTokenName, getAuthTokenString, getDefaultRecordType, getDefaultRole, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getRecordTypes,
+    getAccountList, getAuthTokenName, getAuthTokenString, getDefaultRecordType, getDefaultRole, getExchangeRateDefaultForeignerCurrency, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getRecordTypes,
     getRoles, getStockList, getStockOwnList, getStockTrackingList, isLoading, ReduxState
 } from 'reducer/Selector';
 import rootReducer from 'reducer/Reducer';
@@ -132,8 +132,12 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
             const { success, data } = response;
             if (success) {
                 dispatch(SetExchangeRateList(data));
+                if (!getExchangeRateDefaultForeignerCurrency(getState())) {
+                    dispatch(SetExchangeRateDefaultForeignerCurrency(data.filter(x => x.currency !== 'TWD')[0]?.currency));
+                }
             } else {
                 dispatch(SetExchangeRateList([]));
+                dispatch(SetExchangeRateDefaultForeignerCurrency(''));
             }
         });
     }

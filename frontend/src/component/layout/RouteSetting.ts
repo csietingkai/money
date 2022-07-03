@@ -1,7 +1,7 @@
 import { ChartBarIcon, ChartLineIcon, CogIcon, CogsIcon, CommentsDollarIcon, HandHoldingUsdIcon, TachometerAltIcon, UserIcon } from 'component/common/Icons';
 
 import DashBoard from 'view/DashBoard';
-import ExchangeRateQuerier from 'view/investment/ExchangeRateQuerier';
+import ExchangeRatePage from 'view/investment/ExchangeRate';
 import FundQuerier from 'view/investment/FundQuerier';
 import StockQuerier from 'view/investment/StockQuerier';
 import TradeFund from 'view/investment/TradeFund';
@@ -57,11 +57,11 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
                 component: TradeFund
             },
             {
-                name: 'Exchange Rate Querier',
+                name: 'Exchange Rate',
                 level: 1,
-                url: '/exchangeRateQuerier',
+                url: '/exchangeRate',
                 icon: ChartLineIcon(),
-                component: ExchangeRateQuerier
+                component: ExchangeRatePage
             }
         ]
     },

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { EXCHANGE_RATE_GET_ALL_PATH, EXCHANGE_RATE_GET_RECORDS_PATH, EXCHANGE_RATE_REFRESH_PATH } from 'api/Constant';
+import { EXCHANGE_RATE_GET_ALL_PATH, EXCHANGE_RATE_GET_RECORDS_PATH, EXCHANGE_RATE_REFRESH_PATH, EXCHANGE_RATE_TRADE_PATH } from 'api/Constant';
 
 import { toDate } from 'util/AppUtil';
 import { ApiResponse, SimpleResponse } from 'util/Interface';
@@ -62,4 +62,10 @@ const refresh = async (currency: string): Promise<SimpleResponse> => {
     return data;
 };
 
-export default { getAll, getRecords, refresh };
+const trade = async (fromAccountId: string, toAccountId: string, date: Date, rate: number, srcPayment: number, targetPayment: number): Promise<SimpleResponse> => {
+    const response = await axios.post(EXCHANGE_RATE_TRADE_PATH, { fromAccountId, toAccountId, date: date.getTime(), rate, srcPayment, targetPayment });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
+export default { getAll, getRecords, refresh, trade };

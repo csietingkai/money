@@ -1,4 +1,4 @@
-import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
+import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
@@ -6,7 +6,7 @@ import {
     SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST,
     SET_EXCHANGE_RATE_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_STOCK_QUERY_CONDITION, SET_STOCK_LIST, SET_FUND_LIST, SET_STOCK_OWN_LIST, SET_FUND_OWN_LIST,
     SET_STOCK_PREDICT_RESULT, SET_FUND_PREDICT_RESULT, SET_PREDICT_DAYS, SET_ACCOUNT_RECORD_DELETABLE, SET_DEFAULT_MARKET_TYPE, SET_DEFAULT_RECORD_TYPE,
-    SET_DEFAULT_ROLE, SET_MARKET_TYPES, SET_RECORD_TYPES, SET_ROLES
+    SET_DEFAULT_ROLE, SET_MARKET_TYPES, SET_RECORD_TYPES, SET_ROLES, SET_EXCHANGE_RATE_DEFAULT_FOREIGNER_CURRENCY
 } from 'reducer/ActionType';
 
 import { Account } from 'api/account';
@@ -39,6 +39,7 @@ export const SetFundPredictResult = (payload: PredictResultVo[]): Action<Predict
 // exchange rate
 export const SetExchangeRateList = (payload: ExchangeRateVo[]): Action<ExchangeRateVo[]> => ({ type: SET_EXCHANGE_RATE_LIST, payload });
 export const SetExchangeRateQueryCondition = (payload: ExchangeRateQueryCondition): Action<ExchangeRateQueryCondition> => ({ type: SET_EXCHANGE_RATE_QUERY_CONDITION, payload });
+export const SetExchangeRateDefaultForeignerCurrency = (payload: string): Action<string> => ({ type: SET_EXCHANGE_RATE_DEFAULT_FOREIGNER_CURRENCY, payload });
 
 // account
 export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type: SET_ACCOUNT_LIST, payload });

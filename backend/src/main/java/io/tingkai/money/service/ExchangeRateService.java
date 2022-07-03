@@ -2,21 +2,33 @@ package io.tingkai.money.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.money.constant.MessageConstant;
+import io.tingkai.money.entity.Account;
+import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.entity.ExchangeRateRecord;
+import io.tingkai.money.enumeration.RecordType;
+import io.tingkai.money.facade.AccountFacade;
+import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.ExchangeRateFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
 import io.tingkai.money.logging.Loggable;
+import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
+import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
@@ -31,6 +43,12 @@ public class ExchangeRateService {
 
 	@Autowired
 	private ExchangeRateRecordFacade exchangeRateRecordFacade;
+
+	@Autowired
+	private AccountFacade accountFacade;
+
+	@Autowired
+	private AccountRecordFacade accountRecordFacade;
 
 	@Autowired
 	@Qualifier(CodeConstants.PYTHON_CACHE)
@@ -73,8 +91,38 @@ public class ExchangeRateService {
 		return vos;
 	}
 
-	public void delete(String id) throws NotExistException {
-		this.exchangeRateFacade.delete(id);
+	@Transactional
+	public void trade(UUID fromAccountId, UUID toAccountId, LocalDateTime date, BigDecimal rate, BigDecimal srcPayment, BigDecimal targetPayment) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
+		Account fromAccount = this.accountFacade.query(fromAccountId);
+		Account toAccount = this.accountFacade.query(toAccountId);
+
+		if (fromAccount.getBalance().compareTo(srcPayment) < 0) {
+			throw new AccountBalanceNotEnoughException(fromAccount.getName());
+		}
+
+		fromAccount.setBalance(fromAccount.getBalance().subtract(srcPayment));
+		this.accountFacade.update(fromAccount);
+
+		toAccount.setBalance(toAccount.getBalance().add(targetPayment));
+		this.accountFacade.update(toAccount);
+
+		AccountRecord fromRecord = new AccountRecord();
+		fromRecord.setTransDate(date);
+		fromRecord.setTransAmount(BigDecimal.ZERO.subtract(srcPayment));
+		fromRecord.setTransFrom(fromAccountId);
+		fromRecord.setTransTo(fromAccountId);
+		fromRecord.setRecordType(RecordType.INVEST);
+		fromRecord.setDescription(MessageFormat.format(MessageConstant.EXCHANGE_RATE_TRADE, fromAccount.getName(), fromAccount.getCurrency(), toAccount.getName(), toAccount.getCurrency(), rate));
+		this.accountRecordFacade.insert(fromRecord);
+
+		AccountRecord toRecord = new AccountRecord();
+		toRecord.setTransDate(date);
+		toRecord.setTransAmount(targetPayment);
+		toRecord.setTransFrom(toAccountId);
+		toRecord.setTransTo(toAccountId);
+		toRecord.setRecordType(RecordType.INVEST);
+		toRecord.setDescription(MessageFormat.format(MessageConstant.EXCHANGE_RATE_TRADE, fromAccount.getName(), fromAccount.getCurrency(), toAccount.getName(), toAccount.getCurrency(), rate));
+		this.accountRecordFacade.insert(toRecord);
 	}
 
 	private List<ExchangeRateRecordVo> handleRecordMas(List<ExchangeRateRecord> records) {

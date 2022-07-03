@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
+import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
-
+import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.ExchangeRateTradeRequest;
 import io.tingkai.money.model.response.ExchangeRateResponse;
 import io.tingkai.money.model.response.SimpleResponse;
 import io.tingkai.money.model.response.StockResponse;
@@ -20,6 +23,7 @@ import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.ExchangeRateService;
+import io.tingkai.money.util.TimeUtil;
 
 @RestController
 @RequestMapping(value = ExchangeRateController.CONROLLER_PREFIX)
@@ -29,6 +33,7 @@ public class ExchangeRateController {
 	public static final String GET_ALL_PATH = "/getAll";
 	public static final String GET_RECORDS_PATH = "/getRecords";
 	public static final String REFRESH_PATH = "/refresh";
+	public static final String TRADE_PATH = "/trade";
 
 	@Autowired
 	private ExchangeRateService exchangeRateService;
@@ -51,6 +56,12 @@ public class ExchangeRateController {
 	@RequestMapping(value = ExchangeRateController.REFRESH_PATH, method = RequestMethod.POST)
 	public SimpleResponse refresh(@RequestParam String currency) throws AlreadyExistException, FieldMissingException, IOException {
 		this.pythonFetcherService.fetechExchangeRateRecord(currency);
+		return new SimpleResponse(true);
+	}
+
+	@RequestMapping(value = ExchangeRateController.TRADE_PATH, method = RequestMethod.POST)
+	public SimpleResponse trade(@RequestBody ExchangeRateTradeRequest request) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
+		this.exchangeRateService.trade(request.getFromAccountId(), request.getToAccountId(), TimeUtil.convertToDateTime(request.getDate()), request.getRate(), request.getSrcPayment(), request.getTargetPayment());
 		return new SimpleResponse(true);
 	}
 }

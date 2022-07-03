@@ -1,11 +1,11 @@
 import { Dispatch } from 'react';
 
-import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
+import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
 import { FundQueryCondition } from 'view/investment/FundQuerier';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 import {
-    Login, Logout, SetAccountList, SetAccountRecordDeletable, SetDefaultMarketType, SetDefaultRecordType, SetDefaultRole,
+    Login, Logout, SetAccountList, SetAccountRecordDeletable, SetExchangeRateDefaultForeignerCurrency, SetDefaultMarketType, SetDefaultRecordType, SetDefaultRole,
     SetExchangeRateList, SetExchangeRateQueryCondition, SetFundList, SetFundOwnList, SetFundPredictResult, SetFundQueryCondition,
     SetFundTrackingList, SetLoading, SetMarketTypes, SetPredictDays, SetRecordTypes, SetRoles, SetStockList, SetStockOwnList,
     SetStockPredictResult, SetStockQueryCondition, SetStockStyle, SetStockTrackingList
@@ -41,6 +41,7 @@ export const SetFundPredictResultDispatcher = (dispatch: Dispatch<Action<Predict
 // exchange rate
 export const SetExchangeRateListDispatcher = (dispatch: Dispatch<Action<ExchangeRateVo[]>>) => (exchangeRateList: ExchangeRateVo[]): void => dispatch(SetExchangeRateList(exchangeRateList));
 export const SetExchangeRateQueryConditionDispatcher = (dispatch: Dispatch<Action<ExchangeRateQueryCondition>>) => (condition: ExchangeRateQueryCondition): void => dispatch(SetExchangeRateQueryCondition(condition));
+export const SetExchangeRateDefaultForeignerCurrencyDispatcher = (dispatch: Dispatch<Action<string>>) => (defaultForeignerCurrency: string): void => dispatch(SetExchangeRateDefaultForeignerCurrency(defaultForeignerCurrency));
 
 // account
 export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) => (accounts: Account[]): void => dispatch(SetAccountList(accounts));

@@ -1,4 +1,4 @@
-import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRateQuerier';
+import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
 
 import * as StateHolder from 'reducer/StateHolder';
 
@@ -86,10 +86,12 @@ export const getFundPredictResult = (state: ReduxState): PredictResultVo[] => ge
 export interface ReduxExchangeRateState {
     list: ExchangeRateVo[];
     condition: ExchangeRateQueryCondition;
+    defaultForeignerCurrency: string;
 }
 export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
     list: [],
-    condition: { start: new Date(), end: new Date() }
+    condition: { currency: StateHolder.getDefaultForeignerCurrency(), start: new Date(), end: new Date() },
+    defaultForeignerCurrency: StateHolder.getDefaultForeignerCurrency()
 };
 const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;
 export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRateVo[] => {
@@ -100,6 +102,7 @@ export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true):
     return list;
 };
 export const getExchangeRateQueryCondition = (state: ReduxState): ExchangeRateQueryCondition => getExchangeRateState(state)?.condition;
+export const getExchangeRateDefaultForeignerCurrency = (state: ReduxState): string => getExchangeRateState(state)?.defaultForeignerCurrency;
 
 // accountReducer
 export interface ReduxAccountState {
