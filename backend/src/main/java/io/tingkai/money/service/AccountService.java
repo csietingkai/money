@@ -1,7 +1,6 @@
 package io.tingkai.money.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,10 +18,8 @@ import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
-import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
-import io.tingkai.money.facade.ExchangeRateRecordFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
@@ -31,14 +28,10 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.BalancePairVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
-import io.tingkai.money.util.AppUtil;
 
 @Service
 @Loggable
 public class AccountService {
-
-	@Autowired
-	private ExchangeRateRecordFacade exchangeRateRecordFacade;
 
 	@Autowired
 	private AccountFacade accountFacade;
@@ -186,24 +179,8 @@ public class AccountService {
 			throw new AccountBalanceWrongException(entity.getTransAmount());
 		}
 		entity.setTransAmount(entity.getTransAmount().abs());
-		// currency exchange
-		BigDecimal rate1 = BigDecimal.ONE;
-		BigDecimal rate2 = BigDecimal.ONE;
-		if (!CodeConstants.BASE_EXCHANGE_RATE.equals(account.getCurrency())) {
-			ExchangeRateRecord latestRecord = this.exchangeRateRecordFacade.latestRecord(account.getCurrency());
-			if (AppUtil.isPresent(latestRecord)) {
-				rate1 = latestRecord.getSpotBuy();
-			}
-		}
-		if (!CodeConstants.BASE_EXCHANGE_RATE.equals(transferTo.getCurrency())) {
-			ExchangeRateRecord latestRecord = this.exchangeRateRecordFacade.latestRecord(transferTo.getCurrency());
-			if (AppUtil.isPresent(latestRecord)) {
-				rate2 = latestRecord.getSpotBuy();
-			}
-		}
 		account.setBalance(account.getBalance().subtract(entity.getTransAmount()));
-		entity.setRate(rate1.divide(rate2, 5, RoundingMode.HALF_UP));
-		transferTo.setBalance(transferTo.getBalance().add(entity.getTransAmount().multiply(entity.getRate())));
+		transferTo.setBalance(transferTo.getBalance().add(entity.getTransAmount()));
 		entity.setTransFrom(accountId);
 		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_TRANSFER_DESC, account.getName(), transferTo.getName(), entity.getDescription()));
 

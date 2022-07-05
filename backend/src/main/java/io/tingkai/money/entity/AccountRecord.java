@@ -25,7 +25,6 @@ public class AccountRecord {
 	protected UUID id;
 	protected LocalDateTime transDate;
 	protected BigDecimal transAmount;
-	protected BigDecimal rate = BigDecimal.ONE;
 	protected UUID transFrom;
 	protected UUID transTo;
 	@Enumerated(EnumType.STRING)
