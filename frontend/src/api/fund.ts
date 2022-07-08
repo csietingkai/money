@@ -117,8 +117,8 @@ const buy = async (username: string, accountId: string, fundCode: string, date: 
     return data;
 };
 
-const sell = async (username: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, priceFix: number): Promise<UserFundResponse> => {
-    const response = await axios.put(USER_FUND_SELL_PATH, null, { params: { username, accountId, fundCode, date: date.getTime(), share, price, rate, priceFix } });
+const sell = async (username: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, total: number): Promise<UserFundResponse> => {
+    const response = await axios.put(USER_FUND_SELL_PATH, null, { params: { username, accountId, fundCode, date: date.getTime(), share, price, rate, total } });
     const data: UserFundResponse = response.data;
     return data;
 };

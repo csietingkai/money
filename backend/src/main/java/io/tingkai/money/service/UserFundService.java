@@ -161,7 +161,7 @@ public class UserFundService {
 	}
 
 	@Transactional
-	public UserFund sell(String username, UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal priceFix) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserFund sell(String username, UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal total) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new FundAmountInvalidException(share);
 		}
@@ -174,7 +174,6 @@ public class UserFundService {
 		entity = this.userFundFacade.update(entity);
 
 		Account account = this.accountFacade.query(accountId);
-		BigDecimal total = share.multiply(price).add(priceFix);
 		account.setBalance(account.getBalance().add(total));
 		account = this.accountFacade.update(account);
 

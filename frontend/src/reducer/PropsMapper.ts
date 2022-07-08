@@ -1,7 +1,7 @@
 import { Dispatch } from 'react';
 
 import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
-import { FundQueryCondition } from 'view/investment/FundQuerier';
+import { FundQueryCondition } from 'view/investment/FundView';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 import {

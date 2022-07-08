@@ -9,7 +9,7 @@ import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
 import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
-import { FundQueryCondition } from 'view/investment/FundQuerier';
+import { FundQueryCondition } from 'view/investment/FundView';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 import { PredictResultVo } from 'util/Interface';
 

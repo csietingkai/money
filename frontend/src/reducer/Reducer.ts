@@ -23,7 +23,7 @@ import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { Action, PredictResultVo } from 'util/Interface';
 import { StockStyle } from 'util/Enum';
-import { FundQueryCondition } from 'view/investment/FundQuerier';
+import { FundQueryCondition } from 'view/investment/FundView';
 import { StockQueryCondition } from 'view/investment/StockQuerier';
 
 const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: Action<AuthToken>): ReduxAuthState => {

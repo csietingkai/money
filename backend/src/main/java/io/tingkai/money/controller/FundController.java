@@ -84,8 +84,8 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.SELL_PATH, method = RequestMethod.PUT)
-	public FundResponse<UserFund> sell(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, @RequestParam BigDecimal priceFix) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
-		UserFund result = this.userFundService.sell(username, accountId, fundCode, TimeUtil.convertToDateTime(date), share, price, rate, priceFix);
+	public FundResponse<UserFund> sell(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, @RequestParam BigDecimal total) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UserFund result = this.userFundService.sell(username, accountId, fundCode, TimeUtil.convertToDateTime(date), share, price, rate, total);
 		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, username, fundCode, share, price));
 	}
 

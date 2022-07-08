@@ -82,7 +82,6 @@ export interface FormProps {
 }
 
 export interface FormState {
-    values: any;
 }
 
 export default class Form extends React.Component<FormProps, FormState> {
@@ -95,17 +94,12 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     constructor(props: FormProps) {
         super(props);
-        this.state = {
-            values: this.props.inputs.reduce((acc: any, curr: Input) => {
-                acc[curr.key] = curr.value;
-                return acc;
-            }, {})
-        };
+        this.state = {};
     }
 
     private onFormChange = (key: string) => (event: any) => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}`);
         if (input) {
             form[key] = getValueByKeys(event, 'target', 'value');
@@ -115,7 +109,7 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     private onFormNumericChange = (key: string) => (event: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}`);
         if (input) {
             const value = toNumber(getValueByKeys(event, 'target', 'value'));
@@ -126,7 +120,7 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     private onFormRadioChange = (key: string) => (selection: string) => () => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}-${selection}`);
         if (input) {
             form[key] = selection;
@@ -136,7 +130,7 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     private onFormCheckChange = (key: string) => (selection: string) => (event: React.FormEvent<HTMLInputElement>) => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}-${selection}`);
         if (input) {
             form[key] = form[key] ? form[key] : {};
@@ -147,7 +141,7 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     private onFileChange = (key: string) => () => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}`);
         if (input) {
             const fileList = getValueByKeys(input, 'files');
@@ -162,7 +156,7 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     private onDateChange = (key: string) => (event: any) => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}-date`);
         if (input) {
             const dateStr = getValueByKeys(event, 'target', 'value');
@@ -178,7 +172,7 @@ export default class Form extends React.Component<FormProps, FormState> {
 
     private onTimeChange = (key: string) => (event: any) => {
         const { formRef } = this;
-        const { values: form } = this.state;
+        const form = this.getFormValues(this.props.inputs);
         const input = formRef.current.querySelector(`#form-${key}-time`);
         if (input) {
             const timeStrs: string[] = getValueByKeys(event, 'target', 'value').split(':');
@@ -187,6 +181,13 @@ export default class Form extends React.Component<FormProps, FormState> {
             form[key] = date;
             this.props.onChange(form, key);
         }
+    };
+
+    private getFormValues = (inputs: Input[]): { [key: string]: any; } => {
+        return inputs.reduce((acc: any, curr: Input) => {
+            acc[curr.key] = curr.value;
+            return acc;
+        }, {});
     };
 
     render(): JSX.Element {
