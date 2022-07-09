@@ -27,9 +27,9 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         icon: HandHoldingUsdIcon(),
         children: [
             {
-                name: 'Stock Querier',
+                name: 'Stock',
                 level: 1,
-                url: '/StockView',
+                url: '/stockView',
                 icon: ChartBarIcon(),
                 component: StockView
             },

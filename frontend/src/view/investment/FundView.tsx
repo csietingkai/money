@@ -19,9 +19,9 @@ import FundApi, { FundRecordVo, FundVo, UserFundListResponse, UserFundVo, UserTr
 import { numberComma, reverseNumberComma, toDateStr } from 'util/AppUtil';
 import { DealType, InputType, StockStyle } from 'util/Enum';
 import Notify from 'util/Notify';
-import { Action, PredictResultVo, Record } from 'util/Interface';
+import { Action, PredictResultVo } from 'util/Interface';
 
-export interface FundQuerierProps {
+export interface FundViewProps {
     stockStyle: StockStyle;
     predictDays: number;
     username: string;
@@ -39,7 +39,7 @@ export interface FundQuerierProps {
     setLoading: (loading: boolean) => void;
 }
 
-export interface FundQuerierState {
+export interface FundViewState {
     funds: FundVo[];
     selectedFundCode: string;
     fundRecords: FundRecordVo[];
@@ -65,9 +65,9 @@ export interface FundTradeForm {
     total: string;
 }
 
-class FundQuerier extends React.Component<FundQuerierProps, FundQuerierState> {
+class FundView extends React.Component<FundViewProps, FundViewState> {
 
-    constructor(props: FundQuerierProps) {
+    constructor(props: FundViewProps) {
         super(props);
         this.state = {
             funds: [],
@@ -497,4 +497,4 @@ const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | UserFundVo[] |
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(FundQuerier);
+export default connect(mapStateToProps, mapDispatchToProps)(FundView);
