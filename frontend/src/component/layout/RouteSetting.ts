@@ -3,8 +3,7 @@ import { ChartBarIcon, ChartLineIcon, CogIcon, CogsIcon, CommentsDollarIcon, Han
 import DashBoard from 'view/DashBoard';
 import ExchangeRatePage from 'view/investment/ExchangeRate';
 import FundView from 'view/investment/FundView';
-import StockQuerier from 'view/investment/StockQuerier';
-import TradeStock from 'view/investment/TradeStock';
+import StockView from 'view/investment/StockView';
 import AccountManagementPage from 'view/settings/AccountManagementPage';
 import PersonalSettingPage from 'view/settings/PersonalSettingPage';
 
@@ -30,16 +29,9 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
             {
                 name: 'Stock Querier',
                 level: 1,
-                url: '/stockQuerier',
+                url: '/StockView',
                 icon: ChartBarIcon(),
-                component: StockQuerier
-            },
-            {
-                name: 'Trade Stock',
-                level: 1,
-                url: '/tradeStock',
-                icon: CommentsDollarIcon(),
-                component: TradeStock
+                component: StockView
             },
             {
                 name: 'Fund',

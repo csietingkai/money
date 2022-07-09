@@ -121,12 +121,11 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public UserStock buy(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fix, BigDecimal fee) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public UserStock buy(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal total) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
 		}
 		Account account = this.accountFacade.query(accountId);
-		BigDecimal total = price.multiply(share).add(fee).add(fix);
 		if (account.getBalance().compareTo(total) < 0) {
 			throw new AccountBalanceNotEnoughException(account.getName());
 		}
@@ -175,7 +174,7 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public UserStock sell(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fix, BigDecimal fee, BigDecimal tax) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserStock sell(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal tax, BigDecimal total) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
 		}
@@ -188,7 +187,6 @@ public class UserStockService {
 		entity = this.userStockFacade.update(entity);
 
 		Account account = this.accountFacade.query(accountId);
-		BigDecimal total = price.multiply(share).subtract(fee).subtract(tax).subtract(fix);
 		account.setBalance(account.getBalance().add(total));
 		account = this.accountFacade.update(account);
 

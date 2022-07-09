@@ -2,7 +2,7 @@ import { Dispatch } from 'react';
 
 import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
 import { FundQueryCondition } from 'view/investment/FundView';
-import { StockQueryCondition } from 'view/investment/StockQuerier';
+import { StockQueryCondition } from 'view/investment/StockView';
 
 import {
     Login, Logout, SetAccountList, SetAccountRecordDeletable, SetExchangeRateDefaultForeignerCurrency, SetDefaultMarketType, SetDefaultRecordType, SetDefaultRole,

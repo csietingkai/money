@@ -10,7 +10,7 @@ import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
 
 import { StockStyle } from 'util/Enum';
 import { FundQueryCondition } from 'view/investment/FundView';
-import { StockQueryCondition } from 'view/investment/StockQuerier';
+import { StockQueryCondition } from 'view/investment/StockView';
 import { PredictResultVo } from 'util/Interface';
 
 export interface ReduxState {

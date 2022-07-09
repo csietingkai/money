@@ -177,7 +177,7 @@ class ExchangeRate extends React.Component<ExchangeRateProps, ExchangeRateState>
         );
     };
 
-    private renderTrade = (): JSX.Element => {
+    private renderTradeView = (): JSX.Element => {
         const { exchangeRateQueryCondition: { currency }, accountList } = this.props;
         const { exchangeRateTradeForm: form } = this.state;
         if (accountList.length) {
@@ -248,7 +248,7 @@ class ExchangeRate extends React.Component<ExchangeRateProps, ExchangeRateState>
                         {this.renderQueryCondition()}
                     </Col>
                     <Col>
-                        {this.renderTrade()}
+                        {this.renderTradeView()}
                     </Col>
                 </Row>
                 <Row>

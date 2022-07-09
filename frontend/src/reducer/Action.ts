@@ -1,6 +1,6 @@
 import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
 import { FundQueryCondition } from 'view/investment/FundView';
-import { StockQueryCondition } from 'view/investment/StockQuerier';
+import { StockQueryCondition } from 'view/investment/StockView';
 
 import {
     SET_EXCHANGE_RATE_LIST, LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_STOCK_STYLE, SET_LOADING, SET_STOCK_TRACKING_LIST, SET_FUND_TRACKING_LIST,

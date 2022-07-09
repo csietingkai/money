@@ -86,14 +86,14 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.BUY_PATH, method = RequestMethod.PUT)
-	public StockResponse<UserStock> buy(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fix, @RequestParam BigDecimal fee) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		UserStock result = this.userStockService.buy(username, accountId, stockCode, TimeUtil.convertToDateTime(date), share, price, fix, fee);
+	public StockResponse<UserStock> buy(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal total) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UserStock result = this.userStockService.buy(username, accountId, stockCode, TimeUtil.convertToDateTime(date), share, price, fee, total);
 		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, username, stockCode, share, price));
 	}
 
 	@RequestMapping(value = StockController.SELL_PATH, method = RequestMethod.PUT)
-	public StockResponse<UserStock> sell(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fix, @RequestParam BigDecimal fee, @RequestParam BigDecimal tax) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		UserStock result = this.userStockService.sell(username, accountId, stockCode, TimeUtil.convertToDateTime(date), share, price, fix, fee, tax);
+	public StockResponse<UserStock> sell(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal tax, @RequestParam BigDecimal total) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UserStock result = this.userStockService.sell(username, accountId, stockCode, TimeUtil.convertToDateTime(date), share, price, fee, tax, total);
 		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, username, stockCode, share, price));
 	}
 

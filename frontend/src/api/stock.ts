@@ -13,6 +13,7 @@ export interface Stock {
     code: string;
     name: string;
     isinCode: string;
+    currency: string;
     offeringDate: Date;
     marketType: string;
     industryType: string;
@@ -124,14 +125,14 @@ const precalc = async (dealType: string, share: number, price: number): Promise<
     return data;
 };
 
-const buy = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fix: number, fee: number): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_BUY_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fix, fee } });
+const buy = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, total: number): Promise<UserStockResponse> => {
+    const response = await axios.put(USER_STOCK_BUY_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fee, total } });
     const data: UserStockResponse = response.data;
     return data;
 };
 
-const sell = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fix: number, fee: number, tax: number): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_SELL_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fix, fee, tax } });
+const sell = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, tax: number, total: number): Promise<UserStockResponse> => {
+    const response = await axios.put(USER_STOCK_SELL_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fee, tax, total } });
     const data: UserStockResponse = response.data;
     return data;
 };
