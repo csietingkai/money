@@ -103,6 +103,7 @@ else
 	echo -e "  localhost server       start postgresql, mongodb, redis"
 	echo -e "  localhost backend      start spring boot RESTful api"
 	echo -e "  localhost frontend     start frontend react app"
+	echo -e "  localhost python       start python app"
 	echo -e "  build backend          use docker build backend spring boot image"
 	echo -e "  build frontend         use docker build frontend react app image"
 	echo -e "  build python           use docker build python app image"
