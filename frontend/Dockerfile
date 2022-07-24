@@ -1,16 +1,9 @@
 # build environment
-FROM node:15.0.1-alpine3.12 as build
+FROM node:14.20.0-alpine3.15 as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json ./
-COPY package-lock.json ./
-RUN apk add --no-cache --virtual .gyp \
-        python2 \
-        make \
-        g++ \
-    && npm install \
-    && apk del .gyp
-COPY . ./
+COPY . .
+RUN npm install
 RUN npm run build
 
 # production environment

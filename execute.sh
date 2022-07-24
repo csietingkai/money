@@ -64,9 +64,10 @@ elif [ "$1" = 'build' ]; then
 		cd ..
 		cd backend
 		mvn clean install package
-		docker build . --rm --tag=$backend_image_name:$version
-#		docker push $backend_image_name:$version
-#		docker image rm $backend_image_name:$version
+		docker build . --rm --tag=$backend_image_name:latest --tag=$backend_image_name:$version
+		docker push $backend_image_name:latest
+		docker push $backend_image_name:$version
+		docker image rm $backend_image_name:latest $backend_image_name:$version
 		cd ..
 	elif [ "$2" = 'frontend' ]; then
 		cd server
@@ -74,19 +75,19 @@ elif [ "$1" = 'build' ]; then
 		docker container rm $frontend_container_name
 		cd ..
 		cd frontend
-		docker build . --rm --tag=$frontend_image_name:$version
-#		docker push $frontend_image_name:$version
-#		docker image rm $frontend_image_name:$version
+		docker build . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
+		docker push $frontend_image_name:latest
+		docker push $frontend_image_name:$version
+		docker image rm $frontend_image_name:latest $frontend_image_name:$version
 		cd ..
 	elif [ "$2" = 'python' ]; then
 		docker container stop $python_container_name
 		docker container rm $python_container_name
 		cd python
-		pipenv lock -r > requirements.txt
-		docker build --cpu-period="1000" --cpu-quota="2000000" --cpuset-cpus="0-8" --rm --tag=$python_image_name:$version .
-#		docker push $python_image_name:$version
-#		docker image rm $python_image_name:$version
-		rm requirements.txt
+		docker build . --tag=$python_image_name:latest --rm --tag=$python_image_name:$version
+		docker push $python_image_name:latest
+		docker push $python_image_name:$version
+		docker image rm $python_image_name:latest $python_image_name:$version
 		cd ..
 	fi
 
