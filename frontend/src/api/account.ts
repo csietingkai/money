@@ -20,7 +20,6 @@ export interface AccountRecord {
     id: string;
     transDate: Date;
     transAmount: number;
-    rate: number;
     transFrom: string;
     transTo: string;
     recordType: string;

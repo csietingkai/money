@@ -247,7 +247,6 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             id: '',
             transDate: new Date(),
             transAmount: 0,
-            rate: 1,
             transFrom: currentAccount.id,
             transTo: currentAccount.id,
             recordType: DEFAULT_RECORD_TYPE,
@@ -263,7 +262,6 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             id: '',
             transDate: new Date(),
             transAmount: 0,
-            rate: 1,
             transFrom: currentAccount.id,
             transTo: accounts.filter(x => x.id !== currentAccount.id)[0]?.id,
             recordType: DEFAULT_RECORD_TYPE,
@@ -279,7 +277,6 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
             id: '',
             transDate: new Date(),
             transAmount: 0,
-            rate: 1,
             transFrom: currentAccount.id,
             transTo: currentAccount.id,
             recordType: DEFAULT_RECORD_TYPE,
@@ -424,7 +421,7 @@ class AccountManagement extends React.Component<AccountManagementProps, AccountM
                                 </div>
                                 <Table
                                     id='account-record'
-                                    header={['transDate', 'transAmount', 'rate', 'transFromName', 'transToName', 'recordType', 'description', 'functions']}
+                                    header={['transDate', 'transAmount', 'transFromName', 'transToName', 'recordType', 'description', 'functions']}
                                     data={accountRecords}
                                     columnConverter={(header: string, rowData: any) => {
                                         if (header === 'transDate') {

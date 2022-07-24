@@ -357,7 +357,7 @@ class StockView extends React.Component<StockViewProps, StockViewState> {
 
         if (selectedStockCode) {
             const selectedStock = stocks.find(x => x.code === selectedStockCode);
-            accounts = accounts.filter(x => x.currency === selectedStock.currency);
+            accounts = accounts.filter(x => x.currency === selectedStock?.currency);
             if (!stockTradeForm.usedAccount) {
                 stockTradeForm.usedAccount = accounts[0]?.id;
             }

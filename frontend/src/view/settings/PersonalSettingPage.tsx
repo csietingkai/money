@@ -156,7 +156,7 @@ class PersonalSettingPage extends React.Component<PersonalSettingPageProps, Pers
                     </Col>
                     <Col md={4} sm={6} xs={12}>
                         <Card
-                            title={'Preidct Config'}
+                            title={'Predict Config'}
                         >
                             <Form>
                                 <Form.Group as={Row}>
