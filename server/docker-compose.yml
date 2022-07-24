@@ -85,4 +85,4 @@ services:
       - backend
     environment:
       - NODE_ENV=production
-      - API_URL=http://${BACKEND_SERVICE}:${BACKEND_INTERNEL_PORT}/api
+      - API_URL=http://localhost:${BACKEND_PORT}/api

@@ -36,7 +36,11 @@ backend_container_name=$container_prefix-backend
 frontend_container_name=$container_prefix-frontend
 python_container_name=$container_prefix-python
 
-if [ "$1" = 'localhost' ]; then
+if [ "$1" = 'prod' ]; then
+	cd server/
+	docker-compose --project-name $project_name up -d
+	cd ../
+elif [ "$1" = 'localhost' ]; then
 	if [ "$2" = 'server' ]; then
 		cd server
 		docker-compose --project-name $project_name up -d postgres mongo redis
@@ -75,16 +79,18 @@ elif [ "$1" = 'build' ]; then
 		docker container rm $frontend_container_name
 		cd ..
 		cd frontend
+		sed -i -e 's/8080/1080/g' .env
 		docker build . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
 		docker push $frontend_image_name:latest
 		docker push $frontend_image_name:$version
 		docker image rm $frontend_image_name:latest $frontend_image_name:$version
+		git restore .env
 		cd ..
 	elif [ "$2" = 'python' ]; then
 		docker container stop $python_container_name
 		docker container rm $python_container_name
 		cd python
-		docker build . --tag=$python_image_name:latest --rm --tag=$python_image_name:$version
+		docker build . --rm --tag=$python_image_name:latest --tag=$python_image_name:$version
 		docker push $python_image_name:latest
 		docker push $python_image_name:$version
 		docker image rm $python_image_name:latest $python_image_name:$version
@@ -101,6 +107,7 @@ else
 	echo "usage: ./execute.sh [ARGS]"
 	echo ""
 	echo "ARGS:"
+	echo -e "  prod                   start production"
 	echo -e "  localhost server       start postgresql, mongodb, redis"
 	echo -e "  localhost backend      start spring boot RESTful api"
 	echo -e "  localhost frontend     start frontend react app"
