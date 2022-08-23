@@ -103,6 +103,12 @@ public class UserFundService {
 			});
 			vos.add(vo);
 		});
+		vos.sort((vo1, vo2) -> {
+			if (vo1.getFundCode().length() != vo2.getFundCode().length()) {
+				return vo1.getFundCode().length() - vo2.getFundCode().length();
+			}
+			return vo1.getFundCode().compareTo(vo2.getFundCode());
+		});
 		return vos;
 	}
 

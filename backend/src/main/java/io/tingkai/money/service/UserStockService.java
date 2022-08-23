@@ -104,6 +104,12 @@ public class UserStockService {
 			});
 			vos.add(vo);
 		});
+		vos.sort((vo1, vo2) -> {
+			if (vo1.getStockCode().length() != vo2.getStockCode().length()) {
+				return vo1.getStockCode().length() - vo2.getStockCode().length();
+			}
+			return vo1.getStockCode().compareTo(vo2.getStockCode());
+		});
 		return vos;
 	}
 
