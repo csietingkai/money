@@ -53,6 +53,7 @@ services:
   backend:
     image: tingkai/money-backend:${BACKEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${BACKEND_SERVICE}
+    restart: always
     ports:
       - ${BACKEND_PORT}:${BACKEND_INTERNEL_PORT}
     depends_on:
@@ -77,6 +78,7 @@ services:
   frontend:
     image: tingkai/money-frontend:${FRONTEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${FRONTEND_SERVICE}
+    restart: always
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_INTERNEL_PORT}
     volumes:
