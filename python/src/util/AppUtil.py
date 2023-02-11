@@ -1,3 +1,4 @@
+import datetime
 import math
 from typing import Optional
 
@@ -27,3 +28,6 @@ def toDateStr(year: int, month: int, day: int, appender = ''):
         s += '0'
     s += str(day)
     return s
+
+def convertDateToStr(date: datetime) -> str:
+    return date.strftime("%Y/%m/%d")

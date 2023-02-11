@@ -96,28 +96,32 @@ def fetchFundRecords(code: str):
             records = FundRecordFacade.queryByCode(code)
             if len(records) > 0:
                 targetDate = records[-1].date
-            url = CodeConstant.FUND_RICH_RECORDS_URL.format(code = code)
-            response = requests.get(url)
+            requestData = {
+                'data': {
+                    'fundId': code,
+                    'period': 'Customize',
+                    'startTime': AppUtil.convertDateToStr(targetDate),
+                    'endTime': AppUtil.convertDateToStr(datetime.datetime.now())
+                }
+            }
+            response = requests.post(CodeConstant.FUND_RICH_RECORDS_URL, json = requestData, headers = CodeConstant.FUND_RICH_REQUEST_HEADER)
             richData = response.json()
             response.close()
-            if isinstance(richData, list):
-                for item in richData:
-                    date = datetime.datetime(int(item['TransDate'][0:4]), int(item['TransDate'][4:6]), int(item['TransDate'][6:8]))
-                    if targetDate > date:
-                        continue
-                    entity = FundRecord()
-                    queryEntity = FundRecordFacade.queryByCodeAndDate(code, date)
-                    if queryEntity:
-                        entity.id = queryEntity.id
-                    entity.code = code
-                    entity.date = date
-                    entity.price = item['Price']
-                    if entity.id:
-                        FundRecordFacade.update(entity)
-                    else:
-                        FundRecordFacade.insert(entity)
-                return 'SUCCESS'
-            return richData['Message']
+            print(richData)
+            for item in richData['data']['tableRow']['priceHistory']:
+                date = datetime.datetime(int(item['date'][0:4]), int(item['date'][5:7]), int(item['date'][8:10]))
+                entity = FundRecord()
+                queryEntity = FundRecordFacade.queryByCodeAndDate(code, date)
+                if queryEntity:
+                    entity.id = queryEntity.id
+                entity.code = code
+                entity.date = date
+                entity.price = float(item['price'])
+                if entity.id:
+                    FundRecordFacade.update(entity)
+                else:
+                    FundRecordFacade.insert(entity)
+            return 'SUCCESS'
         else:
             print('[INFO] find no fund with code<{code}>'.format(code = code))
             return 'NO_DATA'
