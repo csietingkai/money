@@ -4,6 +4,7 @@ export const API_URL: string = process.env.API_URL;
 export const AUTH_LOGIN_PATH: string = '/login';
 export const AUTH_REGISTER_PATH: string = '/register';
 export const AUTH_VALIDATE_PATH: string = '/validate';
+export const AUTH_LOGOUT_PATH: string = '/userLogout';
 
 // api file
 const FILE_API_PREFIX: string = '/file';

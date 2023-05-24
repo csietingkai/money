@@ -27,6 +27,7 @@ export const getAuthToken = (): AuthToken => {
     }
     const parseObj = JSON.parse(authTokenStr);
     const authToken: AuthToken = {
+        id: parseObj.id,
         name: parseObj.name,
         role: parseObj.role,
         tokenString: parseObj.tokenString,

@@ -51,7 +51,7 @@ public final class AuthTokenService {
 	}
 
 	public void revoke(AuthToken authToken) {
-		this.stringRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_USER_KEY, authToken.getName()));
+		this.stringRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_USER_KEY, authToken.getId()));
 		this.authTokenRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, authToken.getTokenString()));
 	}
 
@@ -65,6 +65,7 @@ public final class AuthTokenService {
 
 	private AuthToken generate(User user) {
 		AuthToken authToken = new AuthToken();
+		authToken.setId(user.getId());
 		authToken.setName(user.getName());
 		authToken.setTokenString(this.tokenStringService.next());
 		authToken.setExpiryDate(this.getExpiryDate());

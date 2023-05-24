@@ -14,7 +14,7 @@ import Loading from 'component/layout/Loading';
 import { APP_ROUTES } from 'component/layout/RouteSetting';
 import Sidebar from 'component/layout/Sidebar';
 
-import { AuthToken } from 'api/auth';
+import AuthApi, { AuthToken } from 'api/auth';
 
 import { Action } from 'util/Interface';
 
@@ -34,7 +34,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state = {};
     }
 
-    private onLogoutClick = () => {
+    private onLogoutClick = async () => {
+        const { id, tokenString } = this.props.authToken;
+        await AuthApi.logout(id, tokenString);
         this.props.logout();
     };
 

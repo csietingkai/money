@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-import { AUTH_LOGIN_PATH, AUTH_REGISTER_PATH, AUTH_VALIDATE_PATH } from 'api/Constant';
+import { AUTH_LOGIN_PATH, AUTH_LOGOUT_PATH, AUTH_REGISTER_PATH, AUTH_VALIDATE_PATH } from 'api/Constant';
 
 import { ApiResponse } from 'util/Interface';
 
 export interface AuthToken {
+    id: string;
     name: string;
     role: string;
     tokenString: string;
@@ -36,4 +37,10 @@ const validate = async (tokenString: string): Promise<AuthResponse> => {
     return data;
 };
 
-export default { login, register, validate };
+const logout = async (userId: string, tokenString: string): Promise<AuthResponse> => {
+    const response = await axios.post(AUTH_LOGOUT_PATH, null, { params: { userId, tokenString } });
+    const data: AuthResponse = response.data;
+    return data;
+};
+
+export default { login, register, validate, logout };

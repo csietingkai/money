@@ -1,12 +1,16 @@
 package io.tingkai.money.controller;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.User;
 import io.tingkai.money.model.exception.AlreadyExistException;
@@ -30,6 +34,7 @@ public class AuthController {
 	public static final String REGISTER_PATH = "/register";
 	public static final String CONFIRM_PATH = "/confirm";
 	public static final String VALIDATE_PATH = "/validate";
+	public static final String LOGOUT_PATH = "/userLogout";
 
 	@Autowired
 	private UserService userService;
@@ -72,5 +77,14 @@ public class AuthController {
 		} else {
 			return new AuthResponse(false, null, MessageConstant.AUTH_TOKEN_EXPIRE);
 		}
+	}
+
+	@RequestMapping(value = AuthController.LOGOUT_PATH, method = RequestMethod.POST)
+	public AuthResponse logout(@RequestParam UUID userId, @RequestHeader(name = CodeConstants.REQUEST_TOKEN_KEY) String tokenString) {
+		AuthToken token = new AuthToken();
+		token.setId(userId);
+		token.setTokenString(tokenString);
+		this.authTokenService.revoke(token);
+		return new AuthResponse(true, token, MessageConstant.LOGOUT_SUCCESS);
 	}
 }

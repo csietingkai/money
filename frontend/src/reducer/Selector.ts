@@ -33,6 +33,7 @@ export const DEFAULT_REDUX_AUTH_STATE: ReduxAuthState = {
 };
 const getAuthState = (state: ReduxState): ReduxAuthState => state.auth;
 export const getAuthToken = (state: ReduxState): AuthToken => getAuthState(state)?.authToken;
+export const getAuthTokenId = (state: ReduxState): string => getAuthToken(state)?.id;
 export const getAuthTokenName = (state: ReduxState): string => getAuthToken(state)?.name;
 export const getAuthTokenRole = (state: ReduxState): string => getAuthToken(state)?.role;
 export const getAuthTokenString = (state: ReduxState): string => getAuthToken(state)?.tokenString;
