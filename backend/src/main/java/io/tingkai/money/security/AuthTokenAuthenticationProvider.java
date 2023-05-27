@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.util.AppUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class AuthTokenAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired
@@ -23,7 +25,7 @@ public class AuthTokenAuthenticationProvider implements AuthenticationProvider {
 			try {
 				authToken = this.authTokenService.validate(authentication.getCredentials().toString());
 			} catch (AuthTokenExpireException e) {
-				e.printStackTrace();
+				log.warn(e.getMessage());
 			}
 			if (AppUtil.isPresent(authToken)) {
 				return new AuthTokenAuthentication(authToken);

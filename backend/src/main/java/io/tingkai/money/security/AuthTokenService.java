@@ -3,6 +3,7 @@ package io.tingkai.money.security;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,12 @@ public final class AuthTokenService {
 		this.authTokenRedisTemplate.opsForValue().set(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, authToken.getTokenString()), authToken, CodeConstants.AUTH_TOKEN_VALID_HOURS, TimeUnit.HOURS);
 
 		return authToken;
+	}
+
+	public void remove(UUID userId) {
+		String tokenString = this.stringRedisTemplate.opsForValue().get(MessageFormat.format(CodeConstants.AUTH_USER_KEY, userId));
+		this.stringRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_USER_KEY, userId));
+		this.authTokenRedisTemplate.delete(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, tokenString));
 	}
 
 	public void revoke(AuthToken authToken) {

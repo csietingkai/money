@@ -48,6 +48,7 @@ public class AuthController {
 	@RequestMapping(value = AuthController.LOGIN_PATH, method = RequestMethod.POST)
 	public AuthResponse login(@RequestParam String username, @RequestParam String password) throws UserNotFoundException, WrongPasswordException {
 		User user = this.userService.login(username, password);
+		this.authTokenService.remove(user.getId());
 		AuthToken token = this.authTokenService.issue(user);
 		return new AuthResponse(true, token, MessageConstant.LOGIN_SUCCESS, username);
 	}
