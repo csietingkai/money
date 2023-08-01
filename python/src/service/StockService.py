@@ -90,6 +90,7 @@ def fetchStock(targetCode):
                 entity.code = code
                 entity.name = name
                 entity.isin_code = data[1][row]
+                entity.currency = 'TWD'
                 year = data[2][row].split('/')[0]
                 month = data[2][row].split('/')[1]
                 day = data[2][row].split('/')[2]
