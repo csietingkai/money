@@ -1,5 +1,6 @@
 import { ExchangeRateVo } from 'api/exchangeRate';
 
+import { DEFAULT_DECIMAL_PRECISION } from 'util/Constant';
 import { SortType } from 'util/Enum';
 import { Record } from 'util/Interface';
 
@@ -161,7 +162,7 @@ export const sumMoney = (amounts: { num: number, currency: string; }[], exchange
         }
         sum += m.num * rate;
     });
-    return sum;
+    return toNumber(sum.toFixed(DEFAULT_DECIMAL_PRECISION));
 };
 
 export const Comparator = (sortType: SortType = SortType.ASC) => <T>(a: T, b: T): number => {
