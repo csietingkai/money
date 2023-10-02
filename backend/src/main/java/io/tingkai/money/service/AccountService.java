@@ -28,6 +28,7 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.BalancePairVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
+import io.tingkai.money.util.AppUtil;
 
 @Service
 @Loggable
@@ -77,6 +78,10 @@ public class AccountService {
 		vo.setMonth(month);
 
 		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, ownerName));
+		if (AppUtil.isEmpty(accounts)) {
+			accounts = this.accountFacade.queryAll(ownerName);
+			this.userCache.opsForValue().set(CodeConstants.ACCOUNT_LIST, accounts);
+		}
 		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
 		Map<UUID, String> accountCurrency = accounts.stream().collect(Collectors.toMap(Account::getId, Account::getCurrency));
 		List<AccountRecord> records = this.accountRecordFacade.queryAllInMonth(accountIds, year, month);
