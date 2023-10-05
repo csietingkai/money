@@ -54,7 +54,7 @@ def fetchFunds():
     return 'SUCCESS'
 
 def fetchFund(targetCode):
-    response = requests.post(CodeConstant.FUND_LIST_URL, json={'order': 'isincode-asc', 'keyword': targetCode})
+    response = requests.post(CodeConstant.FUND_LIST_URL, json={'order': 'isincode-asc', 'keyword': targetCode}, headers={'User-Agent': 'Mozilla/5.0'})
     response = response.json()
     hasResult = len(response['items']) > 0
     if hasResult:
