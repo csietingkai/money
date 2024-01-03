@@ -51,7 +51,7 @@ export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
     list: [],
     own: [],
     tracking: [],
-    condition: { code: '', name: '', start: new Date(), end: new Date() },
+    condition: { code: '', name: '', start: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), end: new Date() },
     predict: []
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
@@ -73,7 +73,7 @@ export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     list: [],
     own: [],
     tracking: [],
-    condition: { code: '', name: '', start: new Date(), end: new Date() },
+    condition: { code: '', name: '', start: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), end: new Date() },
     predict: []
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
