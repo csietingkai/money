@@ -79,7 +79,7 @@ elif [ "$1" = 'build' ]; then
 		docker container rm $frontend_container_name
 		cd ..
 		cd frontend
-		sed -i -e 's/8080/1080/g' .env
+		sed -i -e 's/localhost:8080/192.168.0.170:1080/g' .env
 		docker build . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
 		docker push $frontend_image_name:latest
 		docker push $frontend_image_name:$version
