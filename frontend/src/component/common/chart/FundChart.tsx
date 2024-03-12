@@ -217,13 +217,13 @@ export default class FundChart extends React.Component<FundChartProps, FundChart
                                             </ListGroupItem>
                                             <ListGroupItem action variant='secondary'>
                                                 <h5>Current Price: {records[hoveredIndex].price.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>MA5: {records[hoveredIndex].ma5.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>MA10: {records[hoveredIndex].ma10.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>MA20: {records[hoveredIndex].ma20.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>MA40: {records[hoveredIndex].ma40.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>MA60: {records[hoveredIndex].ma60.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>B.Brand Up: {records[hoveredIndex].bbup.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
-                                                <h5>B.Brand Down: {records[hoveredIndex].bbdown.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA5: {records[hoveredIndex].ma5?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA10: {records[hoveredIndex].ma10?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA20: {records[hoveredIndex].ma20?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA40: {records[hoveredIndex].ma40?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>MA60: {records[hoveredIndex].ma60?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>B.Brand Up: {records[hoveredIndex].bbup?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
+                                                <h5>B.Brand Down: {records[hoveredIndex].bbdown?.toFixed(DEFAULT_DECIMAL_PRECISION)}</h5>
                                             </ListGroupItem>
                                         </ListGroup>
                                     </Col>
