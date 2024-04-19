@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-import { AUTH_LOGIN_PATH, AUTH_LOGOUT_PATH, AUTH_REGISTER_PATH, AUTH_VALIDATE_PATH } from 'api/Constant';
+import { AUTH_LOGIN_PATH, AUTH_LOGOUT_PATH, AUTH_CHANGE_PWD_PATH, AUTH_UPDATE_SETTING_PATH, AUTH_VALIDATE_PATH } from './Constant';
 
-import { ApiResponse } from 'util/Interface';
+import { ApiResponse } from '../util/Interface';
+import { StockType } from '../util/Enum';
 
 export interface AuthToken {
     id: string;
@@ -12,7 +13,23 @@ export interface AuthToken {
     expiryDate: Date;
 }
 
-export interface AuthResponse extends ApiResponse<AuthToken> { }
+export interface UserSetting {
+    id: string;
+    userId: string;
+    stockType: StockType;
+    predictDays: number;
+    stockFeeRate: number;
+    fundFeeRate: number;
+    accountRecordDeletable: boolean;
+    accountRecordType: string;
+}
+
+export interface LoginRespVo {
+    authToken: AuthToken;
+    setting: UserSetting;
+}
+
+export interface AuthResponse extends ApiResponse<LoginRespVo> { }
 
 const login = async (username: string, password: string): Promise<AuthResponse> => {
     const response = await axios.post(AUTH_LOGIN_PATH, null, { params: { username, password } });
@@ -20,13 +37,8 @@ const login = async (username: string, password: string): Promise<AuthResponse> 
     return data;
 };
 
-const register = async (username: string, email: string, password: string, role: string, sendMail?: boolean): Promise<AuthResponse> => {
-    const response = await axios.post(AUTH_REGISTER_PATH, {
-        name: username,
-        email,
-        pwd: password,
-        role
-    }, { params: { sendMail } });
+const changePwd = async (userId: string, password: string): Promise<AuthResponse> => {
+    const response = await axios.post(AUTH_CHANGE_PWD_PATH, null, { params: { userId, password } });
     const data: AuthResponse = response.data;
     return data;
 };
@@ -43,4 +55,10 @@ const logout = async (userId: string, tokenString: string): Promise<AuthResponse
     return data;
 };
 
-export default { login, register, validate, logout };
+const updateUserSetting = async (userSetting: UserSetting): Promise<AuthResponse> => {
+    const response = await axios.post(AUTH_UPDATE_SETTING_PATH, userSetting);
+    const data: AuthResponse = response.data;
+    return data;
+};
+
+export default { login, changePwd, validate, logout, updateUserSetting };

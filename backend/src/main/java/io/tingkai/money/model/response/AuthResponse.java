@@ -1,15 +1,15 @@
 package io.tingkai.money.model.response;
 
-import io.tingkai.money.security.AuthToken;
+import io.tingkai.money.model.vo.LoginRespVo;
 
-public class AuthResponse extends BaseResponse<AuthToken> {
+public class AuthResponse extends BaseResponse<LoginRespVo> {
 
-	public AuthResponse(boolean success, AuthToken authToken, String pattern) {
-		super(success, authToken, pattern);
+	public AuthResponse(boolean success, LoginRespVo vo, String pattern) {
+		super(success, vo, pattern);
 	}
 
-	public AuthResponse(boolean success, AuthToken authToken, String pattern, String... params) {
-		super(success, authToken, pattern, params);
+	public AuthResponse(boolean success, LoginRespVo vo, String pattern, String... params) {
+		super(success, vo, pattern, params);
 	}
 
 	public AuthResponse(Exception e) {

@@ -21,6 +21,7 @@ public class TimeUtil {
 		SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR
 	}
 
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(CodeConstants.DATE_FORMAT);
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(CodeConstants.DATE_TIME_FORMAT).withZone(CodeConstants.ZONE_TPE);
 
 	public static long getCurrentDate() {
@@ -126,5 +127,9 @@ public class TimeUtil {
 
 	public static LocalDateTime minus(LocalDateTime currentDateTime, int amount, TemporalUnit unit) {
 		return currentDateTime.minus(amount, unit);
+	}
+
+	public static LocalDateTime handleRequestDate(String text) {
+		return LocalDate.parse(text, DATE_FORMATTER).atStartOfDay();
 	}
 }

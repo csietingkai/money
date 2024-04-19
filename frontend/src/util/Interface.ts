@@ -1,7 +1,12 @@
 // common
-export interface Record<K, V> {
-    key: K;
-    value: V;
+export interface Notification {
+    time: number;
+    message: string;
+}
+
+export interface Option {
+    key: string;
+    value: string;
 }
 
 // redux
@@ -16,6 +21,7 @@ export interface ApiResponse<T> {
     data: T;
     message: string;
 }
+
 export interface SimpleResponse {
     success: boolean;
     data: null;
@@ -29,14 +35,3 @@ export interface PredictResultVo {
 }
 
 export interface PredictResponse extends ApiResponse<PredictResultVo[]> { }
-
-// component/layout
-export interface SidebarItem {
-    name: string;
-    level: number;
-    type?: 'dropdown' | 'wrapper' | 'divider';
-    url?: string;
-    icon?: JSX.Element;
-    children?: SidebarItem[];
-    component?: React.ComponentType<any>;
-}

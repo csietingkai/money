@@ -12,7 +12,7 @@ import io.tingkai.money.entity.Account;
 @Repository
 public interface AccountDao extends JpaRepository<Account, UUID> {
 
-	public List<Account> findByOwnerName(String ownerName);
+	public List<Account> findByUserId(UUID userId);
 
-	public Optional<Account> findByNameAndOwnerName(String name, String ownerName);
+	public Optional<Account> findByNameAndUserId(String name, UUID userId);
 }

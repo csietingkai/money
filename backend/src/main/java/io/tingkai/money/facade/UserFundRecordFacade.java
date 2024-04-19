@@ -49,14 +49,6 @@ public class UserFundRecordFacade {
 		return entities;
 	}
 
-	public List<UserFundRecord> queryByAccountId(UUID accountId) {
-		List<UserFundRecord> entities = this.userFundRecordDao.findByAccountId(accountId);
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND_RECORD));
-		}
-		return entities;
-	}
-
 	public UserFundRecord query(UUID id) {
 		Optional<UserFundRecord> optional = this.userFundRecordDao.findById(id);
 		if (optional.isEmpty()) {

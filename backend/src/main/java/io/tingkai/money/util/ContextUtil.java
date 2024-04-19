@@ -1,5 +1,7 @@
 package io.tingkai.money.util;
 
+import java.util.UUID;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -8,10 +10,18 @@ import io.tingkai.money.security.AuthTokenAuthentication;
 
 public class ContextUtil {
 
+	public static UUID getUserId() {
+		AuthTokenAuthentication authToken = getAuthToken();
+		if (AppUtil.isPresent(authToken)) {
+			return UUID.fromString(authToken.getPrincipal().toString());
+		}
+		return null;
+	}
+
 	public static String getUserName() {
 		AuthTokenAuthentication authToken = getAuthToken();
 		if (AppUtil.isPresent(authToken)) {
-			return authToken.getPrincipal().toString();
+			return authToken.getName().toString();
 		}
 		return CodeConstants.EMPTY_STRING;
 	}

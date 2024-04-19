@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.UserFund;
+import io.tingkai.money.entity.UserFundRecord;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
@@ -42,6 +43,7 @@ public class FundController {
 	public static final String BUY_PATH = "/buy";
 	public static final String SELL_PATH = "/sell";
 	public static final String GET_OWN_PATH = "/getOwn";
+	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
 	public static final String TRACK_PATH = "/track";
 	public static final String UNTRACK_PATH = "/untrack";
@@ -66,8 +68,8 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public FundResponse<List<FundRecordVo>> getRecords(@RequestParam String code, @RequestParam long start, @RequestParam long end) {
-		List<FundRecordVo> records = this.fundService.getAllRecords(code, start, end);
+	public FundResponse<List<FundRecordVo>> getRecords(@RequestParam String code, @RequestParam String start, @RequestParam String end) {
+		List<FundRecordVo> records = this.fundService.getAllRecords(code, TimeUtil.handleRequestDate(start), TimeUtil.handleRequestDate(end));
 		return new FundResponse<List<FundRecordVo>>(true, records, MessageConstant.FUND_GET_SUCCESS, code);
 	}
 
@@ -78,38 +80,44 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.BUY_PATH, method = RequestMethod.PUT)
-	public FundResponse<UserFund> buy(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, BigDecimal payment, @RequestParam BigDecimal fee) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		UserFund result = this.userFundService.buy(username, accountId, fundCode, TimeUtil.convertToDateTime(date), share, price, rate, payment, fee);
-		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, username, fundCode, share, price));
+	public FundResponse<UserFund> buy(@RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, BigDecimal payment, @RequestParam BigDecimal fee, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UserFund result = this.userFundService.buy(accountId, fundCode, TimeUtil.handleRequestDate(date), share, price, rate, payment, fee, fileId);
+		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, fundCode, share, price));
 	}
 
 	@RequestMapping(value = FundController.SELL_PATH, method = RequestMethod.PUT)
-	public FundResponse<UserFund> sell(@RequestParam String username, @RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam long date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, @RequestParam BigDecimal total) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
-		UserFund result = this.userFundService.sell(username, accountId, fundCode, TimeUtil.convertToDateTime(date), share, price, rate, total);
-		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, username, fundCode, share, price));
+	public FundResponse<UserFund> sell(@RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UserFund result = this.userFundService.sell(accountId, fundCode, TimeUtil.handleRequestDate(date), share, price, rate, total, fileId);
+		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, fundCode, share, price));
 	}
 
 	@RequestMapping(value = FundController.GET_OWN_PATH, method = RequestMethod.GET)
-	public FundResponse<List<UserFundVo>> getOwnFunds(@RequestParam String username) {
-		List<UserFundVo> result = this.userFundService.getOwnFunds(username, true);
+	public FundResponse<List<UserFundVo>> getOwnFunds() {
+		List<UserFundVo> result = this.userFundService.getOwnFunds(true);
 		return new FundResponse<List<UserFundVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
+	@RequestMapping(value = StockController.GET_OWN_RECORDS_PATH, method = RequestMethod.GET)
+	public StockResponse<List<UserFundRecord>> getOwnStockRecords(@RequestParam UUID userFundId) {
+		List<UserFundRecord> result = this.userFundService.getOwnFundRecords(userFundId);
+		return new StockResponse<List<UserFundRecord>>(true, result, MessageConstant.SUCCESS);
+	}
+
 	@RequestMapping(value = FundController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)
-	public FundResponse<List<UserTrackingFundVo>> getAll(@RequestParam String username) {
-		List<UserTrackingFundVo> funds = this.userFundService.getUserTrackingFundList(username);
-		return new FundResponse<List<UserTrackingFundVo>>(true, funds, MessageConstant.USER_FUND_GET_TRACKING_LIST_SUCCESS, username);
+	public FundResponse<List<UserTrackingFundVo>> getAll(@RequestParam UUID userId) {
+		List<UserTrackingFundVo> funds = this.userFundService.getUserTrackingFundList(userId);
+		return new FundResponse<List<UserTrackingFundVo>>(true, funds, MessageConstant.USER_FUND_GET_TRACKING_LIST_SUCCESS);
 	}
 
 	@RequestMapping(value = FundController.TRACK_PATH, method = RequestMethod.POST)
-	public FundResponse<Void> track(@RequestParam String username, @RequestParam String code) throws AlreadyExistException, FieldMissingException {
-		this.userFundService.track(username, code);
+	public FundResponse<Void> track(@RequestParam UUID userId, @RequestParam String code) throws AlreadyExistException, FieldMissingException {
+		this.userFundService.track(userId, code);
 		return new FundResponse<Void>(true, null, MessageConstant.FUND_REFRESH_SUCCESS);
 	}
 
 	@RequestMapping(value = FundController.UNTRACK_PATH, method = RequestMethod.POST)
-	public FundResponse<Void> untrack(@RequestParam String username, @RequestParam String code) throws NotExistException {
-		this.userFundService.untrack(username, code);
+	public FundResponse<Void> untrack(@RequestParam UUID userId, @RequestParam String code) throws NotExistException {
+		this.userFundService.untrack(userId, code);
 		return new FundResponse<Void>(true, null, MessageConstant.FUND_REFRESH_SUCCESS);
 	}
 

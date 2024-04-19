@@ -1,7 +1,9 @@
 package io.tingkai.money.service;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,17 +12,19 @@ import org.springframework.stereotype.Service;
 import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.User;
+import io.tingkai.money.entity.UserSetting;
 import io.tingkai.money.enumeration.Role;
+import io.tingkai.money.enumeration.option.RecordType;
+import io.tingkai.money.enumeration.option.StockType;
 import io.tingkai.money.facade.UserFacade;
+import io.tingkai.money.facade.UserSettingFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.IllegalRoleException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.ContextUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -30,6 +34,9 @@ public class UserService {
 
 	@Autowired
 	private UserFacade userFacade;
+
+	@Autowired
+	private UserSettingFacade userSettingFacade;
 
 	@Autowired
 	private PasswordEncoder bCryptPasswordEncoder;
@@ -55,31 +62,24 @@ public class UserService {
 			entity.setRole(Role.USER);
 		}
 		entity.setPwd(this.bCryptPasswordEncoder.encode(entity.getPwd()));
-		return this.userFacade.insert(entity);
+		entity = this.userFacade.insert(entity);
+
+		UserSetting defaultSetting = new UserSetting();
+		defaultSetting.setAccountRecordDeletable(false);
+		defaultSetting.setAccountRecordType(RecordType.SALARY);
+		defaultSetting.setPredictDays(BigDecimal.ONE);
+		defaultSetting.setStockFeeRate(BigDecimal.ONE);
+		defaultSetting.setFundFeeRate(BigDecimal.ONE);
+		defaultSetting.setStockType(StockType.TW);
+		defaultSetting.setUserId(entity.getId());
+		this.userSettingFacade.insert(defaultSetting);
+		return entity;
 	}
 
-	public User confirm(String email) throws NotExistException, FieldMissingException {
-		User entity = this.userFacade.queryByEmail(email);
-		entity.setConfirm(true);
+	public User changePwd(UUID userId, String newPwd) throws NotExistException, FieldMissingException {
+		User entity = this.userFacade.query(userId);
+		entity.setPwd(this.bCryptPasswordEncoder.encode(newPwd));
 		return this.userFacade.update(entity);
-	}
-
-	public User setUserAsAdmin(User userToBeAdmin) throws NotExistException, FieldMissingException, IllegalRoleException {
-		if (!isCurrentUserRoot()) {
-			throw new IllegalRoleException("Need Root Role");
-		}
-		userToBeAdmin.setRole(Role.ADMIN);
-		return this.userFacade.update(userToBeAdmin);
-	}
-
-	public boolean isCurrentUserRoot() {
-		User loginUser = getCurrentLoginUser();
-		return loginUser.getRole() == Role.ROOT;
-	}
-
-	public boolean isCurrentUserConfirm() {
-		User loginUser = getCurrentLoginUser();
-		return loginUser.getRole() == Role.ROOT;
 	}
 
 	public boolean isRootExist() {
@@ -91,13 +91,21 @@ public class UserService {
 		User root = new User();
 		root.setName(AppConstants.INIT_ROOT_USERNAME);
 		root.setPwd(this.bCryptPasswordEncoder.encode(initRootPassword));
-		root.setEmail(AppConstants.INIT_ROOT_EMAIL);
 		root.setRole(Role.ROOT);
 		return this.userFacade.insert(root);
 	}
 
-	private User getCurrentLoginUser() {
-		String loginUsername = ContextUtil.getUserName();
-		return this.userFacade.queryByName(loginUsername);
+	public UserSetting getUserSetting(UUID userId) {
+		return this.userSettingFacade.queryByUserId(userId);
+	}
+
+	public UserSetting updateUserSetting(UserSetting newSetting) throws FieldMissingException, NotExistException {
+		if (BigDecimal.ZERO.compareTo(newSetting.getPredictDays()) >= 0) {
+			throw new FieldMissingException();
+		}
+		if (BigDecimal.ZERO.compareTo(newSetting.getStockFeeRate()) >= 0 || BigDecimal.ONE.compareTo(newSetting.getStockFeeRate()) < 0 || BigDecimal.ZERO.compareTo(newSetting.getFundFeeRate()) >= 0 || BigDecimal.ONE.compareTo(newSetting.getFundFeeRate()) < 0) {
+			throw new FieldMissingException();
+		}
+		return this.userSettingFacade.update(newSetting);
 	}
 }

@@ -1,12 +1,10 @@
 import axios from 'axios';
-
 import {
     ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH,
     ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_RECORD_DELETE_PATH, ACCOUNT_MONTH_BALANCE_PATH
-} from 'api/Constant';
-
-import { ApiResponse, SimpleResponse } from 'util/Interface';
-import { handleRequestDate } from 'util/AppUtil';
+} from './Constant';
+import { ApiResponse, SimpleResponse } from '../util/Interface';
+import * as AppUtil from '../util/AppUtil';
 
 export interface Account {
     id: string;
@@ -26,6 +24,14 @@ export interface AccountRecord {
     description: string | null;
 }
 
+export interface AccountRecordVo extends AccountRecord {
+    transFromName: string;
+    transFromCurrency: string;
+    transToName: string;
+    transToCurrency: string;
+    transCurrentExchangeRate: number;
+}
+
 export interface MonthBalanceVo {
     year: number;
     month: number;
@@ -40,25 +46,23 @@ export interface BalancePairVo {
 
 export interface AccountResponse extends ApiResponse<Account> { }
 export interface AccountListResponse extends ApiResponse<Account[]> { }
-export interface AccountRecordListResponse extends ApiResponse<AccountRecord[]> { }
+export interface AccountRecordListResponse extends ApiResponse<AccountRecordVo[]> { }
 export interface AccountMonthBalanceResponse extends ApiResponse<MonthBalanceVo> { }
 
-const getAccounts = async (ownerName: string): Promise<AccountListResponse> => {
-    const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { ownerName } });
+const getAccounts = async (userId: string): Promise<AccountListResponse> => {
+    const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { userId } });
     const data: AccountListResponse = response.data;
     return data;
 };
 
-const createAccount = async (entity: Account): Promise<SimpleResponse> => {
-    entity.id = '';
-    entity.balance = 0;
-    const response = await axios.post(ACCOUNT_CREATE_PATH, entity);
+const createAccount = async (name: string, currency: string): Promise<SimpleResponse> => {
+    const response = await axios.post(ACCOUNT_CREATE_PATH, null, { params: { name, currency } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const updateAccount = async (entity: Account): Promise<SimpleResponse> => {
-    const response = await axios.put(ACCOUNT_UPDATE_PATH, entity);
+const updateAccount = async (id: string, name: string): Promise<SimpleResponse> => {
+    const response = await axios.put(ACCOUNT_UPDATE_PATH, null, { params: { id, name } });
     const data: SimpleResponse = response.data;
     return data;
 };
@@ -85,29 +89,20 @@ const getMonthBalance = async (ownerName: string, year: number, month: number): 
     return data;
 };
 
-const income = async (accountId: string, entity: AccountRecord): Promise<SimpleResponse> => {
-    if (!entity.transDate) {
-        entity.transDate = new Date();
-    }
-    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, handleRequestDate(entity), { params: { accountId } });
+const income = async (accountId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
+    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, null, { params: { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const transfer = async (accountId: string, entity: AccountRecord): Promise<SimpleResponse> => {
-    if (!entity.transDate) {
-        entity.transDate = new Date();
-    }
-    const response = await axios.post(ACCOUNT_TRANSFER_RECORD_PATH, handleRequestDate(entity), { params: { accountId } });
+const transfer = async (fromId: string, toId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
+    const response = await axios.post(ACCOUNT_TRANSFER_RECORD_PATH, null, { params: { fromId, toId, date: AppUtil.toDateStr(date), amount, type, description, fileId } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const expend = async (accountId: string, entity: AccountRecord): Promise<SimpleResponse> => {
-    if (!entity.transDate) {
-        entity.transDate = new Date();
-    }
-    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, handleRequestDate(entity), { params: { accountId } });
+const expend = async (accountId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
+    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, null, { params: { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId } });
     const data: SimpleResponse = response.data;
     return data;
 };

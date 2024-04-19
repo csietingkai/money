@@ -33,8 +33,8 @@ public class UserStockFacade {
 		return entities;
 	}
 
-	public List<UserStock> queryByUsername(String username) {
-		List<UserStock> entities = this.userStockDao.findByUserName(username);
+	public List<UserStock> queryByUserId(UUID userId) {
+		List<UserStock> entities = this.userStockDao.findByUserId(userId);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK));
 		}
@@ -49,8 +49,8 @@ public class UserStockFacade {
 		return optional.get();
 	}
 
-	public UserStock queryByUsernameAndStockCode(String username, String stockCode) {
-		Optional<UserStock> optional = this.userStockDao.findByUserNameAndStockCode(username, stockCode);
+	public UserStock queryByUserIdAndStockCode(UUID userId, String stockCode) {
+		Optional<UserStock> optional = this.userStockDao.findByUserIdAndStockCode(userId, stockCode);
 		if (optional.isEmpty()) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK));
 		}
@@ -58,10 +58,10 @@ public class UserStockFacade {
 	}
 
 	public UserStock insert(UserStock entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getUserName(), entity.getStockCode(), entity.getAmount())) {
+		if (!AppUtil.isAllPresent(entity, entity.getUserId(), entity.getStockCode(), entity.getAmount())) {
 			throw new FieldMissingException();
 		}
-		Optional<UserStock> optional = this.userStockDao.findByUserNameAndStockCode(entity.getUserName(), entity.getStockCode());
+		Optional<UserStock> optional = this.userStockDao.findByUserIdAndStockCode(entity.getUserId(), entity.getStockCode());
 		if (optional.isPresent()) {
 			throw new AlreadyExistException();
 		}

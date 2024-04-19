@@ -1,34 +1,24 @@
-import { Dispatch } from 'react';
-import { applyMiddleware, createStore } from 'redux';
-import thunkMiddleware from 'redux-thunk';
+import { Dispatch, legacy_createStore as createStore } from 'redux';
+import rootReducer from './Reducer';
+import * as AppUtil from '../util/AppUtil';
+import AccountApi, { Account, AccountListResponse } from '../api/account';
+import AuthApi, { AuthResponse, AuthToken, LoginRespVo } from '../api/auth';
+import OptionApi, { OptionResponse } from '../api/option';
+import FundApi, { UserFundListResponse } from '../api/fund';
+import StockApi, { UserStockListResponse } from '../api/stock';
+import { Login, Logout, SetAccountList, SetCurrencyOptions, SetFileTypeOptions, SetLoading, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
+import { ReduxState, getAuthTokenString, getAccountList, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId } from './Selector';
+import { Action, ApiResponse, Option } from '../util/Interface';
+import { getAuthToken } from './StateHolder';
 
-import {
-    Login, Logout, SetAccountList, SetExchangeRateDefaultForeignerCurrency, SetDefaultRecordType, SetDefaultRole, SetExchangeRateList, SetFundList, SetFundOwnList, SetFundTrackingList,
-    SetLoading, SetRecordTypes, SetRoles, SetStockList, SetStockOwnList, SetStockTrackingList
-} from 'reducer/Action';
-import {
-    getAccountList, getAuthTokenName, getAuthTokenString, getDefaultRecordType, getDefaultRole, getExchangeRateDefaultForeignerCurrency, getExchangeRateList, getFundList, getFundOwnList, getFundTrackingList, getRecordTypes,
-    getRoles, getStockList, getStockOwnList, getStockTrackingList, isLoading, ReduxState
-} from 'reducer/Selector';
-import rootReducer from 'reducer/Reducer';
-
-import AccountApi, { Account, AccountListResponse } from 'api/account';
-import AuthApi, { AuthResponse, AuthToken } from 'api/auth';
-import EnumApi, { EnumResponse } from 'api/enum';
-import ExchangeRateApi, { ExchangeRateVo, ExchangeRateListResponse } from 'api/exchangeRate';
-import FundApi, { FundListResponse, FundTrackingListResponse, FundVo, UserFundListResponse, UserFundVo, UserTrackingFundVo } from 'api/fund';
-import StockApi, { StockListResponse, StockTrackingListResponse, StockVo, UserStockListResponse, UserStockVo, UserTrackingStockVo } from 'api/stock';
-
-import { isArrayEmpty } from 'util/AppUtil';
-import { Action, ApiResponse } from 'util/Interface';
-
-export const validateToken = (dispatch: Dispatch<Action<AuthToken>>, getState: () => ReduxState): void => {
-    const tokenString: string = getAuthTokenString(getState());
+export const validateToken = (dispatch: Dispatch<Action<LoginRespVo | undefined>>, getState: () => ReduxState): void => {
+    const tokenString: string | undefined = getAuthToken()?.tokenString;
     if (tokenString) {
         AuthApi.validate(tokenString).then((response: AuthResponse) => {
             const { success, data } = response;
             if (success) {
                 dispatch(Login(data));
+                init(dispatch, getState);
             } else {
                 dispatch(Logout());
             }
@@ -47,104 +37,60 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
 
     const tokenString: string = getAuthTokenString(getState());
 
-    const stockList: StockVo[] = getStockList(getState());
-    if (tokenString && isArrayEmpty(stockList)) {
-        apis.push(StockApi.getAll());
-        responseHandlers.push((response: StockListResponse) => {
+    const currencies: Option[] = getCurrencies(getState());
+    if (tokenString && AppUtil.isArrayEmpty(currencies)) {
+        apis.push(OptionApi.getCurrencies());
+        responseHandlers.push((response: OptionResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetStockList(data));
+                dispatch(SetCurrencyOptions(data));
             } else {
-                dispatch(SetStockList([]));
+                dispatch(SetCurrencyOptions([]));
             }
         });
     }
 
-    const stockOwnList: UserStockVo[] = getStockOwnList(getState());
-    if (tokenString && isArrayEmpty(stockOwnList)) {
-        apis.push(StockApi.getOwn(getAuthTokenName(getState())));
-        responseHandlers.push((response: UserStockListResponse) => {
+    const fileTypes: Option[] = getFileTypes(getState());
+    if (tokenString && AppUtil.isArrayEmpty(fileTypes)) {
+        apis.push(OptionApi.getFileTypes());
+        responseHandlers.push((response: OptionResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetStockOwnList(data));
+                dispatch(SetFileTypeOptions(data));
             } else {
-                dispatch(SetStockOwnList([]));
+                dispatch(SetFileTypeOptions([]));
             }
         });
     }
 
-    const stockTrackingList: UserTrackingStockVo[] = getStockTrackingList(getState());
-    if (tokenString && isArrayEmpty(stockTrackingList)) {
-        apis.push(StockApi.getTrackingList(getAuthTokenName(getState())));
-        responseHandlers.push((response: StockTrackingListResponse) => {
+    const stockTypes: Option[] = getStockTypes(getState());
+    if (tokenString && AppUtil.isArrayEmpty(stockTypes)) {
+        apis.push(OptionApi.getStockTypes());
+        responseHandlers.push((response: OptionResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetStockTrackingList(data));
+                dispatch(SetStockTypeOptions(data));
             } else {
-                dispatch(SetStockTrackingList([]));
+                dispatch(SetStockTypeOptions([]));
             }
         });
     }
 
-    const fundList: FundVo[] = getFundList(getState());
-    if (tokenString && isArrayEmpty(fundList)) {
-        apis.push(FundApi.getAll());
-        responseHandlers.push((response: FundListResponse) => {
+    const recordTypes: Option[] = getRecordTypes(getState());
+    if (tokenString && AppUtil.isArrayEmpty(recordTypes)) {
+        apis.push(OptionApi.getRecordTypes());
+        responseHandlers.push((response: OptionResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetFundList(data));
+                dispatch(SetRecordTypeOptions(data));
             } else {
-                dispatch(SetFundList([]));
+                dispatch(SetRecordTypeOptions([]));
             }
         });
     }
 
-    const fundOwnList: UserFundVo[] = getFundOwnList(getState());
-    if (tokenString && isArrayEmpty(fundOwnList)) {
-        apis.push(FundApi.getOwn(getAuthTokenName(getState())));
-        responseHandlers.push((response: UserFundListResponse) => {
-            const { success, data } = response;
-            if (success) {
-                dispatch(SetFundOwnList(data));
-            } else {
-                dispatch(SetFundOwnList([]));
-            }
-        });
-    }
-
-    const fundTrackingList: UserTrackingFundVo[] = getFundTrackingList(getState());
-    if (tokenString && isArrayEmpty(fundTrackingList)) {
-        apis.push(FundApi.getTrackingList(getAuthTokenName(getState())));
-        responseHandlers.push((response: FundTrackingListResponse) => {
-            const { success, data } = response;
-            if (success) {
-                dispatch(SetFundTrackingList(data));
-            } else {
-                dispatch(SetFundTrackingList([]));
-            }
-        });
-    }
-
-    const exchangeRateList: ExchangeRateVo[] = getExchangeRateList(getState());
-    if (tokenString && isArrayEmpty(exchangeRateList)) {
-        apis.push(ExchangeRateApi.getAll());
-        responseHandlers.push((response: ExchangeRateListResponse) => {
-            const { success, data } = response;
-            if (success) {
-                dispatch(SetExchangeRateList(data));
-                if (!getExchangeRateDefaultForeignerCurrency(getState())) {
-                    dispatch(SetExchangeRateDefaultForeignerCurrency(data.filter(x => x.currency !== 'TWD')[0]?.currency));
-                }
-            } else {
-                dispatch(SetExchangeRateList([]));
-                dispatch(SetExchangeRateDefaultForeignerCurrency(''));
-            }
-        });
-    }
-
-    const accountList: Account[] = getAccountList(getState());
-    if (tokenString && isArrayEmpty(accountList)) {
-        apis.push(AccountApi.getAccounts(getAuthTokenName(getState())));
+    if (tokenString) {
+        apis.push(AccountApi.getAccounts(getAuthTokenId(getState())));
         responseHandlers.push((response: AccountListResponse) => {
             const { success, data } = response;
             if (success) {
@@ -155,36 +101,26 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
         });
     }
 
-    const roles: string[] = getRoles(getState());
-    if (tokenString && isArrayEmpty(roles)) {
-        apis.push(EnumApi.getRoles());
-        responseHandlers.push((response: EnumResponse) => {
+    if (tokenString) {
+        apis.push(StockApi.getOwn());
+        responseHandlers.push((response: UserStockListResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetRoles(data));
-                if (!getDefaultRole(getState())) {
-                    dispatch(SetDefaultRole(data[0]));
-                }
+                dispatch(SetOwnStockList(data));
             } else {
-                dispatch(SetRoles([]));
-                dispatch(SetDefaultRole(''));
+                dispatch(SetOwnStockList([]));
             }
         });
     }
 
-    const recordTypes: string[] = getRecordTypes(getState());
-    if (tokenString && isArrayEmpty(recordTypes)) {
-        apis.push(EnumApi.getRecordTypes());
-        responseHandlers.push((response: EnumResponse) => {
+    if (tokenString) {
+        apis.push(FundApi.getOwn());
+        responseHandlers.push((response: UserFundListResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetRecordTypes(data));
-                if (!getDefaultRecordType(getState())) {
-                    dispatch(SetDefaultRecordType(data[0]));
-                }
+                dispatch(SetOwnFundList(data));
             } else {
-                dispatch(SetRecordTypes([]));
-                dispatch(SetDefaultRecordType(''));
+                dispatch(SetOwnFundList([]));
             }
         });
     }
@@ -194,10 +130,5 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
     });
 };
 
-export const setLoading = (dispatch: Dispatch<Action<boolean>>, getState: () => ReduxState): void => {
-    dispatch(SetLoading(isLoading(getState())));
-};
-
-const store = createStore<any, any, any, any>(rootReducer, applyMiddleware(thunkMiddleware));
-
+const store = createStore<any, any>(rootReducer);
 export default store;

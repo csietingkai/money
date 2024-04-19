@@ -65,7 +65,7 @@ public class FundService {
 		return vos;
 	}
 
-	public List<FundRecordVo> getAllRecords(String code, long start, long end) {
+	public List<FundRecordVo> getAllRecords(String code, LocalDateTime start, LocalDateTime end) {
 		List<FundRecord> records = new ArrayList<FundRecord>();
 		int removeSize = 0;
 		try {

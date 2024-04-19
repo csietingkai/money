@@ -12,7 +12,7 @@ import io.tingkai.money.entity.UserTrackingFund;
 @Repository
 public interface UserTrackingFundDao extends JpaRepository<UserTrackingFund, UUID> {
 
-	public List<UserTrackingFund> findByUserNameOrderByFundCode(String username);
+	public List<UserTrackingFund> findByUserIdOrderByFundCode(UUID userId);
 
-	public Optional<UserTrackingFund> findByUserNameAndFundCode(String username, String fundCode);
+	public Optional<UserTrackingFund> findByUserIdAndFundCode(UUID userId, String fundCode);
 }

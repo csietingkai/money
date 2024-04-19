@@ -58,22 +58,14 @@ public class UserFacade {
 		return optional.get();
 	}
 
-	public User queryByEmail(String email) {
-		Optional<User> optional = this.userDao.findByEmail(email);
-		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER));
-		}
-		return optional.get();
-	}
-
 	public User insert(User entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getName(), entity.getEmail(), entity.getPwd())) {
+		if (!AppUtil.isAllPresent(entity, entity.getName(), entity.getPwd())) {
 			throw new FieldMissingException();
 		}
-		Optional<User> optional = this.userDao.findByName(entity.getName());
-		if (optional.isEmpty()) {
-			optional = this.userDao.findByEmail(entity.getEmail());
+		if (!AppUtil.isAllPresent(entity.getRole())) {
+			entity.setRole(Role.USER);
 		}
+		Optional<User> optional = this.userDao.findByName(entity.getName());
 		if (optional.isPresent()) {
 			throw new AlreadyExistException();
 		}
@@ -81,7 +73,7 @@ public class UserFacade {
 	}
 
 	public User update(User entity) throws NotExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getId())) {
+		if (!AppUtil.isAllPresent(entity, entity.getId(), entity.getName(), entity.getPwd(), entity.getRole())) {
 			throw new FieldMissingException();
 		}
 		Optional<User> optional = this.userDao.findById(entity.getId());
@@ -90,7 +82,6 @@ public class UserFacade {
 		}
 		User updateEntity = optional.get();
 		updateEntity.setName(entity.getName());
-		updateEntity.setEmail(entity.getEmail());
 		updateEntity.setPwd(entity.getPwd());
 		updateEntity.setRole(entity.getRole());
 		return this.userDao.save(updateEntity);

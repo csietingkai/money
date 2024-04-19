@@ -2,11 +2,11 @@ import axios from 'axios';
 
 import {
     FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH,
-    FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_SELL_PATH
-} from 'api/Constant';
+    FUND_UNTRACK_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_GET_OWN_RECORDS_PATH, USER_FUND_SELL_PATH
+} from './Constant';
 
-import { toDate } from 'util/AppUtil';
-import { ApiResponse, PredictResponse, SimpleResponse } from 'util/Interface';
+import * as AppUtil from '../util/AppUtil';
+import { ApiResponse, PredictResponse, SimpleResponse } from '../util/Interface';
 
 export interface Fund {
     id: string;
@@ -62,6 +62,7 @@ export interface UserFundRecord {
     share: number;
     price: number;
     fee: number;
+    total: number;
 }
 
 export interface UserTrackingFund {
@@ -83,6 +84,7 @@ export interface FundRecordListResponse extends ApiResponse<FundRecordVo[]> { }
 export interface UserFundResponse extends ApiResponse<UserFundVo> { }
 export interface UserFundListResponse extends ApiResponse<UserFundVo[]> { }
 export interface UserFundRecordResponse extends ApiResponse<UserFundRecord> { }
+export interface UserFundRecordListResponse extends ApiResponse<UserFundRecord[]> { }
 export interface FundTrackingListResponse extends ApiResponse<UserTrackingFundVo[]> { }
 
 const REFRESH_FUND_MAX_TIME = 30 * 60 * 1000; // 30 mins
@@ -91,16 +93,23 @@ const getAll = async (code?: string, name?: string, sort: boolean = true): Promi
     const response = await axios.get(FUND_GET_ALL_PATH, { params: { code, name, sort } });
     const data: FundListResponse = response.data;
     if (data.success) {
-        data.data = data.data.map(x => ({ ...x, offeringDate: toDate(x.offeringDate), updateTime: toDate(x.updateTime, toDate(x.offeringDate)) }));
+        data.data = data.data?.map(x => {
+            x.offeringDate = new Date(x.offeringDate);
+            x.updateTime = AppUtil.toDate(x.updateTime) || x.offeringDate;
+            return x;
+        });
     }
     return data;
 };
 
 const getRecords = async (code: string, start: Date, end: Date): Promise<FundRecordListResponse> => {
-    const response = await axios.get(FUND_GET_RECORDS_PATH, { params: { code, start: start.getTime(), end: end.getTime() } });
+    const response = await axios.get(FUND_GET_RECORDS_PATH, { params: { code, start: AppUtil.toDateStr(start), end: AppUtil.toDateStr(end) } });
     const data: FundRecordListResponse = response.data;
     if (data.success) {
-        data.data = data.data.map(x => ({ ...x, date: toDate(x.date) }));
+        data.data = data.data?.map(x => {
+            x.date = new Date(x.date);
+            return x;
+        });
     }
     return data;
 };
@@ -111,21 +120,31 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     return data;
 };
 
-const buy = async (username: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, payment: number, fee: number): Promise<UserFundResponse> => {
-    const response = await axios.put(USER_FUND_BUY_PATH, null, { params: { username, accountId, fundCode, date: date.getTime(), share, price, rate, payment, fee } });
+const buy = async (accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, payment: number, fee: number, fileId: string): Promise<UserFundResponse> => {
+    const response = await axios.put(USER_FUND_BUY_PATH, null, { params: { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, payment, fee, fileId } });
     const data: UserFundResponse = response.data;
     return data;
 };
 
-const sell = async (username: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, total: number): Promise<UserFundResponse> => {
-    const response = await axios.put(USER_FUND_SELL_PATH, null, { params: { username, accountId, fundCode, date: date.getTime(), share, price, rate, total } });
+const sell = async (accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, total: number, fileId: string): Promise<UserFundResponse> => {
+    const response = await axios.put(USER_FUND_SELL_PATH, null, { params: { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, total, fileId } });
     const data: UserFundResponse = response.data;
     return data;
 };
 
-const getOwn = async (username: string): Promise<UserFundListResponse> => {
-    const response = await axios.get(USER_FUND_GET_OWN_PATH, { params: { username } });
+const getOwn = async (): Promise<UserFundListResponse> => {
+    const response = await axios.get(USER_FUND_GET_OWN_PATH);
     const data: UserFundListResponse = response.data;
+    return data;
+};
+
+const getOwnRecords = async (userFundId: string): Promise<UserFundRecordListResponse> => {
+    const response = await axios.get(USER_FUND_GET_OWN_RECORDS_PATH, { params: { userFundId } });
+    const data: UserFundRecordListResponse = response.data;
+    data.data = data.data?.map(x => {
+        x.date = new Date(x.date);
+        return x;
+    });
     return data;
 };
 
@@ -153,4 +172,4 @@ const predict = async (code: string, days?: number): Promise<PredictResponse> =>
     return data;
 };
 
-export default { getAll, getRecords, buy, sell, getOwn, refresh, getTrackingList, track, untrack, predict };
+export default { getAll, getRecords, buy, sell, getOwn, getOwnRecords, refresh, getTrackingList, track, untrack, predict };

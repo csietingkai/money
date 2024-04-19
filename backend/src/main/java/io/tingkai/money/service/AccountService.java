@@ -2,6 +2,7 @@ package io.tingkai.money.service;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,14 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.tingkai.money.constant.CodeConstants;
-import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.logging.Loggable;
+import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
@@ -29,6 +31,7 @@ import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.BalancePairVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
@@ -44,42 +47,40 @@ public class AccountService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<Account>> userCache;
 
-	public List<Account> getAll(String ownerName) {
-		List<Account> entities = this.syncCache(ownerName);
+	public List<Account> getAll(UUID userId) {
+		List<Account> entities = this.syncCache(userId);
 		return entities;
 	}
 
-	public Account get(String name, String ownerName) {
-		return this.accountFacade.query(name, ownerName);
+	public Account get(String name, UUID userId) {
+		return this.accountFacade.query(name, userId);
 	}
 
-	public Account insert(Account entity) throws AlreadyExistException, FieldMissingException {
-		if (entity.getBalance().compareTo(BigDecimal.ZERO) != 0) {
-			return null;
-		}
+	@Transactional
+	public Account insert(String name, String currency) throws AlreadyExistException, FieldMissingException {
+		Account entity = new Account();
+		entity.setName(name);
+		entity.setUserId(ContextUtil.getUserId());
+		entity.setCurrency(currency);
+		entity.setBalance(BigDecimal.ZERO);
 		return this.accountFacade.insert(entity);
 	}
 
-	public Account update(Account entity) throws NotExistException, FieldMissingException {
+	@Transactional
+	public Account update(UUID id, String name) throws NotExistException, FieldMissingException {
+		Account entity = this.accountFacade.query(id);
+		entity.setName(name);
 		return this.accountFacade.update(entity);
 	}
 
-	public void delete(UUID id) throws NotExistException {
-		List<AccountRecord> records = this.accountRecordFacade.queryAll(id);
-		for (AccountRecord record : records) {
-			this.accountRecordFacade.delete(record.getId());
-		}
-		this.accountFacade.delete(id);
-	}
-
-	public MonthBalanceVo getAllRecordInMonth(String ownerName, int year, int month) {
+	public MonthBalanceVo getAllRecordInMonth(UUID userId, int year, int month) {
 		MonthBalanceVo vo = new MonthBalanceVo();
 		vo.setYear(year);
 		vo.setMonth(month);
 
-		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, ownerName));
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId));
 		if (AppUtil.isEmpty(accounts)) {
-			accounts = this.accountFacade.queryAll(ownerName);
+			accounts = this.accountFacade.queryAll(userId);
 			this.userCache.opsForValue().set(CodeConstants.ACCOUNT_LIST, accounts);
 		}
 		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
@@ -144,7 +145,7 @@ public class AccountService {
 		}
 
 		Account account = this.accountFacade.query(accountId);
-		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, account.getOwnerName()));
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, account.getUserId()));
 		Map<UUID, Account> accountMap = accounts.stream().collect(Collectors.toMap(Account::getId, acc -> acc));
 
 		List<AccountRecordVo> vos = new ArrayList<AccountRecordVo>();
@@ -160,54 +161,70 @@ public class AccountService {
 		return vos;
 	}
 
-	public AccountRecord income(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+	@Transactional
+	public AccountRecord income(UUID accountId, LocalDateTime date, BigDecimal amount, String type, String description, UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		Account account = this.accountFacade.query(accountId);
-		entity.setTransAmount(entity.getTransAmount().abs());
-		account.setBalance(account.getBalance().add(entity.getTransAmount()));
-		entity.setTransFrom(accountId);
-		entity.setTransTo(accountId);
-		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_INCOME_DESC, account.getName(), entity.getDescription()));
-		if (BigDecimal.ZERO.compareTo(entity.getTransAmount()) > 0) {
-			throw new AccountBalanceWrongException(entity.getTransAmount());
+		AccountRecord record = new AccountRecord();
+		record.setTransDate(date);
+		record.setTransAmount(amount);
+		record.setTransFrom(accountId);
+		record.setTransTo(accountId);
+		record.setRecordType(type);
+		record.setDescription(description);
+		record.setFileId(fileId);
+		if (BigDecimal.ZERO.compareTo(record.getTransAmount()) > 0) {
+			throw new AccountBalanceWrongException(record.getTransAmount());
 		}
+		account.setBalance(account.getBalance().add(record.getTransAmount()));
 		this.accountFacade.update(account);
-		return this.accountRecordFacade.insert(entity);
+		return this.accountRecordFacade.insert(record);
 	}
 
-	public AccountRecord transfer(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
-		Account account = this.accountFacade.query(accountId);
-		Account transferTo = this.accountFacade.query(entity.getTransTo());
-		if (account.getBalance().compareTo(entity.getTransAmount()) < 0) {
-			throw new AccountBalanceWrongException(entity.getTransAmount());
+	@Transactional
+	public AccountRecord transfer(UUID fromId, UUID toId, LocalDateTime date, BigDecimal amount, String type, String description, UUID fileId) throws AccountBalanceNotEnoughException, AccountBalanceWrongException, NotExistException, FieldMissingException {
+		Account from = this.accountFacade.query(fromId);
+		Account to = this.accountFacade.query(toId);
+		if (from.getBalance().compareTo(amount) < 0) {
+			throw new AccountBalanceNotEnoughException(from.getName());
 		}
-		if (BigDecimal.ZERO.compareTo(entity.getTransAmount()) > 0) {
-			throw new AccountBalanceWrongException(entity.getTransAmount());
+		if (BigDecimal.ZERO.compareTo(amount) >= 0) {
+			throw new AccountBalanceWrongException(amount);
 		}
-		entity.setTransAmount(entity.getTransAmount().abs());
-		account.setBalance(account.getBalance().subtract(entity.getTransAmount()));
-		transferTo.setBalance(transferTo.getBalance().add(entity.getTransAmount()));
-		entity.setTransFrom(accountId);
-		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_TRANSFER_DESC, account.getName(), transferTo.getName(), entity.getDescription()));
-
-		this.accountFacade.update(account);
-		this.accountFacade.update(transferTo);
-		return this.accountRecordFacade.insert(entity);
+		AccountRecord record = new AccountRecord();
+		record.setTransDate(date);
+		record.setTransAmount(amount);
+		record.setTransFrom(fromId);
+		record.setTransTo(toId);
+		record.setRecordType(type);
+		record.setDescription(description);
+		record.setFileId(fileId);
+		from.setBalance(from.getBalance().subtract(amount));
+		to.setBalance(to.getBalance().add(amount));
+		this.accountFacade.update(from);
+		this.accountFacade.update(to);
+		return this.accountRecordFacade.insert(record);
 	}
 
-	public AccountRecord expend(AccountRecord entity, UUID accountId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+	@Transactional
+	public AccountRecord expend(UUID accountId, LocalDateTime date, BigDecimal amount, String type, String description, UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		Account account = this.accountFacade.query(accountId);
-		entity.setTransAmount(BigDecimal.ZERO.subtract(entity.getTransAmount().abs()));
-		account.setBalance(account.getBalance().add(entity.getTransAmount()));
-		entity.setTransFrom(accountId);
-		entity.setTransTo(accountId);
-		entity.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), entity.getDescription()));
-		if (BigDecimal.ZERO.compareTo(entity.getTransAmount()) < 0) {
-			throw new AccountBalanceWrongException(entity.getTransAmount());
+		AccountRecord record = new AccountRecord();
+		record.setTransDate(date);
+		record.setTransAmount(amount);
+		record.setTransFrom(accountId);
+		record.setTransTo(accountId);
+		record.setRecordType(type);
+		record.setDescription(description);
+		record.setFileId(fileId);
+		if (BigDecimal.ZERO.compareTo(record.getTransAmount()) < 0) {
+			throw new AccountBalanceWrongException(record.getTransAmount());
 		}
+		account.setBalance(account.getBalance().add(record.getTransAmount()));
 		this.accountFacade.update(account);
-		return this.accountRecordFacade.insert(entity);
+		return this.accountRecordFacade.insert(record);
 	}
 
+	@Transactional
 	public void reverseRecord(UUID recordId) throws NotExistException, FieldMissingException {
 		AccountRecord record = this.accountRecordFacade.query(recordId);
 		UUID from = record.getTransFrom();
@@ -229,12 +246,12 @@ public class AccountService {
 		}
 	}
 
-	private List<Account> syncCache(String name) {
-		List<Account> entities = this.accountFacade.queryAll(name);
+	private List<Account> syncCache(UUID userId) {
+		List<Account> entities = this.accountFacade.queryAll(userId);
 		entities.sort((Account a, Account b) -> {
 			return a.getName().compareToIgnoreCase(b.getName());
 		});
-		this.userCache.opsForValue().set(MessageFormat.format(CodeConstants.ACCOUNT_LIST, name), entities);
+		this.userCache.opsForValue().set(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId), entities);
 		return entities;
 	}
 }

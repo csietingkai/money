@@ -1,109 +1,48 @@
-import { ExchangeRateQueryCondition } from 'view/investment/ExchangeRate';
-
-import * as StateHolder from 'reducer/StateHolder';
-
-import { Account } from 'api/account';
-import { AuthToken } from 'api/auth';
-import { ExchangeRateVo } from 'api/exchangeRate';
-import { FundVo, UserFundVo, UserTrackingFundVo } from 'api/fund';
-import { StockVo, UserStockVo, UserTrackingStockVo } from 'api/stock';
-
-import { StockStyle } from 'util/Enum';
-import { FundQueryCondition } from 'view/investment/FundView';
-import { StockQueryCondition } from 'view/investment/StockView';
-import { PredictResultVo } from 'util/Interface';
+import * as StateHolder from './StateHolder';
+import { Account } from '../api/account';
+import { AuthToken, UserSetting } from '../api/auth';
+import { UserStockVo } from '../api/stock';
+import { UserFundVo } from '../api/fund';
+import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
+import StockTradeCondition from '../views/stock/interface/StockTradeCondition';
+import { StockType } from '../util/Enum';
+import { Notification, Option } from '../util/Interface';
+import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
+import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 
 export interface ReduxState {
     auth: ReduxAuthState;
+    account: ReduxAccountState;
     stock: ReduxStockState;
     fund: ReduxFundState;
-    exchangeRate: ReduxExchangeRateState;
-    account: ReduxAccountState;
+    option: ReduxOptionState;
     setting: ReduxSystemSettingState;
 }
 
-export type ReduxChildState = ReduxAuthState | ReduxStockState | ReduxExchangeRateState | ReduxAccountState | ReduxSystemSettingState;
+export type ReduxChildState = ReduxAuthState | ReduxAccountState | ReduxStockState | ReduxOptionState | ReduxSystemSettingState;
 
 // authReducer
 export interface ReduxAuthState {
-    authToken: AuthToken;
+    authToken: AuthToken | undefined;
+    userSetting: UserSetting | undefined;
 }
 export const DEFAULT_REDUX_AUTH_STATE: ReduxAuthState = {
-    authToken: StateHolder.getAuthToken()
+    authToken: undefined,
+    userSetting: undefined
 };
 const getAuthState = (state: ReduxState): ReduxAuthState => state.auth;
-export const getAuthToken = (state: ReduxState): AuthToken => getAuthState(state)?.authToken;
+export const getAuthToken = (state: ReduxState): AuthToken => getAuthState(state)?.authToken as AuthToken;
 export const getAuthTokenId = (state: ReduxState): string => getAuthToken(state)?.id;
 export const getAuthTokenName = (state: ReduxState): string => getAuthToken(state)?.name;
 export const getAuthTokenRole = (state: ReduxState): string => getAuthToken(state)?.role;
 export const getAuthTokenString = (state: ReduxState): string => getAuthToken(state)?.tokenString;
 export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(state)?.expiryDate;
-
-// stockReducer
-export interface ReduxStockState {
-    list: StockVo[];
-    own: UserStockVo[];
-    tracking: UserTrackingStockVo[];
-    condition: StockQueryCondition;
-    predict: PredictResultVo[];
-}
-export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
-    list: [],
-    own: [],
-    tracking: [],
-    condition: { code: '', name: '', start: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), end: new Date() },
-    predict: []
-};
-const getStockState = (state: ReduxState): ReduxStockState => state.stock;
-export const getStockList = (state: ReduxState): StockVo[] => getStockState(state)?.list;
-export const getStockOwnList = (state: ReduxState): UserStockVo[] => getStockState(state)?.own;
-export const getStockTrackingList = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.tracking;
-export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.condition;
-export const getStockPredictResult = (state: ReduxState): PredictResultVo[] => getStockState(state)?.predict;
-
-// fundReducer
-export interface ReduxFundState {
-    list: FundVo[];
-    own: UserFundVo[];
-    tracking: UserTrackingFundVo[];
-    condition: FundQueryCondition;
-    predict: PredictResultVo[];
-}
-export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
-    list: [],
-    own: [],
-    tracking: [],
-    condition: { code: '', name: '', start: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), end: new Date() },
-    predict: []
-};
-const getFundState = (state: ReduxState): ReduxFundState => state.fund;
-export const getFundList = (state: ReduxState): FundVo[] => getFundState(state)?.list;
-export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
-export const getFundTrackingList = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.tracking;
-export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.condition;
-export const getFundPredictResult = (state: ReduxState): PredictResultVo[] => getFundState(state)?.predict;
-
-// exchangeReducer
-export interface ReduxExchangeRateState {
-    list: ExchangeRateVo[];
-    condition: ExchangeRateQueryCondition;
-    defaultForeignerCurrency: string;
-}
-export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
-    list: [],
-    condition: { currency: StateHolder.getDefaultForeignerCurrency(), start: new Date(), end: new Date() },
-    defaultForeignerCurrency: StateHolder.getDefaultForeignerCurrency()
-};
-const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;
-export const getExchangeRateList = (state: ReduxState, withNtd: boolean = true): ExchangeRateVo[] => {
-    let list = getExchangeRateState(state)?.list;
-    if (list && !withNtd) {
-        list = list.filter(x => x.currency !== 'TWD');
-    }
-    return list;
-};
-export const getExchangeRateQueryCondition = (state: ReduxState): ExchangeRateQueryCondition => getExchangeRateState(state)?.condition;
-export const getExchangeRateDefaultForeignerCurrency = (state: ReduxState): string => getExchangeRateState(state)?.defaultForeignerCurrency;
+export const getUserSetting = (state: ReduxState): UserSetting => getAuthState(state)?.userSetting as UserSetting;
+export const getStockType = (state: ReduxState): StockType => getUserSetting(state)?.stockType;
+export const getPredictDays = (state: ReduxState): number => getUserSetting(state)?.predictDays;
+export const getTaxFeeRate = (state: ReduxState): number => getUserSetting(state)?.taxFeeRate;
+export const isAccountRecordDeletable = (state: ReduxState): boolean => getUserSetting(state)?.accountRecordDeletable;
+export const getDefaultRecordType = (state: ReduxState): string => getUserSetting(state)?.accountRecordType;
 
 // accountReducer
 export interface ReduxAccountState {
@@ -115,33 +54,74 @@ export const DEFAULT_REDUX_ACCOUNT_STATE: ReduxAccountState = {
 const getAccountState = (state: ReduxState): ReduxAccountState => state.account;
 export const getAccountList = (state: ReduxState): Account[] => getAccountState(state)?.list;
 
+// stockReducer
+export interface ReduxStockState {
+    own: UserStockVo[];
+    queryCondition: StockQueryCondition;
+    tradeCondition: StockTradeCondition;
+}
+export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
+    own: [],
+    queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
+    tradeCondition: { type: 'buy', code: '', name: '', date: new Date(), currency: '', price: 0, share: 0 }
+};
+const getStockState = (state: ReduxState): ReduxStockState => state.stock;
+export const getStockOwnList = (state: ReduxState): UserStockVo[] => getStockState(state)?.own;
+export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.queryCondition;
+export const getStockTradeCondition = (state: ReduxState): StockTradeCondition => getStockState(state)?.tradeCondition;
+
+// fundReducer
+export interface ReduxFundState {
+    own: UserFundVo[];
+    queryCondition: FundQueryCondition;
+    tradeCondition: FundTradeCondition;
+}
+export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
+    own: [],
+    queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
+    tradeCondition: { type: 'buy', code: '', name: '', date: new Date(), currency: '', price: 0, share: 0 }
+};
+const getFundState = (state: ReduxState): ReduxFundState => state.fund;
+export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
+export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.queryCondition;
+export const getFundTradeCondition = (state: ReduxState): FundTradeCondition => getFundState(state)?.tradeCondition;
+
+// options
+export interface ReduxOptionState {
+    currencies: Option[];
+    fileTypes: Option[];
+    stockTypes: Option[];
+    recordTypes: Option[];
+    todayFiles: Option[];
+}
+export const DEFAULT_REDUX_OPTION_STATE: ReduxOptionState = {
+    currencies: [],
+    fileTypes: [],
+    stockTypes: [],
+    recordTypes: [],
+    todayFiles: []
+};
+const getOptionState = (state: ReduxState): ReduxOptionState => state.option;
+export const getCurrencies = (state: ReduxState): Option[] => getOptionState(state)?.currencies;
+export const getFileTypes = (state: ReduxState): Option[] => getOptionState(state)?.fileTypes;
+export const getStockTypes = (state: ReduxState): Option[] => getOptionState(state)?.stockTypes;
+export const getRecordTypes = (state: ReduxState): Option[] => getOptionState(state)?.recordTypes;
+
 // system variable
 export interface ReduxSystemSettingState {
-    stockStyle: StockStyle;
-    predictDays: number;
-    accountRecordDeletable: boolean;
     loading: boolean;
-    roles: string[];
-    defaultRole: string;
-    recordTypes: string[];
-    defaultRecordType: string;
+    sidebarShow: boolean;
+    sidebarFoldable: boolean;
+    notifications: Notification[];
 }
 export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
-    stockStyle: StateHolder.getStockStyle(),
-    predictDays: StateHolder.getPredictDays(),
-    accountRecordDeletable: StateHolder.isAccountRecordDeletable(),
     loading: false,
-    roles: [],
-    defaultRole: StateHolder.getDefaultRole(),
-    recordTypes: [],
-    defaultRecordType: StateHolder.getDefaultRecordType()
+    sidebarShow: StateHolder.getSidebarShow(),
+    sidebarFoldable: StateHolder.getSidebarFoldable(),
+    notifications: []
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
-export const getStockStyle = (state: ReduxState): StockStyle => getSystemSetting(state)?.stockStyle;
-export const getPredictDays = (state: ReduxState): number => getSystemSetting(state)?.predictDays;
-export const isAccountRecordDeletable = (state: ReduxState): boolean => getSystemSetting(state)?.accountRecordDeletable;
 export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;
-export const getRoles = (state: ReduxState): string[] => getSystemSetting(state)?.roles;
-export const getDefaultRole = (state: ReduxState): string => getSystemSetting(state)?.defaultRole;
-export const getRecordTypes = (state: ReduxState): string[] => getSystemSetting(state)?.recordTypes;
-export const getDefaultRecordType = (state: ReduxState): string => getSystemSetting(state)?.defaultRecordType;
+export const isSidebarShow = (state: ReduxState): boolean => getSystemSetting(state)?.sidebarShow;
+export const isSidebarFoldable = (state: ReduxState): boolean => getSystemSetting(state)?.sidebarFoldable;
+export const getNotifications = (state: ReduxState): Notification[] => getSystemSetting(state)?.notifications;

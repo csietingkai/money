@@ -20,7 +20,7 @@ import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.entity.ExchangeRateRecord;
-import io.tingkai.money.enumeration.RecordType;
+import io.tingkai.money.enumeration.option.RecordType;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.ExchangeRateFacade;

@@ -15,12 +15,12 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = DatabaseConstants.TABLE_USER_FUND, uniqueConstraints = { @UniqueConstraint(columnNames = { "userName", "fundCode" }) })
+@Table(name = DatabaseConstants.TABLE_USER_FUND, uniqueConstraints = { @UniqueConstraint(columnNames = { "userId", "fundCode" }) })
 public class UserFund {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected UUID id;
-	protected String userName;
+	protected UUID userId;
 	protected String fundCode;
 	protected BigDecimal amount;
 }

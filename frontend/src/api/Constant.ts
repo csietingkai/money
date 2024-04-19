@@ -1,15 +1,19 @@
-export const API_URL: string = process.env.API_URL;
+export const API_URL: string = process.env.API_URL as string;
 
 // api auth
 export const AUTH_LOGIN_PATH: string = '/login';
-export const AUTH_REGISTER_PATH: string = '/register';
+export const AUTH_CHANGE_PWD_PATH: string = '/changePwd';
 export const AUTH_VALIDATE_PATH: string = '/validate';
 export const AUTH_LOGOUT_PATH: string = '/userLogout';
+export const AUTH_UPDATE_SETTING_PATH: string = '/updateUserSetting';
 
 // api file
-const FILE_API_PREFIX: string = '/file';
-export const FILE_UPLOAD_PATH: string = FILE_API_PREFIX + '/upload';
-export const FILE_DOWNLOAD_PATH: string = FILE_API_PREFIX + '/download';
+const FINANCIAL_FILE_API_PREFIX: string = '/financialFile';
+export const FINANCIAL_FILE_LIST_PATH: string = FINANCIAL_FILE_API_PREFIX + '/list';
+export const FINANCIAL_FILE_UPLOAD_PATH: string = FINANCIAL_FILE_API_PREFIX + '/upload';
+export const FINANCIAL_FILE_UPDATE_PATH: string = FINANCIAL_FILE_API_PREFIX + '/update';
+export const FINANCIAL_FILE_DOWNLOAD_PATH: string = FINANCIAL_FILE_API_PREFIX + '/download';
+export const FINANCIAL_FILE_REMOVE_PATH: string = FINANCIAL_FILE_API_PREFIX + '/remove';
 
 // api stock
 const STOCK_API_PREFIX: string = '/stock';
@@ -20,6 +24,7 @@ export const USER_STOCK_PRECALC_PATH: string = STOCK_API_PREFIX + '/precalc';
 export const USER_STOCK_BUY_PATH: string = STOCK_API_PREFIX + '/buy';
 export const USER_STOCK_SELL_PATH: string = STOCK_API_PREFIX + '/sell';
 export const USER_STOCK_GET_OWN_PATH: string = STOCK_API_PREFIX + '/getOwn';
+export const USER_STOCK_GET_OWN_RECORDS_PATH: string = STOCK_API_PREFIX + '/getOwnRecords';
 export const STOCK_GET_TRACKING_LIST_PATH: string = STOCK_API_PREFIX + '/getTrackingList';
 export const STOCK_TRACK_PATH: string = STOCK_API_PREFIX + '/track';
 export const STOCK_UNTRACK_PATH: string = STOCK_API_PREFIX + '/untrack';
@@ -33,6 +38,7 @@ export const FUND_REFRESH_PATH: string = FUND_API_PREFIX + '/refresh';
 export const USER_FUND_BUY_PATH: string = FUND_API_PREFIX + '/buy';
 export const USER_FUND_SELL_PATH: string = FUND_API_PREFIX + '/sell';
 export const USER_FUND_GET_OWN_PATH: string = FUND_API_PREFIX + '/getOwn';
+export const USER_FUND_GET_OWN_RECORDS_PATH: string = FUND_API_PREFIX + '/getOwnRecords';
 export const FUND_GET_TRACKING_LIST_PATH: string = FUND_API_PREFIX + '/getTrackingList';
 export const FUND_TRACK_PATH: string = FUND_API_PREFIX + '/track';
 export const FUND_UNTRACK_PATH: string = FUND_API_PREFIX + '/untrack';
@@ -59,9 +65,9 @@ export const EXCHANGE_RATE_GET_RECORDS_PATH: string = EXCHANGE_RATE_API_PREFIX +
 export const EXCHANGE_RATE_REFRESH_PATH: string = EXCHANGE_RATE_API_PREFIX + '/refresh';
 export const EXCHANGE_RATE_TRADE_PATH: string = EXCHANGE_RATE_API_PREFIX + '/trade';
 
-// api enum
-const ENUM_API_PREFIX: string = '/enum';
-export const ENUM_GET_DEAL_TYPES: string = ENUM_API_PREFIX + '/dealTypes';
-export const ENUM_GET_MARKET_TYPES: string = ENUM_API_PREFIX + '/marketTypes';
-export const ENUM_GET_ROLES: string = ENUM_API_PREFIX + '/roles';
-export const ENUM_GET_RECORD_TYPES: string = ENUM_API_PREFIX + '/recordTypes';
+// api options
+const OPTION_API_PREFIX: string = '/option';
+export const OPTION_GET_CURRENCIES_TYPES: string = OPTION_API_PREFIX + '/currencies';
+export const OPTION_GET_FILE_TYPES: string = OPTION_API_PREFIX + '/fileTypes';
+export const OPTION_GET_STOCK_TYPES: string = OPTION_API_PREFIX + '/stockTypes';
+export const OPTION_GET_RECORD_TYPES: string = OPTION_API_PREFIX + '/recordTypes';

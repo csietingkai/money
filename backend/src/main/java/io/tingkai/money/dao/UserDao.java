@@ -15,7 +15,5 @@ public interface UserDao extends JpaRepository<User, UUID> {
 
 	public Optional<User> findByName(String name);
 
-	public Optional<User> findByEmail(String email);
-
 	public List<User> findByRole(Role role);
 }

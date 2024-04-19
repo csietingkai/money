@@ -33,4 +33,5 @@ public class UserFundRecord {
 	protected BigDecimal rate;
 	protected BigDecimal fee;
 	protected BigDecimal total;
+	protected UUID accountRecordId;
 }

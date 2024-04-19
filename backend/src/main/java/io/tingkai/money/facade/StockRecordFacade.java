@@ -1,6 +1,7 @@
 package io.tingkai.money.facade;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,6 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -36,16 +36,16 @@ public class StockRecordFacade {
 		return entities;
 	}
 
-	public List<StockRecord> queryAll(String code, long start, long end) {
-		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBetweenOrderByDealDate(code, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
+	public List<StockRecord> queryAll(String code, LocalDateTime start, LocalDateTime end) {
+		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBetweenOrderByDealDate(code, start, end);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
 		}
 		return entities;
 	}
 
-	public List<StockRecord> queryDaysBefore(String code, int days, long date) {
-		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBeforeOrderByDealDateDesc(code, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
+	public List<StockRecord> queryDaysBefore(String code, int days, LocalDateTime date) {
+		List<StockRecord> entities = this.stockRecordDao.findByCodeAndDealDateBeforeOrderByDealDateDesc(code, date, PageRequest.of(0, days));
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK_RECORD));
 		}

@@ -46,6 +46,6 @@ public class ExceptionHelper {
 		if (AppConstants.DEBUG_MODE) {
 			log.debug(e.getMessage(), e);
 		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new SimpleResponse(e));
+		return ResponseEntity.status(HttpStatus.OK).body(new SimpleResponse(e));
 	}
 }

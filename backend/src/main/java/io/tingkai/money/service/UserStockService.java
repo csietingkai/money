@@ -22,15 +22,17 @@ import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
+import io.tingkai.money.entity.UserSetting;
 import io.tingkai.money.entity.UserStock;
 import io.tingkai.money.entity.UserStockRecord;
 import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.enumeration.DealType;
-import io.tingkai.money.enumeration.RecordType;
+import io.tingkai.money.enumeration.option.RecordType;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
+import io.tingkai.money.facade.UserSettingFacade;
 import io.tingkai.money.facade.UserStockFacade;
 import io.tingkai.money.facade.UserStockRecordFacade;
 import io.tingkai.money.facade.UserTrackingStockFacade;
@@ -43,10 +45,14 @@ import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
 public class UserStockService {
+
+	@Autowired
+	private UserSettingFacade userSettingFacade;
 
 	@Autowired
 	private AccountFacade accountFacade;
@@ -73,12 +79,13 @@ public class UserStockService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<UserTrackingStock>> userCache;
 
-	public List<UserStockVo> getOwnStocks(String username) {
-		return getOwnStocks(username, true);
+	public List<UserStockVo> getOwnStocks() {
+		return getOwnStocks(true);
 	}
 
-	public List<UserStockVo> getOwnStocks(String username, boolean onlyShowHave) {
-		List<UserStock> ownList = this.userStockFacade.queryByUsername(username);
+	public List<UserStockVo> getOwnStocks(boolean onlyShowHave) {
+		UUID userId = ContextUtil.getUserId();
+		List<UserStock> ownList = this.userStockFacade.queryByUserId(userId);
 		if (onlyShowHave) {
 			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
@@ -113,11 +120,16 @@ public class UserStockService {
 		return vos;
 	}
 
+	public List<UserStockRecord> getOwnStockRecords(UUID userStockId) {
+		return this.userStockRecordFacade.queryAll(userStockId);
+	}
+
 	public UserStockRecord preCalc(DealType type, BigDecimal share, BigDecimal price) {
 		UserStockRecord temp = new UserStockRecord();
 		temp.setPrice(price);
 		temp.setShare(share);
-		temp.setFee(this.calcFee(price, share, CodeConstants.FEE_DISCOUNT_RATE));
+		UserSetting setting = this.userSettingFacade.queryByUserId(ContextUtil.getUserId());
+		temp.setFee(this.calcFee(price, share, setting.getStockFeeRate()));
 		if (type == DealType.BUY) {
 			temp.setTax(BigDecimal.ZERO);
 		} else if (type == DealType.SELL) {
@@ -127,7 +139,8 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public UserStock buy(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal total) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public UserStock buy(UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal total, UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
 		}
@@ -138,7 +151,7 @@ public class UserStockService {
 
 		UserStock entity = null;
 		try {
-			entity = this.userStockFacade.queryByUsernameAndStockCode(username, stockCode);
+			entity = this.userStockFacade.queryByUserIdAndStockCode(userId, stockCode);
 		} catch (Exception e) {
 		}
 		if (AppUtil.isPresent(entity)) {
@@ -146,7 +159,7 @@ public class UserStockService {
 			entity = this.userStockFacade.update(entity);
 		} else {
 			entity = new UserStock();
-			entity.setUserName(username);
+			entity.setUserId(userId);
 			entity.setStockCode(stockCode);
 			entity.setAmount(share);
 			entity = this.userStockFacade.insert(entity);
@@ -161,8 +174,9 @@ public class UserStockService {
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
 		accountRecord.setRecordType(RecordType.INVEST);
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, username, stockCode, share, price)));
-		this.accountRecordFacade.insert(accountRecord);
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, userId, stockCode, share, price));
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.insert(accountRecord);
 
 		UserStockRecord record = new UserStockRecord();
 		record.setUserStockId(entity.getId());
@@ -174,18 +188,20 @@ public class UserStockService {
 		record.setFee(fee);
 		record.setTax(BigDecimal.ZERO);
 		record.setTotal(total);
+		record.setAccountRecordId(accountRecord.getId());
 		record = this.userStockRecordFacade.insert(record);
 
 		return entity;
 	}
 
 	@Transactional
-	public UserStock sell(String username, UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal tax, BigDecimal total) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserStock sell(UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal tax, BigDecimal total, UUID fileId) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
 		}
 
-		UserStock entity = this.userStockFacade.queryByUsernameAndStockCode(username, stockCode);
+		UserStock entity = this.userStockFacade.queryByUserIdAndStockCode(userId, stockCode);
 		if (entity.getAmount().compareTo(share) < 0) {
 			throw new StockAmountInvalidException(share);
 		}
@@ -202,7 +218,8 @@ public class UserStockService {
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
 		accountRecord.setRecordType(RecordType.INVEST);
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, username, stockCode, share, price)));
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, userId, stockCode, share, price));
+		accountRecord.setFileId(fileId);
 		this.accountRecordFacade.insert(accountRecord);
 
 		UserStockRecord record = new UserStockRecord();
@@ -215,21 +232,17 @@ public class UserStockService {
 		record.setFee(fee);
 		record.setTax(tax);
 		record.setTotal(total);
+		record.setAccountRecordId(accountRecord.getId());
 		record = this.userStockRecordFacade.insert(record);
 
 		return entity;
 	}
 
-	public List<UserStockRecord> getAllRecords(String username, String accountName) {
-		Account account = this.accountFacade.query(accountName, username);
-		return this.userStockRecordFacade.queryByAccountId(account.getId());
-	}
-
-	public List<UserTrackingStockVo> getUserTrackingStockList(String username) {
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, username);
+	public List<UserTrackingStockVo> getUserTrackingStockList(UUID userId) {
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
-			trackingList = this.userTrackingStockFacade.queryAll(username);
+			trackingList = this.userTrackingStockFacade.queryAll(userId);
 			this.userCache.opsForValue().set(cacheKey, trackingList);
 		}
 
@@ -255,15 +268,15 @@ public class UserStockService {
 		return list;
 	}
 
-	public void track(String username, String stockCode) throws AlreadyExistException, FieldMissingException {
+	public void track(UUID userId, String stockCode) throws AlreadyExistException, FieldMissingException {
 		UserTrackingStock entity = new UserTrackingStock();
-		entity.setUserName(username);
+		entity.setUserId(userId);
 		entity.setStockCode(stockCode);
 		this.userTrackingStockFacade.insert(entity);
-		this.syncTrackingCache(username);
+		this.syncTrackingCache(userId);
 	}
 
-	public void untrack(String username, String stockCode) throws NotExistException {
+	public void untrack(UUID username, String stockCode) throws NotExistException {
 		UserTrackingStock entity = this.userTrackingStockFacade.query(username, stockCode);
 		this.userTrackingStockFacade.delete(entity.getId());
 		this.syncTrackingCache(username);
@@ -284,13 +297,14 @@ public class UserStockService {
 
 	private BigDecimal calcTax(BigDecimal price, BigDecimal share) {
 		BigDecimal tax = CodeConstants.TAX_RATE.multiply(price).multiply(share);
+		;
 		tax = tax.setScale(0, RoundingMode.FLOOR);
 		return tax;
 	}
 
-	private void syncTrackingCache(String username) {
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, username);
-		List<UserTrackingStock> trackingList = this.userTrackingStockFacade.queryAll(username);
+	private void syncTrackingCache(UUID userId) {
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
+		List<UserTrackingStock> trackingList = this.userTrackingStockFacade.queryAll(userId);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}
 }

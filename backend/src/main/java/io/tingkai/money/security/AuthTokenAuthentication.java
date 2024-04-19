@@ -57,7 +57,7 @@ public class AuthTokenAuthentication implements Authentication {
 
 	@Override
 	public Object getPrincipal() {
-		return this.authToken.getName();
+		return this.authToken.getId();
 	}
 
 	@Override

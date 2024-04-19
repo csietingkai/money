@@ -33,8 +33,8 @@ public class UserTrackingStockFacade {
 		return entities;
 	}
 
-	public List<UserTrackingStock> queryAll(String username) {
-		List<UserTrackingStock> entities = this.userTrackingStockDao.findByUserNameOrderByStockCode(username);
+	public List<UserTrackingStock> queryAll(UUID userId) {
+		List<UserTrackingStock> entities = this.userTrackingStockDao.findByUserIdOrderByStockCode(userId);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_STOCK));
 		}
@@ -49,8 +49,8 @@ public class UserTrackingStockFacade {
 		return optional.get();
 	}
 
-	public UserTrackingStock query(String username, String stockCode) {
-		Optional<UserTrackingStock> optional = this.userTrackingStockDao.findByUserNameAndStockCode(username, stockCode);
+	public UserTrackingStock query(UUID userId, String stockCode) {
+		Optional<UserTrackingStock> optional = this.userTrackingStockDao.findByUserIdAndStockCode(userId, stockCode);
 		if (optional.isEmpty()) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_STOCK));
 		}
@@ -58,7 +58,7 @@ public class UserTrackingStockFacade {
 	}
 
 	public UserTrackingStock insert(UserTrackingStock entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getUserName(), entity.getStockCode())) {
+		if (!AppUtil.isAllPresent(entity, entity.getUserId(), entity.getStockCode())) {
 			throw new FieldMissingException();
 		}
 		return this.userTrackingStockDao.save(entity);
@@ -73,7 +73,7 @@ public class UserTrackingStockFacade {
 			throw new NotExistException();
 		}
 		UserTrackingStock updateEntity = optional.get();
-		updateEntity.setUserName(entity.getUserName());
+		updateEntity.setUserId(entity.getUserId());
 		updateEntity.setStockCode(entity.getStockCode());
 		return this.userTrackingStockDao.save(updateEntity);
 	}

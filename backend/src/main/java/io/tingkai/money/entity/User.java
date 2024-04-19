@@ -24,10 +24,7 @@ public class User {
 	protected UUID id;
 	@Column(unique = true)
 	protected String name;
-	@Column(unique = true)
-	protected String email;
 	protected String pwd;
 	@Enumerated(EnumType.STRING)
 	protected Role role;
-	protected boolean confirm;
 }

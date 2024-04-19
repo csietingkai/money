@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
 
 public class CodeConstants {
 
@@ -47,7 +49,6 @@ public class CodeConstants {
 	public static final String STOCK_FETCHING_CODE = "fetching-stock-code";
 	public static final int[] MA_DAYS = { 5, 10, 20, 40, 60 };
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.001425d);
-	public static final BigDecimal FEE_DISCOUNT_RATE = new BigDecimal(0.28d);
 	public static final BigDecimal MIN_FEE = new BigDecimal(20);
 	public static final BigDecimal MIN_SMALL_FEE = new BigDecimal(1);
 	public static final BigDecimal TAX_RATE = new BigDecimal(0.003d);
@@ -62,8 +63,12 @@ public class CodeConstants {
 	public static final String USER_TRACKING_FUND_KEY = "track-fund-user:{0}";
 
 	// === other === //
+	public static final int PAGINATION_SIZE = 10;
 	public static final char UNDERLINE = '_';
 	public static final String EMPTY_STRING = "";
 	public static final String RANDOM_RANGE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	public static final int NUMBER_PERCISION = 6;
+	public static final List<String> VALID_OPTION_LANGUAGE = Arrays.asList("TW", "US");
+	public static final String OPTION_LANGUAGE_TW = VALID_OPTION_LANGUAGE.get(0);
+	public static final String OPTION_LANGUAGE_US = VALID_OPTION_LANGUAGE.get(1);
 }

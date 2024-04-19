@@ -12,7 +12,7 @@ import io.tingkai.money.entity.UserTrackingStock;
 @Repository
 public interface UserTrackingStockDao extends JpaRepository<UserTrackingStock, UUID> {
 
-	public List<UserTrackingStock> findByUserNameOrderByStockCode(String userName);
+	public List<UserTrackingStock> findByUserIdOrderByStockCode(UUID userId);
 
-	public Optional<UserTrackingStock> findByUserNameAndStockCode(String userName, String stockCode);
+	public Optional<UserTrackingStock> findByUserIdAndStockCode(UUID userId, String stockCode);
 }

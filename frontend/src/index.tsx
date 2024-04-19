@@ -1,91 +1,39 @@
-// node-modules
 import axios from 'axios';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { HashRouter as Router, Route, Switch } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-
-// components
-import App from 'App';
-import LoginPage from 'view/LoginPage';
-import Page404 from 'view/Page404';
-import Page500 from 'view/Page500';
-import RegisterPage from 'view/RegisterPage';
-
-// reducer
-import { SetLoading } from 'reducer/Action';
-import { getAuthToken } from 'reducer/StateHolder';
-import store, { init, validateToken } from 'reducer/Store';
-
-// apis
-import { API_URL } from 'api/Constant';
-
-// utils
-import { handleRequestDate } from 'util/AppUtil';
-
-// css
-import 'bootstrap/dist/css/bootstrap.css';
-import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
-import 'flag-icon-css/css/flag-icon.min.css';
-import 'react-toastify/dist/ReactToastify.css';
-import 'assets/scss/style.scss';
-
-// images
+import { CToaster } from '@coreui/react';
+import 'core-js';
+import App from './App';
+import { API_URL } from './api/Constant';
+import store, { validateToken } from './reducer/Store';
+import { SetLoading } from './reducer/Action';
 
 axios.defaults.baseURL = API_URL;
-axios.defaults.headers = { 'X-Auth-Token': getAuthToken()?.tokenString };
-axios.interceptors.request.use(
-    (config) => {
-        // system loading = true
-        SetLoading(true);
-        // transform date format
-        config.headers = { ...config.headers, 'Content-Type': 'application/json;charset=utf-8' };
-        config.transformRequest = [].concat((data: any) => {
-            data = handleRequestDate(data);
-            return JSON.stringify(data);
-        });
-        return config;
-    }
-);
 axios.interceptors.response.use(
     (response) => {
-        // system loading = false
-        SetLoading(false);
         return response;
     },
     (error) => {
-        SetLoading(false);
+        store.dispatch(SetLoading(false));
         const { status } = error.response.data;
         if (status === 403) {
             // Notify.warning('Maybe You Need to Login First.');
-            window.location.replace('/#/login');
+            window.location.assign('/#/login');
         } else if (status === 404) {
-            window.location.replace('/#/404');
+            window.location.assign('/#/404');
         } else if (status === 500) {
-            window.location.replace('/#/500');
+            window.location.assign('/#/500');
         }
         throw error;
     }
 );
 
-// validate token on refresh
-store.dispatch(validateToken);
-store.dispatch(init);
+validateToken(store.dispatch, store.getState);
 
-const ROOT = document.querySelector('#root');
-const app = (
+createRoot(document.getElementById('root') as Element).render(
     <Provider store={store}>
-        <Router>
-            <Switch>
-                <Route exact path='/login' component={LoginPage} />
-                <Route exact path='/register' component={RegisterPage} />
-                <Route exact path='/404' component={Page404} />
-                <Route exact path='/500' component={Page500} />
-                <Route path='/' component={App} />
-            </Switch>
-        </Router>
-        <ToastContainer />
+        <App />
+        <CToaster className='p-3' placement='top-end' />
     </Provider>
 );
-ReactDOM.render(app, ROOT);

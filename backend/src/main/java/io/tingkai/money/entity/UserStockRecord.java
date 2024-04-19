@@ -33,4 +33,5 @@ public class UserStockRecord {
 	protected BigDecimal fee;
 	protected BigDecimal tax;
 	protected BigDecimal total;
+	protected UUID accountRecordId;
 }

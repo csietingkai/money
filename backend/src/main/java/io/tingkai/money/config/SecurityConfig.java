@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// @formatter:off
 		http.csrf().disable()
 			.authorizeRequests()
-			.antMatchers(AuthController.LOGIN_PATH, AuthController.REGISTER_PATH, AuthController.CONFIRM_PATH, AuthController.VALIDATE_PATH, AuthController.LOGOUT_PATH).permitAll()
+			.antMatchers(AuthController.LOGIN_PATH, AuthController.VALIDATE_PATH, AuthController.LOGOUT_PATH).permitAll()
 			.anyRequest().authenticated().and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		// @formatter:on

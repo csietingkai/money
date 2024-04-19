@@ -65,7 +65,7 @@ public class StockService {
 		return vos;
 	}
 
-	public List<StockRecordVo> getAllRecords(String code, long start, long end) {
+	public List<StockRecordVo> getAllRecords(String code, LocalDateTime start, LocalDateTime end) {
 		List<StockRecord> records = new ArrayList<StockRecord>();
 		int removeSize = 0;
 		try {

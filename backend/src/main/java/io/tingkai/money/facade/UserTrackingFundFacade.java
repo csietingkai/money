@@ -33,8 +33,8 @@ public class UserTrackingFundFacade {
 		return entities;
 	}
 
-	public List<UserTrackingFund> queryAll(String username) {
-		List<UserTrackingFund> entities = this.userTrackingFundDao.findByUserNameOrderByFundCode(username);
+	public List<UserTrackingFund> queryAll(UUID userId) {
+		List<UserTrackingFund> entities = this.userTrackingFundDao.findByUserIdOrderByFundCode(userId);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_FUND));
 		}
@@ -49,8 +49,8 @@ public class UserTrackingFundFacade {
 		return optional.get();
 	}
 
-	public UserTrackingFund query(String username, String code) {
-		Optional<UserTrackingFund> optional = this.userTrackingFundDao.findByUserNameAndFundCode(username, code);
+	public UserTrackingFund query(UUID userId, String code) {
+		Optional<UserTrackingFund> optional = this.userTrackingFundDao.findByUserIdAndFundCode(userId, code);
 		if (optional.isEmpty()) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_TRACKING_FUND));
 		}
@@ -58,7 +58,7 @@ public class UserTrackingFundFacade {
 	}
 
 	public UserTrackingFund insert(UserTrackingFund entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getUserName(), entity.getFundCode())) {
+		if (!AppUtil.isAllPresent(entity, entity.getUserId(), entity.getFundCode())) {
 			throw new FieldMissingException();
 		}
 		return this.userTrackingFundDao.save(entity);
@@ -73,7 +73,7 @@ public class UserTrackingFundFacade {
 			throw new NotExistException();
 		}
 		UserTrackingFund updateEntity = optional.get();
-		updateEntity.setUserName(entity.getUserName());
+		updateEntity.setUserId(entity.getUserId());
 		updateEntity.setFundCode(entity.getFundCode());
 		return this.userTrackingFundDao.save(updateEntity);
 	}

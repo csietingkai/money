@@ -1,28 +1,21 @@
-import * as React from 'react';
-import { Dispatch } from 'react';
-import { Container } from 'react-bootstrap';
+import React, { Suspense } from 'react';
 import { connect } from 'react-redux';
-import { Route, Redirect, Switch, RouteChildrenProps } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
+import { CSpinner } from '@coreui/react';
+import { ReduxState, isLoading } from './reducer/Selector';
+import './scss/style.scss';
+import AppLoading from './components/AppLoading';
 
-import { LogoutDispatcher } from 'reducer/PropsMapper';
-import { getAuthToken, getAuthTokenString, isLoading, ReduxState } from 'reducer/Selector';
+// Containers
+const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
 
-import Breadcrumb from 'component/layout/Breadcrumb';
-import Footer from 'component/layout/Footer';
-import Header from 'component/layout/Header';
-import Loading from 'component/layout/Loading';
-import { APP_ROUTES } from 'component/layout/RouteSetting';
-import Sidebar from 'component/layout/Sidebar';
+// Pages
+const Login = React.lazy(() => import('./views/Login'));
+const Page404 = React.lazy(() => import('./views/Page404'));
+const Page500 = React.lazy(() => import('./views/Page500'));
 
-import AuthApi, { AuthToken } from 'api/auth';
-
-import { Action } from 'util/Interface';
-
-export interface AppProps extends RouteChildrenProps<any> {
-    authToken?: AuthToken;
-    authTokenString?: string;
-    loading: boolean;
-    logout: () => void;
+export interface AppProps {
+    isLoading: boolean;
 }
 
 export interface AppState { }
@@ -34,57 +27,36 @@ class App extends React.Component<AppProps, AppState> {
         this.state = {};
     }
 
-    private onLogoutClick = async () => {
-        const { id, tokenString } = this.props.authToken;
-        await AuthApi.logout(id, tokenString);
-        this.props.logout();
-    };
-
-    render() {
-        const { loading } = this.props;
-        const app = (
-            <div className='app'>
-                <Header {...this.props} authToken={this.props.authToken} onLogoutClick={this.onLogoutClick} />
-                <div className='app-body'>
-                    <Sidebar {...this.props} authToken={this.props.authToken} />
-                    <main className='main'>
-                        <Breadcrumb {...this.props} />
-                        <Container fluid>
-                            <Switch>
-                                {
-                                    APP_ROUTES.map((route, idx) => {
-                                        return <Route key={`route-${idx}-${route.path}`} path={route.path} component={route.component} />;
-                                    })
-                                }
-                                <Redirect from='/' to='/login' />
-                            </Switch>
-                        </Container>
-                    </main>
-                </div>
-                <Footer {...this.props} />
-            </div>
-        );
+    render(): React.ReactNode {
+        const { isLoading } = this.props;
         return (
-            <>
-                {app}
-                {loading && <Loading />}
-            </>
+            <React.Fragment>
+                <HashRouter>
+                    <Suspense
+                        fallback={
+                            <div className='pt-3 text-center'>
+                                <CSpinner color='primary' variant='grow' />
+                            </div>
+                        }
+                    >
+                        <Routes>
+                            <Route path='/login' element={<Login />} />
+                            <Route path='/404' element={<Page404 />} />
+                            <Route path='/500' element={<Page500 />} />
+                            <Route path='*' element={<DefaultLayout />} />
+                        </Routes>
+                    </Suspense>
+                </HashRouter>
+                {isLoading && <AppLoading />}
+            </React.Fragment>
         );
     }
 }
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        authToken: getAuthToken(state),
-        authTokenString: getAuthTokenString(state),
-        loading: isLoading(state)
+        isLoading: isLoading(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<undefined>>) => {
-    return {
-        logout: LogoutDispatcher(dispatch)
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps)(App);

@@ -25,7 +25,7 @@ import io.tingkai.money.entity.UserFund;
 import io.tingkai.money.entity.UserFundRecord;
 import io.tingkai.money.entity.UserTrackingFund;
 import io.tingkai.money.enumeration.DealType;
-import io.tingkai.money.enumeration.RecordType;
+import io.tingkai.money.enumeration.option.RecordType;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.FundFacade;
@@ -42,6 +42,7 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.vo.UserFundVo;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
@@ -72,12 +73,13 @@ public class UserFundService {
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<UserTrackingFund>> userCache;
 
-	public List<UserFundVo> getOwnFunds(String username) {
-		return getOwnFunds(username, true);
+	public List<UserFundVo> getOwnFunds() {
+		return getOwnFunds(true);
 	}
 
-	public List<UserFundVo> getOwnFunds(String username, boolean onlyShowHave) {
-		List<UserFund> ownList = this.userFundFacade.queryByUsername(username);
+	public List<UserFundVo> getOwnFunds(boolean onlyShowHave) {
+		UUID userId = ContextUtil.getUserId();
+		List<UserFund> ownList = this.userFundFacade.queryByUserId(userId);
 		if (onlyShowHave) {
 			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
@@ -112,8 +114,13 @@ public class UserFundService {
 		return vos;
 	}
 
+	public List<UserFundRecord> getOwnFundRecords(UUID userFundId) {
+		return this.userFundRecordFacade.queryAll(userFundId);
+	}
+
 	@Transactional
-	public UserFund buy(String username, UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal payment, BigDecimal fee) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public UserFund buy(UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal payment, BigDecimal fee, UUID fileId) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new FundAmountInvalidException(share);
 		}
@@ -125,7 +132,7 @@ public class UserFundService {
 
 		UserFund entity = null;
 		try {
-			entity = this.userFundFacade.queryByUsernameAndFundCode(username, fundCode);
+			entity = this.userFundFacade.queryByUserIdAndFundCode(userId, fundCode);
 		} catch (Exception e) {
 		}
 		if (AppUtil.isPresent(entity)) {
@@ -133,7 +140,7 @@ public class UserFundService {
 			entity = this.userFundFacade.update(entity);
 		} else {
 			entity = new UserFund();
-			entity.setUserName(username);
+			entity.setUserId(userId);
 			entity.setFundCode(fundCode);
 			entity.setAmount(share);
 			entity = this.userFundFacade.insert(entity);
@@ -148,8 +155,9 @@ public class UserFundService {
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
 		accountRecord.setRecordType(RecordType.INVEST);
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, username, fundCode, share, price)));
-		this.accountRecordFacade.insert(accountRecord);
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, userId, fundCode, share, price));
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.insert(accountRecord);
 
 		UserFundRecord record = new UserFundRecord();
 		record.setUserFundId(entity.getId());
@@ -161,18 +169,20 @@ public class UserFundService {
 		record.setRate(rate);
 		record.setFee(fee);
 		record.setTotal(total);
+		record.setAccountRecordId(accountRecord.getId());
 		record = this.userFundRecordFacade.insert(record);
 
 		return entity;
 	}
 
 	@Transactional
-	public UserFund sell(String username, UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal total) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserFund sell(UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal total, UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new FundAmountInvalidException(share);
 		}
 
-		UserFund entity = this.userFundFacade.queryByUsernameAndFundCode(username, fundCode);
+		UserFund entity = this.userFundFacade.queryByUserIdAndFundCode(userId, fundCode);
 		if (entity.getAmount().compareTo(share) < 0) {
 			throw new FundAmountInvalidException(share);
 		}
@@ -189,8 +199,9 @@ public class UserFundService {
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
 		accountRecord.setRecordType(RecordType.INVEST);
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.ACCOUNT_EXPEND_DESC, account.getName(), MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, username, fundCode, share, price)));
-		this.accountRecordFacade.insert(accountRecord);
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, userId, fundCode, share, price));
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.insert(accountRecord);
 
 		UserFundRecord record = new UserFundRecord();
 		record.setUserFundId(entity.getId());
@@ -202,16 +213,17 @@ public class UserFundService {
 		record.setRate(rate);
 		record.setFee(BigDecimal.ZERO);
 		record.setTotal(total);
+		record.setAccountRecordId(accountRecord.getId());
 		record = this.userFundRecordFacade.insert(record);
 
 		return entity;
 	}
 
-	public List<UserTrackingFundVo> getUserTrackingFundList(String username) {
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, username);
+	public List<UserTrackingFundVo> getUserTrackingFundList(UUID userId) {
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
-			trackingList = this.userTrackingFundFacade.queryAll(username);
+			trackingList = this.userTrackingFundFacade.queryAll(userId);
 			this.userCache.opsForValue().set(cacheKey, trackingList);
 		}
 
@@ -237,23 +249,23 @@ public class UserFundService {
 		return list;
 	}
 
-	public void track(String username, String fundCode) throws AlreadyExistException, FieldMissingException {
+	public void track(UUID userId, String fundCode) throws AlreadyExistException, FieldMissingException {
 		UserTrackingFund entity = new UserTrackingFund();
-		entity.setUserName(username);
+		entity.setUserId(userId);
 		entity.setFundCode(fundCode);
 		this.userTrackingFundFacade.insert(entity);
-		this.syncTrackingCache(username);
+		this.syncTrackingCache(userId);
 	}
 
-	public void untrack(String username, String fundCode) throws NotExistException {
-		UserTrackingFund entity = this.userTrackingFundFacade.query(username, fundCode);
+	public void untrack(UUID userId, String fundCode) throws NotExistException {
+		UserTrackingFund entity = this.userTrackingFundFacade.query(userId, fundCode);
 		this.userTrackingFundFacade.delete(entity.getId());
-		this.syncTrackingCache(username);
+		this.syncTrackingCache(userId);
 	}
 
-	private void syncTrackingCache(String username) {
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, username);
-		List<UserTrackingFund> trackingList = this.userTrackingFundFacade.queryAll(username);
+	private void syncTrackingCache(UUID userId) {
+		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
+		List<UserTrackingFund> trackingList = this.userTrackingFundFacade.queryAll(userId);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}
 }

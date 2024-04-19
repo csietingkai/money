@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import { EXCHANGE_RATE_GET_ALL_PATH, EXCHANGE_RATE_GET_RECORDS_PATH, EXCHANGE_RATE_REFRESH_PATH, EXCHANGE_RATE_TRADE_PATH } from 'api/Constant';
+import { EXCHANGE_RATE_GET_ALL_PATH, EXCHANGE_RATE_GET_RECORDS_PATH, EXCHANGE_RATE_REFRESH_PATH, EXCHANGE_RATE_TRADE_PATH } from './Constant';
 
-import { toDate } from 'util/AppUtil';
-import { ApiResponse, SimpleResponse } from 'util/Interface';
+import { toDate } from '../util/AppUtil';
+import { ApiResponse, SimpleResponse } from '../util/Interface';
 
 export interface ExchangeRate {
     currency: string;
@@ -42,7 +42,7 @@ const getAll = async (): Promise<ExchangeRateListResponse> => {
     const response = await axios.get(EXCHANGE_RATE_GET_ALL_PATH);
     const data: ExchangeRateListResponse = response.data;
     if (data.success) {
-        data.data = data.data.map(x => ({ ...x, updateTime: toDate(x.updateTime) }));
+        data.data.forEach(x => ({ ...x, updateTime: toDate(x.updateTime) }));
     }
     return data;
 };
@@ -51,7 +51,7 @@ const getRecords = async (currency: string, start: Date, end: Date): Promise<Exc
     const response = await axios.get(EXCHANGE_RATE_GET_RECORDS_PATH, { params: { currency, start: start.getTime(), end: end.getTime() } });
     const data: ExchangeRateRecordListResponse = response.data;
     if (data.success) {
-        data.data = data.data.map(x => ({ ...x, date: toDate(x.date) }));
+        data.data.forEach(x => ({ ...x, date: toDate(x.date) }));
     }
     return data;
 };

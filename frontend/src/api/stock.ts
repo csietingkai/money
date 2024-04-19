@@ -1,12 +1,10 @@
 import axios from 'axios';
-
 import {
     STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH,
-    STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH
-} from 'api/Constant';
-
-import { toDate } from 'util/AppUtil';
-import { ApiResponse, PredictResponse, SimpleResponse } from 'util/Interface';
+    STOCK_UNTRACK_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_GET_OWN_RECORDS_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH
+} from './Constant';
+import * as AppUtil from '../util/AppUtil';
+import { ApiResponse, PredictResponse, SimpleResponse } from '../util/Interface';
 
 export interface Stock {
     id: string;
@@ -70,6 +68,7 @@ export interface UserStockRecord {
     price: number;
     fee: number;
     tax: number;
+    total: number;
 }
 
 export interface UserTrackingStock {
@@ -91,6 +90,7 @@ export interface StockRecordListResponse extends ApiResponse<StockRecordVo[]> { 
 export interface UserStockResponse extends ApiResponse<UserStockVo> { }
 export interface UserStockListResponse extends ApiResponse<UserStockVo[]> { }
 export interface UserStockRecordResponse extends ApiResponse<UserStockRecord> { }
+export interface UserStockRecordListResponse extends ApiResponse<UserStockRecord[]> { }
 export interface StockTrackingListResponse extends ApiResponse<UserTrackingStockVo[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
@@ -99,16 +99,23 @@ const getAll = async (code?: string, name?: string, sort: boolean = true): Promi
     const response = await axios.get(STOCK_GET_ALL_PATH, { params: { code, name, sort } });
     const data: StockListResponse = response.data;
     if (data.success) {
-        data.data = data.data.map(x => ({ ...x, offeringDate: toDate(x.offeringDate), updateTime: toDate(x.updateTime, toDate(x.offeringDate)) }));
+        data.data = data.data?.map(x => {
+            x.offeringDate = new Date(x.offeringDate);
+            x.updateTime = AppUtil.toDate(x.updateTime) || x.offeringDate;
+            return x;
+        });
     }
     return data;
 };
 
 const getRecords = async (code: string, start: Date, end: Date): Promise<StockRecordListResponse> => {
-    const response = await axios.get(STOCK_GET_RECORDS_PATH, { params: { code, start: start.getTime(), end: end.getTime() } });
+    const response = await axios.get(STOCK_GET_RECORDS_PATH, { params: { code, start: AppUtil.toDateStr(start), end: AppUtil.toDateStr(end) } });
     const data: StockRecordListResponse = response.data;
     if (data.success) {
-        data.data = data.data.map(x => ({ ...x, dealDate: toDate(x.dealDate) }));
+        data.data = data.data?.map(x => {
+            x.dealDate = new Date(x.dealDate);
+            return x;
+        });
     }
     return data;
 };
@@ -119,27 +126,37 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
     return data;
 };
 
-const precalc = async (dealType: string, share: number, price: number): Promise<UserStockRecordResponse> => {
+const precalc = async (dealType: 'BUY' | 'SELL', share: number, price: number): Promise<UserStockRecordResponse> => {
     const response = await axios.get(USER_STOCK_PRECALC_PATH, { params: { dealType, share, price } });
     const data: UserStockRecordResponse = response.data;
     return data;
 };
 
-const buy = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, total: number): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_BUY_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fee, total } });
+const buy = async (accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, total: number, fileId: string): Promise<UserStockResponse> => {
+    const response = await axios.put(USER_STOCK_BUY_PATH, null, { params: { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, total, fileId } });
     const data: UserStockResponse = response.data;
     return data;
 };
 
-const sell = async (username: string, accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, tax: number, total: number): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_SELL_PATH, null, { params: { username, accountId, stockCode, date: date.getTime(), share, price, fee, tax, total } });
+const sell = async (accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, tax: number, total: number, fileId: string): Promise<UserStockResponse> => {
+    const response = await axios.put(USER_STOCK_SELL_PATH, null, { params: { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, tax, total, fileId } });
     const data: UserStockResponse = response.data;
     return data;
 };
 
-const getOwn = async (username: string): Promise<UserStockListResponse> => {
-    const response = await axios.get(USER_STOCK_GET_OWN_PATH, { params: { username } });
+const getOwn = async (): Promise<UserStockListResponse> => {
+    const response = await axios.get(USER_STOCK_GET_OWN_PATH);
     const data: UserStockListResponse = response.data;
+    return data;
+};
+
+const getOwnRecords = async (userStockId: string): Promise<UserStockRecordListResponse> => {
+    const response = await axios.get(USER_STOCK_GET_OWN_RECORDS_PATH, { params: { userStockId } });
+    const data: UserStockRecordListResponse = response.data;
+    data.data = data.data?.map(x => {
+        x.date = new Date(x.date);
+        return x;
+    });
     return data;
 };
 
@@ -167,4 +184,4 @@ const predict = async (code: string, days?: number): Promise<PredictResponse> =>
     return data;
 };
 
-export default { getAll, getRecords, refresh, precalc, buy, sell, getOwn, getTrackingList, track, untrack, predict };
+export default { getAll, getRecords, refresh, precalc, buy, sell, getOwn, getOwnRecords, getTrackingList, track, untrack, predict };

@@ -12,7 +12,7 @@ import io.tingkai.money.entity.UserFund;
 @Repository
 public interface UserFundDao extends JpaRepository<UserFund, UUID> {
 
-	public List<UserFund> findByUserName(String username);
+	public List<UserFund> findByUserId(UUID userId);
 
-	public Optional<UserFund> findByUserNameAndFundCode(String username, String fundCode);
+	public Optional<UserFund> findByUserIdAndFundCode(UUID userId, String fundCode);
 }

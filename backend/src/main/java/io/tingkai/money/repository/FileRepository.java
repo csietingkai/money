@@ -1,22 +1,18 @@
 package io.tingkai.money.repository;
 
-import java.util.List;
-
-import io.tingkai.money.enumeration.FileType;
-
 public abstract class FileRepository {
 
-	protected List<FileType> types;
+	protected String type;
 
-	public FileRepository(List<FileType> acceptedTypes) {
-		this.types = acceptedTypes;
+	public FileRepository(String acceptedType) {
+		this.type = acceptedType;
 	}
 
 	public String getName() {
 		return this.getClass().getSimpleName();
 	}
 
-	public List<FileType> getAcceptedTypes() {
-		return types;
+	public String getAcceptedType() {
+		return type;
 	}
 }

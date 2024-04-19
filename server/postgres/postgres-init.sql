@@ -3,10 +3,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	name VARCHAR NOT NULL UNIQUE,
-	email VARCHAR NOT NULL UNIQUE,
 	pwd VARCHAR NOT NULL,
 	role VARCHAR NOT NULL,
-	confirm BOOLEAN DEFAULT false NOT NULL,
 	PRIMARY KEY (id)
 );
 
@@ -29,15 +27,25 @@ CREATE TABLE IF NOT EXISTS exchange_rate_record (
 	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
 );
 
+CREATE TABLE IF NOT EXISTS options (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	catergory VARCHAR NOT NULL,
+	name VARCHAR NOT NULL,
+	en_text VARCHAR NOT NULL,
+	tw_text VARCHAR NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (catergory, name)
+);
+
 CREATE TABLE IF NOT EXISTS account (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	name VARCHAR NOT NULL,
-	owner_name VARCHAR NOT NULL,
+	user_id uuid NOT NULL,
 	currency VARCHAR NOT NULL,
 	balance NUMERIC NOT NULL,
 	PRIMARY KEY (id),
-	UNIQUE (name, owner_name),
-	CONSTRAINT fk_owner_name FOREIGN KEY (owner_name) REFERENCES users(name),
+	UNIQUE (name, user_id),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
 );
 
@@ -49,9 +57,33 @@ CREATE TABLE IF NOT EXISTS account_record (
 	trans_to uuid NOT NULL,
 	record_type VARCHAR NOT NULL,
 	description VARCHAR,
+	file_id uuid,
 	PRIMARY KEY (id),
 	CONSTRAINT fk_trans_from FOREIGN KEY (trans_from) REFERENCES account(id),
 	CONSTRAINT fk_trans_to FOREIGN KEY (trans_to) REFERENCES account(id)
+);
+
+CREATE TABLE IF NOT EXISTS user_setting (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	user_id uuid NOT NULL,
+	stock_type VARCHAR NOT NULL,
+	predict_days NUMERIC(3, 0) NOT NULL,
+	stock_fee_rate NUMERIC(7, 6) NOT NULL,
+	fund_fee_rate NUMERIC(7, 6) NOT NULL,
+	account_record_type VARCHAR NOT NULL,
+	account_record_deletable BOOLEAN NOT NULL DEFAULT false,
+	PRIMARY KEY (id),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS financial_file (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	user_id uuid NOT NULL,
+	filename VARCHAR NOT NULL,
+	type VARCHAR NOT NULL,
+	date TIMESTAMP NOT NULL,
+	PRIMARY KEY (id),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS stock (
@@ -86,22 +118,22 @@ CREATE TABLE IF NOT EXISTS stock_record (
 
 CREATE TABLE IF NOT EXISTS user_tracking_stock (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	user_name VARCHAR NOT NULL,
+	user_id uuid NOT NULL,
 	stock_code VARCHAR NOT NULL,
 	PRIMARY KEY (id),
-	UNIQUE (user_name, stock_code),
-	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
+	UNIQUE (user_id, stock_code),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_stock_code FOREIGN KEY (stock_code) REFERENCES stock(code)
 );
 
 CREATE TABLE IF NOT EXISTS user_stock (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	user_name VARCHAR NOT NULL,
+	user_id uuid NOT NULL,
 	stock_code VARCHAR NOT NULL,
 	amount NUMERIC NOT NULL DEFAULT 0, --持有股數
 	PRIMARY KEY (id),
-	UNIQUE (user_name, stock_code),
-	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
+	UNIQUE (user_id, stock_code),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_stock_code FOREIGN KEY (stock_code) REFERENCES stock(code)
 );
 
@@ -116,9 +148,11 @@ CREATE TABLE IF NOT EXISTS user_stock_record (
 	fee NUMERIC NOT NULL, --手續費
 	tax NUMERIC NOT NULL DEFAULT 0, --稅
 	total NUMERIC NOT NULL, -- 總額 可能與試算不同
+	account_record_id uuid,
 	PRIMARY KEY (id),
 	CONSTRAINT fk_user_stock_id FOREIGN KEY (user_stock_id) REFERENCES user_stock(id),
-	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id)
+	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id),
+	CONSTRAINT fk_user_account_record_id FOREIGN KEY (account_record_id) REFERENCES account_record(id)
 );
 
 CREATE TABLE IF NOT EXISTS fund (
@@ -146,22 +180,22 @@ CREATE TABLE IF NOT EXISTS fund_record (
 
 CREATE TABLE IF NOT EXISTS user_tracking_fund (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	user_name VARCHAR NOT NULL,
+	user_id uuid NOT NULL,
 	fund_code VARCHAR NOT NULL,
 	PRIMARY KEY (id),
-	UNIQUE (user_name, fund_code),
-	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
+	UNIQUE (user_id, fund_code),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
 );
 
 CREATE TABLE IF NOT EXISTS user_fund (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	user_name VARCHAR NOT NULL,
+	user_id uuid NOT NULL,
 	fund_code VARCHAR NOT NULL,
 	amount NUMERIC NOT NULL DEFAULT 0, --持有股數
 	PRIMARY KEY (id),
-	UNIQUE (user_name, fund_code),
-	CONSTRAINT fk_user_name FOREIGN KEY (user_name) REFERENCES users(name),
+	UNIQUE (user_id, fund_code),
+	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
 );
 
@@ -176,7 +210,35 @@ CREATE TABLE IF NOT EXISTS user_fund_record (
 	rate numeric NOT NULL DEFAULT 1, --匯率
 	fee NUMERIC NOT NULL, --手續費
 	total NUMERIC NOT NULL, -- 總額
+	account_record_id uuid,
 	PRIMARY KEY (id),
 	CONSTRAINT fk_user_fund_id FOREIGN KEY (user_fund_id) REFERENCES user_fund(id),
-	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id)
+	CONSTRAINT fk_user_account_id FOREIGN KEY (account_id) REFERENCES account(id),
+	CONSTRAINT fk_user_account_record_id FOREIGN KEY (account_record_id) REFERENCES account_record(id)
 );
+
+insert into options (catergory, name, en_text, tw_text) values
+	('FILE_TYPE', 'STOCK', 'Stock', '股票'),
+	('FILE_TYPE', 'FUND', 'Fund', '基金'),
+	('FILE_TYPE', 'CREDIT_CARD', 'Credit Card', '信用卡'),
+	('FILE_TYPE', 'PASSBOOK', 'Passbook', '存摺'),
+	('FILE_TYPE', 'SALARY_SLIP', 'Salary Slip', '薪資條'),
+	('FILE_TYPE', 'OTHER', 'Other', '其他');
+
+insert into options (catergory, name, en_text, tw_text) values
+	('STOCK_TYPE', 'TW', 'TW', 'TW'),
+	('STOCK_TYPE', 'US', 'US', 'US');
+
+insert into options (catergory, name, en_text, tw_text) values
+	('RECORD_TYPE', 'SALARY', 'TW', '薪資'),
+	('RECORD_TYPE', 'BONUS', 'Bonus', '獎金'),
+	('RECORD_TYPE', 'FOOD', 'Food', '食物'),
+	('RECORD_TYPE', 'LIFE', 'Life', '生活費'),
+	('RECORD_TYPE', 'SPORT', 'Sport', '運動'),
+	('RECORD_TYPE', 'INVEST', 'Investment', '投資'),
+	('RECORD_TYPE', 'TRANSPORTATION', 'Transportation', '交通'),
+	('RECORD_TYPE', 'CREDIT_CARD', 'Credit Card', '信用卡費'),
+	('RECORD_TYPE', 'MEDIC', 'Medic', '醫療'),
+	('RECORD_TYPE', 'FEE', 'Fee', '手續費'),
+	('RECORD_TYPE', 'DONATE', 'Donate', '抖內'),
+	('RECORD_TYPE', 'OTHER', 'Other', '其他');

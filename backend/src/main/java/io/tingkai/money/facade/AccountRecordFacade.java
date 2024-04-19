@@ -14,7 +14,7 @@ import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.AccountRecordDao;
 import io.tingkai.money.entity.AccountRecord;
-import io.tingkai.money.model.exception.AlreadyExistException;
+import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.TimeUtil;
@@ -58,17 +58,17 @@ public class AccountRecordFacade {
 		return optional.get();
 	}
 
-	public AccountRecord insert(AccountRecord entity) throws AlreadyExistException {
-		if (AppUtil.isAllPresent(entity, entity.getId())) {
-			Optional<AccountRecord> optional = this.accountRecordDao.findById(entity.getId());
-			if (optional.isPresent()) {
-				throw new AlreadyExistException();
-			}
+	public AccountRecord insert(AccountRecord entity) throws FieldMissingException {
+		if (!AppUtil.isAllPresent(entity, entity.getTransDate(), entity.getTransAmount(), entity.getTransFrom(), entity.getTransTo(), entity.getRecordType())) {
+			throw new FieldMissingException();
 		}
 		return this.accountRecordDao.save(entity);
 	}
 
-	public AccountRecord update(AccountRecord entity) throws NotExistException {
+	public AccountRecord update(AccountRecord entity) throws NotExistException, FieldMissingException {
+		if (!AppUtil.isAllPresent(entity, entity.getId(), entity.getTransDate(), entity.getTransAmount(), entity.getTransFrom(), entity.getTransTo(), entity.getRecordType())) {
+			throw new FieldMissingException();
+		}
 		Optional<AccountRecord> optional = this.accountRecordDao.findById(entity.getId());
 		if (optional.isEmpty()) {
 			throw new NotExistException();
@@ -79,6 +79,7 @@ public class AccountRecordFacade {
 		updateEntity.setTransFrom(entity.getTransFrom());
 		updateEntity.setTransTo(entity.getTransTo());
 		updateEntity.setDescription(entity.getDescription());
+		updateEntity.setFileId(entity.getFileId());
 		return this.accountRecordDao.save(updateEntity);
 	}
 

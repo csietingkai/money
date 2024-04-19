@@ -25,16 +25,8 @@ public class UserFundFacade {
 	@Autowired
 	private UserFundDao userFundDao;
 
-	public List<UserFund> queryAll() {
-		List<UserFund> entities = this.userFundDao.findAll();
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND));
-		}
-		return entities;
-	}
-
-	public List<UserFund> queryByUsername(String username) {
-		List<UserFund> entities = this.userFundDao.findByUserName(username);
+	public List<UserFund> queryByUserId(UUID userId) {
+		List<UserFund> entities = this.userFundDao.findByUserId(userId);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND));
 		}
@@ -49,8 +41,8 @@ public class UserFundFacade {
 		return optional.get();
 	}
 
-	public UserFund queryByUsernameAndFundCode(String username, String fundCode) {
-		Optional<UserFund> optional = this.userFundDao.findByUserNameAndFundCode(username, fundCode);
+	public UserFund queryByUserIdAndFundCode(UUID userId, String fundCode) {
+		Optional<UserFund> optional = this.userFundDao.findByUserIdAndFundCode(userId, fundCode);
 		if (optional.isEmpty()) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND));
 		}
@@ -58,10 +50,10 @@ public class UserFundFacade {
 	}
 
 	public UserFund insert(UserFund entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getUserName(), entity.getFundCode(), entity.getAmount())) {
+		if (!AppUtil.isAllPresent(entity, entity.getUserId(), entity.getFundCode(), entity.getAmount())) {
 			throw new FieldMissingException();
 		}
-		Optional<UserFund> optional = this.userFundDao.findByUserNameAndFundCode(entity.getUserName(), entity.getFundCode());
+		Optional<UserFund> optional = this.userFundDao.findByUserIdAndFundCode(entity.getUserId(), entity.getFundCode());
 		if (optional.isPresent()) {
 			throw new AlreadyExistException();
 		}

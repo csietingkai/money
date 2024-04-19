@@ -49,14 +49,6 @@ public class UserStockRecordFacade {
 		return entities;
 	}
 
-	public List<UserStockRecord> queryByAccountId(UUID accountId) {
-		List<UserStockRecord> entities = this.userStockRecordDao.findByAccountId(accountId);
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
-		}
-		return entities;
-	}
-
 	public UserStockRecord query(UUID id) {
 		Optional<UserStockRecord> optional = this.userStockRecordDao.findById(id);
 		if (optional.isEmpty()) {
