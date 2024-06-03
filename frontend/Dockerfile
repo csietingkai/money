@@ -7,7 +7,7 @@ RUN npm install
 RUN npm run build
 
 # production environment
-FROM nginx:1.19.4-alpine
-COPY --from=build /app/build /usr/share/nginx/html
+FROM httpd:2.4.59-alpine3.20
+COPY --from=build /app/build /usr/local/apache2/htdocs
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["httpd-foreground"]
