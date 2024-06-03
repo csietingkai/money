@@ -81,9 +81,9 @@ elif [ "$1" = 'build' ]; then
 		cd frontend
 		sed -i -e 's/192.168.0.170:8080/bbt.ddns.net:10005/g' .env
 		docker build . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
-		#docker push $frontend_image_name:latest
-		#docker push $frontend_image_name:$version
-		#docker image rm $frontend_image_name:latest $frontend_image_name:$version
+		docker push $frontend_image_name:latest
+		docker push $frontend_image_name:$version
+		docker image rm $frontend_image_name:latest $frontend_image_name:$version
 		git restore .env
 		cd ..
 	elif [ "$2" = 'python' ]; then
