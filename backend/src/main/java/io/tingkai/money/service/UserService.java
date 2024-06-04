@@ -103,7 +103,10 @@ public class UserService {
 		if (BigDecimal.ZERO.compareTo(newSetting.getPredictDays()) >= 0) {
 			throw new FieldMissingException();
 		}
-		if (BigDecimal.ZERO.compareTo(newSetting.getStockFeeRate()) >= 0 || BigDecimal.ONE.compareTo(newSetting.getStockFeeRate()) < 0 || BigDecimal.ZERO.compareTo(newSetting.getFundFeeRate()) >= 0 || BigDecimal.ONE.compareTo(newSetting.getFundFeeRate()) < 0) {
+		if (BigDecimal.ZERO.compareTo(newSetting.getStockFeeRate()) >= 0 || BigDecimal.ONE.compareTo(newSetting.getStockFeeRate()) < 0) {
+			throw new FieldMissingException();
+		}
+		if (BigDecimal.ZERO.compareTo(newSetting.getFundFeeRate()) > 0 || BigDecimal.ONE.compareTo(newSetting.getFundFeeRate()) < 0) {
 			throw new FieldMissingException();
 		}
 		return this.userSettingFacade.update(newSetting);

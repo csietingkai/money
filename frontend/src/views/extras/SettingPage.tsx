@@ -69,9 +69,9 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
     };
 
     private updateUserSetting = async () => {
-        const { userSetting, notify } = this.props;
+        const { userSetting, notify, setUserSetting } = this.props;
         const { settingForm } = this.state;
-        const response = await AuthApi.updateUserSetting({
+        const newSetting: UserSetting = {
             ...userSetting,
             stockType: settingForm.stockType as StockType,
             predictDays: settingForm.predictDays,
@@ -79,9 +79,13 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
             fundFeeRate: settingForm.fundFeeRate,
             accountRecordDeletable: settingForm.accountRecordDeletable,
             accountRecordType: settingForm.accountRecordType
-        });
-        const { message } = response;
+        }
+        const response = await AuthApi.updateUserSetting(newSetting);
+        const { success, message } = response;
         notify(message);
+        if (success) {
+            setUserSetting(newSetting);
+        }
     };
 
     private resetUserSetting = (part: 'invest' | 'account') => () => {
