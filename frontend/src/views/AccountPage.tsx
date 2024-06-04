@@ -14,6 +14,7 @@ import * as AppUtil from '../util/AppUtil';
 import { Action, SimpleResponse, Option } from '../util/Interface';
 import { StockType } from '../util/Enum';
 import currencyIcon from '../assets/currency';
+import { DATA_COUNT_PER_PAGE } from '../util/Constant';
 
 export interface AccountPageProps {
     userId: string,
@@ -722,6 +723,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     render(): React.ReactNode {
         const { accountList } = this.props;
         const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteRecordModal } = this.state;
+        const showAccountRecords = currentAccountRecords.slice((accountRecordsPage - 1) * DATA_COUNT_PER_PAGE, accountRecordsPage * DATA_COUNT_PER_PAGE);
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
@@ -783,7 +785,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                 </CTableHead>
                                                                 <CTableBody>
                                                                     {
-                                                                        currentAccountRecords.map(r =>
+                                                                        showAccountRecords.map(r =>
                                                                             <CTableRow key={r.id}>
                                                                                 <CTableDataCell>{AppUtil.toDateStr(r.transDate)}</CTableDataCell>
                                                                                 <CTableDataCell>{AppUtil.numberComma(r.transAmount)}</CTableDataCell>
