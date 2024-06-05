@@ -21,6 +21,7 @@ import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.FinancialFile;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
+import io.tingkai.money.model.exception.FinancialFileNotFoundException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.response.FileResponse;
 import io.tingkai.money.service.FinancialFileService;
@@ -70,7 +71,7 @@ public class FinancialFileController {
 	}
 
 	@RequestMapping(value = FinancialFileController.DOWNLOAD_PATH, method = RequestMethod.GET)
-	public ResponseEntity<Resource> download(@RequestParam UUID fileId) throws UnsupportedEncodingException {
+	public ResponseEntity<Resource> download(@RequestParam UUID fileId) throws UnsupportedEncodingException, FinancialFileNotFoundException {
 		FinancialFile entity = this.fileService.get(fileId);
 		InputStreamResource resource = this.fileService.download(fileId);
 		HttpHeaders header = FileUtil.getFileHeader(entity.getFilename());

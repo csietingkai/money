@@ -26,6 +26,7 @@ public class MessageConstant {
 	public static final String FILE_UPLOAD_SUCCESS = "Upload File: {0} Success";
 	public static final String FILE_DOWNLOAD_SUCCESS = "Download File Success";
 	public static final String FILE_DELETE_SUCCESS = "Delete File: {0} Success";
+	public static final String FILE_DOWNLOAD_NOT_FOUND = "File: {0} Not Found";
 
 	// stock
 	public static final String STOCK_GET_ALL_SUCCESS = "Get All Stocks Success";

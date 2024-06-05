@@ -97,7 +97,12 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
     };
 
     private download = async (fileId: string) => {
+        const { notify } = this.props;
         const [filename, data] = await FinancailFileApi.download(fileId);
+        if (!data) {
+            notify(filename);
+            return;
+        }
         const href = URL.createObjectURL(data);
         const link = document.createElement('a');
         link.href = href;

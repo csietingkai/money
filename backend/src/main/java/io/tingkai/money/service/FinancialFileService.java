@@ -12,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mongodb.client.MongoClient;
@@ -29,8 +30,10 @@ import io.tingkai.money.facade.FinacialFileFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
+import io.tingkai.money.model.exception.FinancialFileNotFoundException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.repository.FileRepository;
+import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
 
 @Service
@@ -70,6 +73,7 @@ public class FinancialFileService {
 		return this.finacialFileFacade.query(fileId);
 	}
 
+	@Transactional
 	public FinancialFile upload(MultipartFile file, String type, LocalDateTime date) throws IOException, AlreadyExistException, FieldMissingException {
 		FinancialFile entity = new FinancialFile();
 		entity.setFilename(file.getOriginalFilename());
@@ -83,6 +87,7 @@ public class FinancialFileService {
 		return entity;
 	}
 
+	@Transactional
 	public FinancialFile update(UUID id, String type, LocalDateTime date) throws NotExistException, FieldMissingException {
 		FinancialFile entity = this.finacialFileFacade.query(id);
 		entity.setType(type);
@@ -90,13 +95,14 @@ public class FinancialFileService {
 		return this.finacialFileFacade.update(entity);
 	}
 
-	public InputStreamResource download(UUID fileId) {
+	public InputStreamResource download(UUID fileId) throws FinancialFileNotFoundException {
 		FinancialFile entity = this.get(fileId);
 		InputStream downloadStream = this.getDownloadStream(entity);
 		InputStreamResource resource = new InputStreamResource(downloadStream);
 		return resource;
 	}
 
+	@Transactional
 	public FinancialFile delete(UUID id) throws NotExistException {
 		FinancialFile entity = this.get(id);
 		this.finacialFileFacade.delete(id);
@@ -107,7 +113,9 @@ public class FinancialFileService {
 		while (gridfsFileCursor.hasNext()) {
 			fileObjectId = gridfsFileCursor.next().getObjectId();
 		}
-		this.getBucket(this.getFileRepository(entity.getType()).getName()).delete(fileObjectId);
+		if (AppUtil.isPresent(fileObjectId)) {
+			this.getBucket(this.getFileRepository(entity.getType()).getName()).delete(fileObjectId);
+		}
 		return entity;
 	}
 
@@ -119,13 +127,16 @@ public class FinancialFileService {
 		return this.getBucket(this.getFileRepository(entity.getType()).getName()).openUploadStream(entity.getFilename(), options);
 	}
 
-	protected InputStream getDownloadStream(FinancialFile entity) {
+	protected InputStream getDownloadStream(FinancialFile entity) throws FinancialFileNotFoundException {
 		GridFSBucket bucket = this.getBucket(this.getFileRepository(entity.getType()).getName());
 		Document metadata = new Document(GridFSFileField.METADATA_PREFIX + GridFSFileField.METADATA_FILE_ID_KEY, entity.getId().toString());
 		MongoCursor<GridFSFile> gridfsFileCursor = bucket.find(metadata).iterator();
 		ObjectId fileObjectId = null;
 		while (gridfsFileCursor.hasNext()) {
 			fileObjectId = gridfsFileCursor.next().getObjectId();
+		}
+		if (AppUtil.isEmpty(fileObjectId)) {
+			throw new FinancialFileNotFoundException(entity.getFilename());
 		}
 		return bucket.openDownloadStream(fileObjectId);
 	}

@@ -18,7 +18,7 @@ export interface FinancialFileListResponse extends ApiResponse<FinancialFile[]> 
 
 const list = async (userId: string, date?: Date, type?: string): Promise<FinancialFileListResponse> => {
     const response = await axios.get(FINANCIAL_FILE_LIST_PATH, { params: { userId, type, date: AppUtil.toDateStr(date) } });
-    const data: FinancialFileListResponse  = response.data;
+    const data: FinancialFileListResponse = response.data;
     data.data = data.data?.map(x => {
         x.date = new Date(x.date);
         return x;
@@ -38,10 +38,15 @@ const update = async (id: string, type: string, date: Date): Promise<FileUploadR
     const response = await axios.post(FINANCIAL_FILE_UPDATE_PATH, null, { params: { id, type, date: AppUtil.toDateStr(date) } });
     const data: FileUploadResponse = response.data;
     return data;
-}
+};
 
 const download = async (fileId: string) => {
     const response = await axios.get(FINANCIAL_FILE_DOWNLOAD_PATH, { params: { fileId }, responseType: 'blob' });
+    if (response.headers['content-type'] === 'application/json') {
+        const errorResp: ApiResponse<void> = JSON.parse(await response.data.text());
+        const { message } = errorResp;
+        return [message, null];
+    }
     const filename = decodeURI(response.headers['content-disposition'].split(' ')[1].replace('filename=', ''));
     const data = response.data;
     return [filename, data];
