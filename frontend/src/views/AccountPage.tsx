@@ -90,13 +90,13 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             showDetail: props.accountList.reduce((acc, curr) => { acc[curr.id] = false; return acc; }, {}),
             showAddAccountModal: false,
             addAccountForm: {
-                currency: props.currencyOptions[0].key,
+                currency: props.currencyOptions[0]?.key,
                 name: ''
             },
             showEditAccountModal: false,
             editAccountForm: {
                 id: '',
-                currency: props.currencyOptions[0].key,
+                currency: props.currencyOptions[0]?.key,
                 name: ''
             },
             currentAccountRecords: [],
@@ -318,11 +318,11 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private closeAddAccountModal = () => {
-        this.setState({ showAddAccountModal: false, addAccountForm: { currency: this.props.currencyOptions[0].key, name: '' } });
+        this.setState({ showAddAccountModal: false, addAccountForm: { currency: this.props.currencyOptions[0]?.key, name: '' } });
     };
 
     private closeEditAccountModal = () => {
-        this.setState({ showEditAccountModal: false, editAccountForm: { id: '', currency: this.props.currencyOptions[0].key, name: '' } });
+        this.setState({ showEditAccountModal: false, editAccountForm: { id: '', currency: this.props.currencyOptions[0]?.key, name: '' } });
     };
 
     private fetchAccountRecords = async (accountId: string) => {
