@@ -579,7 +579,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         if (success) {
             this.fetchAccounts();
             this.fetchAccountRecords(accountId);
-            this.closeExpendModal();
+            this.closeTransferModal();
         }
     };
 
