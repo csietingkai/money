@@ -40,7 +40,8 @@ export const getAuthTokenExpiryDate = (state: ReduxState): Date => getAuthToken(
 export const getUserSetting = (state: ReduxState): UserSetting => getAuthState(state)?.userSetting as UserSetting;
 export const getStockType = (state: ReduxState): StockType => getUserSetting(state)?.stockType;
 export const getPredictDays = (state: ReduxState): number => getUserSetting(state)?.predictDays;
-export const getTaxFeeRate = (state: ReduxState): number => getUserSetting(state)?.taxFeeRate;
+export const getStockFeeRate = (state: ReduxState): number => getUserSetting(state)?.stockFeeRate;
+export const getFundFeeRate = (state: ReduxState): number => getUserSetting(state)?.fundFeeRate;
 export const isAccountRecordDeletable = (state: ReduxState): boolean => getUserSetting(state)?.accountRecordDeletable;
 export const getDefaultRecordType = (state: ReduxState): string => getUserSetting(state)?.accountRecordType;
 
@@ -79,7 +80,7 @@ export interface ReduxFundState {
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     own: [],
     queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
-    tradeCondition: { type: 'buy', code: '', name: '', date: new Date(), currency: '', price: 0, share: 0 }
+    tradeCondition: { type: 'buy', code: '', name: '', date: new Date(), price: 0, share: 0 }
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
 export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
