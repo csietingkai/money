@@ -1,2 +1,7 @@
-./node_modules/
-./history/
+node_modules
+build
+npm-debug.log
+.dockerignore
+**/.git
+**/.DS_Store
+**/node_modules
