@@ -65,7 +65,6 @@ const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action
     return newState;
 };
 
-// TODO FundQueryCondition FundTradeCondition
 const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserFundVo[] | FundQueryCondition | FundTradeCondition>): ReduxFundState => {
     const newState: ReduxFundState = { ...state };
     const { type, payload } = action;

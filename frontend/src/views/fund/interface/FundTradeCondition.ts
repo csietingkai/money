@@ -1,5 +1,3 @@
-// TODO all type
-
 interface FundBuyForm {
     type: 'buy';
     code: string;

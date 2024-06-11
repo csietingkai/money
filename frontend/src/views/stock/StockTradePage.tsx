@@ -16,7 +16,7 @@ export interface StockTradePageProps {
     accounts: Account[];
     tradeCondition: StockTradeCondition;
     setAccountList: (accounts: Account[]) => void;
-    setStockOwnList: (ownList: UserStockVo[]) => void;
+    setOwnStockList: (ownList: UserStockVo[]) => void;
     setStockTradeCondition: (condition: StockTradeCondition) => void;
     notify: (message: string) => void;
 }
@@ -318,15 +318,11 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
         const { notify } = this.props;
         const { buyForm } = this.state;
         const { code, accountId, tradeDate, share, price, fee, total, fileId } = buyForm;
-        const { success, message, data } = await StockApi.buy(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
+        const { success, message } = await StockApi.buy(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
+        notify(message);
         if (success) {
-            notify(message);
             this.fetchAccounts();
             this.fetchOwnStocks();
-            // TODO
-            //     if (stockOwnList.find(x => x.stockCode === selectedStockCode)) {
-            //         await this.fetchStockOwnList(username);
-            //     }
         }
     };
 
@@ -543,15 +539,11 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
         const { notify } = this.props;
         const { sellForm } = this.state;
         const { code, accountId, tradeDate, share, price, fee, tax, total, fileId } = sellForm;
-        const { success, message, data } = await StockApi.sell(accountId, code, tradeDate, share, price, fee, tax, AppUtil.reverseNumberComma(total), fileId);
+        const { success, message } = await StockApi.sell(accountId, code, tradeDate, share, price, fee, tax, AppUtil.reverseNumberComma(total), fileId);
+        notify(message);
         if (success) {
-            notify(message);
             this.fetchAccounts();
             this.fetchOwnStocks();
-            // TODO
-            //     if (stockOwnList.find(x => x.stockCode === selectedStockCode)) {
-            //         await this.fetchStockOwnList(username);
-            //     }
         }
     };
 
@@ -601,11 +593,11 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
     };
 
     private fetchOwnStocks = async () => {
-        const { setStockOwnList } = this.props;
+        const { setOwnStockList } = this.props;
         const response: UserStockListResponse = await StockApi.getOwn();
         const { success, data: ownList } = response;
         if (success) {
-            setStockOwnList(ownList);
+            setOwnStockList(ownList);
         }
     };
 

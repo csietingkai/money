@@ -344,16 +344,11 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
         const { notify } = this.props;
         const { buyForm } = this.state;
         const { code, accountId, tradeDate, share, price, fee, total, fileId } = buyForm;
-        // TODO fileId
-        const { success, message, data } = await FundApi.buy(accountId, code, tradeDate, share, price, fee, total, fee, fileId);
+        const { success, message } = await FundApi.buy(accountId, code, tradeDate, share, price, fee, total, fee, fileId);
+        notify(message);
         if (success) {
-            notify(message);
             this.fetchAccounts();
             this.fetchOwnFunds();
-            // TODO
-            //     if (stockOwnList.find(x => x.stockCode === selectedFundCode)) {
-            //         await this.fetchFundOwnList(username);
-            //     }
         }
     };
 
@@ -562,15 +557,11 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
         const { notify } = this.props;
         const { sellForm } = this.state;
         const { code, accountId, tradeDate, share, price, rate, total, fileId } = sellForm;
-        const { success, message, data } = await FundApi.sell(accountId, code, tradeDate, share, price, rate, total, fileId)
+        const { success, message } = await FundApi.sell(accountId, code, tradeDate, share, price, rate, total, fileId)
+        notify(message);
         if (success) {
-            notify(message);
             this.fetchAccounts();
             this.fetchOwnFunds();
-            // TODO
-            //     if (stockOwnList.find(x => x.stockCode === selectedFundCode)) {
-            //         await this.fetchFundOwnList(username);
-            //     }
         }
     };
 
