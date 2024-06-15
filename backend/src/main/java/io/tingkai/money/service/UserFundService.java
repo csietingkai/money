@@ -155,7 +155,7 @@ public class UserFundService {
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
 		accountRecord.setRecordType(RecordType.INVEST);
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, userId, fundCode, share, price));
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, fundCode, share, price));
 		accountRecord.setFileId(fileId);
 		accountRecord = this.accountRecordFacade.insert(accountRecord);
 
@@ -199,7 +199,7 @@ public class UserFundService {
 		accountRecord.setTransFrom(account.getId());
 		accountRecord.setTransTo(account.getId());
 		accountRecord.setRecordType(RecordType.INVEST);
-		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, userId, fundCode, share, price));
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, fundCode, share, price));
 		accountRecord.setFileId(fileId);
 		accountRecord = this.accountRecordFacade.insert(accountRecord);
 
