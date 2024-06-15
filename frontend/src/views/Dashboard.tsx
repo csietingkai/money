@@ -5,11 +5,14 @@ import { cilBank } from '@coreui/icons';
 import { connect } from 'react-redux';
 import { Account } from '../api/account';
 import { SetNotifyDispatcher } from '../reducer/PropsMapper';
-import { ReduxState, getAccountList } from '../reducer/Selector';
+import { ReduxState, getAccountList, getFundOwnList, getStockOwnList } from '../reducer/Selector';
 import { Action } from '../util/Interface';
 import * as AppUtil from '../util/AppUtil';
 import { stock } from '../assets/brand/stock';
 import { fund } from '../assets/brand/fund';
+import { UserStockVo } from '../api/stock';
+import { UserFundVo } from '../api/fund';
+import { DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
 
 export interface AccountBalance {
     value: string;
@@ -18,6 +21,8 @@ export interface AccountBalance {
 
 export interface DashboardProps {
     accountList: Account[];
+    ownStockList: UserStockVo[];
+    ownFundList: UserFundVo[];
 }
 
 export interface DashboardState { }
@@ -44,6 +49,37 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         return balances;
     };
 
+    private getTotalStockValue = (ownStockList: UserStockVo[]): { total: number, big: { code: string, value: number; }; } => {
+        const data: { total: number, big: { code: string, value: number; }; } = { total: 0, big: { code: '', value: 0 } };
+        for (const s of ownStockList) {
+            const total: number = s.amount * s.price;
+            if (total > data.big.value) {
+                data.big.code = `${s.stockCode} ${s.stockName}`;
+                data.big.value = total;
+            }
+            data.total += total;
+        }
+        data.total = AppUtil.toNumber(data.total.toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.big.value = AppUtil.toNumber(data.big.value.toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.big.value = AppUtil.toNumber(data.big.value.toFixed(DEFAULT_DECIMAL_PRECISION));
+        return data;
+    };
+
+    private getTotalFundValue = (ownStockList: UserFundVo[]): { total: number, big: { code: string, value: number; }; } => {
+        const data: { total: number, big: { code: string, value: number; }; } = { total: 0, big: { code: '', value: 0 } };
+        for (const s of ownStockList) {
+            const total: number = s.amount * s.price;
+            if (total > data.big.value) {
+                data.big.code = `${s.fundCode} ${s.fundName}`;
+                data.big.value = total;
+            }
+            data.total += total;
+        }
+        data.total = AppUtil.toNumber(data.total.toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.big.value = AppUtil.toNumber(data.big.value.toFixed(DEFAULT_DECIMAL_PRECISION));
+        return data;
+    };
+
     private balanceCard = (key: string, values: AccountBalance[], icon: string[] = cilBank): React.ReactNode => {
         return (
             <CCard key={key}>
@@ -64,7 +100,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                         <div className='fs-5 fw-semibold'>
                                             {a.value}
                                         </div>
-                                        <div className='text-uppercase text-body-secondary small'>
+                                        <div className='text-uppercase text-body-secondary small' >
                                             {a.desc}
                                         </div>
                                     </CCol>
@@ -78,8 +114,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     };
 
     render(): React.ReactNode {
-        const { accountList } = this.props;
+        const { accountList, ownStockList, ownFundList } = this.props;
         const accountBalances = this.getTotalAccountBalance(accountList);
+        const { total: totalStockValue, big: { code: bigStockCode, value: bigStockValue } } = this.getTotalStockValue(ownStockList);
+        const { total: totalFundValue, big: { code: bigFundCode, value: bigFundValue } } = this.getTotalFundValue(ownFundList);
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
@@ -88,14 +126,14 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('stock-card', [
-                            { value: '100,000', desc: 'Total TWD' },
-                            { value: '10,000', desc: 'TSMC' }
+                            { value: AppUtil.numberComma(totalStockValue), desc: 'Total TWD' },
+                            { value: AppUtil.numberComma(bigStockValue), desc: bigStockCode }
                         ], stock)}
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('fund-card', [
-                            { value: '100,000', desc: 'MAI070' },
-                            { value: '10,000', desc: 'TSMC' }
+                            { value: AppUtil.numberComma(totalFundValue), desc: 'Total TWD' },
+                            { value: AppUtil.numberComma(bigFundValue), desc: bigFundCode }
                         ], fund)}
                     </CCol>
                 </CRow>
@@ -106,7 +144,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     }
 } const mapStateToProps = (state: ReduxState) => {
     return {
-        accountList: getAccountList(state)
+        accountList: getAccountList(state),
+        ownStockList: getStockOwnList(state),
+        ownFundList: getFundOwnList(state)
     };
 };
 
