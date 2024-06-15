@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import org.apache.commons.codec.binary.Hex;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.money.constant.CodeConstants;
@@ -25,6 +25,6 @@ public class TokenStringService {
 		byte[] randomBytes = new byte[CodeConstants.PRNG_PRODUCT_LENGTH];
 		this.secureRandom.nextBytes(randomBytes);
 		byte[] digestBytes = this.messageDigest.digest(randomBytes);
-		return Hex.encodeHexString(digestBytes);
+		return new String(Hex.encode(digestBytes));
 	}
 }

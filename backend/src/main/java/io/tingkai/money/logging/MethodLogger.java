@@ -28,7 +28,7 @@ public class MethodLogger {
 		String className = point.getTarget().getClass().getSimpleName();
 		String methodName = MethodSignature.class.cast(point.getSignature()).getMethod().getName();
 		Object[] args = point.getArgs();
-		this.loggingOut(loggable.level(), this.composeMessage(className, methodName, args, result, spentTime));
+		this.loggingOut(loggable.level(), this.composeMessage(className, methodName, args, spentTime));
 		return result;
 	}
 
@@ -53,7 +53,7 @@ public class MethodLogger {
 		}
 	}
 
-	private String composeMessage(String className, String methodName, Object[] args, Object result, long spentTime) {
+	private String composeMessage(String className, String methodName, Object[] args, long spentTime) {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("### ");
 		messageBuilder.append(className);
@@ -70,13 +70,7 @@ public class MethodLogger {
 				messageBuilder.append(", ");
 			}
 		}
-		messageBuilder.append("): ");
-		if (AppUtil.isPresent(result)) {
-			messageBuilder.append(result.toString());
-		} else {
-			messageBuilder.append("null");
-		}
-		messageBuilder.append(" in ");
+		messageBuilder.append(") in ");
 		messageBuilder.append(spentTime);
 		messageBuilder.append(" milliseconds");
 		return messageBuilder.toString();

@@ -4,12 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -21,7 +19,6 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import io.tingkai.money.constant.CodeConstants;
 
 @Configuration
-@EnableRedisRepositories
 public class RedisConfig {
 
 	@Value("${spring.redis.host}")
@@ -45,37 +42,51 @@ public class RedisConfig {
 	@Bean(name = CodeConstants.APP_CACHE)
 	@Primary
 	public RedisTemplate<?, ?> appCache() {
-		return this.newRedisTemplate(database);
+		return this.newRedisTemplate(appConnectionFactory());
 	}
 
 	@Bean(name = CodeConstants.PYTHON_CACHE)
 	public RedisTemplate<?, ?> pythonCache() {
-		return this.newRedisTemplate(pythonDatabase);
+		return this.newRedisTemplate(pythonConnectionFactory());
 	}
 
 	@Bean(name = CodeConstants.USER_CACHE)
 	public RedisTemplate<?, ?> userCache() {
-		return this.newRedisTemplate(userDatabase);
+		return this.newRedisTemplate(userConnectionFactory());
 	}
 
-	private RedisTemplate<byte[], byte[]> newRedisTemplate(int database) {
+	@Bean(name = CodeConstants.APP_CACHE + "_conectionFactory")
+	@Primary
+	public LettuceConnectionFactory appConnectionFactory() {
+		return this.connectionFactory(database);
+	}
+
+	@Bean(name = CodeConstants.PYTHON_CACHE + "_conectionFactory")
+	public LettuceConnectionFactory pythonConnectionFactory() {
+		return this.connectionFactory(pythonDatabase);
+	}
+
+	@Bean(name = CodeConstants.USER_CACHE + "_conectionFactory")
+	public LettuceConnectionFactory userConnectionFactory() {
+		return this.connectionFactory(userDatabase);
+	}
+
+	private RedisTemplate<byte[], byte[]> newRedisTemplate(LettuceConnectionFactory connectionFactory) {
 		RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
-		template.setConnectionFactory(connectionFactory(database));
-		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
+		template.setConnectionFactory(connectionFactory);
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
-		jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 		template.setKeySerializer(new StringRedisSerializer());
-		template.setValueSerializer(jackson2JsonRedisSerializer);
+		template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, Object.class));
 		template.setHashKeySerializer(new StringRedisSerializer());
 		template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 		return template;
 	}
 
-	private RedisConnectionFactory connectionFactory(int database) {
+	private LettuceConnectionFactory connectionFactory(int database) {
 		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
 		redisStandaloneConfiguration.setPassword(RedisPassword.of(password));
 		redisStandaloneConfiguration.setDatabase(database);
-		return new JedisConnectionFactory(redisStandaloneConfiguration);
+		return new LettuceConnectionFactory(redisStandaloneConfiguration);
 	}
 }

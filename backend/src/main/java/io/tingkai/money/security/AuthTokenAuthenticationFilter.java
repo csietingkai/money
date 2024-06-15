@@ -3,14 +3,8 @@ package io.tingkai.money.security;
 import java.io.IOException;
 import java.util.Date;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +14,12 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.enumeration.Role;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthTokenAuthenticationFilter extends GenericFilterBean {
 
 	@Autowired
+	@Lazy
 	protected AuthenticationManager authenticationManager;
 
 	@Override

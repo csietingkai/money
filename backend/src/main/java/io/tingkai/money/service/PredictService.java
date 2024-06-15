@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +17,6 @@ import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.vo.PredictResultVo;
 import io.tingkai.money.util.AppUtil;
-import net.minidev.json.JSONObject;
 
 @Service
 @Loggable
