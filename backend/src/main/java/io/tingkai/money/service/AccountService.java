@@ -156,6 +156,9 @@ public class AccountService {
 			vo.setTransFromCurrency(accountMap.get(record.getTransFrom()).getCurrency());
 			vo.setTransToName(accountMap.get(record.getTransTo()).getName());
 			vo.setTransToCurrency(accountMap.get(record.getTransTo()).getCurrency());
+			if (!vo.getTransFrom().equals(vo.getTransTo()) && accountId.equals(vo.getTransFrom())) {
+				vo.setTransAmount(BigDecimal.ZERO.subtract(vo.getTransAmount()));
+			}
 			vos.add(vo);
 		}
 		return vos;
