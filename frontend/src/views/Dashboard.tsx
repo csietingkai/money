@@ -49,34 +49,31 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         return balances;
     };
 
-    private getTotalStockValue = (ownStockList: UserStockVo[]): { total: number, big: { code: string, value: number; }; } => {
-        const data: { total: number, big: { code: string, value: number; }; } = { total: 0, big: { code: '', value: 0 } };
+    private getTotalStockValue = (ownStockList: UserStockVo[]): { total: number, benifit: number, percentage: number } => {
+        const data: { total: number, benifit: number, percentage: number } = { total: 0, benifit: 0, percentage: 0 };
+        let cost: number = 0;
         for (const s of ownStockList) {
             const total: number = s.amount * s.price;
-            if (total > data.big.value) {
-                data.big.code = `${s.stockCode} ${s.stockName}`;
-                data.big.value = total;
-            }
             data.total += total;
+            cost += s.cost;
         }
         data.total = AppUtil.toNumber(data.total.toFixed(DEFAULT_DECIMAL_PRECISION));
-        data.big.value = AppUtil.toNumber(data.big.value.toFixed(DEFAULT_DECIMAL_PRECISION));
-        data.big.value = AppUtil.toNumber(data.big.value.toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.benifit = AppUtil.toNumber((data.total - cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.percentage = AppUtil.toNumber((data.benifit * 100 / cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         return data;
     };
 
-    private getTotalFundValue = (ownStockList: UserFundVo[]): { total: number, big: { code: string, value: number; }; } => {
-        const data: { total: number, big: { code: string, value: number; }; } = { total: 0, big: { code: '', value: 0 } };
+    private getTotalFundValue = (ownStockList: UserFundVo[]): { total: number, benifit: number, percentage: number } => {
+        const data: {  total: number, benifit: number, percentage: number } = { total: 0, benifit: 0, percentage: 0 };
+        let cost: number = 0;
         for (const s of ownStockList) {
             const total: number = s.amount * s.price;
-            if (total > data.big.value) {
-                data.big.code = `${s.fundCode} ${s.fundName}`;
-                data.big.value = total;
-            }
             data.total += total;
+            cost += s.cost;
         }
         data.total = AppUtil.toNumber(data.total.toFixed(DEFAULT_DECIMAL_PRECISION));
-        data.big.value = AppUtil.toNumber(data.big.value.toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.benifit = AppUtil.toNumber((data.total - cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        data.percentage = AppUtil.toNumber((data.benifit * 100 / cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         return data;
     };
 
@@ -116,8 +113,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     render(): React.ReactNode {
         const { accountList, ownStockList, ownFundList } = this.props;
         const accountBalances = this.getTotalAccountBalance(accountList);
-        const { total: totalStockValue, big: { code: bigStockCode, value: bigStockValue } } = this.getTotalStockValue(ownStockList);
-        const { total: totalFundValue, big: { code: bigFundCode, value: bigFundValue } } = this.getTotalFundValue(ownFundList);
+        const { total: totalStockValue, benifit: totalStockBenifit, percentage: totalStockPercentage } = this.getTotalStockValue(ownStockList);
+        const { total: totalFundValue, benifit: totalFundBenifit, percentage: totalFundPercentage } = this.getTotalFundValue(ownFundList);
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
@@ -126,14 +123,14 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('stock-card', [
-                            { value: AppUtil.numberComma(totalStockValue), desc: 'Total TWD' },
-                            { value: AppUtil.numberComma(bigStockValue), desc: bigStockCode }
+                            { value: AppUtil.numberComma(totalStockValue), desc: 'Current Value' },
+                            { value: AppUtil.numberComma(totalStockBenifit), desc: `Benifit: ${AppUtil.numberComma(totalStockPercentage)}%` }
                         ], stock)}
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('fund-card', [
-                            { value: AppUtil.numberComma(totalFundValue), desc: 'Total TWD' },
-                            { value: AppUtil.numberComma(bigFundValue), desc: bigFundCode }
+                            { value: AppUtil.numberComma(totalFundValue), desc: 'Current Value' },
+                            { value: AppUtil.numberComma(totalFundBenifit), desc: `Benifit: ${AppUtil.numberComma(totalFundPercentage)}%` }
                         ], fund)}
                     </CCol>
                 </CRow>
