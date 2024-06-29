@@ -5,7 +5,7 @@ import CIcon from '@coreui/icons-react';
 import { cilArrowTop, cilBolt, cilPlus } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getStockOwnList } from '../../reducer/Selector';
 import StockApi, { UserStockRecord, UserStockVo } from '../../api/stock';
-import { SetNotifyDispatcher } from '../../reducer/PropsMapper';
+import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
@@ -17,6 +17,7 @@ export interface StockOwnPageProps {
     stockType: StockType;
     ownStockList: UserStockVo[];
     notify: (message: string) => void;
+    setLoading: (loading: boolean) => void;
 }
 
 export interface StockOwnPageState {
@@ -40,6 +41,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     }
 
     private toggleInfo = async (ownStockInfo: UserStockVo) => {
+        const { setLoading } = this.props;
         const { show } = this.state;
         const { id, stockCode } = ownStockInfo;
         for (const key in show) {
@@ -49,7 +51,9 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         }
         show[stockCode] = !show[stockCode];
         if (show[stockCode]) {
+            setLoading(true);
             await this.fetchUserStockRecords(id);
+            setLoading(false);
         }
         this.setState({ show });
     };
@@ -181,9 +185,10 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserStockVo[] | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<string | boolean>>) => {
     return {
-        notify: SetNotifyDispatcher(dispatch)
+        notify: SetNotifyDispatcher(dispatch),
+        setLoading: SetLoadingDispatcher(dispatch)
     };
 };
 

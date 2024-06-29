@@ -4,7 +4,7 @@ import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol
 import { cilArrowRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
-import { SetAccountListDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
+import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import { ReduxState, getAccountList, getAuthTokenId, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
 import AccountApi, { Account, AccountRecordVo } from '../api/account';
 import FinancailFileApi from '../api/financailFile';
@@ -15,6 +15,7 @@ import { Action, SimpleResponse, Option } from '../util/Interface';
 import { StockType } from '../util/Enum';
 import currencyIcon from '../assets/currency';
 import { DATA_COUNT_PER_PAGE } from '../util/Constant';
+import { SetLoading } from '../reducer/Action';
 
 export interface AccountPageProps {
     userId: string,
@@ -26,6 +27,7 @@ export interface AccountPageProps {
     recordTypeOptions: Option[];
     setAccountList: (accountList: Account[]) => void;
     notify: (message: string) => void;
+    setLoading: (loading: boolean) => void;
 }
 
 export interface AccountPageState {
@@ -137,6 +139,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     }
 
     private toggleRecord = async (accountId: string) => {
+        const { setLoading } = this.props;
         const { showDetail } = this.state;
         for (const key in showDetail) {
             if (key !== accountId) {
@@ -145,7 +148,9 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         }
         showDetail[accountId] = !showDetail[accountId];
         if (showDetail[accountId]) {
+            setLoading(true);
             await this.fetchAccountRecords(accountId);
+            setLoading(false);
         }
         this.setState({ showDetail });
     };
@@ -877,10 +882,11 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string | boolean>>) => {
     return {
         setAccountList: SetAccountListDispatcher(dispatch),
-        notify: SetNotifyDispatcher(dispatch)
+        notify: SetNotifyDispatcher(dispatch),
+        setLoading: SetLoadingDispatcher(dispatch)
     };
 };
 
