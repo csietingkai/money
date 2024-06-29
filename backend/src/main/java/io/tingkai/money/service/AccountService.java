@@ -137,12 +137,7 @@ public class AccountService {
 	}
 
 	public List<AccountRecordVo> getAllRecords(UUID accountId, boolean latestFirstOrder) {
-		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountId);
-		if (latestFirstOrder) {
-			entities.sort((AccountRecord a, AccountRecord b) -> {
-				return b.getTransDate().compareTo(a.getTransDate());
-			});
-		}
+		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountId, latestFirstOrder);
 
 		Account account = this.accountFacade.query(accountId);
 		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, account.getUserId()));

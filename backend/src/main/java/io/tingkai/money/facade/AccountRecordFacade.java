@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.AccountRecordDao;
@@ -42,10 +43,18 @@ public class AccountRecordFacade {
 		return entities;
 	}
 
-	public List<AccountRecord> queryAll(UUID accountId) {
+	public List<AccountRecord> queryAll(UUID accountId, boolean latestFirstOrder) {
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+		}
+		if (latestFirstOrder) {
+			entities.sort((AccountRecord a, AccountRecord b) -> {
+				return b.getTransDate().compareTo(a.getTransDate());
+			});
+		}
+		if (entities.size() > AppConstants.FETCH_MAX_RECORD) {
+			entities = entities.subList(0, AppConstants.FETCH_MAX_RECORD);
 		}
 		return entities;
 	}

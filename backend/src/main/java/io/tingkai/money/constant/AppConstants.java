@@ -17,6 +17,7 @@ public class AppConstants {
 	public static String FRONTEND_URL;
 	public static String PYTHON_BASE_URL;
 	public static String OPTION_LANGUAGE;
+	public static int FETCH_MAX_RECORD;
 
 	@Value("${init-root-username}")
 	public void setInitRootUsername(String username) {
@@ -74,5 +75,10 @@ public class AppConstants {
 		if (CodeConstants.VALID_OPTION_LANGUAGE.indexOf(optionLanguage) >= 0) {
 			AppConstants.OPTION_LANGUAGE = optionLanguage;
 		}
+	}
+
+	@Value("${fetch-max-record}")
+	public void setFetchMaxRecord(int fetchMaxRecord) {
+		AppConstants.FETCH_MAX_RECORD = fetchMaxRecord;
 	}
 }

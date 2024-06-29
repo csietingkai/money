@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.tingkai.money.constant.AppConstants;
 import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.UserStockRecordDao;
@@ -38,13 +39,8 @@ public class UserStockRecordFacade {
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
 		}
-		return entities;
-	}
-
-	public List<UserStockRecord> queryAll(List<UUID> userStockIds) {
-		List<UserStockRecord> entities = this.userStockRecordDao.findByUserStockIdIn(userStockIds);
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
+		if (entities.size() > AppConstants.FETCH_MAX_RECORD) {
+			entities = entities.subList(0, AppConstants.FETCH_MAX_RECORD);
 		}
 		return entities;
 	}
