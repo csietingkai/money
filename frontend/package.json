@@ -1,17 +1,17 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
-  "version": "5.0.0",
-  "description": "CoreUI Free React Admin Template",
+  "name": "tingkai/money-frontend",
+  "version": "v2.2.6",
+  "description": "Frontend for Tingkai Money App",
   "homepage": ".",
   "bugs": {
-    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
+    "url": "https://github.com/csietingkai/money/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
+    "url": "git@github.com:csietingkai/money.git"
   },
   "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "author": "Ting-Kai, Hu (https://github.com/csietingkai)",
   "scripts": {
     "build": "vite build",
     "lint": "eslint \"src/**/*.ts\"",
