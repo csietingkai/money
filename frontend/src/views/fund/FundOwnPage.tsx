@@ -1,21 +1,23 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowTop, cilBolt, cilPlus } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getFundOwnList } from '../../reducer/Selector';
 import FundApi, { UserFundRecord, UserFundVo } from '../../api/fund';
-import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
+import { SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
 import { StockType } from '../../util/Enum';
 import { Action } from '../../util/Interface';
+import FundTradeCondition, { TradeType } from './interface/FundTradeCondition';
 
 export interface FundOwnPageProps {
     userId: string;
     stockType: StockType;
     ownFundList: UserFundVo[];
+    setFundTradeCondition: (tradeCondition?: FundTradeCondition) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -109,6 +111,33 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                             </CCardHeader>
                             <CCardBody>
                                 <CRow>
+                                    <CCol xs={12} className='mb-2 d-grid gap-2 d-md-flex justify-content-md-end'>
+                                        <CButtonGroup role='group'>
+                                            <CButton
+                                                color='danger'
+                                                variant='outline'
+                                                onClick={() => this.tradeFundPage(ownFundInfo, 'buy')}
+                                            >
+                                                Buy
+                                            </CButton>
+                                            <CButton
+                                                color='success'
+                                                variant='outline'
+                                                onClick={() => this.tradeFundPage(ownFundInfo, 'sell')}
+                                            >
+                                                Sell
+                                            </CButton>
+                                            <CButton
+                                                color='info'
+                                                variant='outline'
+                                                onClick={() => this.tradeFundPage(ownFundInfo, 'bonus')}
+                                            >
+                                                Bonus
+                                            </CButton>
+                                        </CButtonGroup>
+                                    </CCol>
+                                </CRow>
+                                <CRow>
                                     <CCol xs={12}>
                                         <CTable align='middle' responsive hover>
                                             <CTableHead>
@@ -147,9 +176,21 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         );
     };
 
-    private tradeFundPage = () => {
-        // TODO set query condition
-        window.location.assign('/#/stockTrade');
+    private tradeFundPage = (fundInfo?: UserFundVo, type?: TradeType) => {
+        const { setFundTradeCondition } = this.props;
+        if (fundInfo && type) {
+            const tradeCondition: FundTradeCondition = {
+                type,
+                code: fundInfo.fundCode,
+                name: fundInfo.fundName,
+                date: new Date(),
+                price: fundInfo.price,
+                rate: 1, // TODO exchange rate
+                share: fundInfo.amount
+            };
+            setFundTradeCondition(tradeCondition);
+        }
+        window.location.assign('/#/fundTrade');
     };
 
     render(): React.ReactNode {
@@ -164,7 +205,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     <CCol sm={12}>
                         <div className='d-grid gap-2 col-xs-8 col-md-6 mx-auto'>
-                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={this.tradeFundPage}>
+                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.tradeFundPage()}>
                                 <CIcon icon={cilPlus} className='me-2' />
                                 Trade More Fund
                             </CButton>
@@ -183,8 +224,9 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<FundTradeCondition | undefined | string | boolean>>) => {
     return {
+        setFundTradeCondition: SetFundTradeConditionDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };

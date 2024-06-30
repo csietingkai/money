@@ -20,7 +20,7 @@ export interface StockQueryPageProps {
     queryCondition: StockQueryCondition;
     stockType: StockType;
     setStockQueryCondition: (queryCondition: StockQueryCondition) => void;
-    setStockTradeCondition: (tradeCondition: StockTradeCondition) => void;
+    setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
     setLoading: (isLoading: boolean) => void;
     notify: (message: string) => void;
 }
@@ -103,7 +103,8 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private tradeStock = (stock: StockVo, type: 'buy' | 'sell') => {
-        const {code, name, currency} = stock
+        const { code, name, currency } = stock;
+        // TODO
         this.props.setStockTradeCondition({ type, code, name, date: new Date(), currency, price: 0, share: 0 });
         window.location.assign('/#/stockTrade');
     };
@@ -305,7 +306,7 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockQueryCondition | StockTradeCondition | boolean | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockQueryCondition | StockTradeCondition | undefined | boolean | string>>) => {
     return {
         setStockQueryCondition: SetStockQueryConditionDispatcher(dispatch),
         setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),

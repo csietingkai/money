@@ -3,8 +3,8 @@ interface FundBuyForm {
     code: string;
     name: string;
     date: Date;
+    rate: number;
     price: number;
-    share: number;
 }
 
 interface FundSellForm {
@@ -13,6 +13,7 @@ interface FundSellForm {
     name: string;
     date: Date;
     price: number;
+    rate: number;
     share: number;
 }
 
@@ -22,6 +23,7 @@ interface FundBonusForm {
     name: string;
     date: Date;
     price: number;
+    rate: number;
     share: number;
 }
 

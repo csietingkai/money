@@ -21,12 +21,12 @@ export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) 
 // stock
 export const SetOwnStockListDispatcher = (dispatch: Dispatch<Action<UserStockVo[]>>) => (vos: UserStockVo[]): void => dispatch(SetOwnStockList(vos));
 export const SetStockQueryConditionDispatcher = (dispatch: Dispatch<Action<StockQueryCondition>>) => (condition: StockQueryCondition): void => dispatch(SetStockQueryCondition(condition));
-export const SetStockTradeConditionDispatcher = (dispatch: Dispatch<Action<StockTradeCondition>>) => (condition: StockTradeCondition): void => dispatch(SetStockTradeCondition(condition));
+export const SetStockTradeConditionDispatcher = (dispatch: Dispatch<Action<StockTradeCondition | undefined>>) => (condition?: StockTradeCondition): void => dispatch(SetStockTradeCondition(condition));
 
 // fund
 export const SetOwnFundListDispatcher = (dispatch: Dispatch<Action<UserFundVo[]>>) => (vos: UserFundVo[]): void => dispatch(SetOwnFundList(vos));
 export const SetFundQueryConditionDispatcher = (dispatch: Dispatch<Action<FundQueryCondition>>) => (condition: FundQueryCondition): void => dispatch(SetFundQueryCondition(condition));
-export const SetFundTradeConditionDispatcher = (dispatch: Dispatch<Action<FundTradeCondition>>) => (condition: FundTradeCondition): void => dispatch(SetFundTradeCondition(condition));
+export const SetFundTradeConditionDispatcher = (dispatch: Dispatch<Action<FundTradeCondition | undefined>>) => (condition?: FundTradeCondition): void => dispatch(SetFundTradeCondition(condition));
 
 // system setting
 export const SetLoadingDispatcher = (dispatch: Dispatch<Action<boolean>>) => (loading: boolean): void => dispatch(SetLoading(loading));

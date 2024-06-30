@@ -17,10 +17,10 @@ export interface FundTradePageProps {
     userId: string;
     userSetting: UserSetting;
     accounts: Account[];
-    tradeCondition: FundTradeCondition;
+    tradeCondition?: FundTradeCondition;
     setAccountList: (accounts: Account[]) => void;
     setOwnFundList: (ownList: UserFundVo[]) => void;
-    setFundTradeCondition: (condition: FundTradeCondition) => void;
+    setFundTradeCondition: (condition?: FundTradeCondition) => void;
     notify: (message: string) => void;
 }
 
@@ -74,7 +74,7 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
         };
     }
 
-    private init = (tradeCondition: FundTradeCondition) => {
+    private init = (tradeCondition?: FundTradeCondition) => {
         const buyForm = {
             code: '',
             name: '',
@@ -104,13 +104,22 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
         };
         const bonusForm = {};
 
-        // TODO get data from props;
-        if (tradeCondition.type === 'buy') {
+        if (tradeCondition?.type === 'buy') {
             buyForm.code = tradeCondition.code;
             buyForm.name = tradeCondition.name;
             buyForm.tradeDate = tradeCondition.date;
-        } else if (tradeCondition.type === 'sell') {
+            // TODO exchange rate
+            buyForm.price = tradeCondition.price;
+        } else if (tradeCondition?.type === 'sell') {
+            sellForm.code = tradeCondition.code;
+            sellForm.name = tradeCondition.name;
+            sellForm.tradeDate = tradeCondition.date;
+            // TODO exchange rate
+            sellForm.price = tradeCondition.price;
+            sellForm.share = tradeCondition.share;
+            sellForm.total = AppUtil.toNumber((sellForm.rate * sellForm.price * sellForm.share).toFixed(DEFAULT_DECIMAL_PRECISION))
         }
+        // TODO bonus form;
 
         return { buyForm, sellForm, bonusForm };
     };
@@ -650,7 +659,7 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string | UserFundVo[] | FundTradeCondition>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string | UserFundVo[] | FundTradeCondition | undefined>>) => {
     return {
         setAccountList: SetAccountListDispatcher(dispatch),
         setOwnFundList: SetOwnFundListDispatcher(dispatch),

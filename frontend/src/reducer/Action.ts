@@ -21,12 +21,12 @@ export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type
 // stock
 export const SetOwnStockList = (payload: UserStockVo[]): Action<UserStockVo[]> => ({ type: SET_OWN_STOCK_LIST, payload });
 export const SetStockQueryCondition = (payload: StockQueryCondition): Action<StockQueryCondition> => ({ type: SET_STOCK_QUERY_CONDITION, payload });
-export const SetStockTradeCondition = (payload: StockTradeCondition): Action<StockTradeCondition> => ({ type: SET_STOCK_TRADE_CONDITION, payload });
+export const SetStockTradeCondition = (payload?: StockTradeCondition): Action<StockTradeCondition | undefined> => ({ type: SET_STOCK_TRADE_CONDITION, payload });
 
 // fund
 export const SetOwnFundList = (payload: UserFundVo[]): Action<UserFundVo[]> => ({ type: SET_OWN_FUND_LIST, payload });
 export const SetFundQueryCondition = (payload: FundQueryCondition): Action<FundQueryCondition> => ({ type: SET_FUND_QUERY_CONDITION, payload });
-export const SetFundTradeCondition = (payload: FundTradeCondition): Action<FundTradeCondition> => ({ type: SET_FUND_TRADE_CONDITION, payload });
+export const SetFundTradeCondition = (payload?: FundTradeCondition): Action<FundTradeCondition | undefined> => ({ type: SET_FUND_TRADE_CONDITION, payload });
 
 // options
 export const SetCurrencyOptions = (payload: Option[]): Action<Option[]> => ({ type: SET_CURRENCY_OPTIONS, payload });

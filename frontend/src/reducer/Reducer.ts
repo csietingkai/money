@@ -52,7 +52,7 @@ const accountReducer = (state: ReduxAccountState = DEFAULT_REDUX_ACCOUNT_STATE, 
     return newState;
 };
 
-const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<UserStockVo[] | StockQueryCondition | StockTradeCondition>): ReduxStockState => {
+const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<UserStockVo[] | StockQueryCondition | StockTradeCondition | undefined>): ReduxStockState => {
     const newState: ReduxStockState = { ...state };
     const { type, payload } = action;
     if (type === SET_OWN_STOCK_LIST) {
@@ -60,12 +60,16 @@ const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action
     } else if (type === SET_STOCK_QUERY_CONDITION) {
         newState.queryCondition = payload as StockQueryCondition;
     } else if (type === SET_STOCK_TRADE_CONDITION) {
-        newState.tradeCondition = payload as StockTradeCondition;
+        if (payload) {
+            newState.tradeCondition = payload as StockTradeCondition;
+        } else {
+            newState.tradeCondition = undefined;
+        }
     }
     return newState;
 };
 
-const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserFundVo[] | FundQueryCondition | FundTradeCondition>): ReduxFundState => {
+const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserFundVo[] | FundQueryCondition | FundTradeCondition | undefined>): ReduxFundState => {
     const newState: ReduxFundState = { ...state };
     const { type, payload } = action;
     if (type === SET_OWN_FUND_LIST) {
@@ -73,7 +77,11 @@ const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: A
     } else if (type === SET_FUND_QUERY_CONDITION) {
         newState.queryCondition = payload as FundQueryCondition;
     } else if (type === SET_FUND_TRADE_CONDITION) {
-        newState.tradeCondition = payload as FundTradeCondition;
+        if (payload) {
+            newState.tradeCondition = payload as FundTradeCondition;
+        } else {
+            newState.tradeCondition = undefined;
+        }
     }
     return newState;
 };

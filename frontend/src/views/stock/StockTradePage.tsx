@@ -14,10 +14,10 @@ import StockTradeCondition, { TradeType } from './interface/StockTradeCondition'
 export interface StockTradePageProps {
     userId: string;
     accounts: Account[];
-    tradeCondition: StockTradeCondition;
+    tradeCondition?: StockTradeCondition;
     setAccountList: (accounts: Account[]) => void;
     setOwnStockList: (ownList: UserStockVo[]) => void;
-    setStockTradeCondition: (condition: StockTradeCondition) => void;
+    setStockTradeCondition: (condition?: StockTradeCondition) => void;
     notify: (message: string) => void;
 }
 
@@ -73,7 +73,7 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
         };
     }
 
-    private init = (tradeCondition: StockTradeCondition) => {
+    private init = (tradeCondition?: StockTradeCondition) => {
         const buyForm = {
             code: '',
             name: '',
@@ -103,22 +103,30 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
         };
         const bonusForm = {};
 
-        // TODO get data from props;
-        if (tradeCondition.type === 'buy') {
+        if (tradeCondition?.type === 'buy') {
             buyForm.code = tradeCondition.code;
             buyForm.name = tradeCondition.name;
             buyForm.tradeDate = tradeCondition.date;
             buyForm.currency = tradeCondition.currency;
             buyForm.price = tradeCondition.price;
             buyForm.share = tradeCondition.share;
-        } else if (tradeCondition.type === 'sell') {
+            this.calcFee('BUY', buyForm.share, buyForm.price).then(({ fee }) => {
+                const total = buyForm.price * buyForm.share + fee;
+                this.setState({ buyForm: { ...buyForm, fee, total: AppUtil.numberComma(total) } });
+            });
+        } else if (tradeCondition?.type === 'sell') {
             sellForm.code = tradeCondition.code;
             sellForm.name = tradeCondition.name;
             sellForm.tradeDate = tradeCondition.date;
             sellForm.currency = tradeCondition.currency;
             sellForm.price = tradeCondition.price;
             sellForm.share = tradeCondition.share;
+            this.calcFee('SELL', sellForm.share, sellForm.price).then(({ fee, tax }) => {
+                const total = sellForm.price * sellForm.share - fee - tax;
+                this.setState({ sellForm: { ...sellForm, fee, tax, total: AppUtil.numberComma(total) } });
+            });
         }
+        // TODO bonus form;
 
         return { buyForm, sellForm, bonusForm };
     };
@@ -640,7 +648,7 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string | UserStockVo[] | StockTradeCondition>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string | UserStockVo[] | StockTradeCondition | undefined>>) => {
     return {
         setAccountList: SetAccountListDispatcher(dispatch),
         setOwnStockList: SetOwnStockListDispatcher(dispatch),

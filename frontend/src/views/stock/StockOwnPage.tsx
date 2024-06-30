@@ -1,21 +1,23 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowTop, cilBolt, cilPlus } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getStockOwnList } from '../../reducer/Selector';
 import StockApi, { UserStockRecord, UserStockVo } from '../../api/stock';
-import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
+import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
 import { StockType } from '../../util/Enum';
 import { Action } from '../../util/Interface';
+import StockTradeCondition, { TradeType } from './interface/StockTradeCondition';
 
 export interface StockOwnPageProps {
     userId: string;
     stockType: StockType;
     ownStockList: UserStockVo[];
+    setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -109,6 +111,33 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                             </CCardHeader>
                             <CCardBody>
                                 <CRow>
+                                    <CCol xs={12} className='mb-2 d-grid gap-2 d-md-flex justify-content-md-end'>
+                                        <CButtonGroup role='group'>
+                                            <CButton
+                                                color='danger'
+                                                variant='outline'
+                                                onClick={() => this.tradeStockPage(ownStockInfo, 'buy')}
+                                            >
+                                                Buy
+                                            </CButton>
+                                            <CButton
+                                                color='success'
+                                                variant='outline'
+                                                onClick={() => this.tradeStockPage(ownStockInfo, 'sell')}
+                                            >
+                                                Sell
+                                            </CButton>
+                                            <CButton
+                                                color='info'
+                                                variant='outline'
+                                                onClick={() => this.tradeStockPage(ownStockInfo, 'bonus')}
+                                            >
+                                                Bonus
+                                            </CButton>
+                                        </CButtonGroup>
+                                    </CCol>
+                                </CRow>
+                                <CRow>
                                     <CCol xs={12}>
                                         <CTable align='middle' responsive hover>
                                             <CTableHead>
@@ -149,8 +178,20 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         );
     };
 
-    private tradeStockPage = () => {
-        // TODO set query condition
+    private tradeStockPage = (stockInfo?: UserStockVo, type?: TradeType) => {
+        const { setStockTradeCondition } = this.props;
+        if (stockInfo && type) {
+            const tradeCondition: StockTradeCondition = {
+                type,
+                code: stockInfo.stockCode,
+                name: stockInfo.stockName,
+                currency: 'TWD', // TODO
+                date: new Date(),
+                price: stockInfo.price,
+                share: stockInfo.amount
+            };
+            setStockTradeCondition(tradeCondition);
+        }
         window.location.assign('/#/stockTrade');
     };
 
@@ -166,7 +207,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     <CCol sm={12}>
                         <div className='d-grid gap-2 col-xs-8 col-md-6 mx-auto'>
-                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={this.tradeStockPage}>
+                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.tradeStockPage()}>
                                 <CIcon icon={cilPlus} className='me-2' />
                                 Trade More Stock
                             </CButton>
@@ -185,8 +226,9 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockTradeCondition | undefined | string | boolean>>) => {
     return {
+        setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };

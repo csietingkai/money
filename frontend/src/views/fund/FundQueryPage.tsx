@@ -333,7 +333,7 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<FundQueryCondition | FundTradeCondition | boolean | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<FundQueryCondition | FundTradeCondition | undefined | boolean | string>>) => {
     return {
         setFundQueryCondition: SetFundQueryConditionDispatcher(dispatch),
         setFundTradeCondition: SetFundTradeConditionDispatcher(dispatch),

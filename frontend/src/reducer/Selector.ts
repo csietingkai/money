@@ -59,33 +59,33 @@ export const getAccountList = (state: ReduxState): Account[] => getAccountState(
 export interface ReduxStockState {
     own: UserStockVo[];
     queryCondition: StockQueryCondition;
-    tradeCondition: StockTradeCondition;
+    tradeCondition?: StockTradeCondition;
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
     own: [],
     queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
-    tradeCondition: { type: 'buy', code: '', name: '', date: new Date(), currency: '', price: 0, share: 0 }
+    tradeCondition: undefined
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
 export const getStockOwnList = (state: ReduxState): UserStockVo[] => getStockState(state)?.own;
 export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.queryCondition;
-export const getStockTradeCondition = (state: ReduxState): StockTradeCondition => getStockState(state)?.tradeCondition;
+export const getStockTradeCondition = (state: ReduxState): StockTradeCondition | undefined => getStockState(state)?.tradeCondition;
 
 // fundReducer
 export interface ReduxFundState {
     own: UserFundVo[];
     queryCondition: FundQueryCondition;
-    tradeCondition: FundTradeCondition;
+    tradeCondition?: FundTradeCondition;
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     own: [],
     queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
-    tradeCondition: { type: 'buy', code: '', name: '', date: new Date(), price: 0, share: 0 }
+    tradeCondition: undefined
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
 export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
 export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.queryCondition;
-export const getFundTradeCondition = (state: ReduxState): FundTradeCondition => getFundState(state)?.tradeCondition;
+export const getFundTradeCondition = (state: ReduxState): FundTradeCondition | undefined => getFundState(state)?.tradeCondition;
 
 // options
 export interface ReduxOptionState {
