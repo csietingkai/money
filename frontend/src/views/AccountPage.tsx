@@ -156,8 +156,9 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private getCard = (account: Account) => {
+        const { showDetail } = this.state;
         return (
-            <CCard>
+            <CCard className={showDetail[account.id] ? 'detailed' : ''}>
                 <CCardBody className='d-flex align-items-center'>
                     <div className='me-3 text-white bg-primary p-4'>
                         <CIcon icon={currencyIcon[account.currency.toLocaleLowerCase()]} height={24} />
