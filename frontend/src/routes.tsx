@@ -1,11 +1,6 @@
 import React from 'react';
 import CIcon from '@coreui/icons-react';
-import { cilBank, cilBell, cilCalculator, cilCart, cilChartPie, cilCode, cilCog, cilCursor, cilDescription, cilDollar, cilDrop, cilMonitor, cilNotes, cilPencil, cilPuzzle, cilSearch, cilSpeedometer, cilStar } from '@coreui/icons';
-import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react';
-import { PolymorphicRefForwardingComponent } from '@coreui/react/dist/esm/helpers';
-import { CNavTitleProps } from '@coreui/react/dist/esm/components/nav/CNavTitle';
-import { CNavItemProps } from '@coreui/react/dist/esm/components/nav/CNavItem';
-import { CNavGroupProps } from '@coreui/react/dist/esm/components/nav/CNavGroup';
+import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilMonitor, cilSearch, cilSpeedometer } from '@coreui/icons';
 
 export type RouteItem = {
     type: 'item';

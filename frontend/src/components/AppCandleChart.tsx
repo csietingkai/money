@@ -1,7 +1,6 @@
 import React from 'react';
-import { CButton, CCol, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 import { CChartBar } from '@coreui/react-chartjs';
-import { StockRecord, StockRecordVo } from '../api/stock';
+import { StockRecordVo } from '../api/stock';
 import * as AppUtil from '../util/AppUtil';
 import { StockType } from '../util/Enum';
 

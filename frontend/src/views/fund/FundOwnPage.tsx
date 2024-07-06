@@ -2,7 +2,7 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowTop, cilBolt, cilPlus } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getFundOwnList } from '../../reducer/Selector';
 import FundApi, { UserFundRecord, UserFundVo } from '../../api/fund';
 import { SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
@@ -70,10 +70,11 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     };
 
     private getCard = (ownFundInfo: UserFundVo) => {
-        const { userId } = this.props;
+        const { userId, stockType } = this.props;
         const { show, currentOwnFundRecords, ownFundRecordPage } = this.state;
         const currentValue: number = AppUtil.toNumber((ownFundInfo.price * ownFundInfo.amount).toFixed(DEFAULT_DECIMAL_PRECISION));
         const benefit: number = AppUtil.toNumber((currentValue - ownFundInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        const benefitColor: string = AppUtil.getBenifitColor(benefit, stockType);
         const postiveSign: string = benefit >= 0 ? '+' : '';
         const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownFundInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         const showOwnFundRecords = currentOwnFundRecords.slice((ownFundRecordPage - 1) * DATA_COUNT_PER_PAGE, ownFundRecordPage * DATA_COUNT_PER_PAGE);
@@ -81,13 +82,13 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
             // TODO bg-color by up or down
             <React.Fragment key={`${userId}-${ownFundInfo.fundCode}`}>
                 <CCol sm={6} md={4}>
-                    <CCard key={`own-stock-${ownFundInfo.fundCode}`} className={`bg-info text-white`}>
+                    <CCard key={`own-stock-${ownFundInfo.fundCode}`} className={`bg-${benefitColor} text-white ${show[ownFundInfo.fundCode] ? `detailed-${benefitColor}` : ''}`}>
                         <CCardBody className='pb-0 mb-3 d-flex justify-content-between align-items-start'>
                             <div>
                                 <div className='fs-4 fw-semibold'>
                                     {AppUtil.numberComma(currentValue)}{' '}
                                     <span className='fs-6 fw-normal'>
-                                        ({postiveSign}{AppUtil.numberComma(benefit)} | {postiveSign}{AppUtil.numberComma(benefitRate)}% <CIcon icon={cilArrowTop} />)
+                                        ({postiveSign}{AppUtil.numberComma(benefit)} | {postiveSign}{AppUtil.numberComma(benefitRate)}% <CIcon icon={benefit > 0 ? cilArrowCircleTop : cilArrowCircleBottom} />)
                                     </span>
                                 </div>
                                 <div>
@@ -96,7 +97,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                             </div>
                             <CDropdown alignment='end'>
                                 <CDropdownToggle color='transparent' caret={false} className='text-white p-0' onClick={() => this.toggleInfo(ownFundInfo)}>
-                                    <CIcon icon={cilBolt} />
+                                    <CIcon icon={cilOptions} />
                                 </CDropdownToggle>
                             </CDropdown>
                         </CCardBody>

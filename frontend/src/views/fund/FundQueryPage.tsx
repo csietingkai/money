@@ -4,7 +4,6 @@ import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilChevronBottom, cilChevronTop, cilSync } from '@coreui/icons';
-import AppCandleChart from '../../components/AppCandleChart';
 import AppPagination from '../../components/AppPagination';
 import { ReduxState, getAuthTokenId, getFundQueryCondition, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher } from '../../reducer/PropsMapper';
@@ -105,7 +104,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
 
     private tradeFund = (fund: FundVo, type: 'buy' | 'sell') => {
         const { code, name } = fund;
-        this.props.setFundTradeCondition({ type, code, name, date: new Date(), price: 0, share: 0 });
+        this.props.setFundTradeCondition({ type, code, name, date: new Date(), price: 0, share: 0, rate: 1 });
         window.location.assign('/#/fundTrade');
     };
 

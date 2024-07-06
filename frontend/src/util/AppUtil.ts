@@ -1,3 +1,5 @@
+import { StockType } from './Enum';
+
 export const isNull = (obj: any): boolean => {
     return obj === null || obj === undefined;
 };
@@ -64,7 +66,7 @@ export const toDate = (str: any, defaultVal: Date | null = null): Date | null =>
 
 export const toDateStr = (date?: Date): string | undefined => {
     if (!date) {
-        console.warn(`parameter date: \'${date}\' is not valid`)
+        console.warn(`parameter date: \'${date}\' is not valid`);
         return undefined;
     }
     return new Intl.DateTimeFormat('zh-TW', {
@@ -112,4 +114,20 @@ export const handleRequestDate = (data: any): any => {
         }
     }
     return data;
+};
+
+export const getBenifitColor = (num: number, stockType: StockType): string => {
+    if (num === 0) {
+        return 'secondary';
+    }
+    let positive: string = '';
+    let negitive: string = '';
+    if (stockType === StockType.TW) {
+        positive = 'danger';
+        negitive = 'success';
+    } else {
+        positive = 'success';
+        negitive = 'danger';
+    }
+    return num > 0 ? positive : negitive;
 };

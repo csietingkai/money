@@ -1,13 +1,13 @@
 import { Dispatch, legacy_createStore as createStore } from 'redux';
 import rootReducer from './Reducer';
 import * as AppUtil from '../util/AppUtil';
-import AccountApi, { Account, AccountListResponse } from '../api/account';
-import AuthApi, { AuthResponse, AuthToken, LoginRespVo } from '../api/auth';
+import AccountApi, { AccountListResponse } from '../api/account';
+import AuthApi, { AuthResponse, LoginRespVo } from '../api/auth';
 import OptionApi, { OptionResponse } from '../api/option';
 import FundApi, { UserFundListResponse } from '../api/fund';
 import StockApi, { UserStockListResponse } from '../api/stock';
-import { Login, Logout, SetAccountList, SetCurrencyOptions, SetFileTypeOptions, SetLoading, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
-import { ReduxState, getAuthTokenString, getAccountList, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId } from './Selector';
+import { Login, Logout, SetAccountList, SetCurrencyOptions, SetFileTypeOptions, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
+import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId } from './Selector';
 import { Action, ApiResponse, Option } from '../util/Interface';
 import { getAuthToken } from './StateHolder';
 

@@ -2,7 +2,7 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowTop, cilBolt, cilPlus } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getStockOwnList } from '../../reducer/Selector';
 import StockApi, { UserStockRecord, UserStockVo } from '../../api/stock';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
@@ -70,10 +70,11 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     };
 
     private getCard = (ownStockInfo: UserStockVo) => {
-        const { userId } = this.props;
+        const { userId, stockType } = this.props;
         const { show, currentOwnStockRecords, ownStockRecordPage } = this.state;
         const currentValue: number = AppUtil.toNumber((ownStockInfo.price * ownStockInfo.amount).toFixed(DEFAULT_DECIMAL_PRECISION));
         const benefit: number = AppUtil.toNumber((currentValue - ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        const benefitColor: string = AppUtil.getBenifitColor(benefit, stockType);
         const postiveSign: string = benefit >= 0 ? '+' : '';
         const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         const showOwnStockRecords = currentOwnStockRecords.slice((ownStockRecordPage - 1) * DATA_COUNT_PER_PAGE, ownStockRecordPage * DATA_COUNT_PER_PAGE);
@@ -81,13 +82,13 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
             // TODO bg-color by up or down
             <React.Fragment key={`${userId}-${ownStockInfo.stockCode}`}>
                 <CCol sm={6} md={4}>
-                    <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={`bg-info text-white`}>
+                    <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={`bg-${benefitColor} text-white ${show[ownStockInfo.stockCode] ? `detailed-${benefitColor}` : ''}`}>
                         <CCardBody className='pb-0 mb-3 d-flex justify-content-between align-items-start'>
                             <div>
                                 <div className='fs-4 fw-semibold'>
                                     {AppUtil.numberComma(currentValue)}{' '}
                                     <span className='fs-6 fw-normal'>
-                                        ({postiveSign}{AppUtil.numberComma(benefit)} | {postiveSign}{AppUtil.numberComma(benefitRate)}% <CIcon icon={cilArrowTop} />)
+                                        ({postiveSign}{AppUtil.numberComma(benefit)} | {postiveSign}{AppUtil.numberComma(benefitRate)}% <CIcon icon={benefit > 0 ? cilArrowCircleTop : cilArrowCircleBottom} />)
                                     </span>
                                 </div>
                                 <div>
@@ -96,7 +97,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                             </div>
                             <CDropdown alignment='end'>
                                 <CDropdownToggle color='transparent' caret={false} className='text-white p-0' onClick={() => this.toggleInfo(ownStockInfo)}>
-                                    <CIcon icon={cilBolt} />
+                                    <CIcon icon={cilOptions} />
                                 </CDropdownToggle>
                             </CDropdown>
                         </CCardBody>

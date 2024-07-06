@@ -3,7 +3,7 @@ import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDA
 import { LoginRespVo, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { Action, Option } from '../util/Interface';
-import { UserStock, UserStockVo } from '../api/stock';
+import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
 import StockTradeCondition from '../views/stock/interface/StockTradeCondition';

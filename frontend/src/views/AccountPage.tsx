@@ -15,7 +15,6 @@ import { Action, SimpleResponse, Option } from '../util/Interface';
 import { StockType } from '../util/Enum';
 import currencyIcon from '../assets/currency';
 import { DATA_COUNT_PER_PAGE } from '../util/Constant';
-import { SetLoading } from '../reducer/Action';
 
 export interface AccountPageProps {
     userId: string,
@@ -158,7 +157,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private getCard = (account: Account) => {
         const { showDetail } = this.state;
         return (
-            <CCard className={showDetail[account.id] ? 'detailed' : ''}>
+            <CCard className={showDetail[account.id] ? 'detailed-primary' : ''}>
                 <CCardBody className='d-flex align-items-center'>
                     <div className='me-3 text-white bg-primary p-4'>
                         <CIcon icon={currencyIcon[account.currency.toLocaleLowerCase()]} height={24} />

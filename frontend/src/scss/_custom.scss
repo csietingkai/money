@@ -16,6 +16,19 @@ div.chartjs-tooltip {
     justify-content: center;
 }
 
-div.card.detailed {
-    box-shadow: 0 0.125rem 0.25rem var(--cui-primary)
+$colors: (
+    primary: var(--cui-primary),
+    secondary: var(--cui-secondary),
+    success: var(--cui-success),
+    info: var(--cui-info),
+    warning: var(--cui-warning),
+    danger: var(--cui-danger),
+    light: var(--cui-light),
+    dark: var(--cui-dark)
+);
+
+@each $colorname, $color in $colors {
+    div.card.detailed-#{$colorname} {
+       box-shadow: 0 0.125rem 0.25rem $color
+    }
 }
