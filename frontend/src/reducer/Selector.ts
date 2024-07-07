@@ -114,15 +114,18 @@ export interface ReduxSystemSettingState {
     sidebarShow: boolean;
     sidebarFoldable: boolean;
     notifications: Notification[];
+    isMobile: boolean;
 }
 export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
     loading: false,
     sidebarShow: StateHolder.getSidebarShow(),
     sidebarFoldable: StateHolder.getSidebarFoldable(),
-    notifications: []
+    notifications: [],
+    isMobile: false
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
 export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;
 export const isSidebarShow = (state: ReduxState): boolean => getSystemSetting(state)?.sidebarShow;
 export const isSidebarFoldable = (state: ReduxState): boolean => getSystemSetting(state)?.sidebarFoldable;
 export const getNotifications = (state: ReduxState): Notification[] => getSystemSetting(state)?.notifications;
+export const isMobile = (state: ReduxState): boolean => getSystemSetting(state)?.isMobile;

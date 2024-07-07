@@ -3,7 +3,7 @@ import axios from 'axios';
 import { AuthToken, LoginRespVo, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_OPTION_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxFundState, ReduxOptionState, ReduxStockState, ReduxSystemSettingState } from './Selector';
-import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_CURRENCY_OPTIONS, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION } from './ActionType';
+import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_CURRENCY_OPTIONS, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_IS_MOBILE } from './ActionType';
 import { removeAuthToken, setAuthToken, setSidebarFoldable, setSidebarShow } from './StateHolder';
 import { Action, Option } from '../util/Interface';
 import { UserStockVo } from '../api/stock';
@@ -115,6 +115,8 @@ const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SET
     } else if (type === NOTIFY) {
         const now: number = new Date().getTime();
         newState.notifications = [...newState.notifications, { time: now, message: payload as string }].filter(x => now - x.time <= 30000);
+    } else if (type === SET_IS_MOBILE) {
+        newState.isMobile = payload as boolean;
     }
     return newState;
 };

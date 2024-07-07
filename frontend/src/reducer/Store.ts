@@ -6,7 +6,7 @@ import AuthApi, { AuthResponse, LoginRespVo } from '../api/auth';
 import OptionApi, { OptionResponse } from '../api/option';
 import FundApi, { UserFundListResponse } from '../api/fund';
 import StockApi, { UserStockListResponse } from '../api/stock';
-import { Login, Logout, SetAccountList, SetCurrencyOptions, SetFileTypeOptions, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
+import { Login, Logout, SetAccountList, SetCurrencyOptions, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
 import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId } from './Selector';
 import { Action, ApiResponse, Option } from '../util/Interface';
 import { getAuthToken } from './StateHolder';
@@ -32,6 +32,8 @@ export const validateToken = (dispatch: Dispatch<Action<LoginRespVo | undefined>
 };
 
 export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState): void => {
+    dispatch(SetIsMobile(navigator.userAgent.indexOf('Android') != -1))
+
     const apis: any[] = [];
     const responseHandlers: ((response: ApiResponse<any>) => void)[] = [];
 

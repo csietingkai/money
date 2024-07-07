@@ -1,5 +1,5 @@
 
-import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_CURRENCY_OPTIONS, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_TRADE_CONDITION, SET_STOCK_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_OWN_FUND_LIST } from './ActionType';
+import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_CURRENCY_OPTIONS, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_TRADE_CONDITION, SET_STOCK_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_IS_MOBILE } from './ActionType';
 import { LoginRespVo, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { Action, Option } from '../util/Interface';
@@ -39,3 +39,4 @@ export const SetLoading = (payload: boolean): Action<boolean> => ({ type: SET_LO
 export const SetSidebarShow = (payload: boolean): Action<boolean> => ({ type: SET_SIDEBAR_SHOW, payload });
 export const SetSidebarFoldable = (payload: boolean): Action<boolean> => ({ type: SET_SIDEBAR_FOLDABLE, payload });
 export const Notify = (payload: string): Action<string> => ({ type: NOTIFY, payload });
+export const SetIsMobile = (payload: boolean): Action<boolean> => ({ type: SET_IS_MOBILE, payload });

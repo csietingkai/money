@@ -2,12 +2,12 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-import { cilCloudDownload, cilCloudUpload, cilPencil, cilTrash } from '@coreui/icons';
+import { cilCloudUpload, cilPencil, cilTrash, cilZoom } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import FinancailFileApi, { FinancialFile } from '../../api/financailFile';
-import { ReduxState, getAuthTokenId, getFileTypes } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getFileTypes, isMobile } from '../../reducer/Selector';
 import { SetNotifyDispatcher } from '../../reducer/PropsMapper';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
@@ -16,6 +16,7 @@ import { Action, Option } from '../../util/Interface';
 export interface FileManagePageProps {
     userId: string,
     fileTypeOptions: Option[];
+    isMobile: boolean;
     notify: (message: string) => void;
 }
 
@@ -24,6 +25,7 @@ export interface FileManagePageState {
     fileType: string;
     showUploadModal: boolean;
     showEditModal: boolean;
+    showPreviewModal: boolean;
     showDeleteModal: boolean;
     holdingFileId: string;
     uploadForm: {
@@ -39,6 +41,7 @@ export interface FileManagePageState {
     };
     page: number;
     fileTypeMap: { [key: string]: string; };
+    pdfData: string;
 }
 
 class FileManagePage extends React.Component<FileManagePageProps, FileManagePageState> {
@@ -51,12 +54,14 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
             fileType: '',
             showUploadModal: false,
             showEditModal: false,
+            showPreviewModal: false,
             showDeleteModal: false,
             holdingFileId: '',
             uploadForm: { type: fileTypeOptions[0].key, date: new Date(), file: null },
             editForm: { id: '', type: fileTypeOptions[0].key, date: new Date(), file: '' },
             page: 1,
-            fileTypeMap: fileTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {})
+            fileTypeMap: fileTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
+            pdfData: ''
         };
         this.init();
     }
@@ -96,21 +101,14 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
         this.closeEditModal();
     };
 
-    private download = async (fileId: string) => {
-        const { notify } = this.props;
+    private preview = async (fileId: string) => {
+        const { isMobile, notify } = this.props;
         const [filename, data] = await FinancailFileApi.download(fileId);
         if (!data) {
             notify(filename);
             return;
         }
-        const href = URL.createObjectURL(data);
-        const link = document.createElement('a');
-        link.href = href;
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(href);
+        this.setState({ showPreviewModal: true, pdfData: URL.createObjectURL(new Blob([data], { type: 'application/pdf' })) });
     };
 
     private remove = async (fileId: string) => {
@@ -130,6 +128,10 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
     private closeEditModal = () => {
         const { fileTypeOptions } = this.props;
         this.setState({ showEditModal: false, editForm: { id: '', type: fileTypeOptions[0].key, date: new Date(), file: '' } });
+    };
+
+    private closePreviewModal = () => {
+        this.setState({ showPreviewModal: false, pdfData: '' });
     };
 
     private getUploadModal = (): React.ReactNode => {
@@ -248,8 +250,24 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
         );
     };
 
+    private getPreviewModal = (): React.ReactNode => {
+        const { showPreviewModal, pdfData } = this.state;
+        return (
+            <CModal size='xl' scrollable alignment='center' visible={showPreviewModal} onClose={this.closePreviewModal}>
+                <CModalBody>
+                    <CRow className='mb-3'>
+                        <object data={pdfData} type='application/pdf' style={{height:'75vh'}} />
+                    </CRow>
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color='secondary' onClick={this.closePreviewModal}>Close</CButton>
+                </CModalFooter>
+            </CModal>
+        );
+    };
+
     render(): React.ReactNode {
-        const { fileTypeOptions } = this.props;
+        const { fileTypeOptions, isMobile } = this.props;
         const { files, fileType, showDeleteModal, editForm, page, fileTypeMap } = this.state;
         const filteredFiles = files.filter(f => fileType ? f.type === fileType : true);
         const showFiles = filteredFiles.slice((page - 1) * DATA_COUNT_PER_PAGE, page * DATA_COUNT_PER_PAGE);
@@ -320,14 +338,17 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                                                                                 >
                                                                                     <CIcon icon={cilPencil}></CIcon>
                                                                                 </CButton>
-                                                                                <CButton
-                                                                                    color='info'
-                                                                                    variant='outline'
-                                                                                    size='sm'
-                                                                                    onClick={() => this.download(f.id)}
-                                                                                >
-                                                                                    <CIcon icon={cilCloudDownload}></CIcon>
-                                                                                </CButton>
+                                                                                {
+                                                                                    !isMobile &&
+                                                                                    <CButton
+                                                                                        color='info'
+                                                                                        variant='outline'
+                                                                                        size='sm'
+                                                                                        onClick={() => this.preview(f.id)}
+                                                                                    >
+                                                                                        <CIcon icon={cilZoom}></CIcon>
+                                                                                    </CButton>
+                                                                                }
                                                                                 <CButton
                                                                                     color='danger'
                                                                                     variant='outline'
@@ -356,6 +377,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                 </CRow>
                 {this.getUploadModal()}
                 {this.getEditModal()}
+                {this.getPreviewModal()}
                 <AppConfirmModal
                     showModal={showDeleteModal}
                     headerText='Remove File'
@@ -374,7 +396,8 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
 const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
-        fileTypeOptions: getFileTypes(state)
+        fileTypeOptions: getFileTypes(state),
+        isMobile: isMobile(state)
     };
 };
 
