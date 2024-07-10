@@ -35,3 +35,6 @@ export interface PredictResultVo {
 }
 
 export interface PredictResponse extends ApiResponse<PredictResultVo[]> { }
+
+export type SupportLineType = '' | 'ma' | 'bb';
+export type Ma = 'ma5' | 'ma10' | 'ma20' | 'ma40' | 'ma60';
