@@ -726,7 +726,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     render(): React.ReactNode {
-        const { accountList } = this.props;
+        const { accountList, accountRecordDeletable } = this.props;
         const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteRecordModal } = this.state;
         const showAccountRecords = currentAccountRecords.slice((accountRecordsPage - 1) * DATA_COUNT_PER_PAGE, accountRecordsPage * DATA_COUNT_PER_PAGE);
         return (
@@ -809,14 +809,17 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                                         >
                                                                                             <CIcon icon={cilPencil}></CIcon>
                                                                                         </CButton> */}
-                                                                                        <CButton
-                                                                                            color='danger'
-                                                                                            variant='outline'
-                                                                                            size='sm'
-                                                                                            onClick={() => this.setState({ showDeleteRecordModal: true, holdingAccountId: account.id, holdingRecordId: r.id })}
-                                                                                        >
-                                                                                            <CIcon icon={cilTrash}></CIcon>
-                                                                                        </CButton>
+                                                                                        {
+                                                                                            accountRecordDeletable && r.removable &&
+                                                                                            <CButton
+                                                                                                color='danger'
+                                                                                                variant='outline'
+                                                                                                size='sm'
+                                                                                                onClick={() => this.setState({ showDeleteRecordModal: true, holdingAccountId: account.id, holdingRecordId: r.id })}
+                                                                                            >
+                                                                                                <CIcon icon={cilTrash}></CIcon>
+                                                                                            </CButton>
+                                                                                        }
                                                                                     </CButtonGroup>
                                                                                 </CTableDataCell>
                                                                             </CTableRow>

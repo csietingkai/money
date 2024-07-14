@@ -14,4 +14,6 @@ public interface UserStockRecordDao extends JpaRepository<UserStockRecord, UUID>
 	public List<UserStockRecord> findByUserStockIdIn(List<UUID> userStockIds);
 
 	public List<UserStockRecord> findByUserStockId(UUID userStockId);
+
+	public List<UserStockRecord> findByAccountRecordId(UUID accountRecordId);
 }

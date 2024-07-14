@@ -26,14 +26,6 @@ public class UserFundRecordFacade {
 	@Autowired
 	private UserFundRecordDao userFundRecordDao;
 
-	public List<UserFundRecord> queryAll() {
-		List<UserFundRecord> entities = this.userFundRecordDao.findAll();
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND_RECORD));
-		}
-		return entities;
-	}
-
 	public List<UserFundRecord> queryAll(UUID userFundId) {
 		List<UserFundRecord> entities = this.userFundRecordDao.findByUserFundId(userFundId);
 		if (entities.size() == 0) {
@@ -51,6 +43,14 @@ public class UserFundRecordFacade {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND_RECORD));
 		}
 		return optional.get();
+	}
+
+	public List<UserFundRecord> queryByAccountRecordId(UUID accountRecordId) {
+		List<UserFundRecord> entities = this.userFundRecordDao.findByAccountRecordId(accountRecordId);
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_FUND_RECORD));
+		}
+		return entities;
 	}
 
 	public UserFundRecord insert(UserFundRecord entity) throws AlreadyExistException, FieldMissingException {

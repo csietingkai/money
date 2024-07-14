@@ -15,5 +15,5 @@ public interface UserFundRecordDao extends JpaRepository<UserFundRecord, UUID> {
 
 	public List<UserFundRecord> findByUserFundId(UUID userFundId);
 
-	public List<UserFundRecord> findByAccountId(UUID accountId);
+	public List<UserFundRecord> findByAccountRecordId(UUID accountRecordId);
 }

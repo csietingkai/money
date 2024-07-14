@@ -21,6 +21,8 @@ import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
+import io.tingkai.money.facade.UserFundRecordFacade;
+import io.tingkai.money.facade.UserStockRecordFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AccountBalanceWrongException;
@@ -42,6 +44,12 @@ public class AccountService {
 
 	@Autowired
 	private AccountRecordFacade accountRecordFacade;
+
+	@Autowired
+	private UserStockRecordFacade userStockRecordFacade;
+
+	@Autowired
+	private UserFundRecordFacade userFundRecordFacade;
 
 	@Autowired
 	@Qualifier(CodeConstants.USER_CACHE)
@@ -154,6 +162,7 @@ public class AccountService {
 			if (!vo.getTransFrom().equals(vo.getTransTo()) && accountId.equals(vo.getTransFrom())) {
 				vo.setTransAmount(BigDecimal.ZERO.subtract(vo.getTransAmount()));
 			}
+			vo.setRemovable(!isLinked(vo.getId()));
 			vos.add(vo);
 		}
 		return vos;
@@ -251,5 +260,9 @@ public class AccountService {
 		});
 		this.userCache.opsForValue().set(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId), entities);
 		return entities;
+	}
+
+	private boolean isLinked(UUID recordId) {
+		return this.userStockRecordFacade.queryByAccountRecordId(recordId).size() > 0 || this.userFundRecordFacade.queryByAccountRecordId(recordId).size() > 0;
 	}
 }

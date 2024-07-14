@@ -26,14 +26,6 @@ public class UserStockRecordFacade {
 	@Autowired
 	private UserStockRecordDao userStockRecordDao;
 
-	public List<UserStockRecord> queryAll() {
-		List<UserStockRecord> entities = this.userStockRecordDao.findAll();
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
-		}
-		return entities;
-	}
-
 	public List<UserStockRecord> queryAll(UUID userStockId) {
 		List<UserStockRecord> entities = this.userStockRecordDao.findByUserStockId(userStockId);
 		if (entities.size() == 0) {
@@ -51,6 +43,14 @@ public class UserStockRecordFacade {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
 		}
 		return optional.get();
+	}
+
+	public List<UserStockRecord> queryByAccountRecordId(UUID accountRecordId) {
+		List<UserStockRecord> entities = this.userStockRecordDao.findByAccountRecordId(accountRecordId);
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK_RECORD));
+		}
+		return entities;
 	}
 
 	public UserStockRecord insert(UserStockRecord entity) throws AlreadyExistException, FieldMissingException {

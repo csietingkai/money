@@ -30,6 +30,7 @@ export interface AccountRecordVo extends AccountRecord {
     transToName: string;
     transToCurrency: string;
     transCurrentExchangeRate: number;
+    removable: boolean;
 }
 
 export interface MonthBalanceVo {
