@@ -3,6 +3,7 @@ interface FundBuyForm {
     code: string;
     name: string;
     date: Date;
+    debitAmount: number;
     rate: number;
     price: number;
 }

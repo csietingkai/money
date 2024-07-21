@@ -238,6 +238,43 @@ public class UserStockService {
 		return entity;
 	}
 
+	@Transactional
+	public void bonus(UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal total, UUID fileId) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UUID userId = ContextUtil.getUserId();
+		if (BigDecimal.ZERO.compareTo(share) >= 0) {
+			throw new StockAmountInvalidException(share);
+		}
+
+		UserStock entity = this.userStockFacade.queryByUserIdAndStockCode(userId, stockCode);
+
+		Account account = this.accountFacade.query(accountId);
+		account.setBalance(account.getBalance().add(total));
+		account = this.accountFacade.update(account);
+
+		AccountRecord accountRecord = new AccountRecord();
+		accountRecord.setTransDate(date);
+		accountRecord.setTransAmount(total);
+		accountRecord.setTransFrom(account.getId());
+		accountRecord.setTransTo(account.getId());
+		accountRecord.setRecordType(RecordType.INVEST);
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, total, stockCode));
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.insert(accountRecord);
+
+		UserStockRecord record = new UserStockRecord();
+		record.setUserStockId(entity.getId());
+		record.setAccountId(account.getId());
+		record.setType(DealType.BONUS);
+		record.setDate(date);
+		record.setShare(share);
+		record.setPrice(price);
+		record.setFee(fee);
+		record.setTax(BigDecimal.ZERO);
+		record.setTotal(total);
+		record.setAccountRecordId(accountRecord.getId());
+		record = this.userStockRecordFacade.insert(record);
+	}
+
 	public List<UserTrackingStockVo> getUserTrackingStockList(UUID userId) {
 		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);

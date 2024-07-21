@@ -42,6 +42,7 @@ public class FundController {
 	public static final String REFRESH_PATH = "/refresh";
 	public static final String BUY_PATH = "/buy";
 	public static final String SELL_PATH = "/sell";
+	public static final String BONUS_PATH = "/bonus";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
@@ -89,6 +90,12 @@ public class FundController {
 	public FundResponse<UserFund> sell(@RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		UserFund result = this.userFundService.sell(accountId, fundCode, TimeUtil.handleRequestDate(date), share, price, rate, total, fileId);
 		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, fundCode, share, price));
+	}
+
+	@RequestMapping(value = FundController.BONUS_PATH, method = RequestMethod.PUT)
+	public FundResponse<UserFund> bonus(@RequestParam UUID accountId, @RequestParam String fundCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal rate, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		this.userFundService.bonus(accountId, fundCode, TimeUtil.handleRequestDate(date), share, price, rate, total, fileId);
+		return new FundResponse<UserFund>(true, null, MessageFormat.format(MessageConstant.USER_FUND_BONUS_SUCCESS, total, fundCode));
 	}
 
 	@RequestMapping(value = FundController.GET_OWN_PATH, method = RequestMethod.GET)

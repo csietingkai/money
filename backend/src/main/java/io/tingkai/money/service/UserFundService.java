@@ -219,6 +219,43 @@ public class UserFundService {
 		return entity;
 	}
 
+	@Transactional
+	public void bonus(UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal total, UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UUID userId = ContextUtil.getUserId();
+		if (BigDecimal.ZERO.compareTo(share) >= 0) {
+			throw new FundAmountInvalidException(share);
+		}
+
+		UserFund entity = this.userFundFacade.queryByUserIdAndFundCode(userId, fundCode);
+
+		Account account = this.accountFacade.query(accountId);
+		account.setBalance(account.getBalance().add(total));
+		account = this.accountFacade.update(account);
+
+		AccountRecord accountRecord = new AccountRecord();
+		accountRecord.setTransDate(date);
+		accountRecord.setTransAmount(total);
+		accountRecord.setTransFrom(account.getId());
+		accountRecord.setTransTo(account.getId());
+		accountRecord.setRecordType(RecordType.INVEST);
+		accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_BONUS_SUCCESS, total, fundCode));
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.insert(accountRecord);
+
+		UserFundRecord record = new UserFundRecord();
+		record.setUserFundId(entity.getId());
+		record.setAccountId(account.getId());
+		record.setType(DealType.BONUS);
+		record.setDate(date);
+		record.setShare(share);
+		record.setPrice(price);
+		record.setRate(rate);
+		record.setFee(BigDecimal.ZERO);
+		record.setTotal(total);
+		record.setAccountRecordId(accountRecord.getId());
+		record = this.userFundRecordFacade.insert(record);
+	}
+
 	public List<UserTrackingFundVo> getUserTrackingFundList(UUID userId) {
 		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);

@@ -1,5 +1,5 @@
 package io.tingkai.money.enumeration;
 
 public enum DealType {
-	BUY, SELL
+	BUY, SELL, BONUS
 }

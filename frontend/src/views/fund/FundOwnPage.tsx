@@ -180,16 +180,29 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     private tradeFundPage = (fundInfo?: UserFundVo, type?: TradeType) => {
         const { setFundTradeCondition } = this.props;
         if (fundInfo && type) {
-            const tradeCondition: FundTradeCondition = {
-                type,
-                code: fundInfo.fundCode,
-                name: fundInfo.fundName,
-                date: new Date(),
-                price: fundInfo.price,
-                rate: 1, // TODO exchange rate
-                share: fundInfo.amount
-            };
-            setFundTradeCondition(tradeCondition);
+            if (type === 'buy') {
+                const tradeCondition: FundTradeCondition = {
+                    type,
+                    code: fundInfo.fundCode,
+                    name: fundInfo.fundName,
+                    date: new Date(),
+                    debitAmount: 0, // TODO
+                    price: fundInfo.price,
+                    rate: 1 // TODO exchange rate
+                };
+                setFundTradeCondition(tradeCondition);
+            } else {
+                const tradeCondition: FundTradeCondition = {
+                    type,
+                    code: fundInfo.fundCode,
+                    name: fundInfo.fundName,
+                    date: new Date(),
+                    price: fundInfo.price,
+                    rate: 1, // TODO exchange rate
+                    share: fundInfo.amount
+                };
+                setFundTradeCondition(tradeCondition);
+            }
         }
         window.location.assign('/#/fundTrade');
     };

@@ -24,7 +24,6 @@ interface StockBonusForm {
     name: string;
     currency: string;
     date: Date;
-    price: number;
     share: number;
 }
 

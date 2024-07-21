@@ -35,6 +35,7 @@ public class MessageConstant {
 	public static final String USER_STOCK_PRECALC_SUCCESS = "Pre Calc Success";
 	public static final String USER_STOCK_BUY_SUCCESS = "User: Buy {0} {1} shares with Price: {2} Success";
 	public static final String USER_STOCK_SELL_SUCCESS = "User: Sell {0} {1} shares with Price: {2} Success";
+	public static final String USER_STOCK_BONUS_SUCCESS = "Get Bonus {0} from stock: {1} Success";
 	public static final String USER_STOCK_GET_TRACKING_LIST_SUCCESS = "User: Tracking Stock List Fetch Success";
 	public static final String STOCK_SHARE_AMOUNT_INVALID = "Stock Share: {0} is invalid";
 
@@ -44,6 +45,7 @@ public class MessageConstant {
 	public static final String FUND_REFRESH_SUCCESS = "Fund Refresh Success";
 	public static final String USER_FUND_BUY_SUCCESS = "User: Buy {0} {1} shares with Price: {2} Success";
 	public static final String USER_FUND_SELL_SUCCESS = "User: Sell {0} {1} shares with Price: {2} Success";
+	public static final String USER_FUND_BONUS_SUCCESS = "Get Bonus {0} from fund: {1} Success";
 	public static final String USER_FUND_GET_TRACKING_LIST_SUCCESS = "User Tracking Fund List Fetch Success";
 	public static final String FUND_SHARE_AMOUNT_INVALID = "Fund Share: {0} is invalid";
 

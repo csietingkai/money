@@ -43,6 +43,7 @@ public class StockController {
 	public static final String PRECALC_PATH = "/precalc";
 	public static final String BUY_PATH = "/buy";
 	public static final String SELL_PATH = "/sell";
+	public static final String BONUS_PATH = "/bonus";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
@@ -96,6 +97,12 @@ public class StockController {
 	public StockResponse<UserStock> sell(@RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal tax, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UserStock result = this.userStockService.sell(accountId, stockCode, TimeUtil.handleRequestDate(date), share, price, fee, tax, total, fileId);
 		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, stockCode, share, price));
+	}
+
+	@RequestMapping(value = StockController.BONUS_PATH, method = RequestMethod.PUT)
+	public StockResponse<UserStock> bonus(@RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		this.userStockService.bonus(accountId, stockCode, TimeUtil.handleRequestDate(date), share, price, fee, total, fileId);
+		return new StockResponse<UserStock>(true, null, MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, total, stockCode));
 	}
 
 	@RequestMapping(value = StockController.GET_OWN_PATH, method = RequestMethod.GET)
