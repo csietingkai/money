@@ -57,7 +57,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
             await this.fetchUserFundRecords(id);
             setLoading(false);
         }
-        this.setState({ show });
+        this.setState({ show, ownFundRecordPage: 1 });
     };
 
     private fetchUserFundRecords = async (userFundId: string) => {

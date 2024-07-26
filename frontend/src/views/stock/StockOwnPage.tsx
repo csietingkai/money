@@ -57,7 +57,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
             await this.fetchUserStockRecords(id);
             setLoading(false);
         }
-        this.setState({ show });
+        this.setState({ show, ownStockRecordPage: 1 });
     };
 
     private fetchUserStockRecords = async (userStockId: string) => {
