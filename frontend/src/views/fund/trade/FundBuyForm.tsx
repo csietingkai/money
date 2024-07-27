@@ -231,7 +231,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                                     onChange={(event) => {
                                         const newDebitAmount = AppUtil.toNumber(event.target.value)
                                         const fee: number = AppUtil.toNumber((newDebitAmount * fundFeeRate).toFixed(6));
-                                        this.setState({ debitAmount, total: AppUtil.numberComma(newDebitAmount + fee), fee });
+                                        this.setState({ debitAmount: newDebitAmount, total: AppUtil.numberComma(newDebitAmount + fee), fee });
                                     }}
                                 />
                             </CCol>
@@ -303,7 +303,11 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                                 <CFormInput
                                     type='number'
                                     value={fee}
-                                    onChange={(event) => this.setState({ fee: AppUtil.toNumber(event.target.value) })}
+                                    onChange={(event) => {
+                                        const newFee = AppUtil.toNumber(event.target.value);
+                                        const newTotal = debitAmount + newFee;
+                                        this.setState({ fee: newFee, total: AppUtil.numberComma(newTotal) })
+                                    }}
                                 />
                             </CCol>
                         </CRow>

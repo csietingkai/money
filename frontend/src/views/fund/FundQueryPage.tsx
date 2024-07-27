@@ -108,7 +108,11 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
 
     private tradeFund = (fund: FundVo, type: 'buy' | 'sell') => {
         const { code, name } = fund;
-        this.props.setFundTradeCondition({ type, code, name, date: new Date(), price: 0, share: 0, rate: 1 });
+        if (type === 'buy') {
+            this.props.setFundTradeCondition({ type, code, name, date: new Date(), debitAmount: 0, price: 0, rate: 1 });
+        } else {
+            this.props.setFundTradeCondition({ type, code, name, date: new Date(), share: 0, price: 0, rate: 1 });
+        }
         window.location.assign('/#/fundTrade');
     };
 
