@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import {
     FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH,
-    FUND_UNTRACK_PATH, USER_FUND_BOUNS_PATH, USER_FUND_BUY_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_GET_OWN_RECORDS_PATH, USER_FUND_SELL_PATH
+    FUND_UNTRACK_PATH, USER_FUND_BOUNS_PATH, USER_FUND_BUY_PATH, USER_FUND_DELETE_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_GET_OWN_RECORDS_PATH, USER_FUND_SELL_PATH
 } from './Constant';
 
 import * as AppUtil from '../util/AppUtil';
@@ -138,6 +138,12 @@ const bonus = async (accountId: string, fundCode: string, date: Date, share: num
     return data;
 };
 
+const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
+    const response = await axios.delete(USER_FUND_DELETE_PATH, { params: { recordId } });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
 const getOwn = async (): Promise<UserFundListResponse> => {
     const response = await axios.get(USER_FUND_GET_OWN_PATH);
     const data: UserFundListResponse = response.data;
@@ -178,4 +184,4 @@ const predict = async (code: string, days?: number): Promise<PredictResponse> =>
     return data;
 };
 
-export default { getAll, getRecords, buy, sell, bonus, getOwn, getOwnRecords, refresh, getTrackingList, track, untrack, predict };
+export default { getAll, getRecords, buy, sell, bonus, deleteRecord, getOwn, getOwnRecords, refresh, getTrackingList, track, untrack, predict };

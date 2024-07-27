@@ -256,6 +256,30 @@ public class UserFundService {
 		record = this.userFundRecordFacade.insert(record);
 	}
 
+	@Transactional
+	public void reverseRecord(UUID recordId) throws NotExistException, FieldMissingException {
+		UserFundRecord userFundRecord = this.userFundRecordFacade.query(recordId);
+
+		if (AppUtil.isEmpty(userFundRecord)) {
+			throw new NotExistException();
+		}
+
+		this.userFundRecordFacade.delete(recordId);
+
+		UserFund userFund = this.userFundFacade.query(userFundRecord.getUserFundId());
+		if (userFundRecord.getType() == DealType.BUY) {
+			userFund.setAmount(userFund.getAmount().subtract(userFundRecord.getShare()));
+		} else if (userFundRecord.getType() == DealType.SELL) {
+			userFund.setAmount(userFund.getAmount().add(userFundRecord.getShare()));
+		}
+
+		Account account = this.accountFacade.query(userFundRecord.getAccountId());
+		AccountRecord accountRecord = this.accountRecordFacade.query(userFundRecord.getAccountRecordId());
+		account.setBalance(account.getBalance().subtract(accountRecord.getTransAmount()));
+		this.accountFacade.update(account);
+		this.accountRecordFacade.delete(accountRecord.getId());
+	}
+
 	public List<UserTrackingFundVo> getUserTrackingFundList(UUID userId) {
 		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);

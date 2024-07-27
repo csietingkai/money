@@ -275,6 +275,30 @@ public class UserStockService {
 		record = this.userStockRecordFacade.insert(record);
 	}
 
+	@Transactional
+	public void reverseRecord(UUID recordId) throws NotExistException, FieldMissingException {
+		UserStockRecord userStockRecord = this.userStockRecordFacade.query(recordId);
+
+		if (AppUtil.isEmpty(userStockRecord)) {
+			throw new NotExistException();
+		}
+
+		this.userStockRecordFacade.delete(recordId);
+
+		UserStock userStock = this.userStockFacade.query(userStockRecord.getUserStockId());
+		if (userStockRecord.getType() == DealType.BUY) {
+			userStock.setAmount(userStock.getAmount().subtract(userStockRecord.getShare()));
+		} else if (userStockRecord.getType() == DealType.SELL) {
+			userStock.setAmount(userStock.getAmount().add(userStockRecord.getShare()));
+		}
+
+		Account account = this.accountFacade.query(userStockRecord.getAccountId());
+		AccountRecord accountRecord = this.accountRecordFacade.query(userStockRecord.getAccountRecordId());
+		account.setBalance(account.getBalance().subtract(accountRecord.getTransAmount()));
+		this.accountFacade.update(account);
+		this.accountRecordFacade.delete(accountRecord.getId());
+	}
+
 	public List<UserTrackingStockVo> getUserTrackingStockList(UUID userId) {
 		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);

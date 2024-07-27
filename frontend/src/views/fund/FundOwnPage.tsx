@@ -2,10 +2,12 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getFundOwnList } from '../../reducer/Selector';
+import AccountApi, { Account } from '../../api/account';
 import FundApi, { UserFundRecord, UserFundVo } from '../../api/fund';
-import { SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
+import { SetAccountListDispatcher, SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher } from '../../reducer/PropsMapper';
+import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
@@ -18,6 +20,8 @@ export interface FundOwnPageProps {
     stockType: StockType;
     ownFundList: UserFundVo[];
     setFundTradeCondition: (tradeCondition?: FundTradeCondition) => void;
+    setAccountList: (accountList: Account[]) => void;
+    setOwnFundList: (ownFundList: UserFundVo[]) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -26,6 +30,9 @@ export interface FundOwnPageState {
     show: { [stockCode: string]: boolean; };
     currentOwnFundRecords: UserFundRecord[];
     ownFundRecordPage: number;
+    showDeleteRecordModal: boolean;
+    holdingRecordId: string;
+    holdingUserFundId: string;
 }
 
 class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
@@ -38,7 +45,10 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                 return acc;
             }, {}),
             currentOwnFundRecords: [],
-            ownFundRecordPage: 1
+            ownFundRecordPage: 1,
+            showDeleteRecordModal: false,
+            holdingRecordId: '',
+            holdingUserFundId: ''
         };
     }
 
@@ -149,6 +159,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                                     <CTableHeaderCell scope='col'>Share</CTableHeaderCell>
                                                     <CTableHeaderCell scope='col'>Fee</CTableHeaderCell>
                                                     <CTableHeaderCell scope='col'>Total</CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'></CTableHeaderCell>
                                                 </CTableRow>
                                             </CTableHead>
                                             <CTableBody>
@@ -161,6 +172,18 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                                             <CTableDataCell>{AppUtil.numberComma(r.share)}</CTableDataCell>
                                                             <CTableDataCell>{AppUtil.numberComma(r.fee)}</CTableDataCell>
                                                             <CTableDataCell>{AppUtil.numberComma(r.total)}</CTableDataCell>
+                                                            <CTableDataCell>
+                                                                <CButtonGroup role='group'>
+                                                                    <CButton
+                                                                        color='danger'
+                                                                        variant='outline'
+                                                                        size='sm'
+                                                                        onClick={() => this.setState({ showDeleteRecordModal: true, holdingRecordId: r.id, holdingUserFundId: ownFundInfo.id })}
+                                                                    >
+                                                                        <CIcon icon={cilTrash}></CIcon>
+                                                                    </CButton>
+                                                                </CButtonGroup>
+                                                            </CTableDataCell>
                                                         </CTableRow>
                                                     )
                                                 }
@@ -207,8 +230,36 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         window.location.assign('/#/fundTrade');
     };
 
+    private removeRecord = async (recordId: string) => {
+        const { notify } = this.props;
+        const { message } = await FundApi.deleteRecord(recordId);
+        notify(message);
+    };
+
+    private fetchUserFunds = async () => {
+        const { setOwnFundList } = this.props;
+        const { success, data } = await FundApi.getOwn();
+        if (success) {
+            setOwnFundList(data);
+        } else {
+            setOwnFundList([]);
+        }
+    };
+
+    private fetchAccounts = async () => {
+        const { userId, setAccountList } = this.props;
+        const response = await AccountApi.getAccounts(userId);
+        const { success, data } = response;
+        if (success) {
+            setAccountList(data);
+        } else {
+            setAccountList([]);
+        }
+    };
+
     render(): React.ReactNode {
         const { ownFundList } = this.props;
+        const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
@@ -226,6 +277,20 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                         </div>
                     </CCol>
                 </CRow>
+                <AppConfirmModal
+                    showModal={showDeleteRecordModal}
+                    headerText='Remove Record'
+                    onConfirm={async (result: boolean) => {
+                        if (result) {
+                            const { holdingRecordId, holdingUserFundId } = this.state;
+                            await this.removeRecord(holdingRecordId);
+                            this.fetchUserFunds();
+                            this.fetchAccounts();
+                            this.fetchUserFundRecords(holdingUserFundId);
+                        }
+                        this.setState({ showDeleteRecordModal: false, holdingRecordId: '', holdingUserFundId: '' });
+                    }}
+                />
             </React.Fragment>
         );
     }
@@ -238,9 +303,11 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<FundTradeCondition | undefined | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<FundTradeCondition | undefined | Account[] | UserFundVo[] | string | boolean>>) => {
     return {
         setFundTradeCondition: SetFundTradeConditionDispatcher(dispatch),
+        setAccountList: SetAccountListDispatcher(dispatch),
+        setOwnFundList: SetOwnFundListDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };

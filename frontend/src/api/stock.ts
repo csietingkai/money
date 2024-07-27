@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {
     STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH,
-    STOCK_UNTRACK_PATH, USER_STOCK_BONUS_PATH, USER_STOCK_BUY_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_GET_OWN_RECORDS_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH
+    STOCK_UNTRACK_PATH, USER_STOCK_BONUS_PATH, USER_STOCK_BUY_PATH, USER_STOCK_DELETE_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_GET_OWN_RECORDS_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH
 } from './Constant';
 import * as AppUtil from '../util/AppUtil';
 import { ApiResponse, PredictResponse, SimpleResponse } from '../util/Interface';
@@ -150,6 +150,12 @@ const bonus = async (accountId: string, stockCode: string, date: Date, share: nu
     return data;
 };
 
+const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
+    const response = await axios.delete(USER_STOCK_DELETE_PATH, { params: { recordId } });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
 const getOwn = async (): Promise<UserStockListResponse> => {
     const response = await axios.get(USER_STOCK_GET_OWN_PATH);
     const data: UserStockListResponse = response.data;
@@ -190,4 +196,4 @@ const predict = async (code: string, days?: number): Promise<PredictResponse> =>
     return data;
 };
 
-export default { getAll, getRecords, refresh, precalc, buy, sell, bonus, getOwn, getOwnRecords, getTrackingList, track, untrack, predict };
+export default { getAll, getRecords, refresh, precalc, buy, sell, bonus, deleteRecord, getOwn, getOwnRecords, getTrackingList, track, untrack, predict };

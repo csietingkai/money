@@ -2,10 +2,12 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getStockOwnList } from '../../reducer/Selector';
+import AccountApi, { Account } from '../../api/account';
 import StockApi, { UserStockRecord, UserStockVo } from '../../api/stock';
-import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
+import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
+import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
@@ -18,6 +20,8 @@ export interface StockOwnPageProps {
     stockType: StockType;
     ownStockList: UserStockVo[];
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
+    setAccountList: (accountList: Account[]) => void;
+    setOwnStockList: (ownStockList: UserStockVo[]) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -26,6 +30,9 @@ export interface StockOwnPageState {
     show: { [stockCode: string]: boolean; };
     currentOwnStockRecords: UserStockRecord[];
     ownStockRecordPage: number;
+    showDeleteRecordModal: boolean;
+    holdingRecordId: string;
+    holdingUserStockId: string;
 }
 
 class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState> {
@@ -38,7 +45,10 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                 return acc;
             }, {}),
             currentOwnStockRecords: [],
-            ownStockRecordPage: 1
+            ownStockRecordPage: 1,
+            showDeleteRecordModal: false,
+            holdingRecordId: '',
+            holdingUserStockId: ''
         };
     }
 
@@ -150,6 +160,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                                     <CTableHeaderCell scope='col'>Fee</CTableHeaderCell>
                                                     <CTableHeaderCell scope='col'>Tax</CTableHeaderCell>
                                                     <CTableHeaderCell scope='col'>Total</CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'></CTableHeaderCell>
                                                 </CTableRow>
                                             </CTableHead>
                                             <CTableBody>
@@ -163,6 +174,18 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                                             <CTableDataCell>{AppUtil.numberComma(r.fee)}</CTableDataCell>
                                                             <CTableDataCell>{AppUtil.numberComma(r.tax)}</CTableDataCell>
                                                             <CTableDataCell>{AppUtil.numberComma(r.total)}</CTableDataCell>
+                                                            <CTableDataCell>
+                                                                <CButtonGroup role='group'>
+                                                                    <CButton
+                                                                        color='danger'
+                                                                        variant='outline'
+                                                                        size='sm'
+                                                                        onClick={() => this.setState({ showDeleteRecordModal: true, holdingRecordId: r.id, holdingUserStockId: ownStockInfo.id })}
+                                                                    >
+                                                                        <CIcon icon={cilTrash}></CIcon>
+                                                                    </CButton>
+                                                                </CButtonGroup>
+                                                            </CTableDataCell>
                                                         </CTableRow>
                                                     )
                                                 }
@@ -196,8 +219,36 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         window.location.assign('/#/stockTrade');
     };
 
+    private removeRecord = async (recordId: string) => {
+        const { notify } = this.props;
+        const { message } = await StockApi.deleteRecord(recordId);
+        notify(message);
+    };
+
+    private fetchUserStocks = async () => {
+        const { setOwnStockList } = this.props;
+        const { success, data } = await StockApi.getOwn();
+        if (success) {
+            setOwnStockList(data);
+        } else {
+            setOwnStockList([]);
+        }
+    };
+
+    private fetchAccounts = async () => {
+        const { userId, setAccountList } = this.props;
+        const response = await AccountApi.getAccounts(userId);
+        const { success, data } = response;
+        if (success) {
+            setAccountList(data);
+        } else {
+            setAccountList([]);
+        }
+    };
+
     render(): React.ReactNode {
         const { ownStockList } = this.props;
+        const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
@@ -215,6 +266,20 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                         </div>
                     </CCol>
                 </CRow>
+                <AppConfirmModal
+                    showModal={showDeleteRecordModal}
+                    headerText='Remove Record'
+                    onConfirm={async (result: boolean) => {
+                        if (result) {
+                            const { holdingRecordId, holdingUserStockId } = this.state;
+                            await this.removeRecord(holdingRecordId);
+                            this.fetchUserStocks();
+                            this.fetchAccounts();
+                            this.fetchUserStockRecords(holdingUserStockId);
+                        }
+                        this.setState({ showDeleteRecordModal: false, holdingRecordId: '', holdingUserStockId: '' });
+                    }}
+                />
             </React.Fragment>
         );
     }
@@ -227,9 +292,11 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockTradeCondition | undefined | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockTradeCondition | undefined | Account[] | UserStockVo[] | string | boolean>>) => {
     return {
         setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),
+        setAccountList: SetAccountListDispatcher(dispatch),
+        setOwnStockList: SetOwnStockListDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };

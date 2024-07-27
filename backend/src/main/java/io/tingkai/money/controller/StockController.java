@@ -20,6 +20,7 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
+import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.PredictResultVo;
 import io.tingkai.money.model.vo.StockRecordVo;
@@ -44,6 +45,7 @@ public class StockController {
 	public static final String BUY_PATH = "/buy";
 	public static final String SELL_PATH = "/sell";
 	public static final String BONUS_PATH = "/bonus";
+	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
 	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
@@ -103,6 +105,12 @@ public class StockController {
 	public StockResponse<UserStock> bonus(@RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		this.userStockService.bonus(accountId, stockCode, TimeUtil.handleRequestDate(date), share, price, fee, total, fileId);
 		return new StockResponse<UserStock>(true, null, MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, total, stockCode));
+	}
+
+	@RequestMapping(value = StockController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
+	public AccountResponse<Void> deleteRecord(@RequestParam UUID recordId) throws NotExistException, FieldMissingException {
+		this.userStockService.reverseRecord(recordId);
+		return new AccountResponse<Void>(true, null, MessageConstant.USER_STOCK_RECORD_DELETE_SUCCESS);
 	}
 
 	@RequestMapping(value = StockController.GET_OWN_PATH, method = RequestMethod.GET)
