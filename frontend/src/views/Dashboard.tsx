@@ -44,7 +44,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             m[a.currency] += a.balance;
         }
         for (const key in m) {
-            balances.push({ value: AppUtil.numberComma(m[key]), desc: key });
+            if (m[key]) {
+                balances.push({ value: AppUtil.numberComma(m[key]), desc: key });
+            }
         }
         return balances;
     };
