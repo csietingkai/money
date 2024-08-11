@@ -51,7 +51,10 @@ const getRecords = async (currency: string, start: Date, end: Date): Promise<Exc
     const response = await axios.get(EXCHANGE_RATE_GET_RECORDS_PATH, { params: { currency, start: start.getTime(), end: end.getTime() } });
     const data: ExchangeRateRecordListResponse = response.data;
     if (data.success) {
-        data.data.forEach(x => ({ ...x, date: toDate(x.date) }));
+        data.data = data.data?.map(x => {
+            x.date = new Date(x.date);
+            return x;
+        });
     }
     return data;
 };

@@ -56,6 +56,18 @@ export const toNumber = (obj: any, defaultVal: number = 0): number => {
     return parseFloat(obj) || defaultVal;
 };
 
+export const precision = (a: number) => {
+    let e = 1, p = 0;
+    if (!isFinite(a)) {
+        return p;
+    }
+    while (Math.round(a * e) / e !== a) {
+        e *= 10;
+        p++;
+    }
+    return p;
+};
+
 export const toDate = (str: any, defaultVal: Date | null = null): Date | null => {
     const d: Date = new Date(str);
     if (isValidDate(d)) {

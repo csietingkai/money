@@ -3,10 +3,11 @@ import rootReducer from './Reducer';
 import * as AppUtil from '../util/AppUtil';
 import AccountApi, { AccountListResponse } from '../api/account';
 import AuthApi, { AuthResponse, LoginRespVo } from '../api/auth';
+import ExchangeRateApi, { ExchangeRateListResponse } from '../api/exchangeRate';
 import OptionApi, { OptionResponse } from '../api/option';
 import FundApi, { UserFundListResponse } from '../api/fund';
 import StockApi, { UserStockListResponse } from '../api/stock';
-import { Login, Logout, SetAccountList, SetCurrencyOptions, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
+import { Login, Logout, SetAccountList, SetExchangeRates, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
 import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId } from './Selector';
 import { Action, ApiResponse, Option } from '../util/Interface';
 import { getAuthToken } from './StateHolder';
@@ -41,13 +42,13 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
 
     const currencies: Option[] = getCurrencies(getState());
     if (tokenString && AppUtil.isArrayEmpty(currencies)) {
-        apis.push(OptionApi.getCurrencies());
-        responseHandlers.push((response: OptionResponse) => {
+        apis.push(ExchangeRateApi.getAll());
+        responseHandlers.push((response: ExchangeRateListResponse) => {
             const { success, data } = response;
             if (success) {
-                dispatch(SetCurrencyOptions(data));
+                dispatch(SetExchangeRates(data));
             } else {
-                dispatch(SetCurrencyOptions([]));
+                dispatch(SetExchangeRates([]));
             }
         });
     }

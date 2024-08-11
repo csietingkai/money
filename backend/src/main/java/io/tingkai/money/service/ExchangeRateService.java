@@ -30,9 +30,11 @@ import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.ExchangeRateTradeRequest;
 import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.TimeUtil;
 
 @Service
 @Loggable
@@ -92,7 +94,14 @@ public class ExchangeRateService {
 	}
 
 	@Transactional
-	public void trade(UUID fromAccountId, UUID toAccountId, LocalDateTime date, BigDecimal rate, BigDecimal srcPayment, BigDecimal targetPayment) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
+	public void trade(ExchangeRateTradeRequest request) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
+		final UUID fromAccountId = request.getFromAccountId();
+		final UUID toAccountId = request.getToAccountId();
+		final LocalDateTime date = TimeUtil.convertToDateTime(request.getDate());
+		final BigDecimal rate = request.getRate();
+		final BigDecimal srcPayment = request.getSrcPayment();
+		final BigDecimal targetPayment = request.getTargetPayment();
+
 		Account fromAccount = this.accountFacade.query(fromAccountId);
 		Account toAccount = this.accountFacade.query(toAccountId);
 

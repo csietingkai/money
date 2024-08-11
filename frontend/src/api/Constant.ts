@@ -71,7 +71,6 @@ export const EXCHANGE_RATE_TRADE_PATH: string = EXCHANGE_RATE_API_PREFIX + '/tra
 
 // api options
 const OPTION_API_PREFIX: string = '/option';
-export const OPTION_GET_CURRENCIES_TYPES: string = OPTION_API_PREFIX + '/currencies';
 export const OPTION_GET_FILE_TYPES: string = OPTION_API_PREFIX + '/fileTypes';
 export const OPTION_GET_STOCK_TYPES: string = OPTION_API_PREFIX + '/stockTypes';
 export const OPTION_GET_RECORD_TYPES: string = OPTION_API_PREFIX + '/recordTypes';

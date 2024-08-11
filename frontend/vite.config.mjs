@@ -4,54 +4,54 @@ import path from 'node:path'
 import autoprefixer from 'autoprefixer'
 
 export default defineConfig(({ mode }) => {
-  // Load .env
-  const env = loadEnv(mode, process.cwd(), '')
-  process.env = { ...process.env, ...env }
+    // Load .env
+    const env = loadEnv(mode, process.cwd(), '')
+    process.env = { ...process.env, ...env }
 
-  return {
-    base: './',
-    build: {
-      outDir: 'build',
-    },
-    css: {
-      postcss: {
-        plugins: [
-          autoprefixer({}), // add options if needed
-        ],
-      },
-    },
-    define: {
-      // vitejs does not support process.env so we have to redefine it
-      'process.env': process.env,
-    },
-    esbuild: {
-      loader: 'tsx',
-      include: /src\/.*\.tsx?$/,
-      exclude: [],
-    },
-    optimizeDeps: {
-      force: true,
-      esbuildOptions: {
-        loader: {
-          '.ts': 'tsx',
+    return {
+        base: './',
+        build: {
+            outDir: 'build',
         },
-      },
-    },
-    plugins: [react()],
-    resolve: {
-      alias: [
-        {
-          find: 'src/',
-          replacement: `${path.resolve(__dirname, 'src')}/`,
+        css: {
+            postcss: {
+                plugins: [
+                    autoprefixer({}), // add options if needed
+                ],
+            },
         },
-      ],
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss'],
-    },
-    server: {
-      port: 3000,
-      proxy: {
-        // https://vitejs.dev/config/server-options.html
-      },
-    },
-  }
+        define: {
+            // vitejs does not support process.env so we have to redefine it
+            'process.env': process.env,
+        },
+        esbuild: {
+            loader: 'tsx',
+            include: /src\/.*\.tsx?$/,
+            exclude: [],
+        },
+        optimizeDeps: {
+            force: true,
+            esbuildOptions: {
+                loader: {
+                    '.ts': 'tsx',
+                },
+            },
+        },
+        plugins: [react()],
+        resolve: {
+            alias: [
+                {
+                    find: 'src/',
+                    replacement: `${path.resolve(__dirname, 'src')}/`,
+                },
+            ],
+            extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss'],
+        },
+        server: {
+            port: 3000,
+            proxy: {
+                // https://vitejs.dev/config/server-options.html
+            },
+        },
+    }
 })

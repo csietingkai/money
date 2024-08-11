@@ -23,7 +23,6 @@ import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
 import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.ExchangeRateService;
-import io.tingkai.money.util.TimeUtil;
 
 @RestController
 @RequestMapping(value = ExchangeRateController.CONROLLER_PREFIX)
@@ -61,7 +60,7 @@ public class ExchangeRateController {
 
 	@RequestMapping(value = ExchangeRateController.TRADE_PATH, method = RequestMethod.POST)
 	public SimpleResponse trade(@RequestBody ExchangeRateTradeRequest request) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
-		this.exchangeRateService.trade(request.getFromAccountId(), request.getToAccountId(), TimeUtil.convertToDateTime(request.getDate()), request.getRate(), request.getSrcPayment(), request.getTargetPayment());
+		this.exchangeRateService.trade(request);
 		return new SimpleResponse(true);
 	}
 }

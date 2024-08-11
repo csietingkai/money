@@ -1,24 +1,22 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilCheckAlt, cilChevronBottom, cilChevronTop, cilSync } from '@coreui/icons';
+import { cilChevronBottom, cilChevronTop, cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
-import { ReduxState, getAuthTokenId, getFundQueryCondition, getStockType } from '../../reducer/Selector';
+import AppLineChart from '../../components/AppLineChart';
+import { ReduxState, getAuthTokenId, getFundQueryCondition } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import FundApi, { FundRecordVo, FundVo } from '../../api/fund';
 import * as AppUtil from '../../util/AppUtil';
-import { StockType } from '../../util/Enum';
 import { Action, Ma, SupportLineType } from '../../util/Interface';
 import FundQueryCondition from './interface/FundQueryCondition';
 import FundTradeCondition from './interface/FundTradeCondition';
-import { CChartLine } from '@coreui/react-chartjs';
 
 export interface FundQueryPageProps {
     userId: string;
     queryCondition: FundQueryCondition;
-    stockType: StockType;
     setFundQueryCondition: (queryCondition: FundQueryCondition) => void;
     setFundTradeCondition: (tradeCondition: FundTradeCondition) => void;
     setLoading: (isLoading: boolean) => void;
@@ -267,109 +265,10 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
         );
     };
 
-    private toggleMa = (ma: Ma) => {
-        let { selectedMa } = this.state;
-        console.log(selectedMa)
-        if (selectedMa.includes(ma)) {
-            selectedMa = selectedMa.filter(x => x !== ma);
-        } else {
-            selectedMa.push(ma);
-        }
-        this.setState({ supportLineType: 'ma', selectedMa });
-    };
-
     private getFundChartCard = (): React.ReactNode => {
-        const { selectedFund, fundRecords, supportLineType, selectedMa } = this.state;
+        const { selectedFund, fundRecords } = this.state;
         if (!fundRecords.length) {
             return <React.Fragment></React.Fragment>;
-        }
-        const labels = fundRecords.map(x => AppUtil.toDateStr(x.date));
-        const datasets: any[] = [
-            {
-                label: '',
-                data: fundRecords.map((x: FundRecordVo) => x.price),
-                backgroundColor: 'rgba(151, 187, 205, 0.2)',
-                borderColor: 'rgba(151, 187, 205, 1)',
-                pointBackgroundColor: 'rgba(151, 187, 205, 1)',
-                pointBorderColor: '#fff'
-            }
-        ];
-        if (supportLineType === 'ma') {
-            if (selectedMa.includes('ma5')) {
-                datasets.push({
-                    label: 'ma5',
-                    type: 'line',
-                    data: fundRecords.map((x: FundRecordVo) => x.ma5),
-                    borderColor: 'blue',
-                    radius: 0,
-                    borderWidth: 1
-                });
-            }
-            if (selectedMa.includes('ma10')) {
-                datasets.push({
-                    label: 'ma10',
-                    type: 'line',
-                    data: fundRecords.map((x: FundRecordVo) => x.ma10),
-                    borderColor: 'green',
-                    radius: 0,
-                    borderWidth: 1
-                });
-            }
-            if (selectedMa.includes('ma20')) {
-                datasets.push({
-                    label: 'ma20',
-                    type: 'line',
-                    data: fundRecords.map((x: FundRecordVo) => x.ma20),
-                    borderColor: 'purple',
-                    radius: 0,
-                    borderWidth: 1
-                });
-            }
-            if (selectedMa.includes('ma40')) {
-                datasets.push({
-                    label: 'ma40',
-                    type: 'line',
-                    data: fundRecords.map((x: FundRecordVo) => x.ma40),
-                    borderColor: 'pink',
-                    radius: 0,
-                    borderWidth: 1
-                });
-            }
-            if (selectedMa.includes('ma60')) {
-                datasets.push({
-                    label: 'ma60',
-                    type: 'line',
-                    data: fundRecords.map((x: FundRecordVo) => x.ma60),
-                    borderColor: 'yellow',
-                    radius: 0,
-                    borderWidth: 1
-                });
-            }
-        } else if (supportLineType === 'bb') {
-            datasets.push({
-                label: 'ma20',
-                type: 'line',
-                data: fundRecords.map((x: FundRecordVo) => x.ma20),
-                borderColor: 'purple',
-                radius: 0,
-                borderWidth: 1
-            });
-            datasets.push({
-                label: 'bbup',
-                type: 'line',
-                data: fundRecords.map((x: FundRecordVo) => x.bbup),
-                borderColor: 'blue',
-                radius: 0,
-                borderWidth: 1
-            });
-            datasets.push({
-                label: 'bbdown',
-                type: 'line',
-                data: fundRecords.map((x: FundRecordVo) => x.bbdown),
-                borderColor: 'pink',
-                radius: 0,
-                borderWidth: 1
-            });
         }
         return (
             <CCard className='mb-4'>
@@ -377,41 +276,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                     <strong>{selectedFund?.name}</strong> <small>details</small>
                 </CCardHeader>
                 <CCardBody>
-                <CRow className='mb-2'>
-                    <CCol>
-                        <CDropdown variant='btn-group' className='me-2'>
-                            <CButton color='info' variant='outline' onClick={() => this.setState({ supportLineType: 'ma' })}>Moving Average</CButton>
-                            <CDropdownToggle color='info' variant='outline' split />
-                            <CDropdownMenu>
-                                <CDropdownItem onClick={() => this.toggleMa('ma5')}>{selectedMa.includes('ma5') && <CIcon icon={cilCheckAlt} />} MA5</CDropdownItem>
-                                <CDropdownItem onClick={() => this.toggleMa('ma10')}>{selectedMa.includes('ma10') && <CIcon icon={cilCheckAlt} />} MA10</CDropdownItem>
-                                <CDropdownItem onClick={() => this.toggleMa('ma20')}>{selectedMa.includes('ma20') && <CIcon icon={cilCheckAlt} />} MA20</CDropdownItem>
-                                <CDropdownItem onClick={() => this.toggleMa('ma40')}>{selectedMa.includes('ma40') && <CIcon icon={cilCheckAlt} />} MA40</CDropdownItem>
-                                <CDropdownItem onClick={() => this.toggleMa('ma60')}>{selectedMa.includes('ma60') && <CIcon icon={cilCheckAlt} />} MA60</CDropdownItem>
-                            </CDropdownMenu>
-                        </CDropdown>
-                        <CButton color='info' variant='outline' onClick={() => this.setState({ supportLineType: 'bb' })}>Bollinger Bands</CButton>
-                    </CCol>
-                </CRow>
-                    <CChartLine
-                        data={{ labels, datasets }}
-                        options={{
-                            scales: {
-                                y: { beginAtZero: false }
-                            },
-                            interaction: {
-                                intersect: true,
-                                mode: 'index'
-                            },
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    enabled: true,
-                                }
-                            },
-                            animation: false
-                        }}
-                    />
+                    <AppLineChart fundRecords={fundRecords} />
                 </CCardBody>
             </CCard>
         );
@@ -439,8 +304,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
 const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
-        queryCondition: getFundQueryCondition(state),
-        stockType: getStockType(state)
+        queryCondition: getFundQueryCondition(state)
     };
 };
 

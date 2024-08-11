@@ -1,26 +1,24 @@
 import React from 'react';
-import { CChartBar } from '@coreui/react-chartjs';
+import { CChartLine } from '@coreui/react-chartjs';
 import { cilCheckAlt } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
-import { StockRecordVo } from '../api/stock';
+import { FundRecordVo } from '../api/fund';
 import * as AppUtil from '../util/AppUtil';
-import { StockType } from '../util/Enum';
 import { CButton, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CRow } from '@coreui/react';
 import { Ma, SupportLineType } from '../util/Interface';
 
-export interface AppCandleChartProps {
-    stockType: string;
-    stockRecords: StockRecordVo[];
+export interface AppLineChartProps {
+    fundRecords: FundRecordVo[];
 }
 
-export interface AppCandleChartState {
+export interface AppLineChartState {
     supportLineType: SupportLineType;
     selectedMa: Ma[];
 }
 
-class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChartState> {
+class AppLineChart extends React.Component<AppLineChartProps, AppLineChartState> {
 
-    constructor(props: AppCandleChartProps) {
+    constructor(props: AppLineChartProps) {
         super(props);
         this.state = {
             supportLineType: '',
@@ -28,27 +26,8 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
         };
     }
 
-    private getStickColor = (record: StockRecordVo, style = this.props.stockType) => {
-        let color: string = 'black';
-        if (style === StockType.TW) {
-            if (record.openPrice > record.closePrice) {
-                color = 'green';
-            } else if (record.openPrice < record.closePrice) {
-                color = 'red';
-            }
-        } else {
-            if (record.openPrice > record.closePrice) {
-                color = 'red';
-            } else if (record.openPrice < record.closePrice) {
-                color = 'green';
-            }
-        }
-        return color;
-    };
-
     private toggleMa = (ma: Ma) => {
         let { selectedMa } = this.state;
-        console.log(selectedMa)
         if (selectedMa.includes(ma)) {
             selectedMa = selectedMa.filter(x => x !== ma);
         } else {
@@ -58,22 +37,16 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
     };
 
     render(): React.ReactNode {
-        const { stockRecords } = this.props;
+        const { fundRecords } = this.props;
         const { supportLineType, selectedMa } = this.state;
         const datasets: any[] = [
             {
-                label: 'open and close',
-                type: 'bar',
-                data: stockRecords.map((x: StockRecordVo) => [x.openPrice, x.closePrice]),
-                backgroundColor: stockRecords.map((x: StockRecordVo) => this.getStickColor(x)),
-                minBarLength: 1
-            },
-            {
-                label: 'high and low',
-                type: 'bar',
-                barPercentage: 0.1,
-                data: stockRecords.map((x: StockRecordVo) => [x.highPrice, x.lowPrice]),
-                backgroundColor: stockRecords.map((x: StockRecordVo) => this.getStickColor(x))
+                label: '',
+                data: fundRecords.map((x: FundRecordVo) => x.price),
+                backgroundColor: 'rgba(151, 187, 205, 0.2)',
+                borderColor: 'rgba(151, 187, 205, 1)',
+                pointBackgroundColor: 'rgba(151, 187, 205, 1)',
+                pointBorderColor: '#fff'
             }
         ];
         if (supportLineType === 'ma') {
@@ -81,7 +54,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
                 datasets.push({
                     label: 'ma5',
                     type: 'line',
-                    data: stockRecords.map((x: StockRecordVo) => x.ma5),
+                    data: fundRecords.map((x: FundRecordVo) => x.ma5),
                     borderColor: 'blue',
                     radius: 0,
                     borderWidth: 1
@@ -91,7 +64,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
                 datasets.push({
                     label: 'ma10',
                     type: 'line',
-                    data: stockRecords.map((x: StockRecordVo) => x.ma10),
+                    data: fundRecords.map((x: FundRecordVo) => x.ma10),
                     borderColor: 'green',
                     radius: 0,
                     borderWidth: 1
@@ -101,7 +74,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
                 datasets.push({
                     label: 'ma20',
                     type: 'line',
-                    data: stockRecords.map((x: StockRecordVo) => x.ma20),
+                    data: fundRecords.map((x: FundRecordVo) => x.ma20),
                     borderColor: 'purple',
                     radius: 0,
                     borderWidth: 1
@@ -111,7 +84,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
                 datasets.push({
                     label: 'ma40',
                     type: 'line',
-                    data: stockRecords.map((x: StockRecordVo) => x.ma40),
+                    data: fundRecords.map((x: FundRecordVo) => x.ma40),
                     borderColor: 'pink',
                     radius: 0,
                     borderWidth: 1
@@ -121,7 +94,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
                 datasets.push({
                     label: 'ma60',
                     type: 'line',
-                    data: stockRecords.map((x: StockRecordVo) => x.ma60),
+                    data: fundRecords.map((x: FundRecordVo) => x.ma60),
                     borderColor: 'yellow',
                     radius: 0,
                     borderWidth: 1
@@ -131,7 +104,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
             datasets.push({
                 label: 'ma20',
                 type: 'line',
-                data: stockRecords.map((x: StockRecordVo) => x.ma20),
+                data: fundRecords.map((x: FundRecordVo) => x.ma20),
                 borderColor: 'purple',
                 radius: 0,
                 borderWidth: 1
@@ -139,7 +112,7 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
             datasets.push({
                 label: 'bbup',
                 type: 'line',
-                data: stockRecords.map((x: StockRecordVo) => x.bbup),
+                data: fundRecords.map((x: FundRecordVo) => x.bbup),
                 borderColor: 'blue',
                 radius: 0,
                 borderWidth: 1
@@ -147,13 +120,13 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
             datasets.push({
                 label: 'bbdown',
                 type: 'line',
-                data: stockRecords.map((x: StockRecordVo) => x.bbdown),
+                data: fundRecords.map((x: FundRecordVo) => x.bbdown),
                 borderColor: 'pink',
                 radius: 0,
                 borderWidth: 1
             });
         }
-        const labels = stockRecords.map((x: StockRecordVo) => AppUtil.toDateStr(x.dealDate));
+        const labels = fundRecords.map((x: FundRecordVo) => AppUtil.toDateStr(x.date));
         return (
             <React.Fragment>
                 <CRow className='mb-2'>
@@ -172,29 +145,28 @@ class AppCandleChart extends React.Component<AppCandleChartProps, AppCandleChart
                         <CButton color='info' variant='outline' onClick={() => this.setState({ supportLineType: 'bb' })}>Bollinger Bands</CButton>
                     </CCol>
                 </CRow>
-                <CChartBar
-                    data={{ labels, datasets }}
-                    options={{
-                        scales: {
-                            x: { stacked: true },
-                            y: { beginAtZero: false }
-                        },
-                        interaction: {
-                            intersect: true,
-                            mode: 'index'
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                enabled: true,
-                            }
-                        },
-                        animation: false
-                    }}
-                />
+                <CChartLine
+                        data={{ labels, datasets }}
+                        options={{
+                            scales: {
+                                y: { beginAtZero: false }
+                            },
+                            interaction: {
+                                intersect: true,
+                                mode: 'index'
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    enabled: true,
+                                }
+                            },
+                            animation: false
+                        }}
+                    />
             </React.Fragment>
         );
     }
 }
 
-export default AppCandleChart;
+export default AppLineChart;

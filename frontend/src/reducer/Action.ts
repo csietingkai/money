@@ -1,14 +1,17 @@
 
-import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_CURRENCY_OPTIONS, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_TRADE_CONDITION, SET_STOCK_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_IS_MOBILE } from './ActionType';
+import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_TRADE_CONDITION, SET_STOCK_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_IS_MOBILE, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_EXCHANGE_RATES } from './ActionType';
 import { LoginRespVo, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { Action, Option } from '../util/Interface';
+import { ExchangeRateVo } from '../api/exchangeRate';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
 import StockTradeCondition from '../views/stock/interface/StockTradeCondition';
 import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
 import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
+import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
+import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
 
 // auth
 export const Login = (payload: LoginRespVo): Action<LoginRespVo> => ({ type: LOGIN, payload });
@@ -28,8 +31,12 @@ export const SetOwnFundList = (payload: UserFundVo[]): Action<UserFundVo[]> => (
 export const SetFundQueryCondition = (payload: FundQueryCondition): Action<FundQueryCondition> => ({ type: SET_FUND_QUERY_CONDITION, payload });
 export const SetFundTradeCondition = (payload?: FundTradeCondition): Action<FundTradeCondition | undefined> => ({ type: SET_FUND_TRADE_CONDITION, payload });
 
+// currency
+export const SetExchangeRates = (payload: ExchangeRateVo[]): Action<ExchangeRateVo[]> => ({ type: SET_EXCHANGE_RATES, payload });
+export const SetExchangeRateQueryCondition = (payload: ExchangeRateQueryCondition): Action<ExchangeRateQueryCondition> => ({ type: SET_EXCHANGE_RATE_QUERY_CONDITION, payload });
+export const SetExchangeRateTradeCondition = (payload?: ExchangeRateTradeCondition): Action<ExchangeRateTradeCondition | undefined> => ({ type: SET_EXCHANGE_RATE_TRADE_CONDITION, payload });
+
 // options
-export const SetCurrencyOptions = (payload: Option[]): Action<Option[]> => ({ type: SET_CURRENCY_OPTIONS, payload });
 export const SetFileTypeOptions = (payload: Option[]): Action<Option[]> => ({ type: SET_FILE_TYPE_OPTIONS, payload });
 export const SetStockTypeOptions = (payload: Option[]): Action<Option[]> => ({ type: SET_STOCK_TYPE_OPTIONS, payload });
 export const SetRecordTypeOptions = (payload: Option[]): Action<Option[]> => ({ type: SET_RECORD_TYPE_OPTIONS, payload });

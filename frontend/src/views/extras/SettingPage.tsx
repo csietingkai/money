@@ -37,7 +37,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
 
     constructor(props: SettingPageProps) {
         super(props);
-        const { username, userSetting, recordTypeOptions } = props;
+        const { username, userSetting } = props;
         this.state = {
             userForm: {
                 username: username,

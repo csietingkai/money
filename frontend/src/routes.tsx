@@ -1,6 +1,6 @@
 import React from 'react';
 import CIcon from '@coreui/icons-react';
-import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilMonitor, cilSearch, cilSpeedometer } from '@coreui/icons';
+import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilMonitor, cilSearch, cilSpeedometer, cilSwapHorizontal } from '@coreui/icons';
 
 export type RouteItem = {
     type: 'item';
@@ -133,6 +133,20 @@ const routes: Route[] = [
     {
         type: 'title',
         name: 'Currency',
+    },
+    {
+        type: 'item',
+        name: 'Currency Query',
+        path: 'exchangeRateQuery',
+        icon: <CIcon icon={cilSearch} customClassName='nav-icon' />,
+        component: React.lazy(() => import('./views/exchangeRate/ExchangeRateQueryPage'))
+    },
+    {
+        type: 'item',
+        name: 'Currency Trade',
+        path: 'exchangeRateTrade',
+        icon: <CIcon icon={cilSwapHorizontal} customClassName='nav-icon' />,
+        component: React.lazy(() => import('./views/exchangeRate/ExchangeRateTradePage'))
     },
     {
         type: 'title',
