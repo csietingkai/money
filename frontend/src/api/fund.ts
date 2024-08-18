@@ -121,19 +121,19 @@ const refresh = async (code: string): Promise<SimpleResponse> => {
 };
 
 const buy = async (accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, payment: number, fee: number, fileId: string): Promise<UserFundResponse> => {
-    const response = await axios.put(USER_FUND_BUY_PATH, null, { params: { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, payment, fee, fileId } });
+    const response = await axios.put(USER_FUND_BUY_PATH, { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, payment, fee, fileId });
     const data: UserFundResponse = response.data;
     return data;
 };
 
 const sell = async (accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, total: number, fileId: string): Promise<UserFundResponse> => {
-    const response = await axios.put(USER_FUND_SELL_PATH, null, { params: { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, total, fileId } });
+    const response = await axios.put(USER_FUND_SELL_PATH, { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, total, fileId });
     const data: UserFundResponse = response.data;
     return data;
 };
 
 const bonus = async (accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, total: number, fileId: string): Promise<UserFundResponse> => {
-    const response = await axios.put(USER_FUND_BOUNS_PATH, null, { params: { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, total, fileId } });
+    const response = await axios.put(USER_FUND_BOUNS_PATH, { accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, total, fileId });
     const data: UserFundResponse = response.data;
     return data;
 };
@@ -160,20 +160,20 @@ const getOwnRecords = async (userFundId: string): Promise<UserFundRecordListResp
     return data;
 };
 
-const getTrackingList = async (username: string): Promise<FundTrackingListResponse> => {
-    const response = await axios.get(FUND_GET_TRACKING_LIST_PATH, { params: { username } });
+const getTrackingList = async (): Promise<FundTrackingListResponse> => {
+    const response = await axios.get(FUND_GET_TRACKING_LIST_PATH);
     const data: FundTrackingListResponse = response.data;
     return data;
 };
 
-const track = async (username: string, code: string): Promise<SimpleResponse> => {
-    const response = await axios.post(FUND_TRACK_PATH, null, { params: { username, code } });
+const track = async (code: string): Promise<SimpleResponse> => {
+    const response = await axios.post(FUND_TRACK_PATH, null, { params: { code } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const untrack = async (username: string, code: string): Promise<SimpleResponse> => {
-    const response = await axios.post(FUND_UNTRACK_PATH, null, { params: { username, code } });
+const untrack = async (code: string): Promise<SimpleResponse> => {
+    const response = await axios.post(FUND_UNTRACK_PATH, null, { params: { code } });
     const data: SimpleResponse = response.data;
     return data;
 };

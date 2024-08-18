@@ -42,10 +42,14 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
+import io.tingkai.money.model.request.StockBonusRequest;
+import io.tingkai.money.model.request.StockBuyRequest;
+import io.tingkai.money.model.request.StockSellRequest;
 import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
+import io.tingkai.money.util.TimeUtil;
 
 @Service
 @Loggable
@@ -139,7 +143,16 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public UserStock buy(UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal total, UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public UserStock buy(StockBuyRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UUID accountId = request.getAccountId();
+		String stockCode = request.getStockCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal fee = request.getFee();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+
 		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
@@ -195,7 +208,17 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public UserStock sell(UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal tax, BigDecimal total, UUID fileId) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserStock sell(StockSellRequest request) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UUID accountId = request.getAccountId();
+		String stockCode = request.getStockCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal fee = request.getFee();
+		BigDecimal tax = request.getTax();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+
 		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
@@ -239,7 +262,16 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public void bonus(UUID accountId, String stockCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal fee, BigDecimal total, UUID fileId) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public void bonus(StockBonusRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UUID accountId = request.getAccountId();
+		String stockCode = request.getStockCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal fee = request.getFee();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+
 		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new StockAmountInvalidException(share);
@@ -329,7 +361,8 @@ public class UserStockService {
 		return list;
 	}
 
-	public void track(UUID userId, String stockCode) throws AlreadyExistException, FieldMissingException {
+	public void track(String stockCode) throws AlreadyExistException, FieldMissingException {
+		UUID userId = ContextUtil.getUserId();
 		UserTrackingStock entity = new UserTrackingStock();
 		entity.setUserId(userId);
 		entity.setStockCode(stockCode);
@@ -337,10 +370,11 @@ public class UserStockService {
 		this.syncTrackingCache(userId);
 	}
 
-	public void untrack(UUID username, String stockCode) throws NotExistException {
-		UserTrackingStock entity = this.userTrackingStockFacade.query(username, stockCode);
+	public void untrack(String stockCode) throws NotExistException {
+		UUID userId = ContextUtil.getUserId();
+		UserTrackingStock entity = this.userTrackingStockFacade.query(userId, stockCode);
 		this.userTrackingStockFacade.delete(entity.getId());
-		this.syncTrackingCache(username);
+		this.syncTrackingCache(userId);
 	}
 
 	private BigDecimal calcFee(BigDecimal price, BigDecimal share, BigDecimal discount) {

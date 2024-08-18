@@ -1,10 +1,10 @@
 package io.tingkai.money.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,11 +20,15 @@ import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.AccountInsertRequest;
+import io.tingkai.money.model.request.AccountRecordExpendRequest;
+import io.tingkai.money.model.request.AccountRecordIncomeRequest;
+import io.tingkai.money.model.request.AccountRecordTransferRequest;
+import io.tingkai.money.model.request.AccountUpdateRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.service.AccountService;
-import io.tingkai.money.util.TimeUtil;
 
 @RestController
 @RequestMapping(value = AccountController.CONTROLLER_PREFIX)
@@ -51,14 +55,14 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.INSERT_PATH, method = RequestMethod.POST)
-	public AccountResponse<Account> insert(@RequestParam String name, @RequestParam String currency) throws AlreadyExistException, FieldMissingException {
-		Account inserted = this.accountService.insert(name, currency);
+	public AccountResponse<Account> insert(@RequestBody AccountInsertRequest req) throws AlreadyExistException, FieldMissingException {
+		Account inserted = this.accountService.insert(req);
 		return new AccountResponse<Account>(true, inserted, MessageConstant.ACCOUNT_INSERT_SUCCESS, inserted.getName());
 	}
 
 	@RequestMapping(value = AccountController.UPDATE_PATH, method = RequestMethod.PUT)
-	public AccountResponse<Account> update(@RequestParam UUID id, @RequestParam String name) throws NotExistException, FieldMissingException {
-		Account updated = this.accountService.update(id, name);
+	public AccountResponse<Account> update(@RequestBody AccountUpdateRequest req) throws NotExistException, FieldMissingException {
+		Account updated = this.accountService.update(req);
 		return new AccountResponse<Account>(true, updated, MessageConstant.ACCOUNT_UPDATE_SUCCESS, updated.getName());
 	}
 
@@ -75,20 +79,20 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.INCOME_PATH, method = RequestMethod.POST)
-	public AccountResponse<AccountRecord> income(@RequestParam UUID accountId, @RequestParam String date, @RequestParam BigDecimal amount, @RequestParam String type, @RequestParam String description, @RequestParam(required = false) UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
-		AccountRecord inserted = this.accountService.income(accountId, TimeUtil.handleRequestDate(date), amount, type, description, fileId);
+	public AccountResponse<AccountRecord> income(@RequestBody AccountRecordIncomeRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+		AccountRecord inserted = this.accountService.income(request);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
 	}
 
 	@RequestMapping(value = AccountController.TRANSFER_PATH, method = RequestMethod.POST)
-	public AccountResponse<AccountRecord> transfer(@RequestParam UUID fromId, @RequestParam UUID toId, @RequestParam String date, @RequestParam BigDecimal amount, @RequestParam String type, @RequestParam String description, @RequestParam(required = false) UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException, AccountBalanceNotEnoughException {
-		AccountRecord inserted = this.accountService.transfer(fromId, toId, TimeUtil.handleRequestDate(date), amount, type, description, fileId);
+	public AccountResponse<AccountRecord> transfer(@RequestBody AccountRecordTransferRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException, AccountBalanceNotEnoughException {
+		AccountRecord inserted = this.accountService.transfer(request);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
 	}
 
 	@RequestMapping(value = AccountController.EXPEND_PATH, method = RequestMethod.POST)
-	public AccountResponse<AccountRecord> expend(@RequestParam UUID accountId, @RequestParam String date, @RequestParam BigDecimal amount, @RequestParam String type, @RequestParam String description, @RequestParam(required = false) UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
-		AccountRecord inserted = this.accountService.expend(accountId, TimeUtil.handleRequestDate(date), amount, type, description, fileId);
+	public AccountResponse<AccountRecord> expend(@RequestBody AccountRecordExpendRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+		AccountRecord inserted = this.accountService.expend(request);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
 	}
 

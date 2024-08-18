@@ -133,19 +133,19 @@ const precalc = async (dealType: 'BUY' | 'SELL', share: number, price: number): 
 };
 
 const buy = async (accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, total: number, fileId: string): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_BUY_PATH, null, { params: { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, total, fileId } });
+    const response = await axios.put(USER_STOCK_BUY_PATH, { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, total, fileId });
     const data: UserStockResponse = response.data;
     return data;
 };
 
 const sell = async (accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, tax: number, total: number, fileId: string): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_SELL_PATH, null, { params: { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, tax, total, fileId } });
+    const response = await axios.put(USER_STOCK_SELL_PATH, { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, tax, total, fileId });
     const data: UserStockResponse = response.data;
     return data;
 };
 
 const bonus = async (accountId: string, stockCode: string, date: Date, share: number, price: number, fee: number, total: number, fileId: string): Promise<UserStockResponse> => {
-    const response = await axios.put(USER_STOCK_BONUS_PATH, null, { params: { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, total, fileId } });
+    const response = await axios.put(USER_STOCK_BONUS_PATH, { accountId, stockCode, date: AppUtil.toDateStr(date), share, price, fee, total, fileId });
     const data: UserStockResponse = response.data;
     return data;
 };
@@ -172,20 +172,20 @@ const getOwnRecords = async (userStockId: string): Promise<UserStockRecordListRe
     return data;
 };
 
-const getTrackingList = async (username: string): Promise<StockTrackingListResponse> => {
-    const response = await axios.get(STOCK_GET_TRACKING_LIST_PATH, { params: { username } });
+const getTrackingList = async (): Promise<StockTrackingListResponse> => {
+    const response = await axios.get(STOCK_GET_TRACKING_LIST_PATH, {});
     const data: StockTrackingListResponse = response.data;
     return data;
 };
 
-const track = async (username: string, code: string): Promise<SimpleResponse> => {
-    const response = await axios.post(STOCK_TRACK_PATH, null, { params: { username, code } });
+const track = async (code: string): Promise<SimpleResponse> => {
+    const response = await axios.post(STOCK_TRACK_PATH, null, { params: { code } });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const untrack = async (username: string, code: string): Promise<SimpleResponse> => {
-    const response = await axios.post(STOCK_UNTRACK_PATH, null, { params: { username, code } });
+const untrack = async (code: string): Promise<SimpleResponse> => {
+    const response = await axios.post(STOCK_UNTRACK_PATH, null, { params: { code } });
     const data: SimpleResponse = response.data;
     return data;
 };

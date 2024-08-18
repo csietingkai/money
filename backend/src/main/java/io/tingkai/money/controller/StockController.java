@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,9 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
+import io.tingkai.money.model.request.StockBonusRequest;
+import io.tingkai.money.model.request.StockBuyRequest;
+import io.tingkai.money.model.request.StockSellRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.PredictResultVo;
@@ -73,7 +77,7 @@ public class StockController {
 
 	@RequestMapping(value = StockController.GET_RECORDS_PATH, method = RequestMethod.GET)
 	public StockResponse<List<StockRecordVo>> getRecords(@RequestParam String code, @RequestParam String start, @RequestParam String end) {
-		List<StockRecordVo> records = this.stockService.getAllRecords(code, TimeUtil.handleRequestDate(start), TimeUtil.handleRequestDate(end));
+		List<StockRecordVo> records = this.stockService.getAllRecords(code, TimeUtil.convertToDate(start), TimeUtil.convertToDate(end));
 		return new StockResponse<List<StockRecordVo>>(true, records, MessageConstant.STOCK_GET_SUCCESS, code);
 	}
 
@@ -90,21 +94,21 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.BUY_PATH, method = RequestMethod.PUT)
-	public StockResponse<UserStock> buy(@RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		UserStock result = this.userStockService.buy(accountId, stockCode, TimeUtil.handleRequestDate(date), share, price, fee, total, fileId);
-		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, stockCode, share, price));
+	public StockResponse<UserStock> buy(@RequestBody StockBuyRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UserStock result = this.userStockService.buy(request);
+		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, request.getStockCode(), request.getShare(), request.getPrice()));
 	}
 
 	@RequestMapping(value = StockController.SELL_PATH, method = RequestMethod.PUT)
-	public StockResponse<UserStock> sell(@RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal tax, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		UserStock result = this.userStockService.sell(accountId, stockCode, TimeUtil.handleRequestDate(date), share, price, fee, tax, total, fileId);
-		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, stockCode, share, price));
+	public StockResponse<UserStock> sell(@RequestBody StockSellRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UserStock result = this.userStockService.sell(request);
+		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, request.getStockCode(), request.getShare(), request.getPrice()));
 	}
 
 	@RequestMapping(value = StockController.BONUS_PATH, method = RequestMethod.PUT)
-	public StockResponse<UserStock> bonus(@RequestParam UUID accountId, @RequestParam String stockCode, @RequestParam String date, @RequestParam BigDecimal share, @RequestParam BigDecimal price, @RequestParam BigDecimal fee, @RequestParam BigDecimal total, @RequestParam(required = false) UUID fileId) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		this.userStockService.bonus(accountId, stockCode, TimeUtil.handleRequestDate(date), share, price, fee, total, fileId);
-		return new StockResponse<UserStock>(true, null, MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, total, stockCode));
+	public StockResponse<UserStock> bonus(@RequestBody StockBonusRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		this.userStockService.bonus(request);
+		return new StockResponse<UserStock>(true, null, MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, request.getTotal(), request.getStockCode()));
 	}
 
 	@RequestMapping(value = StockController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
@@ -132,14 +136,14 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.TRACK_PATH, method = RequestMethod.POST)
-	public StockResponse<Void> track(@RequestParam UUID userId, @RequestParam String code) throws AlreadyExistException, FieldMissingException {
-		this.userStockService.track(userId, code);
+	public StockResponse<Void> track(@RequestParam String code) throws AlreadyExistException, FieldMissingException {
+		this.userStockService.track(code);
 		return new StockResponse<Void>(true, null, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = StockController.UNTRACK_PATH, method = RequestMethod.POST)
-	public StockResponse<Void> untrack(@RequestParam UUID userId, @RequestParam String code) throws NotExistException {
-		this.userStockService.untrack(userId, code);
+	public StockResponse<Void> untrack(@RequestParam String code) throws NotExistException {
+		this.userStockService.untrack(code);
 		return new StockResponse<Void>(true, null, MessageConstant.SUCCESS);
 	}
 

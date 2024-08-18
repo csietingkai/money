@@ -57,13 +57,13 @@ const getAccounts = async (userId: string): Promise<AccountListResponse> => {
 };
 
 const createAccount = async (name: string, currency: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_CREATE_PATH, null, { params: { name, currency } });
+    const response = await axios.post(ACCOUNT_CREATE_PATH, { name, currency });
     const data: SimpleResponse = response.data;
     return data;
 };
 
 const updateAccount = async (id: string, name: string): Promise<SimpleResponse> => {
-    const response = await axios.put(ACCOUNT_UPDATE_PATH, null, { params: { id, name } });
+    const response = await axios.put(ACCOUNT_UPDATE_PATH, { id, name });
     const data: SimpleResponse = response.data;
     return data;
 };
@@ -91,19 +91,19 @@ const getMonthBalance = async (ownerName: string, year: number, month: number): 
 };
 
 const income = async (accountId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, null, { params: { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId } });
+    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };
 
 const transfer = async (fromId: string, toId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_TRANSFER_RECORD_PATH, null, { params: { fromId, toId, date: AppUtil.toDateStr(date), amount, type, description, fileId } });
+    const response = await axios.post(ACCOUNT_TRANSFER_RECORD_PATH, { fromId, toId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };
 
 const expend = async (accountId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, null, { params: { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId } });
+    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };

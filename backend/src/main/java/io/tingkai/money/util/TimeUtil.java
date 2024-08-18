@@ -129,7 +129,7 @@ public class TimeUtil {
 		return currentDateTime.minus(amount, unit);
 	}
 
-	public static LocalDateTime handleRequestDate(String text) {
+	public static LocalDateTime convertToDate(String text) {
 		return LocalDate.parse(text, DATE_FORMATTER).atStartOfDay();
 	}
 }

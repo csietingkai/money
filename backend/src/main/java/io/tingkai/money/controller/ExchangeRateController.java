@@ -18,7 +18,6 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.request.ExchangeRateTradeRequest;
 import io.tingkai.money.model.response.ExchangeRateResponse;
 import io.tingkai.money.model.response.SimpleResponse;
-import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
 import io.tingkai.money.service.DataFetcherService;
@@ -47,9 +46,9 @@ public class ExchangeRateController {
 	}
 
 	@RequestMapping(value = ExchangeRateController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency, @RequestParam long start, @RequestParam long end) {
+	public ExchangeRateResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency, @RequestParam long start, @RequestParam long end) {
 		List<ExchangeRateRecordVo> records = this.exchangeRateService.getAllRecords(currency, start, end);
-		return new StockResponse<List<ExchangeRateRecordVo>>(true, records, MessageConstant.EXCHANGE_RATE_GET_SUCCESS, currency);
+		return new ExchangeRateResponse<List<ExchangeRateRecordVo>>(true, records, MessageConstant.EXCHANGE_RATE_GET_SUCCESS, currency);
 	}
 
 	@RequestMapping(value = ExchangeRateController.REFRESH_PATH, method = RequestMethod.POST)

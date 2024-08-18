@@ -39,10 +39,14 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FundAmountInvalidException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.FundBonusRequest;
+import io.tingkai.money.model.request.FundBuyRequest;
+import io.tingkai.money.model.request.FundSellRequest;
 import io.tingkai.money.model.vo.UserFundVo;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
+import io.tingkai.money.util.TimeUtil;
 
 @Service
 @Loggable
@@ -119,7 +123,17 @@ public class UserFundService {
 	}
 
 	@Transactional
-	public UserFund buy(UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal payment, BigDecimal fee, UUID fileId) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public UserFund buy(FundBuyRequest request) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+		UUID accountId = request.getAccountId();
+		String fundCode = request.getFundCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal rate = request.getRate();
+		BigDecimal payment = request.getPayment();
+		BigDecimal fee = request.getFee();
+		UUID fileId = request.getFileId();
+
 		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new FundAmountInvalidException(share);
@@ -176,7 +190,16 @@ public class UserFundService {
 	}
 
 	@Transactional
-	public UserFund sell(UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal total, UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserFund sell(FundSellRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UUID accountId = request.getAccountId();
+		String fundCode = request.getFundCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal rate = request.getRate();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+
 		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new FundAmountInvalidException(share);
@@ -220,7 +243,16 @@ public class UserFundService {
 	}
 
 	@Transactional
-	public void bonus(UUID accountId, String fundCode, LocalDateTime date, BigDecimal share, BigDecimal price, BigDecimal rate, BigDecimal total, UUID fileId) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public void bonus(FundBonusRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+		UUID accountId = request.getAccountId();
+		String fundCode = request.getFundCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal rate = request.getRate();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+
 		UUID userId = ContextUtil.getUserId();
 		if (BigDecimal.ZERO.compareTo(share) >= 0) {
 			throw new FundAmountInvalidException(share);
@@ -280,7 +312,8 @@ public class UserFundService {
 		this.accountRecordFacade.delete(accountRecord.getId());
 	}
 
-	public List<UserTrackingFundVo> getUserTrackingFundList(UUID userId) {
+	public List<UserTrackingFundVo> getUserTrackingFundList() {
+		UUID userId = ContextUtil.getUserId();
 		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {
@@ -310,7 +343,8 @@ public class UserFundService {
 		return list;
 	}
 
-	public void track(UUID userId, String fundCode) throws AlreadyExistException, FieldMissingException {
+	public void track(String fundCode) throws AlreadyExistException, FieldMissingException {
+		UUID userId = ContextUtil.getUserId();
 		UserTrackingFund entity = new UserTrackingFund();
 		entity.setUserId(userId);
 		entity.setFundCode(fundCode);
@@ -318,7 +352,8 @@ public class UserFundService {
 		this.syncTrackingCache(userId);
 	}
 
-	public void untrack(UUID userId, String fundCode) throws NotExistException {
+	public void untrack(String fundCode) throws NotExistException {
+		UUID userId = ContextUtil.getUserId();
 		UserTrackingFund entity = this.userTrackingFundFacade.query(userId, fundCode);
 		this.userTrackingFundFacade.delete(entity.getId());
 		this.syncTrackingCache(userId);

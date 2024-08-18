@@ -8,15 +8,12 @@ import org.springframework.lang.Nullable;
 import lombok.Data;
 
 @Data
-public class FundBuyRequest {
+public class AccountRecordExpendRequest {
 	protected UUID accountId;
-	protected String fundCode;
 	protected String date;
-	protected BigDecimal share;
-	protected BigDecimal price;
-	protected BigDecimal rate;
-	protected BigDecimal payment;
-	protected BigDecimal fee;
+	protected BigDecimal amount;
+	protected String type;
+	protected String description;
 	@Nullable
 	protected UUID fileId;
 }

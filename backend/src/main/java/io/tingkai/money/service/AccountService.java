@@ -29,11 +29,17 @@ import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.AccountInsertRequest;
+import io.tingkai.money.model.request.AccountRecordExpendRequest;
+import io.tingkai.money.model.request.AccountRecordIncomeRequest;
+import io.tingkai.money.model.request.AccountRecordTransferRequest;
+import io.tingkai.money.model.request.AccountUpdateRequest;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.BalancePairVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
+import io.tingkai.money.util.TimeUtil;
 
 @Service
 @Loggable
@@ -65,19 +71,19 @@ public class AccountService {
 	}
 
 	@Transactional
-	public Account insert(String name, String currency) throws AlreadyExistException, FieldMissingException {
+	public Account insert(AccountInsertRequest req) throws AlreadyExistException, FieldMissingException {
 		Account entity = new Account();
-		entity.setName(name);
+		entity.setName(req.getName());
 		entity.setUserId(ContextUtil.getUserId());
-		entity.setCurrency(currency);
+		entity.setCurrency(req.getCurrency());
 		entity.setBalance(BigDecimal.ZERO);
 		return this.accountFacade.insert(entity);
 	}
 
 	@Transactional
-	public Account update(UUID id, String name) throws NotExistException, FieldMissingException {
-		Account entity = this.accountFacade.query(id);
-		entity.setName(name);
+	public Account update(AccountUpdateRequest req) throws NotExistException, FieldMissingException {
+		Account entity = this.accountFacade.query(req.getId());
+		entity.setName(req.getName());
 		return this.accountFacade.update(entity);
 	}
 
@@ -169,7 +175,14 @@ public class AccountService {
 	}
 
 	@Transactional
-	public AccountRecord income(UUID accountId, LocalDateTime date, BigDecimal amount, String type, String description, UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+	public AccountRecord income(AccountRecordIncomeRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+		UUID accountId = request.getAccountId();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal amount = request.getAmount();
+		String type = request.getType();
+		String description = request.getDescription();
+		UUID fileId = request.getFileId();
+
 		Account account = this.accountFacade.query(accountId);
 		AccountRecord record = new AccountRecord();
 		record.setTransDate(date);
@@ -188,7 +201,15 @@ public class AccountService {
 	}
 
 	@Transactional
-	public AccountRecord transfer(UUID fromId, UUID toId, LocalDateTime date, BigDecimal amount, String type, String description, UUID fileId) throws AccountBalanceNotEnoughException, AccountBalanceWrongException, NotExistException, FieldMissingException {
+	public AccountRecord transfer(AccountRecordTransferRequest request) throws AccountBalanceNotEnoughException, AccountBalanceWrongException, NotExistException, FieldMissingException {
+		UUID fromId = request.getFromId();
+		UUID toId = request.getToId();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal amount = request.getAmount();
+		String type = request.getType();
+		String description = request.getDescription();
+		UUID fileId = request.getFileId();
+
 		Account from = this.accountFacade.query(fromId);
 		Account to = this.accountFacade.query(toId);
 		if (from.getBalance().compareTo(amount) < 0) {
@@ -213,7 +234,14 @@ public class AccountService {
 	}
 
 	@Transactional
-	public AccountRecord expend(UUID accountId, LocalDateTime date, BigDecimal amount, String type, String description, UUID fileId) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+	public AccountRecord expend(AccountRecordExpendRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
+		UUID accountId = request.getAccountId();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal amount = request.getAmount();
+		String type = request.getType();
+		String description = request.getDescription();
+		UUID fileId = request.getFileId();
+
 		Account account = this.accountFacade.query(accountId);
 		AccountRecord record = new AccountRecord();
 		record.setTransDate(date);

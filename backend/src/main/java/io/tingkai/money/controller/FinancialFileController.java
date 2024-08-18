@@ -47,9 +47,9 @@ public class FinancialFileController {
 	public FileResponse<List<FinancialFile>> list(@RequestParam UUID userId, @RequestParam(required = false) String date, @RequestParam(required = false) String type) {
 		List<FinancialFile> files = null;
 		if (AppUtil.isAllPresent(date, type)) {
-			this.fileService.getAll(userId, TimeUtil.handleRequestDate(date), type);
+			this.fileService.getAll(userId, TimeUtil.convertToDate(date), type);
 		} else if (AppUtil.isPresent(date)) {
-			files = this.fileService.getAll(userId, TimeUtil.handleRequestDate(date));
+			files = this.fileService.getAll(userId, TimeUtil.convertToDate(date));
 		} else if (AppUtil.isPresent(type)) {
 			files = this.fileService.getAll(userId, type);
 		} else {
@@ -60,13 +60,13 @@ public class FinancialFileController {
 
 	@RequestMapping(value = FinancialFileController.UPLOAD_PATH, method = RequestMethod.POST)
 	public FileResponse<Void> upload(@RequestParam MultipartFile file, @RequestParam String date, @RequestParam String type) throws AlreadyExistException, FieldMissingException, IOException {
-		FinancialFile entity = this.fileService.upload(file, type, TimeUtil.handleRequestDate(date));
+		FinancialFile entity = this.fileService.upload(file, type, TimeUtil.convertToDate(date));
 		return new FileResponse<Void>(true, null, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
 	}
 
 	@RequestMapping(value = FinancialFileController.UPDATE_PATH, method = RequestMethod.POST)
 	public FileResponse<Void> update(@RequestParam UUID id, @RequestParam String date, @RequestParam String type) throws NotExistException, FieldMissingException {
-		FinancialFile entity = this.fileService.update(id, type, TimeUtil.handleRequestDate(date));
+		FinancialFile entity = this.fileService.update(id, type, TimeUtil.convertToDate(date));
 		return new FileResponse<Void>(true, null, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
 	}
 
