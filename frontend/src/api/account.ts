@@ -1,7 +1,8 @@
 import axios from 'axios';
 import {
     ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH,
-    ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_RECORD_DELETE_PATH, ACCOUNT_MONTH_BALANCE_PATH
+    ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_MONTH_BALANCE_PATH,
+    ACCOUNT_UPDATE_RECORD_PATH, ACCOUNT_DELETE_RECORD_PATH
 } from './Constant';
 import { ApiResponse, SimpleResponse } from '../util/Interface';
 import * as AppUtil from '../util/AppUtil';
@@ -22,6 +23,7 @@ export interface AccountRecord {
     transTo: string;
     recordType: string;
     description: string | null;
+	fileId?: string;
 }
 
 export interface AccountRecordVo extends AccountRecord {
@@ -108,10 +110,16 @@ const expend = async (accountId: string, date: Date, amount: number, type: strin
     return data;
 };
 
-const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
-    const response = await axios.delete(ACCOUNT_RECORD_DELETE_PATH, { params: { recordId } });
+const updateRecord = async (recordId: string, date: Date, amount: number, type: string, description: string, toId?: string, fileId?: string): Promise<SimpleResponse> => {
+    const response = await axios.put(ACCOUNT_UPDATE_RECORD_PATH, { recordId, toId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, getMonthBalance, income, transfer, expend, deleteRecord };
+const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
+    const response = await axios.delete(ACCOUNT_DELETE_RECORD_PATH, { params: { recordId } });
+    const data: SimpleResponse = response.data;
+    return data;
+};
+
+export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, getMonthBalance, income, transfer, expend, updateRecord, deleteRecord };

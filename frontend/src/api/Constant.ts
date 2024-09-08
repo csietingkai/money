@@ -60,7 +60,8 @@ export const ACCOUNT_MONTH_BALANCE_PATH: string = ACCOUNT_API_PREFIX + '/monthBa
 export const ACCOUNT_INCOME_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/income';
 export const ACCOUNT_TRANSFER_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/transfer';
 export const ACCOUNT_EXPEND_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/expend';
-export const ACCOUNT_RECORD_DELETE_PATH: string = ACCOUNT_API_PREFIX + '/deleteRecord';
+export const ACCOUNT_UPDATE_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/updateRecord';
+export const ACCOUNT_DELETE_RECORD_PATH: string = ACCOUNT_API_PREFIX + '/deleteRecord';
 
 // api exchange rate
 const EXCHANGE_RATE_API_PREFIX: string = '/exchangeRate';

@@ -430,16 +430,33 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private openIncomeModal = (accountId: string, recordId: string = '') => async () => {
-        const { incomeForm } = this.state;
-        const fileOptions = await this.getFilesByDate(new Date());
+        const { currentAccountRecords, incomeForm } = this.state;
+        let transDate = new Date();
+        if (recordId) {
+            const accountRecord = currentAccountRecords.find(x => x.id === recordId);
+            if (accountRecord) {
+                incomeForm.date = accountRecord.transDate
+                incomeForm.type = accountRecord.recordType
+                incomeForm.amount = Math.abs(accountRecord.transAmount);
+                incomeForm.description = accountRecord.description || ''
+                incomeForm.fileId = accountRecord.fileId;
+            }
+        }
+        const fileOptions = await this.getFilesByDate(transDate);
         this.setState({ showRecordIncomeModal: true, incomeForm: { ...incomeForm, accountId, recordId }, fileOptions });
     };
 
     private income = async () => {
         const { notify } = this.props;
         const { incomeForm } = this.state;
-        const { accountId, date, amount, type, description, fileId } = incomeForm;
-        const resposne: SimpleResponse = await AccountApi.income(accountId, date, amount, type, description, fileId);
+        const { accountId, recordId, date, amount, type, description, fileId } = incomeForm;
+        let api: Promise<SimpleResponse>;
+        if (!recordId) {
+            api = AccountApi.income(accountId, date, amount, type, description, fileId);
+        } else {
+            api = AccountApi.updateRecord(recordId, date, amount, type, description, undefined, fileId);
+        }
+        const resposne: SimpleResponse = await api;
         const { success, message } = resposne;
         notify(message);
         if (success) {
@@ -563,12 +580,24 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
 
     private openTransferModal = (accountId: string, recordId: string = '') => async () => {
         const { accountList, notify } = this.props;
-        const { transferForm } = this.state;
+        const { currentAccountRecords, transferForm } = this.state;
         const fileOptions = await this.getFilesByDate(new Date());
         const currAccount = accountList.find(a => a.id === accountId);
         const showAccountList = accountList.filter(a => a.id !== accountId && a.currency === currAccount?.currency);
         if (showAccountList.length) {
-            this.setState({ showRecordTransferModal: true, transferForm: { ...transferForm, accountId, recordId, to: showAccountList[0].id }, fileOptions });
+            const newForm = { ...transferForm, accountId, recordId, to: showAccountList[0].id };
+            if (recordId) {
+                const currRecord = currentAccountRecords.find(r => r.id === recordId);
+                if (currRecord) {
+                    newForm.to = currRecord.transTo;
+                    newForm.date = currRecord.transDate;
+                    newForm.type = currRecord.recordType;
+                    newForm.amount = Math.abs(currRecord.transAmount);
+                    newForm.description = currRecord.description || '';
+                    newForm.fileId = currRecord.fileId;
+                }
+            }
+            this.setState({ showRecordTransferModal: true, transferForm: newForm, fileOptions });
         } else {
             notify('No Other Account to Transfer.');
         }
@@ -577,8 +606,14 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private transfer = async () => {
         const { notify } = this.props;
         const { transferForm } = this.state;
-        const { accountId, to, date, amount, type, description, fileId } = transferForm;
-        const resposne: SimpleResponse = await AccountApi.transfer(accountId, to, date, amount, type, description, fileId);
+        const { accountId, recordId, to, date, amount, type, description, fileId } = transferForm;
+        let api: Promise<SimpleResponse>;
+        if (!recordId) {
+            api = AccountApi.transfer(accountId, to, date, amount, type, description, fileId);
+        } else {
+            api = AccountApi.updateRecord(recordId, date, amount, type, description, to, fileId);
+        }
+        const resposne: SimpleResponse = await api;
         const { success, message } = resposne;
         notify(message);
         if (success) {
@@ -685,16 +720,33 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private openExpendModal = (accountId: string, recordId: string = '') => async () => {
-        const { expendForm } = this.state;
-        const fileOptions = await this.getFilesByDate(new Date());
+        const { currentAccountRecords, expendForm } = this.state;
+        let transDate = new Date();
+        if (recordId) {
+            const accountRecord = currentAccountRecords.find(x => x.id === recordId);
+            if (accountRecord) {
+                expendForm.date = accountRecord.transDate
+                expendForm.type = accountRecord.recordType
+                expendForm.amount = Math.abs(accountRecord.transAmount);
+                expendForm.description = accountRecord.description || ''
+                expendForm.fileId = accountRecord.fileId;
+            }
+        }
+        const fileOptions = await this.getFilesByDate(transDate);
         this.setState({ showRecordExpendModal: true, expendForm: { ...expendForm, accountId, recordId }, fileOptions });
     };
 
     private expend = async () => {
         const { notify } = this.props;
         const { expendForm } = this.state;
-        const { accountId, date, amount, type, description, fileId } = expendForm;
-        const resposne: SimpleResponse = await AccountApi.expend(accountId, date, -amount, type, description, fileId);
+        const { accountId, recordId, date, amount, type, description, fileId } = expendForm;
+        let api: Promise<SimpleResponse>;
+        if (!recordId) {
+            api = AccountApi.expend(accountId, date, -amount, type, description, fileId);
+        } else {
+            api = AccountApi.updateRecord(recordId, date, -amount, type, description, undefined, fileId);
+        }
+        const resposne: SimpleResponse = await api;
         const { success, message } = resposne;
         notify(message);
         if (success) {
@@ -800,15 +852,27 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                                 <CTableDataCell>{r.description}</CTableDataCell>
                                                                                 <CTableDataCell>
                                                                                     <CButtonGroup role='group'>
-                                                                                        {/* TODO */}
-                                                                                        {/* <CButton
-                                                                                            color='info'
-                                                                                            variant='outline'
-                                                                                            size='sm'
-                                                                                            onClick={() => this.setState({ holdingRecordId: r.id })}
-                                                                                        >
-                                                                                            <CIcon icon={cilPencil}></CIcon>
-                                                                                        </CButton> */}
+                                                                                        {
+                                                                                            r.removable &&
+                                                                                            <CButton
+                                                                                                color='info'
+                                                                                                variant='outline'
+                                                                                                size='sm'
+                                                                                                onClick={() => {
+                                                                                                    if (r.transFrom === r.transTo) {
+                                                                                                        if (r.transAmount > 0) {
+                                                                                                            this.openIncomeModal(account.id, r.id)();
+                                                                                                        } else if (r.transAmount < 0) {
+                                                                                                            this.openExpendModal(account.id, r.id)();
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        this.openTransferModal(account.id, r.id)();
+                                                                                                    }
+                                                                                                }}
+                                                                                            >
+                                                                                                <CIcon icon={cilPencil}></CIcon>
+                                                                                            </CButton>
+                                                                                        }
                                                                                         {
                                                                                             accountRecordDeletable && r.removable &&
                                                                                             <CButton

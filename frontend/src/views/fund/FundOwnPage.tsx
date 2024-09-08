@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus, cilTrash } from '@coreui/icons';
-import { ReduxState, getAuthTokenId, getFundOwnList } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getFundOwnList, getStockType } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import FundApi, { UserFundRecord, UserFundVo } from '../../api/fund';
 import { SetAccountListDispatcher, SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher } from '../../reducer/PropsMapper';
@@ -89,7 +89,6 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownFundInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         const showOwnFundRecords = currentOwnFundRecords.slice((ownFundRecordPage - 1) * DATA_COUNT_PER_PAGE, ownFundRecordPage * DATA_COUNT_PER_PAGE);
         return (
-            // TODO bg-color by up or down
             <React.Fragment key={`${userId}-${ownFundInfo.fundCode}`}>
                 <CCol sm={6} md={4}>
                     <CCard key={`own-stock-${ownFundInfo.fundCode}`} className={`bg-${benefitColor} text-white ${show[ownFundInfo.fundCode] ? `detailed-${benefitColor}` : ''}`}>
@@ -299,7 +298,8 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
 const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
-        ownFundList: getFundOwnList(state)
+        ownFundList: getFundOwnList(state),
+        stockType: getStockType(state)
     };
 };
 

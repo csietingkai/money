@@ -21,6 +21,7 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.request.AccountInsertRequest;
+import io.tingkai.money.model.request.AccountRecordEditRequest;
 import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
@@ -43,6 +44,7 @@ public class AccountController {
 	public static final String INCOME_PATH = "/income";
 	public static final String TRANSFER_PATH = "/transfer";
 	public static final String EXPEND_PATH = "/expend";
+	public static final String UPDATE_RECORD_PATH = "/updateRecord";
 	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 
 	@Autowired
@@ -94,6 +96,12 @@ public class AccountController {
 	public AccountResponse<AccountRecord> expend(@RequestBody AccountRecordExpendRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.expend(request);
 		return new AccountResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
+	}
+
+	@RequestMapping(value = AccountController.UPDATE_RECORD_PATH, method = RequestMethod.PUT)
+	public AccountResponse<Void> updateRecord(@RequestBody AccountRecordEditRequest request) throws NotExistException, FieldMissingException {
+		this.accountService.editRecord(request);
+		return new AccountResponse<Void>(true, null, MessageConstant.ACCOUNT_RECORD_UPDATE_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)

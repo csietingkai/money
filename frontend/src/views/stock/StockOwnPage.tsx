@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus, cilTrash } from '@coreui/icons';
-import { ReduxState, getAuthTokenId, getStockOwnList } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getStockOwnList, getStockType } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import StockApi, { UserStockRecord, UserStockVo } from '../../api/stock';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
@@ -84,12 +84,12 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         const { show, currentOwnStockRecords, ownStockRecordPage } = this.state;
         const currentValue: number = AppUtil.toNumber((ownStockInfo.price * ownStockInfo.amount).toFixed(DEFAULT_DECIMAL_PRECISION));
         const benefit: number = AppUtil.toNumber((currentValue - ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        console.log(stockType);
         const benefitColor: string = AppUtil.getBenifitColor(benefit, stockType);
         const postiveSign: string = benefit >= 0 ? '+' : '';
         const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         const showOwnStockRecords = currentOwnStockRecords.slice((ownStockRecordPage - 1) * DATA_COUNT_PER_PAGE, ownStockRecordPage * DATA_COUNT_PER_PAGE);
         return (
-            // TODO bg-color by up or down
             <React.Fragment key={`${userId}-${ownStockInfo.stockCode}`}>
                 <CCol sm={6} md={4}>
                     <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={`bg-${benefitColor} text-white ${show[ownStockInfo.stockCode] ? `detailed-${benefitColor}` : ''}`}>
@@ -288,7 +288,8 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
 const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
-        ownStockList: getStockOwnList(state)
+        ownStockList: getStockOwnList(state),
+        stockType: getStockType(state)
     };
 };
 

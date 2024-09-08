@@ -30,6 +30,7 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.request.AccountInsertRequest;
+import io.tingkai.money.model.request.AccountRecordEditRequest;
 import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
@@ -257,6 +258,52 @@ public class AccountService {
 		account.setBalance(account.getBalance().add(record.getTransAmount()));
 		this.accountFacade.update(account);
 		return this.accountRecordFacade.insert(record);
+	}
+
+	@Transactional
+	public AccountRecord editRecord(AccountRecordEditRequest request) throws NotExistException, FieldMissingException {
+		UUID recordId = request.getRecordId();
+		AccountRecord record = this.accountRecordFacade.query(recordId);
+
+		if (AppUtil.isEmpty(record)) {
+			throw new NotExistException();
+		}
+
+		BigDecimal amount = request.getAmount();
+		UUID toId = request.getToId();
+		if (record.getTransFrom().equals(record.getTransTo())) {
+			Account account = this.accountFacade.query(record.getTransFrom());
+			account.setBalance(account.getBalance().add(amount).subtract(record.getTransAmount()));
+			this.accountFacade.update(account);
+		} else {
+			Account fromAccount = this.accountFacade.query(record.getTransFrom());
+			fromAccount.setBalance(fromAccount.getBalance().add(record.getTransAmount()).subtract(amount));
+			this.accountFacade.update(fromAccount);
+
+			Account toAccount1 = this.accountFacade.query(record.getTransTo());
+			toAccount1.setBalance(toAccount1.getBalance().subtract(record.getTransAmount()));
+			this.accountFacade.update(toAccount1);
+
+			if (AppUtil.isPresent(toId)) {
+				Account toAccount2 = this.accountFacade.query(toId);
+				toAccount2.setBalance(toAccount1.getBalance().add(amount));
+				this.accountFacade.update(toAccount2);
+			}
+		}
+
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		String type = request.getType();
+		String description = request.getDescription();
+		UUID fileId = request.getFileId();
+
+		record.setTransDate(date);
+		record.setTransAmount(amount);
+		record.setRecordType(type);
+		record.setDescription(description);
+		record.setFileId(fileId);
+		this.accountRecordFacade.update(record);
+
+		return record;
 	}
 
 	@Transactional

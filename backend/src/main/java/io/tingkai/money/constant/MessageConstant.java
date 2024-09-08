@@ -63,6 +63,7 @@ public class MessageConstant {
 	public static final String ACCOUNT_GET_RECORDS_SUCCESS = "Get Account<{0}> Records Success";
 	public static final String ACCOUNT_GET_MONTH_BALANCE_SUCCESS = "Get Records Success";
 	public static final String ACCOUNT_INSERT_RECORDS_SUCCESS = "Create Account Records Success";
+	public static final String ACCOUNT_RECORD_UPDATE_SUCCESS = "Account Records Update Success";
 	public static final String ACCOUNT_RECORD_DELETE_SUCCESS = "Account Record Delete Success";
 	public static final String ACCOUNT_BALANCE_NOT_ENOUGH = "Account: {0} doesn't have enough balance";
 	public static final String ACCOUNT_WRONG_AMOUNT = "Amount: {0} is invalid";
