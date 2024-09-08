@@ -69,13 +69,14 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
     };
 
     private onBonusClick = async () => {
-        const { notify } = this.props;
+        const { tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, rate, total, fileId } = this.state;
         const { success, message } = await FundApi.bonus(accountId, code, tradeDate, share, price, rate, total, fileId);
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
+            this.setState(this.init(tradeCondition));
         }
     };
 

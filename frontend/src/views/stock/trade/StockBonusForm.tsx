@@ -70,12 +70,13 @@ export default class StockBonusForm extends React.Component<StockBonusFormProps,
     };
 
     private onBonusClick = async () => {
-        const { notify } = this.props;
+        const { tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, fee, total, fileId } = this.state;
         const { success, message } = await StockApi.bonus(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
         notify(message);
         if (success) {
             this.fetchAccounts();
+            this.setState(this.init(tradeCondition));
         }
     };
 

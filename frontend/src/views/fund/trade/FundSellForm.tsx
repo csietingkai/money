@@ -70,13 +70,14 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
     };
 
     private onSellClick = async () => {
-        const { notify } = this.props;
+        const { tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, rate, total, fileId } = this.state;
         const { success, message } = await FundApi.sell(accountId, code, tradeDate, share, price, rate, total, fileId);
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
+            this.setState(this.init(tradeCondition));
         }
     };
 
@@ -121,7 +122,7 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
     };
 
     render(): React.ReactNode {
-        const { accounts, userSetting: { fundFeeRate } } = this.props;
+        const { accounts } = this.props;
         const { code, name, accountId, balance, tradeDate, rate, share, price, total, fileId, sellFileOptions } = this.state;
         return (
             <CCard className='mb-4'>

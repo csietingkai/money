@@ -76,13 +76,14 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
     };
 
     private onBuyClick = async () => {
-        const { notify } = this.props;
+        const { tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, rate, fee, total, fileId } = this.state;
         const { success, message } = await FundApi.buy(accountId, code, tradeDate, share, price, rate, AppUtil.reverseNumberComma(total), fee, fileId);
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
+            this.setState(this.init(tradeCondition));
         }
     };
 

@@ -77,13 +77,14 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
     };
 
     private onBuyClick = async () => {
-        const { notify } = this.props;
+        const { tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, fee, total, fileId } = this.state;
         const { success, message } = await StockApi.buy(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnStocks();
+            this.setState(this.init(tradeCondition));
         }
     };
 

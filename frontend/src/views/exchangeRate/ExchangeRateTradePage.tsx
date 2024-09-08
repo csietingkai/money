@@ -40,7 +40,11 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
 
     constructor(props: ExchangeRateQueryPageProps) {
         super(props);
-        this.state = {
+        this.state = this.init();
+    }
+
+    private init = (): ExchangeRateQueryPageState => {
+        return {
             tradeForm: {
                 fromCurr: '',
                 toCurr: '',
@@ -53,7 +57,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                 fromAmount: 0,
                 toAmount: 0
             }
-        };
+        }
     }
 
     private onTradeClick = async () => {
@@ -64,6 +68,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
         notify(message);
         if (success) {
             this.fetchAccounts();
+            this.setState(this.init())
         }
     };
 
