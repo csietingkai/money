@@ -7,12 +7,12 @@ def toString(s, defaultVal: Optional[str] = ''):
         s = defaultVal
     return s
 
-def toNumber(s: Optional[str], defaultVal: Optional[float] = 0.0) -> float:
+def toNumber(s: Optional[str], percision: int = 2, defaultVal: Optional[float] = 0.0) -> float:
     try:
         if not s:
             return defaultVal
         s = s.replace(',', '')
-        return float(format(float(s), '.2f'))
+        return float(format(float(s), '.' + str(percision) + 'f'))
     except Exception as e:
         print('[ERROR] ' + str(e))
         return defaultVal

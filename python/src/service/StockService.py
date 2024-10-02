@@ -1,7 +1,7 @@
 import datetime
+import json
 import requests
 import pandas
-import csv
 import time
 import re
 from typing import Optional
@@ -146,20 +146,27 @@ def fetchStockRecordFromYahoo(symbol: str, start: int, end: int):
                 download = s.get(url, headers = CodeConstant.YAHOO_REQUEST_HEADER)
 
                 decoded_content = download.content.decode('utf-8')
+                response = json.loads(decoded_content)
+                chart = response['chart']
 
-                cr = csv.reader(decoded_content.splitlines(), delimiter = ',')
-                my_list = list(cr)
-                firstRow = True
-                for row in my_list:
-                    if firstRow:
-                        firstRow = False
-                        continue
-                    dealDate = datetime.datetime(int(row[0][0:4]), int(row[0][5:7]), int(row[0][8:10]))
-                    openPrice = AppUtil.toNumber(row[1])
-                    highPrice = AppUtil.toNumber(row[2])
-                    lowPrice = AppUtil.toNumber(row[3])
-                    closePrice = AppUtil.toNumber(row[4])
-                    dealShare = AppUtil.toNumber(row[6])
+                if chart['error']:
+                    return str(chart['error'])
+
+                dateLst = chart['result'][0]['timestamp']
+                openLst = chart['result'][0]['indicators']['quote'][0]['open']
+                closeLst = chart['result'][0]['indicators']['quote'][0]['close']
+                highLst = chart['result'][0]['indicators']['quote'][0]['high']
+                lowLst = chart['result'][0]['indicators']['quote'][0]['low']
+                volumeLst = chart['result'][0]['indicators']['quote'][0]['volume']
+
+                size = len(dateLst)
+                for i in range(size):
+                    dealDate = datetime.datetime.fromtimestamp(dateLst[i]).replace(hour=0, minute=0)
+                    openPrice = handleYahooPrice(openLst[i])
+                    highPrice = handleYahooPrice(highLst[i])
+                    lowPrice = handleYahooPrice(lowLst[i])
+                    closePrice = handleYahooPrice(closeLst[i])
+                    dealShare = handleYahooPrice(volumeLst[i])
                     if openPrice == '0.00' or highPrice == '0.00' or lowPrice == '0.00' or closePrice == '0.00':
                         print('[WARN]: {date} has openPrice<{openPrice}> highPrice<{highPrice}> lowPrice<{lowPrice}> closePrice<{closePrice}>'.format(date = dealDate, openPrice = openPrice, highPrice = highPrice, lowPrice = lowPrice, closePrice = closePrice))
                         noDataDates.append(dealDate)
@@ -230,10 +237,10 @@ def fetchStockRecordFromTwse(code: str, start: int, end: Optional[int]):
                         entity.code = code
                         entity.deal_date = dealDate
                         entity.deal_share = AppUtil.toNumber(item[1])
-                        entity.open_price = AppUtil.toNumber(item[3], currentClose)
-                        entity.high_price = AppUtil.toNumber(item[4], currentClose)
-                        entity.low_price = AppUtil.toNumber(item[5], currentClose)
-                        entity.close_price = AppUtil.toNumber(item[6], currentClose)
+                        entity.open_price = AppUtil.toNumber(item[3], 4, currentClose)
+                        entity.high_price = AppUtil.toNumber(item[4], 4, currentClose)
+                        entity.low_price = AppUtil.toNumber(item[5], 4, currentClose)
+                        entity.close_price = AppUtil.toNumber(item[6], 4, currentClose)
                         currentClose = entity.close_price
                         # entity has id means update
                         if entity.id:
@@ -313,3 +320,30 @@ def fetchStockRecordFromTpex(code: str, start: int, end: Optional[int]):
 # 是否為權證
 def isWarrant(code: str) -> bool:
     return re.search("[0-9]{6}", code) or re.search("[0-9]{5}[PFQCBXY]", code)
+
+def handleYahooPrice(price: float) -> float:
+    step, percision = priceStep(price)
+    priceStr = ("{:." + str(percision) + "f}").format(price)
+    return AppUtil.toNumber(priceStr, percision)
+
+# 股價升降級距
+def priceStep(price: float):
+    step = 0.01
+    percision = 2
+    if price >= 1000:
+        step = 5
+        percision = 0
+    elif price >= 500:
+        step = 1
+        percision = 0
+    elif price >= 100:
+        step = 0.5
+        percision = 1
+    elif price >= 50:
+        step = 0.1
+        percision = 1
+    elif price >= 10:
+        step = 0.05
+        percision = 2
+
+    return step, percision
