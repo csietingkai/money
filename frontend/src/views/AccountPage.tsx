@@ -151,7 +151,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             await this.fetchAccountRecords(accountId);
             setLoading(false);
         }
-        this.setState({ showDetail });
+        this.setState({ accountRecordsPage: 1, showDetail });
     };
 
     private getCard = (account: Account) => {
