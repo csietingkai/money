@@ -42,14 +42,13 @@ services:
       - ${PYTHON_PORT}:${PYTHON_INTERNEL_PORT}
     depends_on:
       - postgres
-      - mongo
-      - redis
     environment:
       - DATASOURCE_HOST=${POSTGRES_SERVICE}
       - DATASOURCE_PORT=${POSTGRES_INTERNEL_PORT}
       - DATASOURCE_DB=postgres
       - DATASOURCE_USERNAME=postgres
       - DATASOURCE_PASSWORD=${POSTGRES_ROOT_PASSWORD}
+      - PYTHONUNBUFFERED=1
   backend:
     image: tingkai/money-backend:${BACKEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${BACKEND_SERVICE}
@@ -58,6 +57,8 @@ services:
       - ${BACKEND_PORT}:${BACKEND_INTERNEL_PORT}
     depends_on:
       - python
+      - mongo
+      - redis
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_SERVICE}:${POSTGRES_INTERNEL_PORT}/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
