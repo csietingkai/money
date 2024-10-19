@@ -56,6 +56,9 @@ public class MessageConstant {
 	public static final String EXCHANGE_RATE_GET_SUCCESS = "Get Exchange Rate: {0} Success";
 	public static final String EXCHANGE_RATE_TRADE = "Trade {0}({1}) to {2}({3}) with rate {4}";
 
+	// bank info
+	public static final String BANK_INFO_GET_ALL_SUCCESS = "Get All Bank Info Success";
+
 	// account
 	public static final String ACCOUNT_GET_ALL_SUCCESS = "Get Accounts Success";
 	public static final String ACCOUNT_INSERT_SUCCESS = "Create Account<{0}> Success";

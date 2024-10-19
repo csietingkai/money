@@ -25,7 +25,7 @@ import io.tingkai.money.model.request.AccountRecordEditRequest;
 import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
-import io.tingkai.money.model.request.AccountUpdateRequest;
+import io.tingkai.money.model.request.AccountEditRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
@@ -63,7 +63,7 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.UPDATE_PATH, method = RequestMethod.PUT)
-	public AccountResponse<Account> update(@RequestBody AccountUpdateRequest req) throws NotExistException, FieldMissingException {
+	public AccountResponse<Account> update(@RequestBody AccountEditRequest req) throws NotExistException, FieldMissingException {
 		Account updated = this.accountService.update(req);
 		return new AccountResponse<Account>(true, updated, MessageConstant.ACCOUNT_UPDATE_SUCCESS, updated.getName());
 	}

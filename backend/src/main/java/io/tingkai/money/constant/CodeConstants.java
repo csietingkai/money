@@ -39,6 +39,9 @@ public class CodeConstants {
 	// === account === //
 	public static final String ACCOUNT_LIST = "account-list:{0}";
 
+	// === bank info === //
+	public static final String BANK_INFO_LIST_KEY = "bank-info-list";
+
 	/// === exchange rate === //
 	public static final String BASE_EXCHANGE_RATE = "TWD";
 	public static final String EXCHANGE_RATE_FETCHING_CURRENCY = "fetching-exchange-rate";

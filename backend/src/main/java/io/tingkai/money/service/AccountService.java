@@ -29,12 +29,12 @@ import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.AccountEditRequest;
 import io.tingkai.money.model.request.AccountInsertRequest;
 import io.tingkai.money.model.request.AccountRecordEditRequest;
 import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
-import io.tingkai.money.model.request.AccountUpdateRequest;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.BalancePairVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
@@ -78,13 +78,19 @@ public class AccountService {
 		entity.setUserId(ContextUtil.getUserId());
 		entity.setCurrency(req.getCurrency());
 		entity.setBalance(BigDecimal.ZERO);
+		entity.setBankCode(req.getBankCode());
+		entity.setBankNo(req.getBankNo());
+		entity.setShown(req.isShown());
 		return this.accountFacade.insert(entity);
 	}
 
 	@Transactional
-	public Account update(AccountUpdateRequest req) throws NotExistException, FieldMissingException {
+	public Account update(AccountEditRequest req) throws NotExistException, FieldMissingException {
 		Account entity = this.accountFacade.query(req.getId());
 		entity.setName(req.getName());
+		entity.setBankCode(req.getBankCode());
+		entity.setBankNo(req.getBankNo());
+		entity.setShown(req.isShown());
 		return this.accountFacade.update(entity);
 	}
 

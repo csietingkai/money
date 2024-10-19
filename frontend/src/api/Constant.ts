@@ -75,3 +75,7 @@ const OPTION_API_PREFIX: string = '/option';
 export const OPTION_GET_FILE_TYPES: string = OPTION_API_PREFIX + '/fileTypes';
 export const OPTION_GET_STOCK_TYPES: string = OPTION_API_PREFIX + '/stockTypes';
 export const OPTION_GET_RECORD_TYPES: string = OPTION_API_PREFIX + '/recordTypes';
+
+// api bankInfo
+const BANK_INFO_API_PREFIX: string = '/bankInfo';
+export const BANK_INFO_GET_ALL_PATH: string = BANK_INFO_API_PREFIX + '/getAll';

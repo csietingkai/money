@@ -5,8 +5,8 @@ import { Account } from '../api/account';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import { ExchangeRateVo } from '../api/exchangeRate';
-import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_OPTION_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxExchangeRateState, ReduxFundState, ReduxOptionState, ReduxStockState, ReduxSystemSettingState } from './Selector';
-import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_IS_MOBILE, SET_EXCHANGE_RATES, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION } from './ActionType';
+import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_BANK_INFO_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_OPTION_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxBankInfoState, ReduxExchangeRateState, ReduxFundState, ReduxOptionState, ReduxStockState, ReduxSystemSettingState } from './Selector';
+import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_IS_MOBILE, SET_EXCHANGE_RATES, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_BANK_INFO_LIST } from './ActionType';
 import { removeAuthToken, setAuthToken, setSidebarFoldable, setSidebarShow } from './StateHolder';
 import { Action, Option } from '../util/Interface';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
@@ -15,6 +15,7 @@ import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
 import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
+import { BankInfo } from '../api/bankInfo';
 
 const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: Action<LoginRespVo | AuthToken | UserSetting>): ReduxAuthState => {
     const newState: ReduxAuthState = { ...state };
@@ -50,6 +51,15 @@ const accountReducer = (state: ReduxAccountState = DEFAULT_REDUX_ACCOUNT_STATE, 
     const newState: ReduxAccountState = { ...state };
     const { type, payload } = action;
     if (type === SET_ACCOUNT_LIST) {
+        newState.list = payload;
+    }
+    return newState;
+};
+
+const bankInfoReducer = (state: ReduxBankInfoState = DEFAULT_REDUX_BANK_INFO_STATE, action: Action<BankInfo[]>): ReduxBankInfoState => {
+    const newState: ReduxBankInfoState = { ...state };
+    const { type, payload } = action;
+    if (type === SET_BANK_INFO_LIST) {
         newState.list = payload;
     }
     return newState;
@@ -104,7 +114,7 @@ const exchangeRateReducer = (state: ReduxExchangeRateState = DEFAULT_REDUX_EXCHA
         }
     }
     return newState;
-}
+};
 
 const optionReducer = (state: ReduxOptionState = DEFAULT_REDUX_OPTION_STATE, action: Action<Option[]>): ReduxOptionState => {
     const newState: ReduxOptionState = { ...state };
@@ -142,9 +152,10 @@ const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SET
 const reducers = [
     { key: 'auth', reducer: authReducer },
     { key: 'account', reducer: accountReducer },
+    { key: 'bankInfo', reducer: bankInfoReducer },
     { key: 'stock', reducer: stockReducer },
     { key: 'fund', reducer: fundReducer },
-    { key: 'exchangeRate', reducer: exchangeRateReducer},
+    { key: 'exchangeRate', reducer: exchangeRateReducer },
     { key: 'option', reducer: optionReducer },
     { key: 'setting', reducer: systemReducer }
 ];

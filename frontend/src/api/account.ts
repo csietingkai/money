@@ -13,6 +13,9 @@ export interface Account {
     currency: string;
     name: string;
     balance: number;
+    bankCode?: string;
+    bankNo?: string;
+    shown: boolean;
 }
 
 export interface AccountRecord {
@@ -58,14 +61,14 @@ const getAccounts = async (userId: string): Promise<AccountListResponse> => {
     return data;
 };
 
-const createAccount = async (name: string, currency: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_CREATE_PATH, { name, currency });
+const createAccount = async (name: string, currency: string, bankCode?: string, bankNo?: string, shown: boolean = true): Promise<SimpleResponse> => {
+    const response = await axios.post(ACCOUNT_CREATE_PATH, { name, currency, bankCode, bankNo, shown });
     const data: SimpleResponse = response.data;
     return data;
 };
 
-const updateAccount = async (id: string, name: string): Promise<SimpleResponse> => {
-    const response = await axios.put(ACCOUNT_UPDATE_PATH, { id, name });
+const updateAccount = async (id: string, name: string, bankCode?: string, bankNo?: string, shown: boolean = true): Promise<SimpleResponse> => {
+    const response = await axios.put(ACCOUNT_UPDATE_PATH, { id, name, bankCode, bankNo, shown });
     const data: SimpleResponse = response.data;
     return data;
 };

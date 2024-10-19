@@ -37,16 +37,27 @@ CREATE TABLE IF NOT EXISTS options (
 	UNIQUE (catergory, name)
 );
 
+CREATE TABLE IF NOT EXISTS bank_info (
+	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	code VARCHAR(3) NOT NULL UNIQUE,
+	name VARCHAR NOT NULL,
+	PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS account (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	name VARCHAR NOT NULL,
 	user_id uuid NOT NULL,
 	currency VARCHAR NOT NULL,
 	balance NUMERIC NOT NULL,
+	bank_code VARCHAR(3),
+	bank_no VARCHAR(16),
+	shown BOOLEAN DEFAULT true NULL,
 	PRIMARY KEY (id),
 	UNIQUE (name, user_id),
 	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
-	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency)
+	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency),
+	CONSTRAINT fk_bank_code FOREIGN KEY (bank_code) REFERENCES public.bank_info(code)
 );
 
 CREATE TABLE IF NOT EXISTS account_record (
@@ -242,3 +253,44 @@ insert into options (catergory, name, en_text, tw_text) values
 	('RECORD_TYPE', 'FEE', 'Fee', '手續費'),
 	('RECORD_TYPE', 'DONATE', 'Donate', '抖內'),
 	('RECORD_TYPE', 'OTHER', 'Other', '其他');
+
+insert into bank_info (code, name) values
+	('004', '臺灣銀行'),
+	('005', '土地銀行'),
+	('006', '合作金庫'),
+	('007', '第一銀行'),
+	('008', '華南銀行'),
+	('009', '彰化銀行'),
+	('011', '上海銀行'),
+	('012', '富邦銀行'),
+	('013', '國泰世華'),
+	('016', '高雄銀行'),
+	('017', '兆豐商銀'),
+	('021', '花旗銀行'),
+	('048', '王道銀行'),
+	('050', '台灣企銀'),
+	('052', '渣打銀行'),
+	('053', '台中銀行'),
+	('054', '京城銀行'),
+	('081', '滙豐銀行'),
+	('101', '瑞興銀行'),
+	('102', '華泰銀行'),
+	('103', '新光銀行'),
+	('108', '陽信銀行'),
+	('118', '板信商銀'),
+	('147', '三信銀行'),
+	('700', '中華郵政'),
+	('803', '聯邦銀行'),
+	('805', '遠東商銀'),
+	('806', '元大銀行'),
+	('807', '永豐銀行'),
+	('808', '玉山銀行'),
+	('809', '凱基銀行'),
+	('810', '星展銀行'),
+	('812', '台新銀行'),
+	('815', '日盛銀行'),
+	('816', '安泰銀行'),
+	('822', '中國信託'),
+	('823', '將來銀行'),
+	('824', 'LINE Bank'),
+	('826', '樂天銀行');

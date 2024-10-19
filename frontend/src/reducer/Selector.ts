@@ -12,10 +12,12 @@ import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
 import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
+import { BankInfo } from '../api/bankInfo';
 
 export interface ReduxState {
     auth: ReduxAuthState;
     account: ReduxAccountState;
+    bankInfo: ReduxBankInfoState;
     stock: ReduxStockState;
     fund: ReduxFundState;
     exchangeRate: ReduxExchangeRateState;
@@ -56,6 +58,15 @@ export const DEFAULT_REDUX_ACCOUNT_STATE: ReduxAccountState = {
 };
 const getAccountState = (state: ReduxState): ReduxAccountState => state.account;
 export const getAccountList = (state: ReduxState): Account[] => getAccountState(state)?.list;
+
+export interface ReduxBankInfoState {
+    list: BankInfo[];
+}
+export const DEFAULT_REDUX_BANK_INFO_STATE: ReduxBankInfoState = {
+    list: []
+};
+const getBankInfoState = (state: ReduxState): ReduxBankInfoState => state.bankInfo;
+export const getBankInfoList = (state: ReduxState): BankInfo[] => getBankInfoState(state)?.list;
 
 // stockReducer
 export interface ReduxStockState {
@@ -123,6 +134,7 @@ export const getCurrencies = (state: ReduxState): Option[] => getExchangeRateLis
 export const getFileTypes = (state: ReduxState): Option[] => getOptionState(state)?.fileTypes;
 export const getStockTypes = (state: ReduxState): Option[] => getOptionState(state)?.stockTypes;
 export const getRecordTypes = (state: ReduxState): Option[] => getOptionState(state)?.recordTypes;
+export const getBankInfos = (state: ReduxState): Option[] => getBankInfoList(state)?.map(x => ({ key: x.code, value: x.name }));
 
 // system variable
 export interface ReduxSystemSettingState {

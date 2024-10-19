@@ -18,5 +18,6 @@ public class DatabaseConstants {
 	public static final String TABLE_EXCHANGE_RATE = "exchange_rate";
 	public static final String TABLE_EXCHANGE_RATE_RECORD = "exchange_rate_record";
 	public static final String TABLE_FINANCIAL_FILE = "financial_file";
+	public static final String TABLE_BANK_INFO = "bank_info";
 	public static final String TABLE_OPTION = "options";
 }

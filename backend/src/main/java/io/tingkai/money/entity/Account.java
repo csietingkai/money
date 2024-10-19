@@ -3,6 +3,8 @@ package io.tingkai.money.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import org.springframework.lang.Nullable;
+
 import io.tingkai.money.constant.DatabaseConstants;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,4 +25,9 @@ public class Account {
 	protected UUID userId;
 	protected String currency;
 	protected BigDecimal balance;
+	@Nullable
+	protected String bankCode;
+	@Nullable
+	protected String bankNo;
+	protected boolean shown = true;
 }

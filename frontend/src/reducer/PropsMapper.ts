@@ -1,5 +1,5 @@
 import { Dispatch } from 'react';
-import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition } from './Action';
+import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition, SetBankInfoList } from './Action';
 import { LoginRespVo, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { Action } from '../util/Interface';
@@ -11,6 +11,7 @@ import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
 import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
 import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
+import { BankInfo } from '../api/bankInfo';
 
 // auth
 export const LoginDispatcher = (dispatch: Dispatch<Action<LoginRespVo>>) => (vo: LoginRespVo): void => dispatch(Login(vo));
@@ -19,6 +20,9 @@ export const SetUserSettingDispatcher = (dispatch: Dispatch<Action<UserSetting>>
 
 // account
 export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) => (accounts: Account[]): void => dispatch(SetAccountList(accounts));
+
+// bank info
+export const SetBankInfoListDispatcher = (dispatch: Dispatch<Action<BankInfo[]>>) => (bankInfos: BankInfo[]): void => dispatch(SetBankInfoList(bankInfos));
 
 // stock
 export const SetOwnStockListDispatcher = (dispatch: Dispatch<Action<UserStockVo[]>>) => (vos: UserStockVo[]): void => dispatch(SetOwnStockList(vos));

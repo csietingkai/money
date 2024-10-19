@@ -3,12 +3,13 @@ import rootReducer from './Reducer';
 import * as AppUtil from '../util/AppUtil';
 import AccountApi, { AccountListResponse } from '../api/account';
 import AuthApi, { AuthResponse, LoginRespVo } from '../api/auth';
+import BankInfoApi, { BankInfo, BankInfoListResponse } from '../api/bankInfo';
 import ExchangeRateApi, { ExchangeRateListResponse } from '../api/exchangeRate';
 import OptionApi, { OptionResponse } from '../api/option';
 import FundApi, { UserFundListResponse } from '../api/fund';
 import StockApi, { UserStockListResponse } from '../api/stock';
-import { Login, Logout, SetAccountList, SetExchangeRates, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
-import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId } from './Selector';
+import { Login, Logout, SetAccountList, SetBankInfoList, SetExchangeRates, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions } from './Action';
+import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId, getBankInfoList, getBankInfos } from './Selector';
 import { Action, ApiResponse, Option } from '../util/Interface';
 import { getAuthToken } from './StateHolder';
 
@@ -49,6 +50,19 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
                 dispatch(SetExchangeRates(data));
             } else {
                 dispatch(SetExchangeRates([]));
+            }
+        });
+    }
+
+    const bankInfos: BankInfo[] = getBankInfoList(getState());
+    if (tokenString && AppUtil.isArrayEmpty(bankInfos)) {
+        apis.push(BankInfoApi.getAll());
+        responseHandlers.push((response: BankInfoListResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetBankInfoList(data));
+            } else {
+                dispatch(SetBankInfoList([]));
             }
         });
     }

@@ -1,13 +1,15 @@
 package io.tingkai.money.model.request;
 
+import java.util.UUID;
+
 import org.springframework.lang.Nullable;
 
 import lombok.Data;
 
 @Data
-public class AccountInsertRequest {
+public class AccountEditRequest {
+	protected UUID id;
 	protected String name;
-	protected String currency;
 	@Nullable
 	protected String bankCode;
 	@Nullable

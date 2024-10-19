@@ -5,7 +5,7 @@ import { cilArrowRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
-import { ReduxState, getAccountList, getAuthTokenId, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
+import { ReduxState, getAccountList, getAuthTokenId, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
 import AccountApi, { Account, AccountRecordVo } from '../api/account';
 import FinancailFileApi from '../api/financailFile';
 import AppConfirmModal from '../components/AppConfirmModal';
@@ -24,6 +24,7 @@ export interface AccountPageProps {
     defaultRecordType: string;
     currencyOptions: Option[];
     recordTypeOptions: Option[];
+    bankCodeOptions: Option[];
     setAccountList: (accountList: Account[]) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
@@ -34,14 +35,18 @@ export interface AccountPageState {
     showDetail: { [accountId: string]: boolean; };
     showAddAccountModal: boolean;
     addAccountForm: {
-        currency: string,
+        currency: string;
         name: string;
+        bankCode: string;
+        bankNo: string;
     };
     showEditAccountModal: boolean;
     editAccountForm: {
         id: string;
         currency: string;
         name: string;
+        bankCode: string;
+        bankNo: string;
     };
     currentAccountRecords: AccountRecordVo[];
     accountRecordsPage: number;
@@ -92,13 +97,17 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             showAddAccountModal: false,
             addAccountForm: {
                 currency: props.currencyOptions[0]?.key,
-                name: ''
+                name: '',
+                bankCode: '',
+                bankNo: ''
             },
             showEditAccountModal: false,
             editAccountForm: {
                 id: '',
                 currency: props.currencyOptions[0]?.key,
-                name: ''
+                name: '',
+                bankCode: '',
+                bankNo: ''
             },
             currentAccountRecords: [],
             accountRecordsPage: 1,
@@ -176,7 +185,16 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         <CCol>
                             <CLink
                                 className='font-weight-bold font-xs text-body-secondary'
-                                onClick={() => this.setState({ showEditAccountModal: true, editAccountForm: { id: account.id, currency: account.currency, name: account.name } })}
+                                onClick={() => {
+                                    const editAccountForm = {
+                                        id: account.id,
+                                        currency: account.currency,
+                                        name: account.name,
+                                        bankCode: account.bankCode || '',
+                                        bankNo: account.bankNo || ''
+                                    };
+                                    this.setState({ showEditAccountModal: true, editAccountForm });
+                                }}
                             >
                                 <CIcon icon={cilPencil} className='float-start' width={22} />
                             </CLink>
@@ -196,7 +214,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private getAddAccountModal = (): React.ReactNode => {
-        const { currencyOptions } = this.props;
+        const { currencyOptions, bankCodeOptions } = this.props;
         const { showAddAccountModal, addAccountForm } = this.state;
         return (
             <CModal alignment='center' visible={showAddAccountModal} onClose={this.closeAddAccountModal}>
@@ -205,10 +223,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 </CModalHeader>
                 <CModalBody>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor='currency' className='col-sm-2 col-form-label'>
+                        <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
                             Currency
                         </CFormLabel>
-                        <div className='col-sm-10'>
+                        <div className='col-sm-9'>
                             <CFormSelect
                                 value={addAccountForm.currency}
                                 onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, currency: event.target.value as string } })}
@@ -218,15 +236,41 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </div>
                     </CRow>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-2 col-form-label'>
+                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
                             Name
                         </CFormLabel>
-                        <div className='col-sm-10'>
+                        <div className='col-sm-9'>
                             <CFormInput
                                 type='text'
                                 placeholder='Enter your new account name'
                                 value={addAccountForm.name}
                                 onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, name: event.target.value as string } })}
+                            />
+                        </div>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                            Bank
+                        </CFormLabel>
+                        <div className='col-sm-9'>
+                            <CFormSelect
+                                value={addAccountForm.bankCode}
+                                onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankCode: event.target.value as string } })}
+                            >
+                                {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                            </CFormSelect>
+                        </div>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                            Bank No.
+                        </CFormLabel>
+                        <div className='col-sm-9'>
+                            <CFormInput
+                                type='text'
+                                placeholder='Enter your new 16 digitals bank number'
+                                value={addAccountForm.bankNo}
+                                onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankNo: event.target.value as string } })}
                             />
                         </div>
                     </CRow>
@@ -240,7 +284,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private getEditAccountModal = (): React.ReactNode => {
-        const { currencyOptions } = this.props;
+        const { currencyOptions, bankCodeOptions } = this.props;
         const { showEditAccountModal, editAccountForm } = this.state;
         return (
             <CModal alignment='center' visible={showEditAccountModal} onClose={this.closeEditAccountModal}>
@@ -249,10 +293,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 </CModalHeader>
                 <CModalBody>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor='currency' className='col-sm-2 col-form-label'>
+                        <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
                             Currency
                         </CFormLabel>
-                        <div className='col-sm-10'>
+                        <div className='col-sm-9'>
                             <CFormSelect
                                 value={editAccountForm.currency}
                                 disabled
@@ -262,15 +306,41 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </div>
                     </CRow>
                     <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-2 col-form-label'>
+                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
                             Name
                         </CFormLabel>
-                        <div className='col-sm-10'>
+                        <div className='col-sm-9'>
                             <CFormInput
                                 type='text'
                                 placeholder='Enter your new account name'
                                 value={editAccountForm.name}
                                 onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, name: event.target.value as string } })}
+                            />
+                        </div>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                            Bank
+                        </CFormLabel>
+                        <div className='col-sm-9'>
+                            <CFormSelect
+                                value={editAccountForm.bankCode}
+                                onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankCode: event.target.value as string } })}
+                            >
+                                {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                            </CFormSelect>
+                        </div>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                            Bank No.
+                        </CFormLabel>
+                        <div className='col-sm-9'>
+                            <CFormInput
+                                type='text'
+                                placeholder='Enter your new 16 digitals bank number'
+                                value={editAccountForm.bankNo}
+                                onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankNo: event.target.value as string } })}
                             />
                         </div>
                     </CRow>
@@ -297,7 +367,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private addAccount = async () => {
         const { notify } = this.props;
         const { addAccountForm } = this.state;
-        const response: SimpleResponse = await AccountApi.createAccount(addAccountForm.name, addAccountForm.currency);
+        const response: SimpleResponse = await AccountApi.createAccount(addAccountForm.name, addAccountForm.currency, addAccountForm.bankCode, addAccountForm.bankNo);
         const { success, message } = response;
         if (success) {
             notify(message);
@@ -311,7 +381,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private editAccount = async () => {
         const { notify } = this.props;
         const { editAccountForm } = this.state;
-        const response: SimpleResponse = await AccountApi.updateAccount(editAccountForm.id, editAccountForm.name);
+        const response: SimpleResponse = await AccountApi.updateAccount(editAccountForm.id, editAccountForm.name, editAccountForm.bankCode, editAccountForm.bankNo);
         const { success, message } = response;
         if (success) {
             notify(message);
@@ -323,11 +393,24 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private closeAddAccountModal = () => {
-        this.setState({ showAddAccountModal: false, addAccountForm: { currency: this.props.currencyOptions[0]?.key, name: '' } });
+        const addAccountForm = {
+            currency: this.props.currencyOptions[0]?.key,
+            name: '',
+            bankCode: '',
+            bankNo: ''
+        };
+        this.setState({ showAddAccountModal: false, addAccountForm });
     };
 
     private closeEditAccountModal = () => {
-        this.setState({ showEditAccountModal: false, editAccountForm: { id: '', currency: this.props.currencyOptions[0]?.key, name: '' } });
+        const editAccountForm = {
+            id: '',
+            currency: this.props.currencyOptions[0]?.key,
+            name: '',
+            bankCode: '',
+            bankNo: ''
+        };
+        this.setState({ showEditAccountModal: false, editAccountForm });
     };
 
     private fetchAccountRecords = async (accountId: string) => {
@@ -435,10 +518,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         if (recordId) {
             const accountRecord = currentAccountRecords.find(x => x.id === recordId);
             if (accountRecord) {
-                incomeForm.date = accountRecord.transDate
-                incomeForm.type = accountRecord.recordType
+                incomeForm.date = accountRecord.transDate;
+                incomeForm.type = accountRecord.recordType;
                 incomeForm.amount = Math.abs(accountRecord.transAmount);
-                incomeForm.description = accountRecord.description || ''
+                incomeForm.description = accountRecord.description || '';
                 incomeForm.fileId = accountRecord.fileId;
             }
         }
@@ -725,10 +808,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         if (recordId) {
             const accountRecord = currentAccountRecords.find(x => x.id === recordId);
             if (accountRecord) {
-                expendForm.date = accountRecord.transDate
-                expendForm.type = accountRecord.recordType
+                expendForm.date = accountRecord.transDate;
+                expendForm.type = accountRecord.recordType;
                 expendForm.amount = Math.abs(accountRecord.transAmount);
-                expendForm.description = accountRecord.description || ''
+                expendForm.description = accountRecord.description || '';
                 expendForm.fileId = accountRecord.fileId;
             }
         }
@@ -945,7 +1028,8 @@ const mapStateToProps = (state: ReduxState) => {
         stockType: getStockType(state),
         defaultRecordType: getDefaultRecordType(state),
         currencyOptions: getCurrencies(state),
-        recordTypeOptions: getRecordTypes(state)
+        recordTypeOptions: getRecordTypes(state),
+        bankCodeOptions: getBankInfos(state)
     };
 };
 

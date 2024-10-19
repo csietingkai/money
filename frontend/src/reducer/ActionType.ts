@@ -6,6 +6,9 @@ export const SET_USER_SETTING: string = 'SET_USER_SETTING';
 // account
 export const SET_ACCOUNT_LIST: string = 'SET_ACCOUNT_LIST';
 
+// bank info
+export const SET_BANK_INFO_LIST: string = 'SET_BANK_INFO_LIST';
+
 // stock
 export const SET_OWN_STOCK_LIST: string = 'SET_OWN_STOCK_LIST';
 export const SET_STOCK_QUERY_CONDITION: string = 'SET_STOCK_QUERY_CONDITION';
