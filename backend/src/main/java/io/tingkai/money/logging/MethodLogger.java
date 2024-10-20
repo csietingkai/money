@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MethodLogger {
 
+	private static String LOG_PATTERN = "### %s.%s(%s) in %d milliseconds.";
+
 	@Pointcut("execution(* (@Loggable *).*(..))")
 	protected void methodOfAnnotatedClass() {
 	}
@@ -54,25 +56,14 @@ public class MethodLogger {
 	}
 
 	private String composeMessage(String className, String methodName, Object[] args, long spentTime) {
-		StringBuilder messageBuilder = new StringBuilder();
-		messageBuilder.append("### ");
-		messageBuilder.append(className);
-		messageBuilder.append(".");
-		messageBuilder.append(methodName);
-		messageBuilder.append("(");
+		String[] argStrs = new String[args.length];
 		for (int argsCnt = 0; argsCnt < args.length; argsCnt++) {
 			if (AppUtil.isPresent(args[argsCnt])) {
-				messageBuilder.append(args[argsCnt].toString());
+				argStrs[argsCnt] = args[argsCnt].toString();
 			} else {
-				messageBuilder.append("null");
-			}
-			if (argsCnt != args.length - 1) {
-				messageBuilder.append(", ");
+				argStrs[argsCnt] = "null";
 			}
 		}
-		messageBuilder.append(") in ");
-		messageBuilder.append(spentTime);
-		messageBuilder.append(" milliseconds");
-		return messageBuilder.toString();
+		return String.format(LOG_PATTERN, className, methodName, String.join(", ", argStrs), spentTime);
 	}
 }
