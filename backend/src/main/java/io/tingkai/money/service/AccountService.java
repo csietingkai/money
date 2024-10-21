@@ -290,11 +290,9 @@ public class AccountService {
 			toAccount1.setBalance(toAccount1.getBalance().subtract(record.getTransAmount()));
 			this.accountFacade.update(toAccount1);
 
-			if (AppUtil.isPresent(toId)) {
-				Account toAccount2 = this.accountFacade.query(toId);
-				toAccount2.setBalance(toAccount1.getBalance().add(amount));
-				this.accountFacade.update(toAccount2);
-			}
+			Account toAccount2 = this.accountFacade.query(toId);
+			toAccount2.setBalance(toAccount1.getBalance().add(amount));
+			this.accountFacade.update(toAccount2);
 		}
 
 		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
@@ -304,6 +302,7 @@ public class AccountService {
 
 		record.setTransDate(date);
 		record.setTransAmount(amount);
+		record.setTransTo(toId);
 		record.setRecordType(type);
 		record.setDescription(description);
 		record.setFileId(fileId);
