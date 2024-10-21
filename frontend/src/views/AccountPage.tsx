@@ -1,9 +1,10 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CFormInput, CFormLabel, CFormSelect, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-import { cilArrowRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
+import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
+import qrcode from 'qrcode';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import { ReduxState, getAccountList, getAuthTokenId, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
 import AccountApi, { Account, AccountRecordVo } from '../api/account';
@@ -47,6 +48,11 @@ export interface AccountPageState {
         name: string;
         bankCode: string;
         bankNo: string;
+    };
+    showQrcodeModal: boolean;
+    qrcodeForm: {
+        accountName: string;
+        img: string;
     };
     currentAccountRecords: AccountRecordVo[];
     accountRecordsPage: number;
@@ -108,6 +114,11 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 name: '',
                 bankCode: '',
                 bankNo: ''
+            },
+            showQrcodeModal: false,
+            qrcodeForm: {
+                accountName: '',
+                img: ''
             },
             currentAccountRecords: [],
             accountRecordsPage: 1,
@@ -198,6 +209,24 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                             >
                                 <CIcon icon={cilPencil} className='float-start' width={22} />
                             </CLink>
+                            {
+                                account.bankCode && account.bankNo &&
+                                <CLink
+                                    className='font-weight-bold font-xs text-body-secondary'
+                                    onClick={async () => {
+                                        const fullBankNo: string = ('0000000000000000' + account.bankNo).slice(-16);
+                                        // `TWQRP://銀行轉帳/158/02/V1?D5=${account.bankCode}&D6=${fullBankNo}&D10=901`
+                                        const twqr = `TWQRP%3A%2F%2F%E9%8A%80%E8%A1%8C%E8%BD%89%E5%B8%B3%2F158%2F02%2FV1%3FD5%3D${account.bankCode}%26D6%3D${fullBankNo}%26D10%3D901`;
+                                        console.log(twqr);
+                                        const img = await qrcode.toDataURL(twqr, { errorCorrectionLevel: 'H' });
+                                        console.log(img);
+                                        const qrcodeForm = { accountName: account.name, img };
+                                        this.setState({ showQrcodeModal: true, qrcodeForm });
+                                    }}
+                                >
+                                    <CIcon icon={cilQrCode} className='float-start ms-2' width={22} />
+                                </CLink>
+                            }
                         </CCol>
                         <CCol>
                             <CLink
@@ -211,6 +240,17 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 </CCardFooter>
             </CCard>
         );
+    };
+
+    private fetchAccounts = async () => {
+        const { userId, setAccountList } = this.props;
+        const response = await AccountApi.getAccounts(userId);
+        const { success, data } = response;
+        if (success) {
+            setAccountList(data);
+        } else {
+            setAccountList([]);
+        }
     };
 
     private getAddAccountModal = (): React.ReactNode => {
@@ -257,6 +297,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                 value={addAccountForm.bankCode}
                                 onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankCode: event.target.value as string } })}
                             >
+                                <option value=''></option>
                                 {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
                             </CFormSelect>
                         </div>
@@ -281,6 +322,30 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 </CModalFooter>
             </CModal>
         );
+    };
+
+    private addAccount = async () => {
+        const { notify } = this.props;
+        const { addAccountForm } = this.state;
+        const response: SimpleResponse = await AccountApi.createAccount(addAccountForm.name, addAccountForm.currency, addAccountForm.bankCode, addAccountForm.bankNo);
+        const { success, message } = response;
+        if (success) {
+            notify(message);
+            await this.fetchAccounts();
+            this.closeAddAccountModal();
+        } else {
+            notify(message);
+        }
+    };
+
+    private closeAddAccountModal = () => {
+        const addAccountForm = {
+            currency: this.props.currencyOptions[0]?.key,
+            name: '',
+            bankCode: '',
+            bankNo: ''
+        };
+        this.setState({ showAddAccountModal: false, addAccountForm });
     };
 
     private getEditAccountModal = (): React.ReactNode => {
@@ -327,6 +392,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                 value={editAccountForm.bankCode}
                                 onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankCode: event.target.value as string } })}
                             >
+                                <option value=''></option>
                                 {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
                             </CFormSelect>
                         </div>
@@ -353,31 +419,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         );
     };
 
-    private fetchAccounts = async () => {
-        const { userId, setAccountList } = this.props;
-        const response = await AccountApi.getAccounts(userId);
-        const { success, data } = response;
-        if (success) {
-            setAccountList(data);
-        } else {
-            setAccountList([]);
-        }
-    };
-
-    private addAccount = async () => {
-        const { notify } = this.props;
-        const { addAccountForm } = this.state;
-        const response: SimpleResponse = await AccountApi.createAccount(addAccountForm.name, addAccountForm.currency, addAccountForm.bankCode, addAccountForm.bankNo);
-        const { success, message } = response;
-        if (success) {
-            notify(message);
-            await this.fetchAccounts();
-            this.closeAddAccountModal();
-        } else {
-            notify(message);
-        }
-    };
-
     private editAccount = async () => {
         const { notify } = this.props;
         const { editAccountForm } = this.state;
@@ -392,16 +433,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         }
     };
 
-    private closeAddAccountModal = () => {
-        const addAccountForm = {
-            currency: this.props.currencyOptions[0]?.key,
-            name: '',
-            bankCode: '',
-            bankNo: ''
-        };
-        this.setState({ showAddAccountModal: false, addAccountForm });
-    };
-
     private closeEditAccountModal = () => {
         const editAccountForm = {
             id: '',
@@ -411,6 +442,33 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             bankNo: ''
         };
         this.setState({ showEditAccountModal: false, editAccountForm });
+    };
+
+    private getQrcodeModal = (): React.ReactNode => {
+        const { showQrcodeModal, qrcodeForm } = this.state;
+        return (
+            <CModal alignment='center' visible={showQrcodeModal} onClose={this.closeQrcodeModal}>
+                <CModalHeader>
+                    <CModalTitle>{qrcodeForm.accountName}</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    <CRow className='mb-3'>
+                        <img src={qrcodeForm.img}></img>
+                    </CRow>
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color='secondary' onClick={this.closeQrcodeModal}>Close</CButton>
+                </CModalFooter>
+            </CModal>
+        );
+    };
+
+    private closeQrcodeModal = () => {
+        const qrcodeForm = {
+            accountName: '',
+            img: ''
+        };
+        this.setState({ showQrcodeModal: false, qrcodeForm });
     };
 
     private fetchAccountRecords = async (accountId: string) => {
@@ -998,6 +1056,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 </CRow>
                 {this.getAddAccountModal()}
                 {this.getEditAccountModal()}
+                {this.getQrcodeModal()}
                 {this.getIncomeModal()}
                 {this.getTransferModal()}
                 {this.getExpendModal()}
