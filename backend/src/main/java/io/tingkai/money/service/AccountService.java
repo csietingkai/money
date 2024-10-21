@@ -302,7 +302,9 @@ public class AccountService {
 
 		record.setTransDate(date);
 		record.setTransAmount(amount);
-		record.setTransTo(toId);
+		if (AppUtil.isPresent(toId)) {
+			record.setTransTo(toId);
+		}
 		record.setRecordType(type);
 		record.setDescription(description);
 		record.setFileId(fileId);
