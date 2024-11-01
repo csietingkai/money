@@ -24,11 +24,13 @@ import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.StockBonusRequest;
 import io.tingkai.money.model.request.StockBuyRequest;
 import io.tingkai.money.model.request.StockSellRequest;
+import io.tingkai.money.model.request.StockTradeRecordEditRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.PredictResultVo;
 import io.tingkai.money.model.vo.StockRecordVo;
 import io.tingkai.money.model.vo.StockVo;
+import io.tingkai.money.model.vo.UserStockRecordVo;
 import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.service.DataFetcherService;
@@ -49,6 +51,7 @@ public class StockController {
 	public static final String BUY_PATH = "/buy";
 	public static final String SELL_PATH = "/sell";
 	public static final String BONUS_PATH = "/bonus";
+	public static final String UPDATE_RECORD_PATH = "/updateRecord";
 	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
@@ -107,8 +110,14 @@ public class StockController {
 
 	@RequestMapping(value = StockController.BONUS_PATH, method = RequestMethod.PUT)
 	public StockResponse<UserStock> bonus(@RequestBody StockBonusRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
-		this.userStockService.bonus(request);
-		return new StockResponse<UserStock>(true, null, MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, request.getTotal(), request.getStockCode()));
+		UserStock result = this.userStockService.bonus(request);
+		return new StockResponse<UserStock>(true, result, MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, request.getTotal(), request.getStockCode()));
+	}
+
+	@RequestMapping(value = StockController.UPDATE_RECORD_PATH, method = RequestMethod.PUT)
+	public StockResponse<UserStock> updateRecord(@RequestBody StockTradeRecordEditRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException {
+		UserStock result = this.userStockService.updateRecord(request);
+		return new StockResponse<UserStock>(true, result, MessageConstant.USER_STOCK_RECORD_UPDATE_SUCCESS);
 	}
 
 	@RequestMapping(value = StockController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
@@ -124,9 +133,9 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.GET_OWN_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<UserStockRecord>> getOwnStockRecords(@RequestParam UUID userStockId) {
-		List<UserStockRecord> result = this.userStockService.getOwnStockRecords(userStockId);
-		return new StockResponse<List<UserStockRecord>>(true, result, MessageConstant.SUCCESS);
+	public StockResponse<List<UserStockRecordVo>> getOwnStockRecords(@RequestParam UUID userStockId) {
+		List<UserStockRecordVo> result = this.userStockService.getOwnStockRecords(userStockId);
+		return new StockResponse<List<UserStockRecordVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = StockController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)

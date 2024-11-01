@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,6 +46,8 @@ import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.StockBonusRequest;
 import io.tingkai.money.model.request.StockBuyRequest;
 import io.tingkai.money.model.request.StockSellRequest;
+import io.tingkai.money.model.request.StockTradeRecordEditRequest;
+import io.tingkai.money.model.vo.UserStockRecordVo;
 import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.util.AppUtil;
@@ -124,8 +127,19 @@ public class UserStockService {
 		return vos;
 	}
 
-	public List<UserStockRecord> getOwnStockRecords(UUID userStockId) {
-		return this.userStockRecordFacade.queryAll(userStockId);
+	public List<UserStockRecordVo> getOwnStockRecords(UUID userStockId) {
+		List<UserStockRecord> entities = this.userStockRecordFacade.queryAll(userStockId);
+		List<UUID> accountRecordIds = entities.stream().map(UserStockRecord::getAccountRecordId).distinct().toList();
+		List<AccountRecord> accountRecords = this.accountRecordFacade.queryAll(accountRecordIds);
+		Map<UUID, UUID> accountRecordFileIdMap = accountRecords.stream().collect(HashMap::new, (map, accountRecord) -> map.put(accountRecord.getId(), accountRecord.getFileId()), HashMap::putAll);
+		List<UserStockRecordVo> vos = new ArrayList<UserStockRecordVo>();
+		for (UserStockRecord record : entities) {
+			UserStockRecordVo vo = new UserStockRecordVo();
+			vo.transform(record);
+			vo.setFileId(accountRecordFileIdMap.getOrDefault(record.getAccountRecordId(), null));
+			vos.add(vo);
+		}
+		return vos;
 	}
 
 	public UserStockRecord preCalc(DealType type, BigDecimal share, BigDecimal price) {
@@ -262,7 +276,7 @@ public class UserStockService {
 	}
 
 	@Transactional
-	public void bonus(StockBonusRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
+	public UserStock bonus(StockBonusRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
 		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
@@ -305,6 +319,95 @@ public class UserStockService {
 		record.setTotal(total);
 		record.setAccountRecordId(accountRecord.getId());
 		record = this.userStockRecordFacade.insert(record);
+
+		return entity;
+	}
+
+	@Transactional
+	public UserStock updateRecord(StockTradeRecordEditRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException {
+		UUID recordId = request.getRecordId();
+		UUID accountId = request.getAccountId();
+		String stockCode = request.getStockCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal fee = request.getFee();
+		BigDecimal tax = request.getTax();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+		UUID accountRecordId = request.getAccountRecordId();
+		UUID userId = ContextUtil.getUserId();
+
+		if (BigDecimal.ZERO.compareTo(share) >= 0) {
+			throw new StockAmountInvalidException(share);
+		}
+
+		UserStockRecord tradeRecord = this.userStockRecordFacade.query(recordId);
+		if (AppUtil.isEmpty(tradeRecord)) {
+			throw new NotExistException();
+		}
+		// handle origin account record and user stock record
+		{
+			UserStock userStock = this.userStockFacade.query(tradeRecord.getUserStockId());
+			if (tradeRecord.getType() == DealType.BUY) {
+				userStock.setAmount(userStock.getAmount().subtract(tradeRecord.getShare()));
+			} else if (tradeRecord.getType() == DealType.SELL) {
+				userStock.setAmount(userStock.getAmount().add(tradeRecord.getShare()));
+			}
+			userStock = this.userStockFacade.update(userStock);
+
+			Account account = this.accountFacade.query(tradeRecord.getAccountId());
+			AccountRecord accountRecord = this.accountRecordFacade.query(tradeRecord.getAccountRecordId());
+			account.setBalance(account.getBalance().subtract(accountRecord.getTransAmount()));
+			account = this.accountFacade.update(account);
+		}
+
+		UserStock userStock = this.userStockFacade.queryByUserIdAndStockCode(userId, stockCode);
+		if (tradeRecord.getType() == DealType.BUY) {
+			userStock.setAmount(userStock.getAmount().add(share));
+		} else if (tradeRecord.getType() == DealType.SELL) {
+			userStock.setAmount(userStock.getAmount().subtract(share));
+		}
+		userStock = this.userStockFacade.update(userStock);
+
+		Account account = this.accountFacade.query(accountId);
+		if (tradeRecord.getType() == DealType.BUY) {
+			account.setBalance(account.getBalance().subtract(total));
+		} else if (tradeRecord.getType() == DealType.SELL || tradeRecord.getType() == DealType.BONUS) {
+			account.setBalance(account.getBalance().add(total));
+		}
+		account = this.accountFacade.update(account);
+
+		AccountRecord accountRecord = this.accountRecordFacade.query(accountRecordId);
+		if (tradeRecord.getType() == DealType.BUY) {
+			accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_STOCK_BUY_SUCCESS, stockCode, share, price));
+			accountRecord.setTransAmount(BigDecimal.ZERO.subtract(total));
+		} else if (tradeRecord.getType() == DealType.SELL) {
+			accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_STOCK_SELL_SUCCESS, stockCode, share, price));
+			accountRecord.setTransAmount(total);
+		} else if (tradeRecord.getType() == DealType.BONUS) {
+			accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_STOCK_BONUS_SUCCESS, total, stockCode));
+			accountRecord.setTransAmount(total);
+		}
+		accountRecord.setTransFrom(accountId);
+		accountRecord.setTransTo(accountId);
+		accountRecord.setTransDate(date);
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.update(accountRecord);
+
+		tradeRecord.setAccountId(accountId);
+		tradeRecord.setUserStockId(userStock.getId());
+		tradeRecord.setDate(date);
+		tradeRecord.setShare(share);
+		tradeRecord.setPrice(price);
+		tradeRecord.setFee(fee);
+		if (tradeRecord.getType() == DealType.SELL) {
+			tradeRecord.setTax(tax);
+		}
+		tradeRecord.setTotal(total);
+		tradeRecord = this.userStockRecordFacade.update(tradeRecord);
+
+		return userStock;
 	}
 
 	@Transactional

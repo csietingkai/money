@@ -217,9 +217,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                         const fullBankNo: string = ('0000000000000000' + account.bankNo).slice(-16);
                                         // `TWQRP://銀行轉帳/158/02/V1?D5=${account.bankCode}&D6=${fullBankNo}&D10=901`
                                         const twqr = `TWQRP%3A%2F%2F%E9%8A%80%E8%A1%8C%E8%BD%89%E5%B8%B3%2F158%2F02%2FV1%3FD5%3D${account.bankCode}%26D6%3D${fullBankNo}%26D10%3D901`;
-                                        console.log(twqr);
                                         const img = await qrcode.toDataURL(twqr, { errorCorrectionLevel: 'H' });
-                                        console.log(img);
                                         const qrcodeForm = { accountName: account.name, img };
                                         this.setState({ showQrcodeModal: true, qrcodeForm });
                                     }}

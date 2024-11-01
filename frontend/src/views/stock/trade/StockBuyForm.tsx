@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import AccountApi, { Account } from '../../../api/account';
-import StockApi, { UserStockListResponse, UserStockVo } from '../../../api/stock';
+import StockApi, { UserStockListResponse, UserStockResponse, UserStockVo } from '../../../api/stock';
 import FinancailFileApi from '../../../api/financailFile';
 import * as AppUtil from '../../../util/AppUtil';
 import { Option } from '../../../util/Interface';
@@ -36,12 +36,11 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
 
     constructor(props: StockBuyFormProps) {
         super(props);
-        const { tradeCondition } = props;
-        console.log(tradeCondition);
-        this.state = this.init(tradeCondition);
+        const { accounts, tradeCondition } = props;
+        this.state = this.init(accounts, tradeCondition);
     }
 
-    private init = (tradeCondition: StockTradeCondition | undefined): StockBuyFormState => {
+    private init = (accounts: Account[], tradeCondition: StockTradeCondition | undefined): StockBuyFormState => {
         const state: StockBuyFormState = {
             code: '',
             name: '',
@@ -62,14 +61,29 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
             state.name = tradeCondition.name;
             state.tradeDate = tradeCondition.date;
             state.currency = tradeCondition.currency;
+            state.accountId = tradeCondition.accountId || '';
+            if (state.accountId) {
+                const showAccountList = accounts.filter(x => x.currency === state.currency);
+                const balance = showAccountList.find(x => x.id === state.accountId)?.balance || 0;
+                state.balance = AppUtil.numberComma(balance);
+            }
             state.price = tradeCondition.price;
             state.share = tradeCondition.share;
-            this.calcFee(state.share, state.price).then(({ fee }) => {
-                const total = state.price * state.share + fee;
-                this.setState({ fee, total: AppUtil.numberComma(total) });
-            });
-            this.getFilesByDate(new Date()).then((buyFileOptions: Option[]) => {
-                this.setState({ buyFileOptions });
+            if (tradeCondition.fee && tradeCondition.total) {
+                state.fee = tradeCondition.fee;
+                state.total = AppUtil.numberComma(tradeCondition.total);
+            } else {
+                this.calcFee(state.share, state.price).then(({ fee }) => {
+                    const total = state.price * state.share + fee;
+                    this.setState({ fee, total: AppUtil.numberComma(total) });
+                });
+            }
+            this.getFilesByDate(state.tradeDate).then((buyFileOptions: Option[]) => {
+                let fileId: string = '';
+                if (tradeCondition.fileId && buyFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                    fileId = tradeCondition.fileId;
+                }
+                this.setState({ buyFileOptions, fileId });
             });
         }
 
@@ -77,14 +91,20 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
     };
 
     private onBuyClick = async () => {
-        const { tradeCondition, notify } = this.props;
+        const { accounts, tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, fee, total, fileId } = this.state;
-        const { success, message } = await StockApi.buy(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
+        let api: Promise<UserStockResponse>;
+        if (tradeCondition?.recordId && tradeCondition.accountRecordId) {
+            api = StockApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId);
+        } else {
+            api = StockApi.buy(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
+        }
+        const { success, message } = await api;
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnStocks();
-            this.setState(this.init(tradeCondition));
+            this.setState(this.init(accounts, tradeCondition));
         }
     };
 
@@ -98,7 +118,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
         return { name: '', currency: '' };
     };
 
-    private calcFee = async (share: number, price: number): Promise<{ fee: number }> => {
+    private calcFee = async (share: number, price: number): Promise<{ fee: number; }> => {
         const { success, data } = await StockApi.precalc('BUY', share, price);
         if (success) {
             const { fee } = data;

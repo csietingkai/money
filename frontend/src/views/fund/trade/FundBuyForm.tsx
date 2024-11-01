@@ -3,7 +3,7 @@ import moment from 'moment';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import { UserSetting } from '../../../api/auth';
 import AccountApi, { Account } from '../../../api/account';
-import FundApi, { UserFundListResponse, UserFundVo } from '../../../api/fund';
+import FundApi, { UserFundListResponse, UserFundResponse, UserFundVo } from '../../../api/fund';
 import FinancailFileApi from '../../../api/financailFile';
 import * as AppUtil from '../../../util/AppUtil';
 import { DEFAULT_DECIMAL_PRECISION } from '../../../util/Constant';
@@ -40,11 +40,11 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
 
     constructor(props: FundBuyFormProps) {
         super(props);
-        const { tradeCondition } = props;
-        this.state = this.init(tradeCondition);
+        const { accounts, tradeCondition, userSetting: { fundFeeRate } } = props;
+        this.state = this.init(accounts, fundFeeRate, tradeCondition);
     }
 
-    private init = (tradeCondition?: FundTradeCondition): FundBuyFormState => {
+    private init = (accounts: Account[], fundFeeRate: number, tradeCondition?: FundTradeCondition): FundBuyFormState => {
         const state: FundBuyFormState = {
             code: '',
             name: '',
@@ -64,26 +64,44 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
         if (tradeCondition?.type === 'buy') {
             state.code = tradeCondition.code;
             state.name = tradeCondition.name;
+            state.accountId = tradeCondition.accountId || '';
+            if (state.accountId) {
+                const balance = accounts.find(x => x.id === state.accountId)?.balance || 0;
+                state.balance = AppUtil.numberComma(balance);
+            }
             state.tradeDate = tradeCondition.date;
             state.debitAmount = tradeCondition.debitAmount;
-            // TODO exchange rate
             state.price = tradeCondition.price;
+            state.rate = tradeCondition.rate;
+            state.share = tradeCondition.share || 0;
+            state.fee = tradeCondition.fee || AppUtil.toNumber((state.debitAmount * fundFeeRate).toFixed(6));
+            state.total = AppUtil.numberComma(state.debitAmount + state.fee);
             this.getFilesByDate(state.tradeDate).then((buyFileOptions: Option[]) => {
-                this.setState({ fileId: '', buyFileOptions });
+                let fileId: string = '';
+                if (tradeCondition.fileId && buyFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                    fileId = tradeCondition.fileId;
+                }
+                this.setState({ buyFileOptions, fileId });
             });
         }
         return state;
     };
 
     private onBuyClick = async () => {
-        const { tradeCondition, notify } = this.props;
+        const { accounts, tradeCondition, userSetting: { fundFeeRate }, notify } = this.props;
         const { code, accountId, tradeDate, share, price, rate, fee, total, fileId } = this.state;
-        const { success, message } = await FundApi.buy(accountId, code, tradeDate, share, price, rate, AppUtil.reverseNumberComma(total), fee, fileId);
+        let api: Promise<UserFundResponse>;
+        if (tradeCondition?.recordId && tradeCondition.accountRecordId) {
+            api = FundApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, rate, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId, fileId);
+        } else {
+            api = FundApi.buy(accountId, code, tradeDate, share, price, rate, AppUtil.reverseNumberComma(total), fee, fileId);
+        }
+        const { success, message } = await api;
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
-            this.setState(this.init(tradeCondition));
+            this.setState(this.init(accounts, fundFeeRate, tradeCondition));
         }
     };
 
@@ -230,7 +248,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                                     type='number'
                                     value={debitAmount}
                                     onChange={(event) => {
-                                        const newDebitAmount = AppUtil.toNumber(event.target.value)
+                                        const newDebitAmount = AppUtil.toNumber(event.target.value);
                                         const fee: number = AppUtil.toNumber((newDebitAmount * fundFeeRate).toFixed(6));
                                         this.setState({ debitAmount: newDebitAmount, total: AppUtil.numberComma(newDebitAmount + fee), fee });
                                     }}
@@ -307,7 +325,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                                     onChange={(event) => {
                                         const newFee = AppUtil.toNumber(event.target.value);
                                         const newTotal = debitAmount + newFee;
-                                        this.setState({ fee: newFee, total: AppUtil.numberComma(newTotal) })
+                                        this.setState({ fee: newFee, total: AppUtil.numberComma(newTotal) });
                                     }}
                                 />
                             </CCol>

@@ -2,7 +2,8 @@ import axios from 'axios';
 
 import {
     FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH,
-    FUND_UNTRACK_PATH, USER_FUND_BOUNS_PATH, USER_FUND_BUY_PATH, USER_FUND_DELETE_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_GET_OWN_RECORDS_PATH, USER_FUND_SELL_PATH
+    FUND_UNTRACK_PATH, USER_FUND_BOUNS_PATH, USER_FUND_BUY_PATH, USER_FUND_DELETE_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_GET_OWN_RECORDS_PATH, USER_FUND_SELL_PATH,
+    USER_FUND_UPDATE_PATH
 } from './Constant';
 
 import * as AppUtil from '../util/AppUtil';
@@ -61,8 +62,14 @@ export interface UserFundRecord {
     date: Date;
     share: number;
     price: number;
+    rate: number;
     fee: number;
     total: number;
+    accountRecordId: string;
+}
+
+export interface UserFundRecordVo extends UserFundRecord {
+    fileId: string;
 }
 
 export interface UserTrackingFund {
@@ -83,8 +90,8 @@ export interface FundRecordResponse extends ApiResponse<FundRecordVo> { }
 export interface FundRecordListResponse extends ApiResponse<FundRecordVo[]> { }
 export interface UserFundResponse extends ApiResponse<UserFundVo> { }
 export interface UserFundListResponse extends ApiResponse<UserFundVo[]> { }
-export interface UserFundRecordResponse extends ApiResponse<UserFundRecord> { }
-export interface UserFundRecordListResponse extends ApiResponse<UserFundRecord[]> { }
+export interface UserFundRecordResponse extends ApiResponse<UserFundRecordVo> { }
+export interface UserFundRecordListResponse extends ApiResponse<UserFundRecordVo[]> { }
 export interface FundTrackingListResponse extends ApiResponse<UserTrackingFundVo[]> { }
 
 const REFRESH_FUND_MAX_TIME = 30 * 60 * 1000; // 30 mins
@@ -138,6 +145,12 @@ const bonus = async (accountId: string, fundCode: string, date: Date, share: num
     return data;
 };
 
+const updateRecord = async (recordId: string, accountId: string, fundCode: string, date: Date, share: number, price: number, rate: number, fee: number, total: number, accountRecordId: string, fileId?: string): Promise<UserFundResponse> => {
+    const response = await axios.put(USER_FUND_UPDATE_PATH, { recordId, accountId, fundCode, date: AppUtil.toDateStr(date), share, price, rate, fee, total, fileId, accountRecordId });
+    const data: UserFundResponse = response.data;
+    return data;
+};
+
 const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
     const response = await axios.delete(USER_FUND_DELETE_PATH, { params: { recordId } });
     const data: SimpleResponse = response.data;
@@ -184,4 +197,4 @@ const predict = async (code: string, days?: number): Promise<PredictResponse> =>
     return data;
 };
 
-export default { getAll, getRecords, buy, sell, bonus, deleteRecord, getOwn, getOwnRecords, refresh, getTrackingList, track, untrack, predict };
+export default { getAll, getRecords, buy, sell, bonus, updateRecord, deleteRecord, getOwn, getOwnRecords, refresh, getTrackingList, track, untrack, predict };

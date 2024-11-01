@@ -2,10 +2,10 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus, cilTrash } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getStockOwnList, getStockType } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
-import StockApi, { UserStockRecord, UserStockVo } from '../../api/stock';
+import StockApi, { UserStockRecord, UserStockRecordVo, UserStockVo } from '../../api/stock';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
@@ -28,7 +28,7 @@ export interface StockOwnPageProps {
 
 export interface StockOwnPageState {
     show: { [stockCode: string]: boolean; };
-    currentOwnStockRecords: UserStockRecord[];
+    currentOwnStockRecords: UserStockRecordVo[];
     ownStockRecordPage: number;
     showDeleteRecordModal: boolean;
     holdingRecordId: string;
@@ -84,7 +84,6 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         const { show, currentOwnStockRecords, ownStockRecordPage } = this.state;
         const currentValue: number = AppUtil.toNumber((ownStockInfo.price * ownStockInfo.amount).toFixed(DEFAULT_DECIMAL_PRECISION));
         const benefit: number = AppUtil.toNumber((currentValue - ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
-        console.log(stockType);
         const benefitColor: string = AppUtil.getBenifitColor(benefit, stockType);
         const postiveSign: string = benefit >= 0 ? '+' : '';
         const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
@@ -177,6 +176,16 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                                             <CTableDataCell>
                                                                 <CButtonGroup role='group'>
                                                                     <CButton
+                                                                        color='info'
+                                                                        variant='outline'
+                                                                        size='sm'
+                                                                        onClick={() => {
+                                                                            this.tradeStockPage(ownStockInfo, r.type.toLowerCase() as TradeType, r);
+                                                                        }}
+                                                                    >
+                                                                        <CIcon icon={cilPencil}></CIcon>
+                                                                    </CButton>
+                                                                    <CButton
                                                                         color='danger'
                                                                         variant='outline'
                                                                         size='sm'
@@ -202,17 +211,24 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         );
     };
 
-    private tradeStockPage = (stockInfo?: UserStockVo, type?: TradeType) => {
+    private tradeStockPage = (stockInfo?: UserStockVo, type?: TradeType, record?: UserStockRecordVo) => {
         const { setStockTradeCondition } = this.props;
         if (stockInfo && type) {
             const tradeCondition: StockTradeCondition = {
+                recordId: record?.id,
                 type,
                 code: stockInfo.stockCode,
                 name: stockInfo.stockName,
                 currency: 'TWD', // TODO
-                date: new Date(),
-                price: stockInfo.price,
-                share: stockInfo.amount
+                accountId: record?.accountId,
+                date: record?.date || new Date(),
+                price: record?.price || stockInfo.price,
+                share: record?.share || stockInfo.amount,
+                fee: record?.fee,
+                tax: record?.tax,
+                total: record?.total,
+                accountRecordId: record?.accountRecordId,
+                fileId: record?.fileId
             };
             setStockTradeCondition(tradeCondition);
         }

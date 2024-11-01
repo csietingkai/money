@@ -13,21 +13,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.UserFund;
-import io.tingkai.money.entity.UserFundRecord;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FundAmountInvalidException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.FundBonusRequest;
 import io.tingkai.money.model.request.FundBuyRequest;
 import io.tingkai.money.model.request.FundSellRequest;
+import io.tingkai.money.model.request.FundTradeRecordEditRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.response.FundResponse;
 import io.tingkai.money.model.response.StockResponse;
 import io.tingkai.money.model.vo.FundRecordVo;
 import io.tingkai.money.model.vo.FundVo;
 import io.tingkai.money.model.vo.PredictResultVo;
+import io.tingkai.money.model.vo.UserFundRecordVo;
 import io.tingkai.money.model.vo.UserFundVo;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
 import io.tingkai.money.service.DataFetcherService;
@@ -47,6 +49,7 @@ public class FundController {
 	public static final String BUY_PATH = "/buy";
 	public static final String SELL_PATH = "/sell";
 	public static final String BONUS_PATH = "/bonus";
+	public static final String UPDATE_RECORD_PATH = "/updateRecord";
 	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
@@ -99,14 +102,20 @@ public class FundController {
 
 	@RequestMapping(value = FundController.BONUS_PATH, method = RequestMethod.PUT)
 	public FundResponse<UserFund> bonus(@RequestBody FundBonusRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
-		this.userFundService.bonus(request);
-		return new FundResponse<UserFund>(true, null, MessageFormat.format(MessageConstant.USER_FUND_BONUS_SUCCESS, request.getTotal(), request.getFundCode()));
+		UserFund result = this.userFundService.bonus(request);
+		return new FundResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_BONUS_SUCCESS, request.getTotal(), request.getFundCode()));
+	}
+
+	@RequestMapping(value = StockController.UPDATE_RECORD_PATH, method = RequestMethod.PUT)
+	public AccountResponse<UserFund> updateRecord(@RequestBody FundTradeRecordEditRequest request) throws NotExistException, FieldMissingException, StockAmountInvalidException {
+		UserFund result = this.userFundService.updateRecord(request);
+		return new AccountResponse<UserFund>(true, result, MessageConstant.USER_FUND_RECORD_UPDATE_SUCCESS);
 	}
 
 	@RequestMapping(value = StockController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
 	public AccountResponse<Void> deleteRecord(@RequestParam UUID recordId) throws NotExistException, FieldMissingException {
 		this.userFundService.reverseRecord(recordId);
-		return new AccountResponse<Void>(true, null, MessageConstant.USER_STOCK_RECORD_DELETE_SUCCESS);
+		return new AccountResponse<Void>(true, null, MessageConstant.USER_FUND_RECORD_DELETE_SUCCESS);
 	}
 
 	@RequestMapping(value = FundController.GET_OWN_PATH, method = RequestMethod.GET)
@@ -116,9 +125,9 @@ public class FundController {
 	}
 
 	@RequestMapping(value = StockController.GET_OWN_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<UserFundRecord>> getOwnStockRecords(@RequestParam UUID userFundId) {
-		List<UserFundRecord> result = this.userFundService.getOwnFundRecords(userFundId);
-		return new StockResponse<List<UserFundRecord>>(true, result, MessageConstant.SUCCESS);
+	public StockResponse<List<UserFundRecordVo>> getOwnStockRecords(@RequestParam UUID userFundId) {
+		List<UserFundRecordVo> result = this.userFundService.getOwnFundRecords(userFundId);
+		return new StockResponse<List<UserFundRecordVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = FundController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)

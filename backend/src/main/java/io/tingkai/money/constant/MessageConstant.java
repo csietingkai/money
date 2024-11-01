@@ -36,6 +36,7 @@ public class MessageConstant {
 	public static final String USER_STOCK_BUY_SUCCESS = "User: Buy {0} {1} shares with Price: {2} Success";
 	public static final String USER_STOCK_SELL_SUCCESS = "User: Sell {0} {1} shares with Price: {2} Success";
 	public static final String USER_STOCK_BONUS_SUCCESS = "Get Bonus {0} from stock: {1} Success";
+	public static final String USER_STOCK_RECORD_UPDATE_SUCCESS = "Stock Trade Record Update Success";
 	public static final String USER_STOCK_RECORD_DELETE_SUCCESS = "Stock Trade Record Delete Success";
 	public static final String USER_STOCK_GET_TRACKING_LIST_SUCCESS = "User: Tracking Stock List Fetch Success";
 	public static final String STOCK_SHARE_AMOUNT_INVALID = "Stock Share: {0} is invalid";
@@ -47,6 +48,7 @@ public class MessageConstant {
 	public static final String USER_FUND_BUY_SUCCESS = "User: Buy {0} {1} shares with Price: {2} Success";
 	public static final String USER_FUND_SELL_SUCCESS = "User: Sell {0} {1} shares with Price: {2} Success";
 	public static final String USER_FUND_BONUS_SUCCESS = "Get Bonus {0} from fund: {1} Success";
+	public static final String USER_FUND_RECORD_UPDATE_SUCCESS = "Fund Trade Record Update Success";
 	public static final String USER_FUND_RECORD_DELETE_SUCCESS = "Fund Trade Record Delete Success";
 	public static final String USER_FUND_GET_TRACKING_LIST_SUCCESS = "User Tracking Fund List Fetch Success";
 	public static final String FUND_SHARE_AMOUNT_INVALID = "Fund Share: {0} is invalid";

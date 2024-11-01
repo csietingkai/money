@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,9 +40,12 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FundAmountInvalidException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.FundBonusRequest;
 import io.tingkai.money.model.request.FundBuyRequest;
 import io.tingkai.money.model.request.FundSellRequest;
+import io.tingkai.money.model.request.FundTradeRecordEditRequest;
+import io.tingkai.money.model.vo.UserFundRecordVo;
 import io.tingkai.money.model.vo.UserFundVo;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
 import io.tingkai.money.util.AppUtil;
@@ -118,8 +122,19 @@ public class UserFundService {
 		return vos;
 	}
 
-	public List<UserFundRecord> getOwnFundRecords(UUID userFundId) {
-		return this.userFundRecordFacade.queryAll(userFundId);
+	public List<UserFundRecordVo> getOwnFundRecords(UUID userFundId) {
+		List<UserFundRecord> entities = this.userFundRecordFacade.queryAll(userFundId);
+		List<UUID> accountRecordIds = entities.stream().map(UserFundRecord::getAccountRecordId).distinct().toList();
+		List<AccountRecord> accountRecords = this.accountRecordFacade.queryAll(accountRecordIds);
+		Map<UUID, UUID> accountRecordFileIdMap = accountRecords.stream().collect(HashMap::new, (map, accountRecord) -> map.put(accountRecord.getId(), accountRecord.getFileId()), HashMap::putAll);
+		List<UserFundRecordVo> vos = new ArrayList<UserFundRecordVo>();
+		for (UserFundRecord record : entities) {
+			UserFundRecordVo vo = new UserFundRecordVo();
+			vo.transform(record);
+			vo.setFileId(accountRecordFileIdMap.getOrDefault(record.getAccountRecordId(), null));
+			vos.add(vo);
+		}
+		return vos;
 	}
 
 	@Transactional
@@ -243,7 +258,7 @@ public class UserFundService {
 	}
 
 	@Transactional
-	public void bonus(FundBonusRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
+	public UserFund bonus(FundBonusRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		UUID accountId = request.getAccountId();
 		String fundCode = request.getFundCode();
 		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
@@ -286,6 +301,93 @@ public class UserFundService {
 		record.setTotal(total);
 		record.setAccountRecordId(accountRecord.getId());
 		record = this.userFundRecordFacade.insert(record);
+
+		return entity;
+	}
+
+	@Transactional
+	public UserFund updateRecord(FundTradeRecordEditRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException {
+		UUID recordId = request.getRecordId();
+		UUID accountId = request.getAccountId();
+		String fundCode = request.getFundCode();
+		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		BigDecimal share = request.getShare();
+		BigDecimal price = request.getPrice();
+		BigDecimal rate = request.getRate();
+		BigDecimal fee = request.getFee();
+		BigDecimal total = request.getTotal();
+		UUID fileId = request.getFileId();
+		UUID accountRecordId = request.getAccountRecordId();
+		UUID userId = ContextUtil.getUserId();
+
+		if (BigDecimal.ZERO.compareTo(share) >= 0) {
+			throw new StockAmountInvalidException(share);
+		}
+
+		UserFundRecord tradeRecord = this.userFundRecordFacade.query(recordId);
+		if (AppUtil.isEmpty(tradeRecord)) {
+			throw new NotExistException();
+		}
+		// handle origin account record and user stock record
+		{
+			UserFund userFund = this.userFundFacade.query(tradeRecord.getUserFundId());
+			if (tradeRecord.getType() == DealType.BUY) {
+				userFund.setAmount(userFund.getAmount().subtract(tradeRecord.getShare()));
+			} else if (tradeRecord.getType() == DealType.SELL) {
+				userFund.setAmount(userFund.getAmount().add(tradeRecord.getShare()));
+			}
+			userFund = this.userFundFacade.update(userFund);
+
+			Account account = this.accountFacade.query(tradeRecord.getAccountId());
+			AccountRecord accountRecord = this.accountRecordFacade.query(tradeRecord.getAccountRecordId());
+			account.setBalance(account.getBalance().subtract(accountRecord.getTransAmount()));
+			account = this.accountFacade.update(account);
+		}
+
+		UserFund userFund = this.userFundFacade.queryByUserIdAndFundCode(userId, fundCode);
+		if (tradeRecord.getType() == DealType.BUY) {
+			userFund.setAmount(userFund.getAmount().add(share));
+		} else if (tradeRecord.getType() == DealType.SELL) {
+			userFund.setAmount(userFund.getAmount().subtract(share));
+		}
+		userFund = this.userFundFacade.update(userFund);
+
+		Account account = this.accountFacade.query(accountId);
+		if (tradeRecord.getType() == DealType.BUY) {
+			account.setBalance(account.getBalance().subtract(total));
+		} else if (tradeRecord.getType() == DealType.SELL || tradeRecord.getType() == DealType.BONUS) {
+			account.setBalance(account.getBalance().add(total));
+		}
+		account = this.accountFacade.update(account);
+
+		AccountRecord accountRecord = this.accountRecordFacade.query(accountRecordId);
+		if (tradeRecord.getType() == DealType.BUY) {
+			accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_BUY_SUCCESS, fundCode, share, price));
+			accountRecord.setTransAmount(BigDecimal.ZERO.subtract(total));
+		} else if (tradeRecord.getType() == DealType.SELL) {
+			accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_SELL_SUCCESS, fundCode, share, price));
+			accountRecord.setTransAmount(total);
+		} else if (tradeRecord.getType() == DealType.BONUS) {
+			accountRecord.setDescription(MessageFormat.format(MessageConstant.USER_FUND_BONUS_SUCCESS, total, fundCode));
+			accountRecord.setTransAmount(total);
+		}
+		accountRecord.setTransFrom(accountId);
+		accountRecord.setTransTo(accountId);
+		accountRecord.setTransDate(date);
+		accountRecord.setFileId(fileId);
+		accountRecord = this.accountRecordFacade.update(accountRecord);
+
+		tradeRecord.setAccountId(accountId);
+		tradeRecord.setUserFundId(userFund.getId());
+		tradeRecord.setDate(date);
+		tradeRecord.setShare(share);
+		tradeRecord.setPrice(price);
+		tradeRecord.setRate(rate);
+		tradeRecord.setFee(fee);
+		tradeRecord.setTotal(total);
+		tradeRecord = this.userFundRecordFacade.update(tradeRecord);
+
+		return userFund;
 	}
 
 	@Transactional

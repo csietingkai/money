@@ -12,6 +12,8 @@ import io.tingkai.money.entity.AccountRecord;
 @Repository
 public interface AccountRecordDao extends JpaRepository<AccountRecord, UUID> {
 
+	public List<AccountRecord> findByIdIn(List<UUID> ids);
+
 	public List<AccountRecord> findByTransFromInAndTransToInAndTransDateBetween(List<UUID> transFroms, List<UUID> transTos, LocalDateTime start, LocalDateTime end);
 
 	public List<AccountRecord> findByTransFromOrTransTo(UUID transFrom, UUID transTo);

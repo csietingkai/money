@@ -3,7 +3,7 @@ import moment from 'moment';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import { UserSetting } from '../../../api/auth';
 import AccountApi, { Account } from '../../../api/account';
-import FundApi, { UserFundListResponse, UserFundVo } from '../../../api/fund';
+import FundApi, { UserFundListResponse, UserFundResponse, UserFundVo } from '../../../api/fund';
 import FinancailFileApi from '../../../api/financailFile';
 import * as AppUtil from '../../../util/AppUtil';
 import { DEFAULT_DECIMAL_PRECISION } from '../../../util/Constant';
@@ -38,11 +38,11 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
 
     constructor(props: FundBonusFormProps) {
         super(props);
-        const { tradeCondition } = props;
-        this.state = this.init(tradeCondition);
+        const { accounts, tradeCondition, userSetting: { fundFeeRate } } = props;
+        this.state = this.init(accounts, fundFeeRate, tradeCondition);
     }
 
-    private init = (tradeCondition?: FundTradeCondition): FundBonusFormState => {
+    private init = (accounts: Account[], fundFeeRate: number, tradeCondition?: FundTradeCondition): FundBonusFormState => {
         const state: FundBonusFormState = {
             code: '',
             name: '',
@@ -60,23 +60,46 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
         if (tradeCondition?.type === 'bonus') {
             state.code = tradeCondition.code;
             state.name = tradeCondition.name;
+            state.accountId = tradeCondition.accountId || '';
+            if (state.accountId) {
+                const balance = accounts.find(x => x.id === state.accountId)?.balance || 0;
+                state.balance = AppUtil.numberComma(balance);
+            }
             state.tradeDate = tradeCondition.date;
-            // TODO exchange rate
+            state.rate = tradeCondition.rate;
+            state.price = tradeCondition.price;
             state.share = tradeCondition.share;
-            state.total = AppUtil.toNumber((state.rate * state.price * state.share).toFixed(DEFAULT_DECIMAL_PRECISION));
+            if (tradeCondition.price && tradeCondition.share) {
+                state.total = tradeCondition.total || 0;
+            } else {
+                state.total = AppUtil.toNumber((state.rate * state.price * state.share).toFixed(DEFAULT_DECIMAL_PRECISION));
+            }
+            this.getFilesByDate(state.tradeDate).then((bonusFileOptions: Option[]) => {
+                let fileId: string = '';
+                if (tradeCondition.fileId && bonusFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                    fileId = tradeCondition.fileId;
+                }
+                this.setState({ bonusFileOptions, fileId });
+            });
         }
         return state;
     };
 
     private onBonusClick = async () => {
-        const { tradeCondition, notify } = this.props;
+        const { accounts, tradeCondition, userSetting: { fundFeeRate }, notify } = this.props;
         const { code, accountId, tradeDate, share, price, rate, total, fileId } = this.state;
-        const { success, message } = await FundApi.bonus(accountId, code, tradeDate, share, price, rate, total, fileId);
+        let api: Promise<UserFundResponse>;
+        if (tradeCondition?.recordId && tradeCondition.accountRecordId) {
+            api = FundApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, rate, 0, total, tradeCondition.accountRecordId, fileId);
+        } else {
+            api = FundApi.bonus(accountId, code, tradeDate, share, price, rate, total, fileId);
+        }
+        const { success, message } = await api;
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
-            this.setState(this.init(tradeCondition));
+            this.setState(this.init(accounts, fundFeeRate, tradeCondition));
         }
     };
 

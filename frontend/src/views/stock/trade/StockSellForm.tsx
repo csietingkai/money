@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import AccountApi, { Account } from '../../../api/account';
-import StockApi, { UserStockListResponse, UserStockVo } from '../../../api/stock';
+import StockApi, { UserStockListResponse, UserStockResponse, UserStockVo } from '../../../api/stock';
 import FinancailFileApi from '../../../api/financailFile';
 import * as AppUtil from '../../../util/AppUtil';
 import { Option } from '../../../util/Interface';
@@ -37,11 +37,11 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
 
     constructor(props: StockSellFormProps) {
         super(props);
-        const { tradeCondition } = props;
-        this.state = this.init(tradeCondition);
+        const { accounts, tradeCondition } = props;
+        this.state = this.init(accounts, tradeCondition);
     }
 
-    private init = (tradeCondition: StockTradeCondition | undefined): StockSellFormState => {
+    private init = (accounts: Account[], tradeCondition: StockTradeCondition | undefined): StockSellFormState => {
         const state: StockSellFormState = {
             code: '',
             name: '',
@@ -63,14 +63,30 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
             state.name = tradeCondition.name;
             state.tradeDate = tradeCondition.date;
             state.currency = tradeCondition.currency;
+            state.accountId = tradeCondition.accountId || '';
+            if (state.accountId) {
+                const showAccountList = accounts.filter(x => x.currency === state.currency);
+                const balance = showAccountList.find(x => x.id === state.accountId)?.balance || 0;
+                state.balance = AppUtil.numberComma(balance);
+            }
             state.price = tradeCondition.price;
             state.share = tradeCondition.share;
-            this.calcFee(state.share, state.price).then(({ fee, tax }) => {
-                const total = state.price * state.share - fee - tax;
-                this.setState({ fee, tax, total: AppUtil.numberComma(total) });
-            });
-            this.getFilesByDate(new Date()).then((sellFileOptions: Option[]) => {
-                this.setState({ sellFileOptions });
+            if (tradeCondition.fee && tradeCondition.tax && tradeCondition.total) {
+                state.fee = tradeCondition.fee;
+                state.tax = tradeCondition.tax;
+                state.total = AppUtil.numberComma(tradeCondition.total);
+            } else {
+                this.calcFee(state.share, state.price).then(({ fee, tax }) => {
+                    const total = state.price * state.share - fee - tax;
+                    this.setState({ fee, tax, total: AppUtil.numberComma(total) });
+                });
+            }
+            this.getFilesByDate(state.tradeDate).then((sellFileOptions: Option[]) => {
+                let fileId: string = '';
+                if (tradeCondition.fileId && sellFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                    fileId = tradeCondition.fileId;
+                }
+                this.setState({ sellFileOptions, fileId });
             });
         }
 
@@ -78,14 +94,20 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
     };
 
     private onSellClick = async () => {
-        const { tradeCondition, notify } = this.props;
+        const { accounts, tradeCondition, notify } = this.props;
         const { code, accountId, tradeDate, share, price, fee, tax, total, fileId } = this.state;
-        const { success, message } = await StockApi.sell(accountId, code, tradeDate, share, price, fee, tax, AppUtil.reverseNumberComma(total), fileId);
+        let api: Promise<UserStockResponse>;
+        if (tradeCondition?.recordId && tradeCondition.accountRecordId) {
+            api = StockApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId);
+        } else {
+            api = StockApi.sell(accountId, code, tradeDate, share, price, fee, tax, AppUtil.reverseNumberComma(total), fileId);
+        }
+        const { success, message } = await api;
         notify(message);
         if (success) {
             this.fetchAccounts();
             this.fetchOwnStocks();
-            this.setState(this.init(tradeCondition));
+            this.setState(this.init(accounts, tradeCondition));
         }
     };
 

@@ -2,10 +2,10 @@ import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPlus, cilTrash } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getFundOwnList, getStockType } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
-import FundApi, { UserFundRecord, UserFundVo } from '../../api/fund';
+import FundApi, { UserFundRecordVo, UserFundVo } from '../../api/fund';
 import { SetAccountListDispatcher, SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher } from '../../reducer/PropsMapper';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
@@ -28,7 +28,7 @@ export interface FundOwnPageProps {
 
 export interface FundOwnPageState {
     show: { [stockCode: string]: boolean; };
-    currentOwnFundRecords: UserFundRecord[];
+    currentOwnFundRecords: UserFundRecordVo[];
     ownFundRecordPage: number;
     showDeleteRecordModal: boolean;
     holdingRecordId: string;
@@ -174,6 +174,16 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                                             <CTableDataCell>
                                                                 <CButtonGroup role='group'>
                                                                     <CButton
+                                                                        color='info'
+                                                                        variant='outline'
+                                                                        size='sm'
+                                                                        onClick={() => {
+                                                                            this.tradeFundPage(ownFundInfo, r.type.toLowerCase() as TradeType, r);
+                                                                        }}
+                                                                    >
+                                                                        <CIcon icon={cilPencil}></CIcon>
+                                                                    </CButton>
+                                                                    <CButton
                                                                         color='danger'
                                                                         variant='outline'
                                                                         size='sm'
@@ -199,29 +209,40 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         );
     };
 
-    private tradeFundPage = (fundInfo?: UserFundVo, type?: TradeType) => {
+    private tradeFundPage = (fundInfo?: UserFundVo, type?: TradeType, record?: UserFundRecordVo) => {
         const { setFundTradeCondition } = this.props;
         if (fundInfo && type) {
             if (type === 'buy') {
                 const tradeCondition: FundTradeCondition = {
+                    recordId: record?.id,
                     type,
                     code: fundInfo.fundCode,
                     name: fundInfo.fundName,
-                    date: new Date(),
-                    debitAmount: 0, // TODO
-                    price: fundInfo.price,
-                    rate: 1 // TODO exchange rate
+                    accountId: record?.accountId,
+                    date: record?.date || new Date(),
+                    debitAmount: (record && (record?.total - record?.fee)) || 0,
+                    rate: record?.rate || 1,
+                    price: record?.price || fundInfo.price,
+                    share: record?.share,
+                    fee: record?.fee,
+                    accountRecordId: record?.accountRecordId,
+                    fileId: record?.fileId
                 };
                 setFundTradeCondition(tradeCondition);
             } else {
                 const tradeCondition: FundTradeCondition = {
+                    recordId: record?.id,
                     type,
                     code: fundInfo.fundCode,
                     name: fundInfo.fundName,
-                    date: new Date(),
+                    accountId: record?.accountId,
+                    date: record?.date || new Date(),
                     price: fundInfo.price,
-                    rate: 1, // TODO exchange rate
-                    share: fundInfo.amount
+                    rate: record?.rate || 1,
+                    share: record?.share || fundInfo.amount,
+                    total: record?.total,
+                    accountRecordId: record?.accountRecordId,
+                    fileId: record?.fileId
                 };
                 setFundTradeCondition(tradeCondition);
             }

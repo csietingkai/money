@@ -28,6 +28,17 @@ public class AccountRecordFacade {
 	@Autowired
 	private AccountRecordDao accountRecordDao;
 
+	public List<AccountRecord> queryAll(List<UUID> ids) {
+		List<AccountRecord> entities = this.accountRecordDao.findByIdIn(ids);
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+		}
+		if (entities.size() > AppConstants.FETCH_MAX_RECORD) {
+			entities = entities.subList(0, AppConstants.FETCH_MAX_RECORD);
+		}
+		return entities;
+	}
+
 	public List<AccountRecord> queryAllInMonth(List<UUID> accountIds, int year, int month) {
 		LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
 		LocalDateTime endOfMonth = null;
