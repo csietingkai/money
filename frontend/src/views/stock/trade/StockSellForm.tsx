@@ -98,7 +98,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
         const { code, accountId, tradeDate, share, price, fee, tax, total, fileId } = this.state;
         let api: Promise<UserStockResponse>;
         if (tradeCondition?.recordId && tradeCondition.accountRecordId) {
-            api = StockApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId);
+            api = StockApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId, tax, fileId);
         } else {
             api = StockApi.sell(accountId, code, tradeDate, share, price, fee, tax, AppUtil.reverseNumberComma(total), fileId);
         }
