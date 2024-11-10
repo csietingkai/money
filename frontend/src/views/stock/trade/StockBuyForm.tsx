@@ -95,7 +95,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
         const { code, accountId, tradeDate, share, price, fee, total, fileId } = this.state;
         let api: Promise<UserStockResponse>;
         if (tradeCondition?.recordId && tradeCondition.accountRecordId) {
-            api = StockApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId);
+            api = StockApi.updateRecord(tradeCondition.recordId, accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), tradeCondition.accountRecordId, 0, fileId);
         } else {
             api = StockApi.buy(accountId, code, tradeDate, share, price, fee, AppUtil.reverseNumberComma(total), fileId);
         }
