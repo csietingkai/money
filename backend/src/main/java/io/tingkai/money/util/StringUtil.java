@@ -14,6 +14,16 @@ public class StringUtil {
 		return AppUtil.isEmpty(str) || str.trim().length() == 0;
 	}
 
+	public static boolean equals(String a, String b) {
+		if (a == null && b == null) {
+			return true;
+		}
+		if (!isBlank(a)) {
+			return a.equals(b);
+		}
+		return false;
+	}
+
 	public static String toString(Object obj) {
 		return AppUtil.isEmpty(obj) ? CodeConstants.EMPTY_STRING : obj.toString();
 	}

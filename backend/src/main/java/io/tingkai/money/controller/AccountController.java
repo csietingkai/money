@@ -20,12 +20,12 @@ import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
+import io.tingkai.money.model.request.AccountEditRequest;
 import io.tingkai.money.model.request.AccountInsertRequest;
 import io.tingkai.money.model.request.AccountRecordEditRequest;
 import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
-import io.tingkai.money.model.request.AccountEditRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.vo.AccountRecordVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
@@ -75,8 +75,8 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.MONTH_BALANCE, method = RequestMethod.GET)
-	public AccountResponse<MonthBalanceVo> getMonthBalance(@RequestParam UUID userId, @RequestParam int year, @RequestParam int month) {
-		MonthBalanceVo vo = this.accountService.getAllRecordInMonth(userId, year, month);
+	public AccountResponse<MonthBalanceVo> getMonthBalance(@RequestParam int cnt) {
+		MonthBalanceVo vo = this.accountService.getAllRecordInMonth(cnt);
 		return new AccountResponse<MonthBalanceVo>(true, vo, MessageConstant.ACCOUNT_GET_MONTH_BALANCE_SUCCESS);
 	}
 

@@ -39,15 +39,23 @@ export interface AccountRecordVo extends AccountRecord {
 }
 
 export interface MonthBalanceVo {
-    year: number;
-    month: number;
-    income: BalancePairVo[];
-    expend: BalancePairVo[];
+    sums: BalanceSumVo[];
+    details: BalanceDetailVo[];
 }
 
-export interface BalancePairVo {
-    currency: string;
-    amount: number;
+export interface BalanceSumVo {
+    year: number;
+    month: number;
+    income: number;
+    expend: number;
+    surplus: number;
+}
+
+export interface BalanceDetailVo {
+    year: number;
+    month: number;
+    income: {[recordType: string]: number};
+    expend: {[recordType: string]: number};
 }
 
 export interface AccountResponse extends ApiResponse<Account> { }
@@ -89,8 +97,8 @@ const getRecords = async (accountId: string): Promise<AccountRecordListResponse>
     return data;
 };
 
-const getMonthBalance = async (ownerName: string, year: number, month: number): Promise<AccountMonthBalanceResponse> => {
-    const response = await axios.get(ACCOUNT_MONTH_BALANCE_PATH, { params: { ownerName, year, month } });
+const getMonthBalance = async (cnt: number): Promise<AccountMonthBalanceResponse> => {
+    const response = await axios.get(ACCOUNT_MONTH_BALANCE_PATH, { params: { cnt } });
     const data: AccountMonthBalanceResponse = response.data;
     return data;
 };

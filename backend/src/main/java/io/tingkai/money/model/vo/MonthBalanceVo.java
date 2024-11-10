@@ -8,8 +8,7 @@ import lombok.Data;
 @Data
 public class MonthBalanceVo {
 
-	protected int year;
-	protected int month;
-	protected List<BalancePairVo> income = new ArrayList<BalancePairVo>();
-	protected List<BalancePairVo> expend = new ArrayList<BalancePairVo>();
+	protected List<BalanceSumVo> sums = new ArrayList<BalanceSumVo>();
+
+	protected List<BalanceDetailVo> details = new ArrayList<BalanceDetailVo>();
 }

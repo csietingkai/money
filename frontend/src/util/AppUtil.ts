@@ -68,6 +68,15 @@ export const precision = (a: number) => {
     return p;
 };
 
+export const prefixZero = (num: number, length: number = 2): string => {
+    let str: string = `${num}`;
+    while (str.length < length) {
+        str = `0${str}`
+    }
+    return str;
+
+}
+
 export const toDate = (str: any, defaultVal: Date | null = null): Date | null => {
     const d: Date = new Date(str);
     if (isValidDate(d)) {

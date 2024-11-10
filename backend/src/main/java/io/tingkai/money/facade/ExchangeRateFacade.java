@@ -3,7 +3,6 @@ package io.tingkai.money.facade;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import io.netty.util.internal.StringUtil;
 import io.tingkai.money.constant.DatabaseConstants;
 import io.tingkai.money.constant.MessageConstant;
-import io.tingkai.money.dao.AccountDao;
 import io.tingkai.money.dao.ExchangeRateDao;
 import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.model.exception.AlreadyExistException;
@@ -27,20 +25,8 @@ public class ExchangeRateFacade {
 	@Autowired
 	private ExchangeRateDao exchangeRateDao;
 
-	@Autowired
-	private AccountDao accountDao;
-
 	public List<ExchangeRate> queryAll() {
 		List<ExchangeRate> entities = this.exchangeRateDao.findAll();
-		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
-		}
-		return entities;
-	}
-
-	public List<ExchangeRate> queryByAccountExist() {
-		List<String> currencies = this.accountDao.findAll().stream().map(acc -> acc.getCurrency()).distinct().collect(Collectors.toList());
-		List<ExchangeRate> entities = this.exchangeRateDao.findAll().stream().filter(rate -> currencies.indexOf(rate.getCurrency()) >= 0).collect(Collectors.toList());
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}

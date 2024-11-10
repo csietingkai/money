@@ -57,10 +57,10 @@ public class ExchangeRateService {
 	private RedisTemplate<String, List<ExchangeRate>> cache;
 
 	public List<ExchangeRateVo> getAll() {
-		List<ExchangeRate> exchangeRates = cache.opsForValue().get(CodeConstants.EXCHANGE_RATE_LIST_KEY);
+		List<ExchangeRate> exchangeRates = this.cache.opsForValue().get(CodeConstants.EXCHANGE_RATE_LIST_KEY);
 		if (AppUtil.isEmpty(exchangeRates)) {
 			exchangeRates = this.exchangeRateFacade.queryAll();
-			cache.opsForValue().set(CodeConstants.EXCHANGE_RATE_LIST_KEY, exchangeRates);
+			this.cache.opsForValue().set(CodeConstants.EXCHANGE_RATE_LIST_KEY, exchangeRates);
 		}
 		List<ExchangeRateVo> vos = new ArrayList<ExchangeRateVo>();
 		for (ExchangeRate exchangeRate : exchangeRates) {

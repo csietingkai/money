@@ -19,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
+import io.tingkai.money.entity.ExchangeRate;
+import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
+import io.tingkai.money.facade.ExchangeRateRecordFacade;
 import io.tingkai.money.facade.UserFundRecordFacade;
 import io.tingkai.money.facade.UserStockRecordFacade;
 import io.tingkai.money.logging.Loggable;
@@ -36,7 +39,8 @@ import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
 import io.tingkai.money.model.vo.AccountRecordVo;
-import io.tingkai.money.model.vo.BalancePairVo;
+import io.tingkai.money.model.vo.BalanceDetailVo;
+import io.tingkai.money.model.vo.BalanceSumVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
@@ -45,6 +49,9 @@ import io.tingkai.money.util.TimeUtil;
 @Service
 @Loggable
 public class AccountService {
+
+	@Autowired
+	private ExchangeRateRecordFacade exchangeRateRecordFacade;
 
 	@Autowired
 	private AccountFacade accountFacade;
@@ -61,6 +68,10 @@ public class AccountService {
 	@Autowired
 	@Qualifier(CodeConstants.USER_CACHE)
 	private RedisTemplate<String, List<Account>> userCache;
+
+	@Autowired
+	@Qualifier(CodeConstants.PYTHON_CACHE)
+	private RedisTemplate<String, List<ExchangeRate>> pythonCache;
 
 	public List<Account> getAll(UUID userId) {
 		List<Account> entities = this.syncCache(userId);
@@ -94,65 +105,59 @@ public class AccountService {
 		return this.accountFacade.update(entity);
 	}
 
-	public MonthBalanceVo getAllRecordInMonth(UUID userId, int year, int month) {
+	public MonthBalanceVo getAllRecordInMonth(int monthCnt) {
+		UUID userId = ContextUtil.getUserId();
+
 		MonthBalanceVo vo = new MonthBalanceVo();
-		vo.setYear(year);
-		vo.setMonth(month);
 
 		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId));
 		if (AppUtil.isEmpty(accounts)) {
 			accounts = this.accountFacade.queryAll(userId);
 			this.userCache.opsForValue().set(CodeConstants.ACCOUNT_LIST, accounts);
 		}
-		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
-		Map<UUID, String> accountCurrency = accounts.stream().collect(Collectors.toMap(Account::getId, Account::getCurrency));
-		List<AccountRecord> records = this.accountRecordFacade.queryAllInMonth(accountIds, year, month);
-		// @formatter:off
-		records = records.stream()
-				.filter(x -> x.getTransFrom().compareTo(x.getTransTo()) == 0)
-				.collect(Collectors.toList());
-		Map<String, List<AccountRecord>> incomes = records.stream()
-				.filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0)
-				.collect(
-						() -> new HashMap<String, List<AccountRecord>>(),
-						(map, record) -> {
-							String currency = accountCurrency.get(record.getTransFrom());
-							if (!map.containsKey(currency)) {
-								map.put(currency, new ArrayList<AccountRecord>());
-							}
-							map.get(currency).add(record);
-						},
-						(map1, map2) -> map1.putAll(map2)
-				);
-		Map<String, List<AccountRecord>> expends = records.stream()
-				.filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) > 0)
-				.collect(
-						() -> new HashMap<String, List<AccountRecord>>(),
-						(map, record) -> {
-							String currency = accountCurrency.get(record.getTransFrom());
-							if (!map.containsKey(currency)) {
-								map.put(currency, new ArrayList<AccountRecord>());
-							}
-							map.get(currency).add(record);
-						},
-						(map1, map2) -> map1.putAll(map2)
-				);
-		// @formatter:on
 
-		incomes.forEach((currency, incomeRecords) -> {
-			BalancePairVo pair = new BalancePairVo();
-			pair.setCurrency(currency);
-			BigDecimal sum = incomeRecords.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-			pair.setAmount(sum);
-			vo.getIncome().add(pair);
-		});
-		expends.forEach((currency, expendRecords) -> {
-			BalancePairVo pair = new BalancePairVo();
-			pair.setCurrency(currency);
-			BigDecimal sum = expendRecords.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-			pair.setAmount(sum);
-			vo.getExpend().add(pair);
-		});
+		Map<UUID, BigDecimal> accountCurrencies = new HashMap<UUID, BigDecimal>();
+		Map<String, BigDecimal> currencies = new HashMap<String, BigDecimal>();
+		currencies.put(CodeConstants.BASE_EXCHANGE_RATE, BigDecimal.ONE);
+		for (Account account : accounts) {
+			BigDecimal rate;
+			if (!currencies.containsKey(account.getCurrency())) {
+				ExchangeRateRecord latestRateRecord = this.exchangeRateRecordFacade.latestRecord(account.getCurrency());
+				rate = latestRateRecord.getSpotSell();
+			} else {
+				rate = currencies.get(account.getCurrency());
+			}
+			accountCurrencies.put(account.getId(), rate);
+		}
+
+		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
+		LocalDateTime now = LocalDateTime.now(CodeConstants.ZONE_TPE);
+		int year = now.getYear();
+		int month = now.getMonthValue();
+		for (int cnt = 0; cnt < monthCnt; cnt++) {
+			List<AccountRecord> records = this.accountRecordFacade.queryAllInMonth(accountIds, year, month);
+			records = records.stream().filter(x -> x.getTransFrom().compareTo(x.getTransTo()) == 0).map(x -> {
+				x.setTransAmount(x.getTransAmount().multiply(accountCurrencies.get(x.getTransFrom())));
+				return x;
+			}).collect(Collectors.toList());
+
+			List<AccountRecord> incomes = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0).toList();
+			BigDecimal incomeSum = incomes.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			List<AccountRecord> expends = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) > 0).toList();
+			expends.forEach(x -> x.setTransAmount(BigDecimal.ZERO.subtract(x.getTransAmount())));
+			BigDecimal expendSum = expends.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			vo.getSums().add(0, BalanceSumVo.of(year, month, incomeSum, expendSum));
+
+			Map<String, BigDecimal> incomeByRecordType = incomes.stream().collect(Collectors.groupingBy(AccountRecord::getRecordType, Collectors.reducing(BigDecimal.ZERO, AccountRecord::getTransAmount, BigDecimal::add)));
+			Map<String, BigDecimal> expendByRecordType = expends.stream().collect(Collectors.groupingBy(AccountRecord::getRecordType, Collectors.reducing(BigDecimal.ZERO, AccountRecord::getTransAmount, BigDecimal::add)));
+			vo.getDetails().add(0, BalanceDetailVo.of(year, month, incomeByRecordType, expendByRecordType));
+
+			month--;
+			if (month <= 0) {
+				month += 12;
+				year--;
+			}
+		}
 
 		return vo;
 	}

@@ -75,7 +75,7 @@ public class ScheduleTaskService {
 			return;
 		}
 
-		List<ExchangeRate> exchangeRates = this.exchangeRateFacade.queryByAccountExist();
+		List<ExchangeRate> exchangeRates = this.exchangeRateFacade.queryAll();
 		for (ExchangeRate exchangeRate : exchangeRates) {
 			ExchangeRateRecord lastRecord = this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency());
 			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
