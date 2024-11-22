@@ -130,6 +130,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     private monthDetailChart = (key: 'income' | 'expend'): React.ReactNode => {
         const { monthBalance, activeTab } = this.state;
         const yms = monthBalance.details.map(x => `${x.year}${AppUtil.prefixZero(x.month)}`);
+        const ymLabels = monthBalance.details.map(x => `${x.year}/${AppUtil.prefixZero(x.month)}`);
         const dataHeader = ['Record Type', `${key.slice(0, 1).toUpperCase()}${key.slice(1)}`];
         const data = {};
         monthBalance.details.forEach(x => {
@@ -159,10 +160,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     <React.Fragment>
                         <CNav variant='underline-border' layout='justified'>
                             {
-                                yms.map(r => {
+                                yms.map((r, idx) => {
                                     return (
                                         <CNavItem key={`${key}-${r}-tab`}>
-                                            <CNavLink active={activeTab[key] === r} onClick={() => this.setState({ activeTab: { ...activeTab, [key]: r } })}>{r}</CNavLink>
+                                            <CNavLink active={activeTab[key] === r} onClick={() => this.setState({ activeTab: { ...activeTab, [key]: r } })}>{ymLabels[idx]}</CNavLink>
                                         </CNavItem>
                                     );
                                 })
