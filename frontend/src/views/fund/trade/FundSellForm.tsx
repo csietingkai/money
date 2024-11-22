@@ -74,14 +74,14 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
             } else {
                 state.total = AppUtil.toNumber((state.rate * state.price * state.share).toFixed(DEFAULT_DECIMAL_PRECISION));
             }
-            this.getFilesByDate(state.tradeDate).then((sellFileOptions: Option[]) => {
-                let fileId: string = '';
-                if (tradeCondition.fileId && sellFileOptions.find(x => x.key === tradeCondition.fileId)) {
-                    fileId = tradeCondition.fileId;
-                }
-                this.setState({ sellFileOptions, fileId });
-            });
         }
+        this.getFilesByDate(state.tradeDate).then((sellFileOptions: Option[]) => {
+            let fileId: string = '';
+            if (tradeCondition?.fileId && sellFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                fileId = tradeCondition.fileId;
+            }
+            this.setState({ sellFileOptions, fileId });
+        });
         return state;
     };
 
@@ -99,7 +99,7 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
-            this.setState(this.init(accounts, fundFeeRate, tradeCondition));
+            this.setState(this.init(accounts, fundFeeRate, undefined));
         }
     };
 

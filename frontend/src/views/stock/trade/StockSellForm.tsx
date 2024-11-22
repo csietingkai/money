@@ -81,14 +81,14 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                     this.setState({ fee, tax, total: AppUtil.numberComma(total) });
                 });
             }
-            this.getFilesByDate(state.tradeDate).then((sellFileOptions: Option[]) => {
-                let fileId: string = '';
-                if (tradeCondition.fileId && sellFileOptions.find(x => x.key === tradeCondition.fileId)) {
-                    fileId = tradeCondition.fileId;
-                }
-                this.setState({ sellFileOptions, fileId });
-            });
         }
+        this.getFilesByDate(state.tradeDate).then((sellFileOptions: Option[]) => {
+            let fileId: string = '';
+            if (tradeCondition?.fileId && sellFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                fileId = tradeCondition.fileId;
+            }
+            this.setState({ sellFileOptions, fileId });
+        });
 
         return state;
     };
@@ -107,7 +107,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
         if (success) {
             this.fetchAccounts();
             this.fetchOwnStocks();
-            this.setState(this.init(accounts, tradeCondition));
+            this.setState(this.init(accounts, undefined));
         }
     };
 

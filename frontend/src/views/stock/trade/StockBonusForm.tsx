@@ -72,14 +72,14 @@ export default class StockBonusForm extends React.Component<StockBonusFormProps,
                 state.fee = tradeCondition.fee;
                 state.total = AppUtil.numberComma(tradeCondition.total);
             }
-            this.getFilesByDate(state.tradeDate).then((bonusFileOptions: Option[]) => {
-                let fileId: string = '';
-                if (tradeCondition.fileId && bonusFileOptions.find(x => x.key === tradeCondition.fileId)) {
-                    fileId = tradeCondition.fileId;
-                }
-                this.setState({ bonusFileOptions, fileId });
-            });
         }
+        this.getFilesByDate(state.tradeDate).then((bonusFileOptions: Option[]) => {
+            let fileId: string = '';
+            if (tradeCondition?.fileId && bonusFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                fileId = tradeCondition.fileId;
+            }
+            this.setState({ bonusFileOptions, fileId });
+        });
 
         return state;
     };
@@ -97,7 +97,7 @@ export default class StockBonusForm extends React.Component<StockBonusFormProps,
         notify(message);
         if (success) {
             this.fetchAccounts();
-            this.setState(this.init(accounts, tradeCondition));
+            this.setState(this.init(accounts, undefined));
         }
     };
 

@@ -74,14 +74,14 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
             } else {
                 state.total = AppUtil.toNumber((state.rate * state.price * state.share).toFixed(DEFAULT_DECIMAL_PRECISION));
             }
-            this.getFilesByDate(state.tradeDate).then((bonusFileOptions: Option[]) => {
-                let fileId: string = '';
-                if (tradeCondition.fileId && bonusFileOptions.find(x => x.key === tradeCondition.fileId)) {
-                    fileId = tradeCondition.fileId;
-                }
-                this.setState({ bonusFileOptions, fileId });
-            });
         }
+        this.getFilesByDate(state.tradeDate).then((bonusFileOptions: Option[]) => {
+            let fileId: string = '';
+            if (tradeCondition?.fileId && bonusFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                fileId = tradeCondition.fileId;
+            }
+            this.setState({ bonusFileOptions, fileId });
+        });
         return state;
     };
 
@@ -99,7 +99,7 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
-            this.setState(this.init(accounts, fundFeeRate, tradeCondition));
+            this.setState(this.init(accounts, fundFeeRate, undefined));
         }
     };
 

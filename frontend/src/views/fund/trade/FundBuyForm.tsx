@@ -76,14 +76,14 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
             state.share = tradeCondition.share || 0;
             state.fee = tradeCondition.fee || AppUtil.toNumber((state.debitAmount * fundFeeRate).toFixed(6));
             state.total = AppUtil.numberComma(state.debitAmount + state.fee);
-            this.getFilesByDate(state.tradeDate).then((buyFileOptions: Option[]) => {
-                let fileId: string = '';
-                if (tradeCondition.fileId && buyFileOptions.find(x => x.key === tradeCondition.fileId)) {
-                    fileId = tradeCondition.fileId;
-                }
-                this.setState({ buyFileOptions, fileId });
-            });
         }
+        this.getFilesByDate(state.tradeDate).then((buyFileOptions: Option[]) => {
+            let fileId: string = '';
+            if (tradeCondition?.fileId && buyFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                fileId = tradeCondition.fileId;
+            }
+            this.setState({ buyFileOptions, fileId });
+        });
         return state;
     };
 
@@ -101,7 +101,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
         if (success) {
             this.fetchAccounts();
             this.fetchOwnFunds();
-            this.setState(this.init(accounts, fundFeeRate, tradeCondition));
+            this.setState(this.init(accounts, fundFeeRate, undefined));
         }
     };
 

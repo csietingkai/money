@@ -78,14 +78,14 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                     this.setState({ fee, total: AppUtil.numberComma(total) });
                 });
             }
-            this.getFilesByDate(state.tradeDate).then((buyFileOptions: Option[]) => {
-                let fileId: string = '';
-                if (tradeCondition.fileId && buyFileOptions.find(x => x.key === tradeCondition.fileId)) {
-                    fileId = tradeCondition.fileId;
-                }
-                this.setState({ buyFileOptions, fileId });
-            });
         }
+        this.getFilesByDate(state.tradeDate).then((buyFileOptions: Option[]) => {
+            let fileId: string = '';
+            if (tradeCondition?.fileId && buyFileOptions.find(x => x.key === tradeCondition.fileId)) {
+                fileId = tradeCondition.fileId;
+            }
+            this.setState({ buyFileOptions, fileId });
+        });
 
         return state;
     };
@@ -104,7 +104,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
         if (success) {
             this.fetchAccounts();
             this.fetchOwnStocks();
-            this.setState(this.init(accounts, tradeCondition));
+            this.setState(this.init(accounts, undefined));
         }
     };
 
