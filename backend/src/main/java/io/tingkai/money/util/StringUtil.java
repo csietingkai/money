@@ -10,8 +10,26 @@ public class StringUtil {
 		return AppUtil.isEmpty(str) || str.length() == 0;
 	}
 
+	public static boolean isAllEmpty(String... strs) {
+		for (String str : strs) {
+			if (!isEmpty(str)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static boolean isBlank(String str) {
 		return AppUtil.isEmpty(str) || str.trim().length() == 0;
+	}
+
+	public static boolean isAllBlank(String... strs) {
+		for (String str : strs) {
+			if (!isBlank(str)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static boolean equals(String a, String b) {

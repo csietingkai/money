@@ -17,6 +17,7 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -61,6 +62,14 @@ public class AccountFacade {
 		if (optional.isPresent()) {
 			throw new AlreadyExistException();
 		}
+
+		if (StringUtil.isBlank(entity.getBankCode())) {
+			entity.setBankCode(null);
+		}
+		if (StringUtil.isBlank(entity.getBankNo())) {
+			entity.setBankNo(null);
+		}
+
 		return this.accountDao.save(entity);
 	}
 
@@ -74,6 +83,12 @@ public class AccountFacade {
 		}
 		Account updateEntity = optional.get();
 		updateEntity.setName(entity.getName());
+		if (StringUtil.isBlank(entity.getBankCode())) {
+			entity.setBankCode(null);
+		}
+		if (StringUtil.isBlank(entity.getBankNo())) {
+			entity.setBankNo(null);
+		}
 		return this.accountDao.save(updateEntity);
 	}
 }
