@@ -296,7 +296,7 @@ public class AccountService {
 			this.accountFacade.update(toAccount1);
 
 			Account toAccount2 = this.accountFacade.query(toId);
-			toAccount2.setBalance(toAccount1.getBalance().add(amount));
+			toAccount2.setBalance(toAccount2.getBalance().add(amount));
 			this.accountFacade.update(toAccount2);
 		}
 
