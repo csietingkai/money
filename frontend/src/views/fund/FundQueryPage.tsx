@@ -119,7 +119,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
         return (
             <CCard className='mb-4'>
                 <CCardBody>
-                    <CForm>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.search)}>
                         <CRow className='mb-2'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>

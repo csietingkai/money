@@ -1,6 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CFormInput, CFormLabel, CFormSelect, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
@@ -14,8 +14,8 @@ import AppPagination from '../components/AppPagination';
 import * as AppUtil from '../util/AppUtil';
 import { Action, SimpleResponse, Option } from '../util/Interface';
 import { StockType } from '../util/Enum';
-import currencyIcon from '../assets/currency';
 import { DATA_COUNT_PER_PAGE } from '../util/Constant';
+import currencyIcon from '../assets/currency';
 
 export interface AccountPageProps {
     userId: string,
@@ -260,59 +260,61 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CModalTitle>New Account</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
-                            Currency
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormSelect
-                                value={addAccountForm.currency}
-                                onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, currency: event.target.value as string } })}
-                            >
-                                {currencyOptions.map(o => <option key={`currency-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                            Name
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormInput
-                                type='text'
-                                placeholder='Enter your new account name'
-                                value={addAccountForm.name}
-                                onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, name: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                            Bank
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormSelect
-                                value={addAccountForm.bankCode}
-                                onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankCode: event.target.value as string } })}
-                            >
-                                <option value=''></option>
-                                {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                            Bank No.
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormInput
-                                type='text'
-                                placeholder='Enter your new 16 digitals bank number'
-                                value={addAccountForm.bankNo}
-                                onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankNo: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.addAccount)}>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
+                                Currency
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormSelect
+                                    value={addAccountForm.currency}
+                                    onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, currency: event.target.value as string } })}
+                                >
+                                    {currencyOptions.map(o => <option key={`currency-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                                Name
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormInput
+                                    type='text'
+                                    placeholder='Enter your new account name'
+                                    value={addAccountForm.name}
+                                    onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, name: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                                Bank
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormSelect
+                                    value={addAccountForm.bankCode}
+                                    onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankCode: event.target.value as string } })}
+                                >
+                                    <option value=''></option>
+                                    {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                                Bank No.
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormInput
+                                    type='text'
+                                    placeholder='Enter your new 16 digitals bank number'
+                                    value={addAccountForm.bankNo}
+                                    onChange={(event: any) => this.setState({ addAccountForm: { ...addAccountForm, bankNo: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                    </CForm>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color='primary' onClick={this.addAccount}>Save</CButton>
@@ -355,59 +357,61 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CModalTitle>Edit Account</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
-                            Currency
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormSelect
-                                value={editAccountForm.currency}
-                                disabled
-                            >
-                                {currencyOptions.map(o => <option key={`currency-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                            Name
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormInput
-                                type='text'
-                                placeholder='Enter your new account name'
-                                value={editAccountForm.name}
-                                onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, name: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                            Bank
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormSelect
-                                value={editAccountForm.bankCode}
-                                onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankCode: event.target.value as string } })}
-                            >
-                                <option value=''></option>
-                                {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                            Bank No.
-                        </CFormLabel>
-                        <div className='col-sm-9'>
-                            <CFormInput
-                                type='text'
-                                placeholder='Enter your new 16 digitals bank number'
-                                value={editAccountForm.bankNo}
-                                onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankNo: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.editAccount)}>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
+                                Currency
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormSelect
+                                    value={editAccountForm.currency}
+                                    disabled
+                                >
+                                    {currencyOptions.map(o => <option key={`currency-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                                Name
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormInput
+                                    type='text'
+                                    placeholder='Enter your new account name'
+                                    value={editAccountForm.name}
+                                    onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, name: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                                Bank
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormSelect
+                                    value={editAccountForm.bankCode}
+                                    onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankCode: event.target.value as string } })}
+                                >
+                                    <option value=''></option>
+                                    {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
+                                Bank No.
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormInput
+                                    type='text'
+                                    placeholder='Enter your new 16 digitals bank number'
+                                    value={editAccountForm.bankNo}
+                                    onChange={(event: any) => this.setState({ editAccountForm: { ...editAccountForm, bankNo: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                    </CForm>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color='primary' onClick={this.editAccount}>Save</CButton>
@@ -422,12 +426,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         const { editAccountForm } = this.state;
         const response: SimpleResponse = await AccountApi.updateAccount(editAccountForm.id, editAccountForm.name, editAccountForm.bankCode, editAccountForm.bankNo);
         const { success, message } = response;
+        notify(message);
         if (success) {
-            notify(message);
             await this.fetchAccounts();
             this.closeEditAccountModal();
-        } else {
-            notify(message);
         }
     };
 
@@ -486,79 +488,81 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CModalTitle>Income</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='income-date' className='col-sm-4 col-form-label'>
-                            Transaction Date
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <input
-                                type='date'
-                                id='income-date'
-                                className='form-control'
-                                value={moment(incomeForm.date).format('YYYY-MM-DD')}
-                                onChange={async (event) => {
-                                    const d = new Date(event.target.value);
-                                    const fs = await this.getFilesByDate(d);
-                                    this.setState({ incomeForm: { ...incomeForm, date: d, fileId: '' }, fileOptions: fs });
-                                }}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='income-record-type' className='col-sm-4 col-form-label'>
-                            Record Type
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={incomeForm.type}
-                                id='income-record-type'
-                                onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, type: event.target.value as string } })}
-                            >
-                                {recordTypeOptions.map(o => <option key={`income-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='income-amount' className='col-sm-4 col-form-label'>
-                            Transaction Amount
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormInput
-                                type='number'
-                                id='income-amount'
-                                value={incomeForm.amount}
-                                onChange={(event) => this.setState({ incomeForm: { ...incomeForm, amount: AppUtil.toNumber(event.target.value) } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='income-description' className='col-sm-4 col-form-label'>
-                            Description
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormInput
-                                type='text'
-                                id='income-description'
-                                value={incomeForm.description}
-                                onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, description: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='income-file' className='col-sm-4 col-form-label'>
-                            Linked File
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={incomeForm.fileId}
-                                id='income-file'
-                                onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, fileId: event.target.value as string } })}
-                            >
-                                <option value=''></option>
-                                {fileOptions.map(o => <option key={`income-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.income)}>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='income-date' className='col-sm-4 col-form-label'>
+                                Transaction Date
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <input
+                                    type='date'
+                                    id='income-date'
+                                    className='form-control'
+                                    value={moment(incomeForm.date).format('YYYY-MM-DD')}
+                                    onChange={async (event) => {
+                                        const d = new Date(event.target.value);
+                                        const fs = await this.getFilesByDate(d);
+                                        this.setState({ incomeForm: { ...incomeForm, date: d, fileId: '' }, fileOptions: fs });
+                                    }}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='income-record-type' className='col-sm-4 col-form-label'>
+                                Record Type
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={incomeForm.type}
+                                    id='income-record-type'
+                                    onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, type: event.target.value as string } })}
+                                >
+                                    {recordTypeOptions.map(o => <option key={`income-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='income-amount' className='col-sm-4 col-form-label'>
+                                Transaction Amount
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormInput
+                                    type='number'
+                                    id='income-amount'
+                                    value={incomeForm.amount}
+                                    onChange={(event) => this.setState({ incomeForm: { ...incomeForm, amount: AppUtil.toNumber(event.target.value) } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='income-description' className='col-sm-4 col-form-label'>
+                                Description
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormInput
+                                    type='text'
+                                    id='income-description'
+                                    value={incomeForm.description}
+                                    onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, description: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='income-file' className='col-sm-4 col-form-label'>
+                                Linked File
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={incomeForm.fileId}
+                                    id='income-file'
+                                    onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, fileId: event.target.value as string } })}
+                                >
+                                    <option value=''></option>
+                                    {fileOptions.map(o => <option key={`income-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                    </CForm>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color='primary' onClick={this.income}>Save</CButton>
@@ -621,93 +625,95 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CModalTitle>Transfer</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='transfer-to' className='col-sm-4 col-form-label'>
-                            Transfer To
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={transferForm.to}
-                                id='transfer-to'
-                                onChange={(event: any) => this.setState({ transferForm: { ...transferForm, to: event.target.value as string } })}
-                            >
-                                {showAccountList.map(a => <option key={`transfer-to-option-${a.id}`} value={a.id}>{a.name}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='transfer-date' className='col-sm-4 col-form-label'>
-                            Transaction Date
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <input
-                                type='date'
-                                id='transfer-date'
-                                className='form-control'
-                                value={moment(transferForm.date).format('YYYY-MM-DD')}
-                                onChange={async (event) => {
-                                    const d = new Date(event.target.value);
-                                    const fs = await this.getFilesByDate(d);
-                                    this.setState({ transferForm: { ...transferForm, date: d, fileId: '' }, fileOptions: fs });
-                                }}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='transfer-record-type' className='col-sm-4 col-form-label'>
-                            Record Type
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={transferForm.type}
-                                id='transfer-record-type'
-                                onChange={(event: any) => this.setState({ transferForm: { ...transferForm, type: event.target.value as string } })}
-                            >
-                                {recordTypeOptions.map(o => <option key={`transfer-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='transfer-amount' className='col-sm-4 col-form-label'>
-                            Transaction Amount
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormInput
-                                type='number'
-                                id='transfer-amount'
-                                value={transferForm.amount}
-                                onChange={(event) => this.setState({ transferForm: { ...transferForm, amount: AppUtil.toNumber(event.target.value) } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='transfer-description' className='col-sm-4 col-form-label'>
-                            Description
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormInput
-                                type='text'
-                                id='transfer-description'
-                                value={transferForm.description}
-                                onChange={(event: any) => this.setState({ transferForm: { ...transferForm, description: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='transfer-file' className='col-sm-4 col-form-label'>
-                            Linked File
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={transferForm.fileId}
-                                id='transfer-file'
-                                onChange={(event: any) => this.setState({ transferForm: { ...transferForm, fileId: event.target.value as string } })}
-                            >
-                                <option value=''></option>
-                                {fileOptions.map(o => <option key={`transfer-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.transfer)}>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='transfer-to' className='col-sm-4 col-form-label'>
+                                Transfer To
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={transferForm.to}
+                                    id='transfer-to'
+                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, to: event.target.value as string } })}
+                                >
+                                    {showAccountList.map(a => <option key={`transfer-to-option-${a.id}`} value={a.id}>{a.name}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='transfer-date' className='col-sm-4 col-form-label'>
+                                Transaction Date
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <input
+                                    type='date'
+                                    id='transfer-date'
+                                    className='form-control'
+                                    value={moment(transferForm.date).format('YYYY-MM-DD')}
+                                    onChange={async (event) => {
+                                        const d = new Date(event.target.value);
+                                        const fs = await this.getFilesByDate(d);
+                                        this.setState({ transferForm: { ...transferForm, date: d, fileId: '' }, fileOptions: fs });
+                                    }}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='transfer-record-type' className='col-sm-4 col-form-label'>
+                                Record Type
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={transferForm.type}
+                                    id='transfer-record-type'
+                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, type: event.target.value as string } })}
+                                >
+                                    {recordTypeOptions.map(o => <option key={`transfer-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='transfer-amount' className='col-sm-4 col-form-label'>
+                                Transaction Amount
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormInput
+                                    type='number'
+                                    id='transfer-amount'
+                                    value={transferForm.amount}
+                                    onChange={(event) => this.setState({ transferForm: { ...transferForm, amount: AppUtil.toNumber(event.target.value) } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='transfer-description' className='col-sm-4 col-form-label'>
+                                Description
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormInput
+                                    type='text'
+                                    id='transfer-description'
+                                    value={transferForm.description}
+                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, description: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='transfer-file' className='col-sm-4 col-form-label'>
+                                Linked File
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={transferForm.fileId}
+                                    id='transfer-file'
+                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, fileId: event.target.value as string } })}
+                                >
+                                    <option value=''></option>
+                                    {fileOptions.map(o => <option key={`transfer-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                    </CForm>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color='primary' onClick={this.transfer}>Save</CButton>
@@ -776,79 +782,81 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CModalTitle>Expend</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='expend-date' className='col-sm-4 col-form-label'>
-                            Transaction Date
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <input
-                                type='date'
-                                id='expend-date'
-                                className='form-control'
-                                value={moment(expendForm.date).format('YYYY-MM-DD')}
-                                onChange={async (event) => {
-                                    const d = new Date(event.target.value);
-                                    const fs = await this.getFilesByDate(d);
-                                    this.setState({ expendForm: { ...expendForm, date: d, fileId: '' }, fileOptions: fs });
-                                }}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='expend-record-type' className='col-sm-4 col-form-label'>
-                            Record Type
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={expendForm.type}
-                                id='expend-record-type'
-                                onChange={(event: any) => this.setState({ expendForm: { ...expendForm, type: event.target.value as string } })}
-                            >
-                                {recordTypeOptions.map(o => <option key={`expend-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='expend-amount' className='col-sm-4 col-form-label'>
-                            Transaction Amount
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormInput
-                                type='number'
-                                id='expend-amount'
-                                value={expendForm.amount}
-                                onChange={(event) => this.setState({ expendForm: { ...expendForm, amount: AppUtil.toNumber(event.target.value) } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='expend-description' className='col-sm-4 col-form-label'>
-                            Description
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormInput
-                                type='text'
-                                id='expend-description'
-                                value={expendForm.description}
-                                onChange={(event: any) => this.setState({ expendForm: { ...expendForm, description: event.target.value as string } })}
-                            />
-                        </div>
-                    </CRow>
-                    <CRow className='mb-3'>
-                        <CFormLabel htmlFor='expend-file' className='col-sm-4 col-form-label'>
-                            Linked File
-                        </CFormLabel>
-                        <div className='col-sm-8'>
-                            <CFormSelect
-                                value={expendForm.fileId}
-                                id='expend-file'
-                                onChange={(event: any) => this.setState({ expendForm: { ...expendForm, fileId: event.target.value as string } })}
-                            >
-                                <option value=''></option>
-                                {fileOptions.map(o => <option key={`expend-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                            </CFormSelect>
-                        </div>
-                    </CRow>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.expend)}>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='expend-date' className='col-sm-4 col-form-label'>
+                                Transaction Date
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <input
+                                    type='date'
+                                    id='expend-date'
+                                    className='form-control'
+                                    value={moment(expendForm.date).format('YYYY-MM-DD')}
+                                    onChange={async (event) => {
+                                        const d = new Date(event.target.value);
+                                        const fs = await this.getFilesByDate(d);
+                                        this.setState({ expendForm: { ...expendForm, date: d, fileId: '' }, fileOptions: fs });
+                                    }}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='expend-record-type' className='col-sm-4 col-form-label'>
+                                Record Type
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={expendForm.type}
+                                    id='expend-record-type'
+                                    onChange={(event: any) => this.setState({ expendForm: { ...expendForm, type: event.target.value as string } })}
+                                >
+                                    {recordTypeOptions.map(o => <option key={`expend-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='expend-amount' className='col-sm-4 col-form-label'>
+                                Transaction Amount
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormInput
+                                    type='number'
+                                    id='expend-amount'
+                                    value={expendForm.amount}
+                                    onChange={(event) => this.setState({ expendForm: { ...expendForm, amount: AppUtil.toNumber(event.target.value) } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='expend-description' className='col-sm-4 col-form-label'>
+                                Description
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormInput
+                                    type='text'
+                                    id='expend-description'
+                                    value={expendForm.description}
+                                    onChange={(event: any) => this.setState({ expendForm: { ...expendForm, description: event.target.value as string } })}
+                                />
+                            </div>
+                        </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='expend-file' className='col-sm-4 col-form-label'>
+                                Linked File
+                            </CFormLabel>
+                            <div className='col-sm-8'>
+                                <CFormSelect
+                                    value={expendForm.fileId}
+                                    id='expend-file'
+                                    onChange={(event: any) => this.setState({ expendForm: { ...expendForm, fileId: event.target.value as string } })}
+                                >
+                                    <option value=''></option>
+                                    {fileOptions.map(o => <option key={`expend-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                                </CFormSelect>
+                            </div>
+                        </CRow>
+                    </CForm>
                 </CModalBody>
                 <CModalFooter>
                     <CButton color='primary' onClick={this.expend}>Save</CButton>

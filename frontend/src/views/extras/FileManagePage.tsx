@@ -1,7 +1,7 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilCloudUpload, cilPencil, cilTrash, cilZoom } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import AppConfirmModal from '../../components/AppConfirmModal';
@@ -142,47 +142,49 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                 <CModalTitle>Upload New File</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                <CRow className='mb-3'>
-                    <CFormLabel htmlFor='type' className='col-sm-2 col-form-label'>
-                        Type
-                    </CFormLabel>
-                    <div className='col-sm-10'>
-                        <CFormSelect
-                            id='type'
-                            value={uploadForm.type}
-                            onChange={(event: any) => this.setState({ uploadForm: { ...uploadForm, type: event.target.value as string } })}
-                        >
-                            {fileTypeOptions.map(o => <option key={`file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                        </CFormSelect>
-                    </div>
-                </CRow>
-                <CRow className='mb-3'>
-                    <CFormLabel htmlFor='date' className='col-sm-2 col-form-label'>
-                        Date
-                    </CFormLabel>
-                    <div className='col-sm-10'>
-                        <input
-                            type='date'
-                            id='date'
-                            className='form-control'
-                            value={moment(uploadForm.date).format('YYYY-MM-DD')}
-                            onChange={(event) => this.setState({ uploadForm: { ...uploadForm, date: new Date(event.target.value) } })}
-                        />
-                    </div>
-                </CRow>
-                <CRow className='mb-3'>
-                    <CFormLabel htmlFor='file' className='col-sm-2 col-form-label'>
-                        File
-                    </CFormLabel>
-                    <div className='col-sm-10'>
-                        <CFormInput
-                            type='file'
-                            id='file'
-                            accept='application/pdf'
-                            onChange={(event: any) => this.setState({ uploadForm: { ...uploadForm, file: event.target.files[0] } })}
-                        />
-                    </div>
-                </CRow>
+                <CForm onKeyDown={AppUtil.bindEnterKey(this.upload)}>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='type' className='col-sm-2 col-form-label'>
+                            Type
+                        </CFormLabel>
+                        <div className='col-sm-10'>
+                            <CFormSelect
+                                id='type'
+                                value={uploadForm.type}
+                                onChange={(event: any) => this.setState({ uploadForm: { ...uploadForm, type: event.target.value as string } })}
+                            >
+                                {fileTypeOptions.map(o => <option key={`file-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                            </CFormSelect>
+                        </div>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='date' className='col-sm-2 col-form-label'>
+                            Date
+                        </CFormLabel>
+                        <div className='col-sm-10'>
+                            <input
+                                type='date'
+                                id='date'
+                                className='form-control'
+                                value={moment(uploadForm.date).format('YYYY-MM-DD')}
+                                onChange={(event) => this.setState({ uploadForm: { ...uploadForm, date: new Date(event.target.value) } })}
+                            />
+                        </div>
+                    </CRow>
+                    <CRow className='mb-3'>
+                        <CFormLabel htmlFor='file' className='col-sm-2 col-form-label'>
+                            File
+                        </CFormLabel>
+                        <div className='col-sm-10'>
+                            <CFormInput
+                                type='file'
+                                id='file'
+                                accept='application/pdf'
+                                onChange={(event: any) => this.setState({ uploadForm: { ...uploadForm, file: event.target.files[0] } })}
+                            />
+                        </div>
+                    </CRow>
+                </CForm>
             </CModalBody>
             <CModalFooter>
                 <CButton color='primary' onClick={this.upload}>Save</CButton>
@@ -256,7 +258,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
             <CModal size='xl' scrollable alignment='center' visible={showPreviewModal} onClose={this.closePreviewModal}>
                 <CModalBody>
                     <CRow className='mb-3'>
-                        <object data={pdfData} type='application/pdf' style={{height:'75vh'}} />
+                        <object data={pdfData} type='application/pdf' style={{ height: '75vh' }} />
                     </CRow>
                 </CModalBody>
                 <CModalFooter>

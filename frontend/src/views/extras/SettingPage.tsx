@@ -123,7 +123,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                             <strong>Change User Info</strong>
                         </CCardHeader>
                         <CCardBody>
-                            <CForm>
+                            <CForm onKeyDown={AppUtil.bindEnterKey(this.updatePwd)}>
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='type' className='col-form-label'>
@@ -186,7 +186,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                             <strong>Investment Setting</strong> <small>Stock / Fund</small>
                         </CCardHeader>
                         <CCardBody>
-                            <CForm>
+                            <CForm onKeyDown={AppUtil.bindEnterKey(this.updateUserSetting)}>
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='chartStyle' className='col-form-label'>
@@ -280,7 +280,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                             <strong>Account Setting</strong>
                         </CCardHeader>
                         <CCardBody>
-                            <CForm>
+                            <CForm onKeyDown={AppUtil.bindEnterKey(this.updateUserSetting)}>
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='chartStyle' className='col-form-label'>

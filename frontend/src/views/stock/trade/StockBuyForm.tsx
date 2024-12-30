@@ -164,7 +164,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
         return (
             <CCard className='mb-4'>
                 <CCardBody>
-                    <CForm>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.onBuyClick)}>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>

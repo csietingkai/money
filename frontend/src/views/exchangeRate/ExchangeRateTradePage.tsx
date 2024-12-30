@@ -97,7 +97,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                     <CCol xs={12} md={10}>
                         <CCard className='mb-4'>
                             <CCardBody>
-                                <CForm>
+                                <CForm onKeyDown={AppUtil.bindEnterKey(this.onTradeClick)}>
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
                                             <CFormLabel className='col-form-label'>

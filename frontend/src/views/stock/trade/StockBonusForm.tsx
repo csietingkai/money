@@ -139,7 +139,7 @@ export default class StockBonusForm extends React.Component<StockBonusFormProps,
         return (
             <CCard className='mb-4'>
                 <CCardBody>
-                    <CForm>
+                    <CForm onKeyDown={AppUtil.bindEnterKey(this.onBonusClick)}>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>

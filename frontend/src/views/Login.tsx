@@ -6,6 +6,7 @@ import { cilLockLocked, cilUser } from '@coreui/icons';
 import AuthApi, { AuthResponse, LoginRespVo } from '../api/auth';
 import { LoginDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import store, { init } from '../reducer/Store';
+import * as AppUtil from '../util/AppUtil';
 import { Action } from '../util/Interface';
 
 export interface LoginProps {
@@ -58,7 +59,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                             <CCardGroup>
                                 <CCard className='p-4'>
                                     <CCardBody>
-                                        <CForm>
+                                        <CForm onKeyDown={AppUtil.bindEnterKey(this.onLoginClick)}>
                                             <h1>Login</h1>
                                             <p className='text-body-secondary'>Sign In to your account</p>
                                             <CInputGroup className='mb-3'>
