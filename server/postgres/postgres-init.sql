@@ -241,7 +241,7 @@ insert into options (catergory, name, en_text, tw_text) values
 	('STOCK_TYPE', 'US', 'US', 'US');
 
 insert into options (catergory, name, en_text, tw_text) values
-	('RECORD_TYPE', 'SALARY', 'TW', '薪資'),
+	('RECORD_TYPE', 'SALARY', 'Salary', '薪資'),
 	('RECORD_TYPE', 'BONUS', 'Bonus', '獎金'),
 	('RECORD_TYPE', 'FOOD', 'Food', '食物'),
 	('RECORD_TYPE', 'LIFE', 'Life', '生活費'),
