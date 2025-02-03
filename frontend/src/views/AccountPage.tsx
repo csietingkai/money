@@ -1,6 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownDivider, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
@@ -16,6 +16,7 @@ import { Action, SimpleResponse, Option } from '../util/Interface';
 import { StockType } from '../util/Enum';
 import { DATA_COUNT_PER_PAGE } from '../util/Constant';
 import currencyIcon from '../assets/currency';
+import account from '../api/account';
 
 export interface AccountPageProps {
     userId: string,
@@ -40,6 +41,7 @@ export interface AccountPageState {
         name: string;
         bankCode: string;
         bankNo: string;
+        shown: boolean;
     };
     showEditAccountModal: boolean;
     editAccountForm: {
@@ -48,6 +50,7 @@ export interface AccountPageState {
         name: string;
         bankCode: string;
         bankNo: string;
+        shown: boolean;
     };
     showQrcodeModal: boolean;
     qrcodeForm: {
@@ -105,7 +108,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 currency: props.currencyOptions[0]?.key,
                 name: '',
                 bankCode: '',
-                bankNo: ''
+                bankNo: '',
+                shown: true
             },
             showEditAccountModal: false,
             editAccountForm: {
@@ -113,7 +117,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 currency: props.currencyOptions[0]?.key,
                 name: '',
                 bankCode: '',
-                bankNo: ''
+                bankNo: '',
+                shown: true
             },
             showQrcodeModal: false,
             qrcodeForm: {
@@ -202,7 +207,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                         currency: account.currency,
                                         name: account.name,
                                         bankCode: account.bankCode || '',
-                                        bankNo: account.bankNo || ''
+                                        bankNo: account.bankNo || '',
+                                        shown: account.shown || true
                                     };
                                     this.setState({ showEditAccountModal: true, editAccountForm });
                                 }}
@@ -314,6 +320,19 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                 />
                             </div>
                         </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-shown' className='col-sm-3 col-form-label'>
+                                Show / Hide
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormSwitch
+                                    size='xl'
+                                    id='account-shown'
+                                    checked={addAccountForm.shown}
+                                    onChange={(event) => this.setState({ addAccountForm: { ...addAccountForm, shown: event.target.checked } })}
+                                />
+                            </div>
+                        </CRow>
                     </CForm>
                 </CModalBody>
                 <CModalFooter>
@@ -327,7 +346,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private addAccount = async () => {
         const { notify } = this.props;
         const { addAccountForm } = this.state;
-        const response: SimpleResponse = await AccountApi.createAccount(addAccountForm.name, addAccountForm.currency, addAccountForm.bankCode, addAccountForm.bankNo);
+        const response: SimpleResponse = await AccountApi.createAccount(addAccountForm.name, addAccountForm.currency, addAccountForm.bankCode, addAccountForm.bankNo, addAccountForm.shown);
         const { success, message } = response;
         if (success) {
             notify(message);
@@ -343,7 +362,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             currency: this.props.currencyOptions[0]?.key,
             name: '',
             bankCode: '',
-            bankNo: ''
+            bankNo: '',
+            shown: true
         };
         this.setState({ showAddAccountModal: false, addAccountForm });
     };
@@ -411,6 +431,19 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                 />
                             </div>
                         </CRow>
+                        <CRow className='mb-3'>
+                            <CFormLabel htmlFor='account-shown' className='col-sm-3 col-form-label'>
+                                Show / Hide
+                            </CFormLabel>
+                            <div className='col-sm-9'>
+                                <CFormSwitch
+                                    size='xl'
+                                    id='account-shown'
+                                    checked={editAccountForm.shown}
+                                    onChange={(event) => this.setState({ editAccountForm: { ...editAccountForm, shown: event.target.checked } })}
+                                />
+                            </div>
+                        </CRow>
                     </CForm>
                 </CModalBody>
                 <CModalFooter>
@@ -424,7 +457,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private editAccount = async () => {
         const { notify } = this.props;
         const { editAccountForm } = this.state;
-        const response: SimpleResponse = await AccountApi.updateAccount(editAccountForm.id, editAccountForm.name, editAccountForm.bankCode, editAccountForm.bankNo);
+        const response: SimpleResponse = await AccountApi.updateAccount(editAccountForm.id, editAccountForm.name, editAccountForm.bankCode, editAccountForm.bankNo, editAccountForm.shown);
         const { success, message } = response;
         notify(message);
         if (success) {
@@ -439,7 +472,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             currency: this.props.currencyOptions[0]?.key,
             name: '',
             bankCode: '',
-            bankNo: ''
+            bankNo: '',
+            shown: true
         };
         this.setState({ showEditAccountModal: false, editAccountForm });
     };
@@ -924,19 +958,57 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         return [];
     };
 
+    private unhideAccount = (accountId: string) => async () => {
+        const { accountList, notify } = this.props;
+        const account = accountList.find(acc => acc.id === accountId);
+        if (account) {
+            account.shown = true;
+            const response: SimpleResponse = await AccountApi.updateAccount(account.id, account.name, account.bankCode, account.bankNo, account.shown);
+            const { success } = response;
+            if (success) {
+                await this.fetchAccounts();
+            }
+        }
+    }
+
     render(): React.ReactNode {
         const { accountList, accountRecordDeletable } = this.props;
         const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteRecordModal } = this.state;
+        const hasHiddenAccount: boolean = accountList.some(x => !x.shown);
         const showAccountRecords = currentAccountRecords.slice((accountRecordsPage - 1) * DATA_COUNT_PER_PAGE, accountRecordsPage * DATA_COUNT_PER_PAGE);
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
+                    <CCol sm={12} className='d-flex justify-content-end'>
+                        <CButton size='lg' color='secondary' variant='outline' onClick={() => this.setState({ showAddAccountModal: true })}>
+                            <CIcon icon={cilPlus} className='me-2' />
+                            Add Account
+                        </CButton>
+                        {
+                            hasHiddenAccount &&
+                            <CDropdown variant='btn-group' className='ms-2'>
+                                <CDropdownToggle color='secondary' variant='outline' size='lg'>Unhide Account </CDropdownToggle>
+                                <CDropdownMenu>
+                                    { accountList.filter(account => !account.shown).map(account => (
+                                        <CDropdownItem
+                                            key={`hiding-account-${account.id}`}
+                                            onClick={this.unhideAccount(account.id)}
+                                        >
+                                            {account.name}
+                                        </CDropdownItem>
+                                    )) }
+                                </CDropdownMenu>
+                            </CDropdown>
+                        }
+                    </CCol>
+                </CRow>
+                <CRow className='mb-4' xs={{ gutter: 4 }}>
                     {
-                        accountList.map((account, idx) => {
+                        accountList.filter(account => account.shown).map((account, idx) => {
                             return (
                                 <React.Fragment key={`account-card-${idx}`}>
                                     <CCol sm={6} md={4} xl={3}>
-                                        {this.getCard(account)}
+                                        {account.shown && this.getCard(account)}
                                     </CCol>
                                     {
                                         showDetail[account.id] &&
@@ -1049,16 +1121,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                             );
                         })
                     }
-                </CRow>
-                <CRow className='mb-4' xs={{ gutter: 4 }}>
-                    <CCol sm={12}>
-                        <div className='d-grid gap-2 col-6 mx-auto'>
-                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.setState({ showAddAccountModal: true })}>
-                                <CIcon icon={cilPlus} className='me-2' />
-                                Add Account
-                            </CButton>
-                        </div>
-                    </CCol>
                 </CRow>
                 {this.getAddAccountModal()}
                 {this.getEditAccountModal()}
