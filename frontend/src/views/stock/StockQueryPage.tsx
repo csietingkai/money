@@ -3,12 +3,13 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilChevronBottom, cilChevronTop, cilSync } from '@coreui/icons';
+import { cilSync } from '@coreui/icons';
 import AppCandleChart from '../../components/AppCandleChart';
 import AppPagination from '../../components/AppPagination';
 import { ReduxState, getAuthTokenId, getStockQueryCondition, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockQueryConditionDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import StockApi, { StockRecordVo, StockVo } from '../../api/stock';
+import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
 import { StockType } from '../../util/Enum';
 import { Action } from '../../util/Interface';
@@ -184,6 +185,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private getStocksCard = () => {
+        const { stockType } = this.props;
         const { stocks, currentStockPage } = this.state;
         if (!stocks.length) {
             return <React.Fragment></React.Fragment>;
@@ -224,24 +226,24 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                                                             content={`Buy ${s.name}`}
                                                         >
                                                             <CButton
-                                                                color='info'
+                                                                color={AppUtil.getBenifitColor(1, stockType)}
                                                                 variant='outline'
                                                                 size='sm'
                                                                 onClick={() => this.tradeStock(s, 'buy')}
                                                             >
-                                                                <CIcon icon={cilChevronTop} />
+                                                                <CIcon icon={cartIcon.buy} />
                                                             </CButton>
                                                         </CTooltip>
                                                         <CTooltip
                                                             content={`Sell ${s.name}`}
                                                         >
                                                             <CButton
-                                                                color='info'
+                                                                color={AppUtil.getBenifitColor(-1, stockType)}
                                                                 variant='outline'
                                                                 size='sm'
                                                                 onClick={() => this.tradeStock(s, 'sell')}
                                                             >
-                                                                <CIcon icon={cilChevronBottom} />
+                                                                <CIcon icon={cartIcon.sell} />
                                                             </CButton>
                                                         </CTooltip>
                                                     </CButtonGroup>

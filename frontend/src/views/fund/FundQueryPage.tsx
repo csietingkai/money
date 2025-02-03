@@ -9,7 +9,9 @@ import AppLineChart from '../../components/AppLineChart';
 import { ReduxState, getAuthTokenId, getFundQueryCondition } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import FundApi, { FundRecordVo, FundVo } from '../../api/fund';
+import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
+import { StockType } from '../../util/Enum';
 import { Action, Ma, SupportLineType } from '../../util/Interface';
 import FundQueryCondition from './interface/FundQueryCondition';
 import FundTradeCondition from './interface/FundTradeCondition';
@@ -17,6 +19,7 @@ import FundTradeCondition from './interface/FundTradeCondition';
 export interface FundQueryPageProps {
     userId: string;
     queryCondition: FundQueryCondition;
+    stockType: StockType;
     setFundQueryCondition: (queryCondition: FundQueryCondition) => void;
     setFundTradeCondition: (tradeCondition: FundTradeCondition) => void;
     setLoading: (isLoading: boolean) => void;
@@ -190,6 +193,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
     };
 
     private getFundsCard = () => {
+        const { stockType } = this.props;
         const { funds, currentFundPage } = this.state;
         if (!funds.length) {
             return <React.Fragment></React.Fragment>;
@@ -230,24 +234,24 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                                                             content={`Buy ${s.name}`}
                                                         >
                                                             <CButton
-                                                                color='info'
+                                                                color={AppUtil.getBenifitColor(1, stockType)}
                                                                 variant='outline'
                                                                 size='sm'
                                                                 onClick={() => this.tradeFund(s, 'buy')}
                                                             >
-                                                                <CIcon icon={cilChevronTop} />
+                                                                <CIcon icon={cartIcon.buy} />
                                                             </CButton>
                                                         </CTooltip>
                                                         <CTooltip
                                                             content={`Sell ${s.name}`}
                                                         >
                                                             <CButton
-                                                                color='info'
+                                                                color={AppUtil.getBenifitColor(-1, stockType)}
                                                                 variant='outline'
                                                                 size='sm'
                                                                 onClick={() => this.tradeFund(s, 'sell')}
                                                             >
-                                                                <CIcon icon={cilChevronBottom} />
+                                                                <CIcon icon={cartIcon.sell} />
                                                             </CButton>
                                                         </CTooltip>
                                                     </CButtonGroup>
