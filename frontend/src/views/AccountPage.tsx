@@ -55,6 +55,8 @@ export interface AccountPageState {
     showQrcodeModal: boolean;
     qrcodeForm: {
         accountName: string;
+        bankCode: string;
+        bankNo: string;
         img: string;
     };
     currentAccountRecords: AccountRecordVo[];
@@ -123,6 +125,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             showQrcodeModal: false,
             qrcodeForm: {
                 accountName: '',
+                bankCode: '',
+                bankNo: '',
                 img: ''
             },
             currentAccountRecords: [],
@@ -220,11 +224,16 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                 <CLink
                                     className='font-weight-bold font-xs text-body-secondary'
                                     onClick={async () => {
-                                        const fullBankNo: string = ('0000000000000000' + account.bankNo).slice(-16);
+                                        const fullBankNo: string = `0000000000000000${account.bankNo}`.slice(-16);
                                         // `TWQRP://銀行轉帳/158/02/V1?D5=${account.bankCode}&D6=${fullBankNo}&D10=901`
                                         const twqr = `TWQRP%3A%2F%2F%E9%8A%80%E8%A1%8C%E8%BD%89%E5%B8%B3%2F158%2F02%2FV1%3FD5%3D${account.bankCode}%26D6%3D${fullBankNo}%26D10%3D901`;
                                         const img = await qrcode.toDataURL(twqr, { errorCorrectionLevel: 'H' });
-                                        const qrcodeForm = { accountName: account.name, img };
+                                        const qrcodeForm = {
+                                            accountName: account.name,
+                                            bankCode: account.bankCode || '',
+                                            bankNo: account.bankNo || '',
+                                            img
+                                        };
                                         this.setState({ showQrcodeModal: true, qrcodeForm });
                                     }}
                                 >
@@ -479,6 +488,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private getQrcodeModal = (): React.ReactNode => {
+        const { bankCodeOptions } = this.props;
         const { showQrcodeModal, qrcodeForm } = this.state;
         return (
             <CModal alignment='center' visible={showQrcodeModal} onClose={this.closeQrcodeModal}>
@@ -486,6 +496,30 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CModalTitle>{qrcodeForm.accountName}</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
+                    <CRow className='mb-3'>
+                        <CCol>
+                            <CFormLabel htmlFor='account-name' className='col-form-label'>
+                                Bank
+                            </CFormLabel>
+                            <CFormSelect
+                                value={qrcodeForm.bankCode}
+                                disabled
+                            >
+                                <option value=''></option>
+                                {bankCodeOptions.map(o => <option key={`bankcode-option-${o.key}`} value={o.key}>{o.value}</option>)}
+                            </CFormSelect>
+                        </CCol>
+                        <CCol>
+                            <CFormLabel htmlFor='account-name' className='col-form-label'>
+                                Bank No.
+                            </CFormLabel>
+                            <CFormInput
+                                type='text'
+                                value={qrcodeForm.bankNo}
+                                disabled
+                            />
+                        </CCol>
+                    </CRow>
                     <CRow className='mb-3'>
                         <img src={qrcodeForm.img}></img>
                     </CRow>
@@ -500,6 +534,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     private closeQrcodeModal = () => {
         const qrcodeForm = {
             accountName: '',
+            bankCode: '',
+            bankNo: '',
             img: ''
         };
         this.setState({ showQrcodeModal: false, qrcodeForm });
