@@ -60,7 +60,7 @@ public class ScheduleTaskService {
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, String> pythonCache;
 
-	@Scheduled(cron = "0 59 23 * * *", zone = "Asia/Taipei") // every sunday night
+	@Scheduled(cron = "0 59 23 * * *")
 	public void fetchRecords() {
 		LocalDateTime today = TimeUtil.convertToDateTime(TimeUtil.getCurrentDate());
 		this.fetchExchangeRatesRecords(today);

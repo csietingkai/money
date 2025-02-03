@@ -3,7 +3,6 @@ package io.tingkai.money.constant;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,8 +14,6 @@ public class CodeConstants {
 	public static final String USER_CACHE = "USER_CACHE";
 
 	// === date time format === //
-	public static final ZoneId ZONE_TPE = ZoneId.of("Asia/Taipei");
-	public static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 	public static final String DATE_FORMAT = "yyyy/MM/dd";
 	public static final String TIME_FORMAT = "HH:mm:ss";
 	public static final String DATE_TIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;

@@ -3,6 +3,7 @@ package io.tingkai.money.service;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -131,7 +132,7 @@ public class AccountService {
 		}
 
 		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
-		LocalDateTime now = LocalDateTime.now(CodeConstants.ZONE_TPE);
+		LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 		int year = now.getYear();
 		int month = now.getMonthValue();
 		for (int cnt = 0; cnt < monthCnt; cnt++) {

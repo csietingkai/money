@@ -3,6 +3,7 @@ package io.tingkai.money.util;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalUnit;
 
@@ -11,25 +12,15 @@ import io.tingkai.money.enumeration.CompareResult;
 
 public class TimeUtil {
 
-	public static final long SECOND_MILISECS = 1000;
-	public static final long MINUTE_MILISECS = 60 * SECOND_MILISECS;
-	public static final long HOUR_MILISECS = 60 * MINUTE_MILISECS;
-	public static final long DAY_MILISECS = 24 * HOUR_MILISECS;
-	public static final long WEEK_MILISECS = 7 * DAY_MILISECS;
-
-	public enum Unit {
-		SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR
-	}
-
-	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(CodeConstants.DATE_FORMAT);
-	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(CodeConstants.DATE_TIME_FORMAT).withZone(CodeConstants.ZONE_TPE);
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(CodeConstants.DATE_FORMAT);
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(CodeConstants.DATE_TIME_FORMAT).withZone(ZoneId.systemDefault());
 
 	public static long getCurrentDate() {
-		return LocalDate.now().atStartOfDay(CodeConstants.ZONE_TPE).toInstant().toEpochMilli();
+		return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 
 	public static long getCurrentDateTime() {
-		return LocalDateTime.now().atZone(CodeConstants.ZONE_TPE).toInstant().toEpochMilli();
+		return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 
 	public static boolean verify(String str) {
@@ -63,7 +54,7 @@ public class TimeUtil {
 	}
 
 	public static LocalDateTime convertToDateTime(long timeStamp) {
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), CodeConstants.ZONE_TPE);
+		return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), ZoneId.systemDefault());
 	}
 
 	public static String convertToString(LocalDateTime dateTime) {
@@ -75,7 +66,7 @@ public class TimeUtil {
 	}
 
 	public static long convertToTimeStamp(LocalDateTime dateTime) {
-		return dateTime.atZone(CodeConstants.ZONE_TPE).toInstant().toEpochMilli();
+		return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 
 	public static long convertToTimeStamp(String str) {
