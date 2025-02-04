@@ -1,7 +1,7 @@
 package io.tingkai.money.security;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import io.tingkai.money.enumeration.Role;
@@ -14,5 +14,9 @@ public class AuthToken implements Serializable {
 	private String name;
 	private Role role;
 	private String tokenString;
-	private Date expiryDate;
+	private LocalDateTime expiryDate;
+
+	public boolean isExpired() {
+		return LocalDateTime.now().isAfter(this.expiryDate);
+	}
 }
