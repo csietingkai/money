@@ -1,6 +1,7 @@
 package io.tingkai.money.security;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -47,7 +48,7 @@ public class AuthTokenAuthenticationFilter extends GenericFilterBean {
 				try {
 					Authentication authentication = this.authenticationManager.authenticate(authTokenAuthentication);
 					Object detail = authentication.getDetails();
-					if (detail instanceof AuthToken && Role.NONE != ((AuthToken) detail).getRole() && !((AuthToken) detail).isExpired()) {
+					if (detail instanceof AuthToken && Role.NONE != ((AuthToken) detail).getRole() && ((AuthToken) detail).getExpiryDate().after(new Date())) {
 						SecurityContextHolder.getContext().setAuthentication(authentication);
 					} else {
 						SecurityContextHolder.getContext().setAuthentication(null);

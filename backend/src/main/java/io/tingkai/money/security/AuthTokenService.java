@@ -1,7 +1,8 @@
 package io.tingkai.money.security;
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +15,7 @@ import io.tingkai.money.constant.CodeConstants;
 import io.tingkai.money.entity.User;
 import io.tingkai.money.model.exception.AuthTokenExpireException;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.TimeUtil;
 
 @Service
 public final class AuthTokenService {
@@ -39,7 +41,7 @@ public final class AuthTokenService {
 		AuthToken authToken = this.generate(user);
 		if (AppUtil.isPresent(existingAuthTokenString)) {
 			authToken = this.authTokenRedisTemplate.opsForValue().get(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, existingAuthTokenString));
-			if (authToken.isExpired()) {
+			if (authToken.getExpiryDate().before(new Date(TimeUtil.getCurrentDateTime()))) {
 				authToken.setExpiryDate(getExpiryDate());
 			}
 		}
@@ -62,7 +64,7 @@ public final class AuthTokenService {
 
 	public AuthToken validate(String tokenString) throws AuthTokenExpireException {
 		AuthToken token = this.authTokenRedisTemplate.opsForValue().get(MessageFormat.format(CodeConstants.AUTH_TOKEN_KEY, tokenString));
-		if (AppUtil.isEmpty(token) || token.isExpired()) {
+		if (AppUtil.isEmpty(token) || token.getExpiryDate().before(new Date())) {
 			throw new AuthTokenExpireException();
 		}
 		return token;
@@ -79,8 +81,10 @@ public final class AuthTokenService {
 		return authToken;
 	}
 
-	private LocalDateTime getExpiryDate() {
-		LocalDateTime dt = LocalDateTime.now();
-		return dt.plusHours(CodeConstants.AUTH_TOKEN_VALID_HOURS);
+	private Date getExpiryDate() {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date(TimeUtil.getCurrentDateTime()));
+		calendar.add(Calendar.HOUR, CodeConstants.AUTH_TOKEN_VALID_HOURS);
+		return calendar.getTime();
 	}
 }
