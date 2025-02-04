@@ -995,7 +995,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private unhideAccount = (accountId: string) => async () => {
-        const { accountList, notify } = this.props;
+        const { accountList } = this.props;
         const account = accountList.find(acc => acc.id === accountId);
         if (account) {
             account.shown = true;
@@ -1016,14 +1016,14 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     <CCol sm={12} className='d-flex justify-content-end'>
-                        <CButton size='lg' color='secondary' variant='outline' onClick={() => this.setState({ showAddAccountModal: true })}>
+                        <CButton color='secondary' variant='outline' onClick={() => this.setState({ showAddAccountModal: true })}>
                             <CIcon icon={cilPlus} className='me-2' />
                             Add Account
                         </CButton>
                         {
                             hasHiddenAccount &&
                             <CDropdown variant='btn-group' className='ms-2'>
-                                <CDropdownToggle color='secondary' variant='outline' size='lg'>Unhide Account </CDropdownToggle>
+                                <CDropdownToggle color='secondary' variant='outline'>Unhide Account</CDropdownToggle>
                                 <CDropdownMenu>
                                     { accountList.filter(account => !account.shown).map(account => (
                                         <CDropdownItem
