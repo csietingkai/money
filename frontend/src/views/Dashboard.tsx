@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CRow, CTabContent, CTabPane } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CProgress, CProgressBar, CRow, CTabContent, CTabPane } from '@coreui/react';
 import Chart from 'react-google-charts';
 import CIcon from '@coreui/icons-react';
 import { cilBank } from '@coreui/icons';
@@ -11,7 +11,7 @@ import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import * as AppUtil from '../util/AppUtil';
 import { Action } from '../util/Interface';
-import { DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
+import { CHART_COLORS, DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
 import { stock } from '../assets/brand/stock';
 import { fund } from '../assets/brand/fund';
 
@@ -141,11 +141,22 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             }
         });
 
+        for (const ym in data) {
+            let sum: number = 0;
+            for (let i = 1; i < data[ym].length; i++) {
+                sum += data[ym][i][1];
+            }
+            for (let i = 1; i < data[ym].length; i++) {
+                data[ym][i].percent = AppUtil.toNumber((data[ym][i][1] / sum * 100).toFixed(DEFAULT_DECIMAL_PRECISION));
+            }
+        }
+
         const options = {
             legend: {
-                position: 'bottom',
+                position: 'right',
                 alignment: 'center'
             },
+            colors: CHART_COLORS
         };
         return (
             <CCard>
@@ -182,6 +193,26 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                 width={'100%'}
                                                 height={'400px'}
                                             />
+                                            {
+                                                data[r].map((series, si) => {
+                                                    return si !== 0 ? (
+                                                        <div className='progress-group' key={`${key}-${r}-series-${si}`}>
+                                                            <div className='progress-group-header'>
+                                                                <span>{series[0]}</span>
+                                                                <span className='ms-auto fw-semibold'>
+                                                                    {AppUtil.numberComma(series[1])}{' '}
+                                                                    <span className='text-body-secondary small'>({series.percent}%)</span>
+                                                                </span>
+                                                            </div>
+                                                            <div className='progress-group-bars'>
+                                                                <CProgress thin value={series.percent}>
+                                                                    <CProgressBar style={{width: `${series.percent}%`, background: CHART_COLORS[(si - 1) % CHART_COLORS.length]}} />
+                                                                </CProgress>
+                                                            </div>
+                                                        </div>
+                                                    ) : <></>
+                                                })
+                                            }
                                         </CTabPane>
                                     );
                                 })
@@ -200,8 +231,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             ...monthBalance.sums.map(x => [`${x.year}${AppUtil.prefixZero(x.month)}`, x.income, x.expend, x.surplus])
         ];
         const options = {
-            seriesType: "bars",
-            series: { 2: { type: "line", curveType: 'function' } },
+            seriesType: 'bars',
+            series: { 2: { type: 'line', curveType: 'function' } },
         };
         return (
             <CCard>
