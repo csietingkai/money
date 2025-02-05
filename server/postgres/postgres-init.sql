@@ -83,6 +83,8 @@ CREATE TABLE IF NOT EXISTS user_setting (
 	fund_fee_rate NUMERIC(7, 6) NOT NULL,
 	account_record_type VARCHAR NOT NULL,
 	account_record_deletable BOOLEAN NOT NULL DEFAULT false,
+	only_show_own_stock BOOLEAN NOT NULL DEFAULT true,
+	only_show_own_fund BOOLEAN NOT NULL DEFAULT true,
 	PRIMARY KEY (id),
 	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id)
 );

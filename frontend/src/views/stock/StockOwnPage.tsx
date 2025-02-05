@@ -1,12 +1,13 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
-import { ReduxState, getAuthTokenId, getStockOwnList, getStockType } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getStockOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
-import StockApi, { UserStockRecord, UserStockRecordVo, UserStockVo } from '../../api/stock';
-import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
+import AuthApi, { UserSetting } from '../../api/auth';
+import StockApi, { UserStockRecordVo, UserStockVo } from '../../api/stock';
+import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
@@ -16,9 +17,11 @@ import { Action } from '../../util/Interface';
 import StockTradeCondition, { TradeType } from './interface/StockTradeCondition';
 
 export interface StockOwnPageProps {
+    userSetting: UserSetting;
     userId: string;
     stockType: StockType;
     ownStockList: UserStockVo[];
+    setUserSetting: (setting: UserSetting) => void;
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
     setAccountList: (accountList: Account[]) => void;
     setOwnStockList: (ownStockList: UserStockVo[]) => void;
@@ -70,6 +73,19 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         this.setState({ show, ownStockRecordPage: 1 });
     };
 
+    private toggleShowOwn = async (checked: boolean) => {
+        const { userSetting, setUserSetting } = this.props;
+        const newSetting: UserSetting = {
+            ...userSetting,
+            onlyShowOwnStock: checked
+        }
+        const { success } = await AuthApi.updateUserSetting(newSetting);
+        if (success) {
+            setUserSetting(newSetting);
+            this.fetchUserStocks();
+        }
+    };
+
     private fetchUserStockRecords = async (userStockId: string) => {
         const response = await StockApi.getOwnRecords(userStockId);
         const { success, data } = response;
@@ -84,9 +100,13 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         const { show, currentOwnStockRecords, ownStockRecordPage } = this.state;
         const currentValue: number = AppUtil.toNumber((ownStockInfo.price * ownStockInfo.amount).toFixed(DEFAULT_DECIMAL_PRECISION));
         const benefit: number = AppUtil.toNumber((currentValue - ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
-        const benefitColor: string = AppUtil.getBenifitColor(benefit, stockType);
-        const postiveSign: string = benefit >= 0 ? '+' : '';
-        const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        let benefitColor: string = 'secondary';
+        const postiveSign: string = benefit > 0 ? '+' : '';
+        let benefitRate: number = 0;
+        if (ownStockInfo.amount) {
+            benefitColor = AppUtil.getBenifitColor(benefit, stockType);
+            benefitRate = AppUtil.toNumber((benefit * 100 / ownStockInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        }
         const showOwnStockRecords = currentOwnStockRecords.slice((ownStockRecordPage - 1) * DATA_COUNT_PER_PAGE, ownStockRecordPage * DATA_COUNT_PER_PAGE);
         return (
             <React.Fragment key={`${userId}-${ownStockInfo.stockCode}`}>
@@ -263,10 +283,21 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     };
 
     render(): React.ReactNode {
-        const { ownStockList } = this.props;
+        const { userSetting: { onlyShowOwnStock }, ownStockList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
+                <CRow className='mb-4'>
+                    <CCol sm={12} className='d-flex justify-content-end'>
+                        <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnStock)}>
+                            <CFormSwitch
+                                label='Only Show Own'
+                                checked={onlyShowOwnStock}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleShowOwn(event.target.checked)}
+                            />
+                        </CButton>
+                    </CCol>
+                </CRow>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     {
                         ownStockList.map(s => this.getCard(s))
@@ -304,13 +335,15 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
 const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
+        userSetting: getUserSetting(state),
         ownStockList: getStockOwnList(state),
         stockType: getStockType(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockTradeCondition | undefined | Account[] | UserStockVo[] | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserSetting | StockTradeCondition | undefined | Account[] | UserStockVo[] | string | boolean>>) => {
     return {
+        setUserSetting: SetUserSettingDispatcher(dispatch),
         setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),
         setAccountList: SetAccountListDispatcher(dispatch),
         setOwnStockList: SetOwnStockListDispatcher(dispatch),

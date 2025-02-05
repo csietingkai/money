@@ -128,7 +128,7 @@ public class StockController {
 
 	@RequestMapping(value = StockController.GET_OWN_PATH, method = RequestMethod.GET)
 	public StockResponse<List<UserStockVo>> getOwnStocks() {
-		List<UserStockVo> result = this.userStockService.getOwnStocks(true);
+		List<UserStockVo> result = this.userStockService.getOwnStocks();
 		return new StockResponse<List<UserStockVo>>(true, result, MessageConstant.SUCCESS);
 	}
 

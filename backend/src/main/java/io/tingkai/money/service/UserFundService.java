@@ -33,6 +33,7 @@ import io.tingkai.money.facade.FundFacade;
 import io.tingkai.money.facade.FundRecordFacade;
 import io.tingkai.money.facade.UserFundFacade;
 import io.tingkai.money.facade.UserFundRecordFacade;
+import io.tingkai.money.facade.UserSettingFacade;
 import io.tingkai.money.facade.UserTrackingFundFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
@@ -55,6 +56,9 @@ import io.tingkai.money.util.TimeUtil;
 @Service
 @Loggable
 public class UserFundService {
+
+	@Autowired
+	private UserSettingFacade userSettingFacade;
 
 	@Autowired
 	private AccountFacade accountFacade;
@@ -82,13 +86,10 @@ public class UserFundService {
 	private RedisTemplate<String, List<UserTrackingFund>> userCache;
 
 	public List<UserFundVo> getOwnFunds() {
-		return getOwnFunds(true);
-	}
-
-	public List<UserFundVo> getOwnFunds(boolean onlyShowHave) {
 		UUID userId = ContextUtil.getUserId();
+		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnFund();
 		List<UserFund> ownList = this.userFundFacade.queryByUserId(userId);
-		if (onlyShowHave) {
+		if (onlyShowOwn) {
 			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
 		Map<String, String> fundNames = this.fundFacade.queryAll().stream().collect(Collectors.toMap(Fund::getCode, Fund::getName));

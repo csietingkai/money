@@ -87,13 +87,10 @@ public class UserStockService {
 	private RedisTemplate<String, List<UserTrackingStock>> userCache;
 
 	public List<UserStockVo> getOwnStocks() {
-		return getOwnStocks(true);
-	}
-
-	public List<UserStockVo> getOwnStocks(boolean onlyShowHave) {
 		UUID userId = ContextUtil.getUserId();
+		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnStock();
 		List<UserStock> ownList = this.userStockFacade.queryByUserId(userId);
-		if (onlyShowHave) {
+		if (onlyShowOwn) {
 			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
 		Map<String, String> stockNames = this.stockFacade.queryAll().stream().collect(Collectors.toMap(Stock::getCode, Stock::getName));

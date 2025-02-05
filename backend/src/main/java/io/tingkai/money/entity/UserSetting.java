@@ -23,6 +23,8 @@ public class UserSetting {
 	protected BigDecimal predictDays;
 	protected BigDecimal stockFeeRate;
 	protected BigDecimal fundFeeRate;
-	protected Boolean accountRecordDeletable;
 	protected String accountRecordType;
+	protected Boolean accountRecordDeletable;
+	protected Boolean onlyShowOwnStock;
+	protected Boolean onlyShowOwnFund;
 }

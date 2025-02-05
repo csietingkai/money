@@ -1,12 +1,13 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
-import { ReduxState, getAuthTokenId, getFundOwnList, getStockType } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getFundOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
+import AuthApi, { UserSetting } from '../../api/auth';
 import FundApi, { UserFundRecordVo, UserFundVo } from '../../api/fund';
-import { SetAccountListDispatcher, SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher } from '../../reducer/PropsMapper';
+import { SetAccountListDispatcher, SetFundTradeConditionDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
@@ -16,9 +17,11 @@ import { Action } from '../../util/Interface';
 import FundTradeCondition, { TradeType } from './interface/FundTradeCondition';
 
 export interface FundOwnPageProps {
+    userSetting: UserSetting;
     userId: string;
     stockType: StockType;
     ownFundList: UserFundVo[];
+    setUserSetting: (setting: UserSetting) => void;
     setFundTradeCondition: (tradeCondition?: FundTradeCondition) => void;
     setAccountList: (accountList: Account[]) => void;
     setOwnFundList: (ownFundList: UserFundVo[]) => void;
@@ -70,6 +73,19 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         this.setState({ show, ownFundRecordPage: 1 });
     };
 
+    private toggleShowOwn = async (checked: boolean) => {
+        const { userSetting, setUserSetting } = this.props;
+        const newSetting: UserSetting = {
+            ...userSetting,
+            onlyShowOwnFund: checked
+        }
+        const { success } = await AuthApi.updateUserSetting(newSetting);
+        if (success) {
+            setUserSetting(newSetting);
+            this.fetchUserFunds();
+        }
+    };
+
     private fetchUserFundRecords = async (userFundId: string) => {
         const response = await FundApi.getOwnRecords(userFundId);
         const { success, data } = response;
@@ -84,10 +100,14 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         const { show, currentOwnFundRecords, ownFundRecordPage } = this.state;
         const currentValue: number = AppUtil.toNumber((ownFundInfo.price * ownFundInfo.amount).toFixed(DEFAULT_DECIMAL_PRECISION));
         const benefit: number = AppUtil.toNumber((currentValue - ownFundInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
-        const benefitColor: string = AppUtil.getBenifitColor(benefit, stockType);
-        const postiveSign: string = benefit >= 0 ? '+' : '';
-        const benefitRate: number = AppUtil.toNumber((benefit * 100 / ownFundInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        let benefitColor: string = 'secondary';
+        const postiveSign: string = benefit > 0 ? '+' : '';
+        let benefitRate: number = 0;
         const showOwnFundRecords = currentOwnFundRecords.slice((ownFundRecordPage - 1) * DATA_COUNT_PER_PAGE, ownFundRecordPage * DATA_COUNT_PER_PAGE);
+        if (ownFundInfo.amount) {
+            benefitColor = AppUtil.getBenifitColor(benefit, stockType);
+            benefitRate = AppUtil.toNumber((benefit * 100 / ownFundInfo.cost).toFixed(DEFAULT_DECIMAL_PRECISION));
+        }
         return (
             <React.Fragment key={`${userId}-${ownFundInfo.fundCode}`}>
                 <CCol sm={6} md={4}>
@@ -278,10 +298,21 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     };
 
     render(): React.ReactNode {
-        const { ownFundList } = this.props;
+        const { userSetting: { onlyShowOwnFund }, ownFundList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
+                <CRow className='mb-4'>
+                    <CCol sm={12} className='d-flex justify-content-end'>
+                        <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnFund)}>
+                            <CFormSwitch
+                                label='Only Show Own'
+                                checked={onlyShowOwnFund}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleShowOwn(event.target.checked)}
+                            />
+                        </CButton>
+                    </CCol>
+                </CRow>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     {
                         ownFundList.map(s => this.getCard(s))
@@ -318,14 +349,16 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
 
 const mapStateToProps = (state: ReduxState) => {
     return {
+        userSetting: getUserSetting(state),
         userId: getAuthTokenId(state),
         ownFundList: getFundOwnList(state),
         stockType: getStockType(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<FundTradeCondition | undefined | Account[] | UserFundVo[] | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserSetting | FundTradeCondition | undefined | Account[] | UserFundVo[] | string | boolean>>) => {
     return {
+        setUserSetting: SetUserSettingDispatcher(dispatch),
         setFundTradeCondition: SetFundTradeConditionDispatcher(dispatch),
         setAccountList: SetAccountListDispatcher(dispatch),
         setOwnFundList: SetOwnFundListDispatcher(dispatch),

@@ -20,8 +20,10 @@ export interface UserSetting {
     predictDays: number;
     stockFeeRate: number;
     fundFeeRate: number;
-    accountRecordDeletable: boolean;
     accountRecordType: string;
+    accountRecordDeletable: boolean;
+    onlyShowOwnStock: boolean;
+    onlyShowOwnFund: boolean;
 }
 
 export interface LoginRespVo {

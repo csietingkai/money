@@ -120,7 +120,7 @@ public class FundController {
 
 	@RequestMapping(value = FundController.GET_OWN_PATH, method = RequestMethod.GET)
 	public FundResponse<List<UserFundVo>> getOwnFunds() {
-		List<UserFundVo> result = this.userFundService.getOwnFunds(true);
+		List<UserFundVo> result = this.userFundService.getOwnFunds();
 		return new FundResponse<List<UserFundVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
