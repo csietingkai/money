@@ -1,12 +1,12 @@
 import React, { Dispatch } from 'react';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CProgress, CProgressBar, CRow, CTabContent, CTabPane } from '@coreui/react';
+import { CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CProgress, CProgressBar, CRow, CTabContent, CTabPane } from '@coreui/react';
 import Chart from 'react-google-charts';
 import CIcon from '@coreui/icons-react';
 import { cilBank } from '@coreui/icons';
 import { connect } from 'react-redux';
 import { SetNotifyDispatcher } from '../reducer/PropsMapper';
 import { ReduxState, getAccountList, getFundOwnList, getStockOwnList } from '../reducer/Selector';
-import AccountApi, { Account, AccountMonthBalanceResponse, MonthBalanceVo } from '../api/account';
+import AccountApi, { Account, MonthBalanceVo } from '../api/account';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import * as AppUtil from '../util/AppUtil';
@@ -195,7 +195,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                             />
                                             {
                                                 data[r].map((series, si) => {
-                                                    return si !== 0 ? (
+                                                    si !== 0 && (
                                                         <div className='progress-group' key={`${key}-${r}-series-${si}`}>
                                                             <div className='progress-group-header'>
                                                                 <span>{series[0]}</span>
@@ -206,11 +206,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                             </div>
                                                             <div className='progress-group-bars'>
                                                                 <CProgress thin value={series.percent}>
-                                                                    <CProgressBar style={{width: `${series.percent}%`, background: CHART_COLORS[(si - 1) % CHART_COLORS.length]}} />
+                                                                    <CProgressBar style={{ width: `${series.percent}%`, background: CHART_COLORS[(si - 1) % CHART_COLORS.length] }} />
                                                                 </CProgress>
                                                             </div>
                                                         </div>
-                                                    ) : <></>
+                                                    );
                                                 })
                                             }
                                         </CTabPane>

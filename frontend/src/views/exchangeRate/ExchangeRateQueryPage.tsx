@@ -4,7 +4,7 @@ import { CCard, CCardBody, CNav, CNavItem, CNavLink, CTabContent, CTabPane } fro
 import { ReduxState, getAuthTokenId, getExchangeRateList, getExchangeRateQueryCondition, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
 import ExchangeRateApi, { ExchangeRateRecordVo, ExchangeRateVo } from '../../api/exchangeRate';
-import AppLineChart from '../../components/AppLineChart';
+import AppPriceChart from '../../components/AppPriceChart';
 import { StockType } from '../../util/Enum';
 import { Action } from '../../util/Interface';
 import ExchangeRateQueryCondition from './interface/ExchangeRateQueryCondition';
@@ -93,7 +93,11 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                 <CTabPane key={`currency-${r.currency}-tabcontent`} visible={activeTab === r.currency} className='mt-2 col-xs-12 mx-auto'>
                                     <CCard className='mb-4'>
                                         <CCardBody>
-                                            <AppLineChart fundRecords={exchangeRateRecords[r.currency] || []} />
+                                            <AppPriceChart
+                                                chartType='fund'
+                                                info={{ name: r.name }}
+                                                records={exchangeRateRecords[r.currency] || []}
+                                            />
                                         </CCardBody>
                                     </CCard>
                                 </CTabPane>

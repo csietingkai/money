@@ -3,16 +3,16 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilChevronBottom, cilChevronTop, cilSync } from '@coreui/icons';
+import { cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
-import AppLineChart from '../../components/AppLineChart';
+import AppPriceChart from '../../components/AppPriceChart';
 import { ReduxState, getAuthTokenId, getFundQueryCondition } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import FundApi, { FundRecordVo, FundVo } from '../../api/fund';
 import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
 import { StockType } from '../../util/Enum';
-import { Action, Ma, SupportLineType } from '../../util/Interface';
+import { Action, SupportLineType } from '../../util/Interface';
 import FundQueryCondition from './interface/FundQueryCondition';
 import FundTradeCondition from './interface/FundTradeCondition';
 
@@ -33,7 +33,6 @@ export interface FundQueryPageState {
     currentFundPage: number;
     fundRecords: FundRecordVo[];
     supportLineType: SupportLineType;
-    selectedMa: Ma[];
 }
 
 class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageState> {
@@ -46,8 +45,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
             selectedFund: undefined,
             currentFundPage: 1,
             fundRecords: [],
-            supportLineType: '',
-            selectedMa: []
+            supportLineType: ''
         };
     }
 
@@ -280,7 +278,14 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                     <strong>{selectedFund?.name}</strong> <small>details</small>
                 </CCardHeader>
                 <CCardBody>
-                    <AppLineChart fundRecords={fundRecords} />
+                    {
+                        selectedFund &&
+                        <AppPriceChart
+                            chartType='fund'
+                            info={selectedFund}
+                            records={fundRecords}
+                        />
+                    }
                 </CCardBody>
             </CCard>
         );

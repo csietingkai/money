@@ -4,7 +4,7 @@ import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilSync } from '@coreui/icons';
-import AppCandleChart from '../../components/AppCandleChart';
+import AppPriceChart from '../../components/AppPriceChart';
 import AppPagination from '../../components/AppPagination';
 import { ReduxState, getAuthTokenId, getStockQueryCondition, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockQueryConditionDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
@@ -274,7 +274,15 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                     <strong>{selectedStock?.name}</strong> <small>details</small>
                 </CCardHeader>
                 <CCardBody>
-                    <AppCandleChart stockType={stockType} stockRecords={stockRecords} />
+                    {
+                        selectedStock &&
+                        <AppPriceChart
+                            stockType={stockType}
+                            chartType='stock'
+                            info={selectedStock}
+                            records={stockRecords}
+                        />
+                    }
                 </CCardBody>
             </CCard>
         );
