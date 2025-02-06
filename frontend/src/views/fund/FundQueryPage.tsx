@@ -15,6 +15,7 @@ import { StockType } from '../../util/Enum';
 import { Action, SupportLineType } from '../../util/Interface';
 import FundQueryCondition from './interface/FundQueryCondition';
 import FundTradeCondition from './interface/FundTradeCondition';
+import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 
 export interface FundQueryPageProps {
     userId: string;
@@ -196,6 +197,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
         if (!funds.length) {
             return <React.Fragment></React.Fragment>;
         }
+        const showFunds = funds.slice((currentFundPage - 1) * DATA_COUNT_PER_PAGE, currentFundPage * DATA_COUNT_PER_PAGE);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -212,7 +214,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                                 </CTableHead>
                                 <CTableBody>
                                     {
-                                        funds.map(s =>
+                                        showFunds.map(s =>
                                             <CTableRow key={s.id} onClick={() => this.searchRecord(s.code)}>
                                                 <CTableDataCell>{s.code}</CTableDataCell>
                                                 <CTableDataCell><div style={{ minWidth: '120px', overflow: 'hidden' }}>{s.name}</div></CTableDataCell>

@@ -15,6 +15,7 @@ import { StockType } from '../../util/Enum';
 import { Action } from '../../util/Interface';
 import StockQueryCondition from './interface/StockQueryCondition';
 import StockTradeCondition from './interface/StockTradeCondition';
+import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 
 export interface StockQueryPageProps {
     userId: string;
@@ -190,6 +191,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
         if (!stocks.length) {
             return <React.Fragment></React.Fragment>;
         }
+        const showStocks = stocks.slice((currentStockPage - 1) * DATA_COUNT_PER_PAGE, currentStockPage * DATA_COUNT_PER_PAGE);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -206,7 +208,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                                 </CTableHead>
                                 <CTableBody>
                                     {
-                                        stocks.map(s =>
+                                        showStocks.map(s =>
                                             <CTableRow key={s.id} onClick={() => this.searchRecord(s.code)}>
                                                 <CTableDataCell>{s.code}</CTableDataCell>
                                                 <CTableDataCell>{s.name}</CTableDataCell>
