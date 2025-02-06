@@ -76,7 +76,7 @@ export interface ReduxStockState {
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
     own: [],
-    queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
+    queryCondition: { code: '', name: '' },
     tradeCondition: undefined
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
@@ -92,7 +92,7 @@ export interface ReduxFundState {
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     own: [],
-    queryCondition: { code: '', name: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
+    queryCondition: { code: '', name: '' },
     tradeCondition: undefined
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
@@ -108,7 +108,7 @@ export interface ReduxExchangeRateState {
 }
 export const DEFAULT_REDUX_EXCHANGE_RATE_STATE: ReduxExchangeRateState = {
     exchangeRates: [],
-    queryCondition: { currency: '', start: new Date(new Date().setDate(new Date().getDate() - 180)), end: new Date() },
+    queryCondition: { currency: '' },
     tradeCondition: undefined
 };
 const getExchangeRateState = (state: ReduxState): ReduxExchangeRateState => state.exchangeRate;

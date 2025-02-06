@@ -37,7 +37,6 @@ import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.PredictService;
 import io.tingkai.money.service.StockService;
 import io.tingkai.money.service.UserStockService;
-import io.tingkai.money.util.TimeUtil;
 
 @RestController
 @RequestMapping(value = StockController.CONROLLER_PREFIX)
@@ -79,8 +78,8 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public StockResponse<List<StockRecordVo>> getRecords(@RequestParam String code, @RequestParam String start, @RequestParam String end) {
-		List<StockRecordVo> records = this.stockService.getAllRecords(code, TimeUtil.convertToDate(start), TimeUtil.convertToDate(end));
+	public StockResponse<List<StockRecordVo>> getRecords(@RequestParam String code) {
+		List<StockRecordVo> records = this.stockService.getAllRecords(code);
 		return new StockResponse<List<StockRecordVo>>(true, records, MessageConstant.STOCK_GET_SUCCESS, code);
 	}
 

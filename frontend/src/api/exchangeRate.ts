@@ -47,8 +47,8 @@ const getAll = async (): Promise<ExchangeRateListResponse> => {
     return data;
 };
 
-const getRecords = async (currency: string, start: Date, end: Date): Promise<ExchangeRateRecordListResponse> => {
-    const response = await axios.get(EXCHANGE_RATE_GET_RECORDS_PATH, { params: { currency, start: start.getTime(), end: end.getTime() } });
+const getRecords = async (currency: string): Promise<ExchangeRateRecordListResponse> => {
+    const response = await axios.get(EXCHANGE_RATE_GET_RECORDS_PATH, { params: { currency } });
     const data: ExchangeRateRecordListResponse = response.data;
     if (data.success) {
         data.data = data.data?.map(x => {

@@ -46,8 +46,8 @@ public class ExchangeRateController {
 	}
 
 	@RequestMapping(value = ExchangeRateController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public ExchangeRateResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency, @RequestParam long start, @RequestParam long end) {
-		List<ExchangeRateRecordVo> records = this.exchangeRateService.getAllRecords(currency, start, end);
+	public ExchangeRateResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency) {
+		List<ExchangeRateRecordVo> records = this.exchangeRateService.getAllRecords(currency);
 		return new ExchangeRateResponse<List<ExchangeRateRecordVo>>(true, records, MessageConstant.EXCHANGE_RATE_GET_SUCCESS, currency);
 	}
 

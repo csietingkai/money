@@ -109,8 +109,8 @@ const getAll = async (code?: string, name?: string, sort: boolean = true): Promi
     return data;
 };
 
-const getRecords = async (code: string, start: Date, end: Date): Promise<FundRecordListResponse> => {
-    const response = await axios.get(FUND_GET_RECORDS_PATH, { params: { code, start: AppUtil.toDateStr(start), end: AppUtil.toDateStr(end) } });
+const getRecords = async (code: string): Promise<FundRecordListResponse> => {
+    const response = await axios.get(FUND_GET_RECORDS_PATH, { params: { code } });
     const data: FundRecordListResponse = response.data;
     if (data.success) {
         data.data = data.data?.map(x => {

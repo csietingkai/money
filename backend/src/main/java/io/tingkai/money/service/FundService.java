@@ -65,20 +65,6 @@ public class FundService {
 		return vos;
 	}
 
-	public List<FundRecordVo> getAllRecords(String code, LocalDateTime start, LocalDateTime end) {
-		List<FundRecord> records = new ArrayList<FundRecord>();
-		int removeSize = 0;
-		try {
-			records.addAll(this.fundRecordFacade.queryDaysBefore(code, CodeConstants.MA_DAYS[CodeConstants.MA_DAYS.length - 1], start));
-			removeSize = records.size();
-		} catch (Exception e) {
-		}
-		records.addAll(this.fundRecordFacade.queryAll(code, start, end));
-		List<FundRecordVo> vos = this.handleRecordMas(records);
-		vos = vos.subList(removeSize, vos.size());
-		return vos;
-	}
-
 	private List<FundRecordVo> handleRecordMas(List<FundRecord> records) {
 		List<FundRecordVo> vos = new ArrayList<FundRecordVo>();
 

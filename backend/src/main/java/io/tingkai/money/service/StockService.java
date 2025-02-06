@@ -65,20 +65,6 @@ public class StockService {
 		return vos;
 	}
 
-	public List<StockRecordVo> getAllRecords(String code, LocalDateTime start, LocalDateTime end) {
-		List<StockRecord> records = new ArrayList<StockRecord>();
-		int removeSize = 0;
-		try {
-			records.addAll(this.stockRecordFacade.queryDaysBefore(code, CodeConstants.MA_DAYS[CodeConstants.MA_DAYS.length - 1], start));
-			removeSize = records.size();
-		} catch (Exception e) {
-		}
-		records.addAll(this.stockRecordFacade.queryAll(code, start, end));
-		List<StockRecordVo> vos = this.handleRecordMas(records);
-		vos = vos.subList(removeSize, vos.size());
-		return vos;
-	}
-
 	private List<StockRecordVo> handleRecordMas(List<StockRecord> records) {
 		List<StockRecordVo> vos = new ArrayList<StockRecordVo>();
 

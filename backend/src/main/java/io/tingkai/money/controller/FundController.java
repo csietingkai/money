@@ -36,7 +36,6 @@ import io.tingkai.money.service.DataFetcherService;
 import io.tingkai.money.service.FundService;
 import io.tingkai.money.service.PredictService;
 import io.tingkai.money.service.UserFundService;
-import io.tingkai.money.util.TimeUtil;
 
 @RestController
 @RequestMapping(value = FundController.CONROLLER_PREFIX)
@@ -77,8 +76,8 @@ public class FundController {
 	}
 
 	@RequestMapping(value = FundController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public FundResponse<List<FundRecordVo>> getRecords(@RequestParam String code, @RequestParam String start, @RequestParam String end) {
-		List<FundRecordVo> records = this.fundService.getAllRecords(code, TimeUtil.convertToDate(start), TimeUtil.convertToDate(end));
+	public FundResponse<List<FundRecordVo>> getRecords(@RequestParam String code) {
+		List<FundRecordVo> records = this.fundService.getAllRecords(code);
 		return new FundResponse<List<FundRecordVo>>(true, records, MessageConstant.FUND_GET_SUCCESS, code);
 	}
 

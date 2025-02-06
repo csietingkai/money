@@ -54,13 +54,9 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private search = async () => {
-        const { queryCondition: { code, name, start, end }, setLoading, notify } = this.props;
+        const { queryCondition: { code, name }, setLoading, notify } = this.props;
         if (!code && !name) {
             notify('Please fill code or name at least.');
-            return;
-        }
-        if (!start || !end) {
-            notify('Please fill start and end time.');
             return;
         }
         setLoading(true);
@@ -78,12 +74,11 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
             return;
         }
         // TODO setStockPredictResult([]);
-        setLoading(false);
+        setTimeout(() => setLoading(false), 500);
     };
 
     private searchRecord = async (code: string) => {
-        const { queryForm: { start, end } } = this.state;
-        const { success, data: stockRecords } = await StockApi.getRecords(code, start, end);
+        const { success, data: stockRecords } = await StockApi.getRecords(code);
         if (success) {
             this.setState({ stockRecords });
         }
@@ -117,60 +112,32 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                 <CCardBody>
                     <CForm onKeyDown={AppUtil.bindEnterKey(this.search)}>
                         <CRow className='mb-2'>
-                            <CCol xs={5} md={4}>
+                            <CCol xs={4} md={3}>
                                 <CFormLabel className='col-form-label'>
                                     Code
                                 </CFormLabel>
                             </CCol>
-                            <CCol xs={7} md={8}>
+                            <CCol xs={8} md={9}>
                                 <CFormInput
                                     type='text'
                                     value={queryForm.code}
+                                    placeholder='Search by Stock Code'
                                     onChange={(event) => this.onQueryFormChange({ ...queryForm, code: event.target.value as string })}
                                 />
                             </CCol>
                         </CRow>
                         <CRow className='mb-2'>
-                            <CCol xs={5} md={4}>
+                            <CCol xs={4} md={3}>
                                 <CFormLabel className='col-form-label'>
                                     Name
                                 </CFormLabel>
                             </CCol>
-                            <CCol xs={7} md={8}>
+                            <CCol xs={8} md={9}>
                                 <CFormInput
                                     type='text'
                                     value={queryForm.name}
+                                    placeholder='Fuzzy Search by Stock Name'
                                     onChange={(event) => this.onQueryFormChange({ ...queryForm, name: event.target.value as string })}
-                                />
-                            </CCol>
-                        </CRow>
-                        <CRow className='mb-2'>
-                            <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
-                                    Start Date
-                                </CFormLabel>
-                            </CCol>
-                            <CCol xs={7} md={8}>
-                                <input
-                                    type='date'
-                                    className='form-control'
-                                    value={moment(queryForm.start).format('YYYY-MM-DD')}
-                                    onChange={(event) => this.onQueryFormChange({ ...queryForm, start: new Date(event.target.value) })}
-                                />
-                            </CCol>
-                        </CRow>
-                        <CRow className='mb-2'>
-                            <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
-                                    End Date
-                                </CFormLabel>
-                            </CCol>
-                            <CCol xs={7} md={8}>
-                                <input
-                                    type='date'
-                                    className='form-control'
-                                    value={moment(queryForm.end).format('YYYY-MM-DD')}
-                                    onChange={(event) => this.onQueryFormChange({ ...queryForm, end: new Date(event.target.value) })}
                                 />
                             </CCol>
                         </CRow>
@@ -294,10 +261,10 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
         return (
             <React.Fragment>
                 <CRow>
-                    <CCol xs={12} md={6}>
+                    <CCol xs={12} md={5}>
                         {this.getQueryCard()}
                     </CCol>
-                    <CCol xs={12} md={6}>
+                    <CCol xs={12} md={7}>
                         {this.getStocksCard()}
                     </CCol>
                     <CCol xs={12}>

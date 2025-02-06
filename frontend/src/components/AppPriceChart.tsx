@@ -23,7 +23,10 @@ interface AppFundChartProps {
 
 export type AppPriceChartProps = AppStockChartProps | AppFundChartProps;
 
+type DateRange = '3m' | '6m' | 'ytd' | '1y' | '5y' | 'all';
+
 export interface AppPriceChartState {
+    dateRange: DateRange,
     supportLineType: SupportLineType;
 }
 
@@ -32,6 +35,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
     constructor(props: AppPriceChartProps) {
         super(props);
         this.state = {
+            dateRange: '3m',
             supportLineType: '',
         };
     }
@@ -43,6 +47,41 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
             return ['#ec0000', '#00da3c'];
         }
     };
+
+    private getZoomRatio = (): number => {
+        const { chartType, records } = this.props;
+        const { dateRange } = this.state;
+        let zoomStart = 0;
+        if (dateRange === 'all') {
+            return zoomStart;
+        }
+        let dateDiff: number = 0;
+        if (dateRange === 'ytd') {
+            const today: Date = new Date();
+            const firstDay: Date = new Date(today.getFullYear(), 0, 1);
+            let firstDayData: StockRecordVo | FundRecordVo | undefined = undefined;
+            if (chartType === 'stock') {
+                firstDayData = records.filter(r => r.dealDate.getTime() >= firstDay.getTime())[0];
+            } else if (chartType === 'fund') {
+                firstDayData = records.filter(r => r.date.getTime() >= firstDay.getTime())[0];
+            }
+            if (firstDayData) {
+                const firstDayDataIdx: number = records.findIndex(r => r.id === firstDayData.id);
+                dateDiff = records.length - firstDayDataIdx - 1;
+            } else {
+                dateDiff = 0;
+            }
+        } else {
+            const recordCntMap: { [dateRange: string]: number } = {
+                '3m': 60,
+                '6m': 120,
+                '1y': 240,
+                '5y': 1200
+            }
+            dateDiff = recordCntMap[dateRange];
+        }
+        return AppUtil.toNumber((100 - dateDiff / records.length * 100).toFixed(1));
+    }
 
     private getSupportSeries = (): any[] => {
         const { records } = this.props;
@@ -71,9 +110,6 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
 
     private getChartOption = (): EChartsOption => {
         const { chartType, info, records } = this.props;
-        // const dates: string[] = records.map(r => AppUtil.toDateStr(r.dealDate) || '');
-        // const data: number[][] = records.map(r => [r.openPrice, r.closePrice, r.lowPrice, r.highPrice])
-        // const volumes: number[] = records.map(r => r.dealShare);
         const option: EChartsOption = {
             animation: false,
             color: CHART_COLORS,
@@ -171,13 +207,17 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
             dataZoom: [
                 {
                     type: 'inside',
-                    xAxisIndex: [0, 1]
+                    xAxisIndex: [0, 1],
+                    start: this.getZoomRatio(),
+                    end: 100
                 },
                 {
                     show: true,
                     xAxisIndex: [0, 1],
                     type: 'slider',
-                    top: '85%'
+                    top: '85%',
+                    start: this.getZoomRatio(),
+                    end: 100
                 }
             ]
         };
@@ -235,7 +275,8 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
     };
 
     render(): React.ReactNode {
-        const { supportLineType } = this.state;
+        const { dateRange, supportLineType } = this.state;
+        const dateRangeRadios: DateRange[] = ['3m', '6m', 'ytd', '1y', '5y', 'all'];
         const supportLineRadios: { label: string, value: SupportLineType; }[] = [
             { label: 'None', value: '' },
             { label: 'Moving Average', value: 'ma' },
@@ -246,10 +287,42 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
                 <CRow className='mb-1'>
                     <CCol sm={12} className='text-center'>
                         {
-                            supportLineRadios.map((r, ri) =>
-                                <CButton key={`support-line-radio-${r.value}-${ri}`} className='ms-1 mb-1' color='info' variant='outline' onClick={() => this.setState({ supportLineType: r.value })}>
+                            dateRangeRadios.map((r, ri) =>
+                                <CButton
+                                    key={`date-range-radio-${r}-${ri}`}
+                                    className='ms-1 mb-1'
+                                    color='info'
+                                    variant='outline'
+                                    onClick={() => this.setState({ dateRange: r })}
+                                >
                                     <CFormSwitch
                                         type='radio'
+                                        label={r.toUpperCase()}
+                                        name='dateRange'
+                                        value={r}
+                                        checked={dateRange === r}
+                                        onChange={() => this.setState({ dateRange: r })}
+                                    />
+                                </CButton>
+                            )
+                        }
+                    </CCol>
+                </CRow>
+                <CRow className='mb-1'>
+                    <CCol sm={12} className='text-center'>
+                        {
+                            supportLineRadios.map((r, ri) =>
+                                <CButton
+                                    key={`support-line-radio-${r.value}-${ri}`}
+                                    className='ms-1 mb-1'
+                                    color='secondary'
+                                    size='sm'
+                                    variant='outline'
+                                    onClick={() => this.setState({ supportLineType: r.value })}
+                                >
+                                    <CFormSwitch
+                                        type='radio'
+                                        className='mb-0'
                                         label={r.label}
                                         name='supportLineType'
                                         value={r.value}

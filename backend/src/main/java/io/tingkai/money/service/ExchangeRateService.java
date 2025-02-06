@@ -79,20 +79,6 @@ public class ExchangeRateService {
 		return vos;
 	}
 
-	public List<ExchangeRateRecordVo> getAllRecords(String currency, long start, long end) {
-		List<ExchangeRateRecord> records = new ArrayList<ExchangeRateRecord>();
-		int removeSize = 0;
-		try {
-			records.addAll(this.exchangeRateRecordFacade.queryDaysBefore(currency, CodeConstants.MA_DAYS[CodeConstants.MA_DAYS.length - 1], start));
-			removeSize = records.size();
-		} catch (Exception e) {
-		}
-		records.addAll(this.exchangeRateRecordFacade.queryAll(currency, start, end));
-		List<ExchangeRateRecordVo> vos = this.handleRecordMas(records);
-		vos = vos.subList(removeSize, vos.size());
-		return vos;
-	}
-
 	@Transactional
 	public void trade(ExchangeRateTradeRequest request) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
 		final UUID fromAccountId = request.getFromAccountId();
