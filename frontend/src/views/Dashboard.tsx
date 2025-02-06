@@ -194,7 +194,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                 height={'400px'}
                                             />
                                             {
-                                                data[r].map((series, si) => {
+                                                data[r].map((series, si) =>
                                                     si !== 0 && (
                                                         <div className='progress-group' key={`${key}-${r}-series-${si}`}>
                                                             <div className='progress-group-header'>
@@ -210,8 +210,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                                 </CProgress>
                                                             </div>
                                                         </div>
-                                                    );
-                                                })
+                                                    )
+                                                )
                                             }
                                         </CTabPane>
                                     );
