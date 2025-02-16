@@ -11,7 +11,6 @@ import { Option } from '../../../util/Interface';
 import FundTradeCondition from '../interface/FundTradeCondition';
 
 export interface FundSellFormProps {
-    userId: string;
     userSetting: UserSetting;
     accounts: Account[];
     tradeCondition?: FundTradeCondition;
@@ -114,8 +113,7 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
     };
 
     private getFilesByDate = async (date: Date): Promise<Option[]> => {
-        const { userId } = this.props;
-        const response = await FinancailFileApi.list(userId, date);
+        const response = await FinancailFileApi.list(date);
         const { success, data } = response;
         if (success) {
             return data.map(f => ({ key: f.id, value: f.filename }));
@@ -124,8 +122,8 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
     };
 
     private fetchAccounts = async () => {
-        const { userId, setAccountList } = this.props;
-        const response = await AccountApi.getAccounts(userId);
+        const { setAccountList } = this.props;
+        const response = await AccountApi.getAccounts();
         const { success, data } = response;
         if (success) {
             setAccountList(data);

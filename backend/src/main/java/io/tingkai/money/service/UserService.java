@@ -25,6 +25,7 @@ import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.UserNotFoundException;
 import io.tingkai.money.model.exception.WrongPasswordException;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.ContextUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -76,7 +77,8 @@ public class UserService {
 		return entity;
 	}
 
-	public User changePwd(UUID userId, String newPwd) throws NotExistException, FieldMissingException {
+	public User changePwd(String newPwd) throws NotExistException, FieldMissingException {
+		UUID userId = ContextUtil.getUserId();
 		User entity = this.userFacade.query(userId);
 		entity.setPwd(this.bCryptPasswordEncoder.encode(newPwd));
 		return this.userFacade.update(entity);

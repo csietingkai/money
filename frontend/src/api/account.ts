@@ -63,8 +63,8 @@ export interface AccountListResponse extends ApiResponse<Account[]> { }
 export interface AccountRecordListResponse extends ApiResponse<AccountRecordVo[]> { }
 export interface AccountMonthBalanceResponse extends ApiResponse<MonthBalanceVo> { }
 
-const getAccounts = async (userId: string): Promise<AccountListResponse> => {
-    const response = await axios.get(ACCOUNT_GET_ALL_PATH, { params: { userId } });
+const getAccounts = async (): Promise<AccountListResponse> => {
+    const response = await axios.get(ACCOUNT_GET_ALL_PATH);
     const data: AccountListResponse = response.data;
     return data;
 };

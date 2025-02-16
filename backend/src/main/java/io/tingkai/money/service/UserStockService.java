@@ -431,7 +431,8 @@ public class UserStockService {
 		this.accountRecordFacade.delete(accountRecord.getId());
 	}
 
-	public List<UserTrackingStockVo> getUserTrackingStockList(UUID userId) {
+	public List<UserTrackingStockVo> getUserTrackingStockList() {
+		UUID userId = ContextUtil.getUserId();
 		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);
 		if (AppUtil.isEmpty(trackingList)) {

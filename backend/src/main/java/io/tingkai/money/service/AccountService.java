@@ -74,7 +74,8 @@ public class AccountService {
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> pythonCache;
 
-	public List<Account> getAll(UUID userId) {
+	public List<Account> getAll() {
+		UUID userId = ContextUtil.getUserId();
 		List<Account> entities = this.syncCache(userId);
 		return entities;
 	}

@@ -138,8 +138,8 @@ public class StockController {
 	}
 
 	@RequestMapping(value = StockController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)
-	public StockResponse<List<UserTrackingStockVo>> getAll(@RequestParam UUID userId) {
-		List<UserTrackingStockVo> stocks = this.userStockService.getUserTrackingStockList(userId);
+	public StockResponse<List<UserTrackingStockVo>> getAll() {
+		List<UserTrackingStockVo> stocks = this.userStockService.getUserTrackingStockList();
 		return new StockResponse<List<UserTrackingStockVo>>(true, stocks, MessageConstant.USER_STOCK_GET_TRACKING_LIST_SUCCESS);
 	}
 

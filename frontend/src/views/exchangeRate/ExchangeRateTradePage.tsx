@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CContainer, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import { cilMediaSkipForward } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
-import { ReduxState, getAccountList, getAuthTokenId, getExchangeRateList } from '../../reducer/Selector';
+import { ReduxState, getAccountList, getExchangeRateList } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
 import AccountApi, { Account } from '../../api/account';
 import ExchangeRateApi, { ExchangeRateVo } from '../../api/exchangeRate';
@@ -12,7 +12,6 @@ import { StockType } from '../../util/Enum';
 import { Action, Option } from '../../util/Interface';
 
 export interface ExchangeRateQueryPageProps {
-    userId: string;
     stockType: StockType;
     exchangeRates: ExchangeRateVo[];
     accounts: Account[];
@@ -73,8 +72,8 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
     };
 
     private fetchAccounts = async () => {
-        const { userId, setAccountList } = this.props;
-        const response = await AccountApi.getAccounts(userId);
+        const { setAccountList } = this.props;
+        const response = await AccountApi.getAccounts();
         const { success, data } = response;
         if (success) {
             setAccountList(data);
@@ -261,7 +260,6 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        userId: getAuthTokenId(state),
         exchangeRates: getExchangeRateList(state),
         accounts: getAccountList(state)
     };

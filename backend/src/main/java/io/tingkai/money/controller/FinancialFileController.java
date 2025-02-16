@@ -44,16 +44,16 @@ public class FinancialFileController {
 	private FinancialFileService fileService;
 
 	@RequestMapping(value = FinancialFileController.LIST_PATH, method = RequestMethod.GET)
-	public FileResponse<List<FinancialFile>> list(@RequestParam UUID userId, @RequestParam(required = false) String date, @RequestParam(required = false) String type) {
+	public FileResponse<List<FinancialFile>> list(@RequestParam(required = false) String date, @RequestParam(required = false) String type) {
 		List<FinancialFile> files = null;
 		if (AppUtil.isAllPresent(date, type)) {
-			this.fileService.getAll(userId, TimeUtil.convertToDate(date), type);
+			this.fileService.getAll(TimeUtil.convertToDate(date), type);
 		} else if (AppUtil.isPresent(date)) {
-			files = this.fileService.getAll(userId, TimeUtil.convertToDate(date));
+			files = this.fileService.getAll(TimeUtil.convertToDate(date));
 		} else if (AppUtil.isPresent(type)) {
-			files = this.fileService.getAll(userId, type);
+			files = this.fileService.getAll(type);
 		} else {
-			files = this.fileService.getAll(userId);
+			files = this.fileService.getAll();
 		}
 		return new FileResponse<List<FinancialFile>>(true, files, MessageConstant.SUCCESS);
 	}

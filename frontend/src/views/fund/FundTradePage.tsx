@@ -55,7 +55,6 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
                 <CTabContent>
                     <CTabPane visible={activeTab === 'buy'} className='mt-2 col-xl-6 mx-auto'>
                         <FundBuyForm
-                            userId={userId}
                             userSetting={userSetting}
                             accounts={accounts}
                             tradeCondition={tradeCondition}
@@ -66,7 +65,6 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
                     </CTabPane>
                     <CTabPane visible={activeTab === 'sell'} className='mt-2 col-xl-6 mx-auto'>
                         <FundSellForm
-                            userId={userId}
                             userSetting={userSetting}
                             accounts={accounts}
                             tradeCondition={tradeCondition}
@@ -77,7 +75,6 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
                     </CTabPane>
                     <CTabPane visible={activeTab === 'bonus'} className='mt-2 col-xl-6 mx-auto'>
                         <FundBonusForm
-                            userId={userId}
                             userSetting={userSetting}
                             accounts={accounts}
                             tradeCondition={tradeCondition}

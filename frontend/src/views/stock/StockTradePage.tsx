@@ -53,7 +53,6 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
                 <CTabContent>
                     <CTabPane visible={activeTab === 'buy'} className='mt-2 col-xl-6 mx-auto'>
                         <StockBuyForm
-                            userId={userId}
                             accounts={accounts}
                             tradeCondition={tradeCondition}
                             setAccountList={setAccountList}
@@ -63,7 +62,6 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
                     </CTabPane>
                     <CTabPane visible={activeTab === 'sell'} className='mt-2 col-xl-6 mx-auto'>
                         <StockSellForm
-                            userId={userId}
                             accounts={accounts}
                             tradeCondition={tradeCondition}
                             setAccountList={setAccountList}
@@ -73,7 +71,6 @@ class StockTradePage extends React.Component<StockTradePageProps, StockTradePage
                     </CTabPane>
                     <CTabPane visible={activeTab === 'bonus'} className='mt-2 col-xl-6 mx-auto'>
                         <StockBonusForm
-                            userId={userId}
                             accounts={accounts}
                             tradeCondition={tradeCondition}
                             setAccountList={setAccountList}

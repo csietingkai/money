@@ -287,8 +287,8 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     };
 
     private fetchAccounts = async () => {
-        const { userId, setAccountList } = this.props;
-        const response = await AccountApi.getAccounts(userId);
+        const { setAccountList } = this.props;
+        const response = await AccountApi.getAccounts();
         const { success, data } = response;
         if (success) {
             setAccountList(data);

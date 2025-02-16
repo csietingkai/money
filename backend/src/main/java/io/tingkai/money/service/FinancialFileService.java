@@ -53,19 +53,23 @@ public class FinancialFileService {
 		this.fileRepositories = fileRepositories;
 	}
 
-	public List<FinancialFile> getAll(UUID userId) {
+	public List<FinancialFile> getAll() {
+		UUID userId = ContextUtil.getUserId();
 		return this.finacialFileFacade.queryAll(userId);
 	}
 
-	public List<FinancialFile> getAll(UUID userId, LocalDateTime date) {
+	public List<FinancialFile> getAll(LocalDateTime date) {
+		UUID userId = ContextUtil.getUserId();
 		return this.finacialFileFacade.queryAll(userId, date);
 	}
 
-	public List<FinancialFile> getAll(UUID userId, String type) {
+	public List<FinancialFile> getAll(String type) {
+		UUID userId = ContextUtil.getUserId();
 		return this.finacialFileFacade.queryAll(userId, type);
 	}
 
-	public List<FinancialFile> getAll(UUID userId, LocalDateTime date, String type) {
+	public List<FinancialFile> getAll(LocalDateTime date, String type) {
+		UUID userId = ContextUtil.getUserId();
 		return this.finacialFileFacade.queryAll(userId, date, type);
 	}
 

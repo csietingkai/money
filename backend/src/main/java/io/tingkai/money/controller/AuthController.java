@@ -1,7 +1,5 @@
 package io.tingkai.money.controller;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,6 +25,7 @@ import io.tingkai.money.security.AuthToken;
 import io.tingkai.money.security.AuthTokenService;
 import io.tingkai.money.service.UserService;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.ContextUtil;
 
 @RestController
 public class AuthController {
@@ -60,8 +59,8 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = AuthController.CHANGE_PWD_PATH, method = RequestMethod.POST)
-	public AuthResponse changePwd(@RequestParam UUID userId, @RequestParam String password) throws NotExistException, FieldMissingException {
-		this.userService.changePwd(userId, password);
+	public AuthResponse changePwd(@RequestParam String password) throws NotExistException, FieldMissingException {
+		this.userService.changePwd(password);
 		return new AuthResponse(true, null, MessageConstant.USER_CHANGE_PASSWORD_SUCCESS);
 	}
 
@@ -77,9 +76,9 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = AuthController.LOGOUT_PATH, method = RequestMethod.POST)
-	public AuthResponse logout(@RequestParam UUID userId, @RequestHeader(name = CodeConstants.REQUEST_TOKEN_KEY) String tokenString) {
+	public AuthResponse logout(@RequestHeader(name = CodeConstants.REQUEST_TOKEN_KEY) String tokenString) {
 		AuthToken token = new AuthToken();
-		token.setId(userId);
+		token.setId(ContextUtil.getUserId());
 		token.setTokenString(tokenString);
 		this.authTokenService.revoke(token);
 		return new AuthResponse(true, null, MessageConstant.LOGOUT_SUCCESS);

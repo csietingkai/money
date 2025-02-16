@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { CCard, CCardBody, CNav, CNavItem, CNavLink, CTabContent, CTabPane } from '@coreui/react';
 import { ReduxState, getAuthTokenId, getExchangeRateList, getExchangeRateQueryCondition, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
-import ExchangeRateApi, { ExchangeRateRecordVo, ExchangeRateVo } from '../../api/exchangeRate';
+import ExchangeRateApi, { ExchangeRateVo } from '../../api/exchangeRate';
 import { FundRecordVo } from '../../api/fund';
 import AppPriceChart from '../../components/AppPriceChart';
 import { StockType } from '../../util/Enum';

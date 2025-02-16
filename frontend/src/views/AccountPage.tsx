@@ -1,12 +1,12 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownDivider, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
 import qrcode from 'qrcode';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
-import { ReduxState, getAccountList, getAuthTokenId, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
+import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
 import AccountApi, { Account, AccountRecordVo } from '../api/account';
 import FinancailFileApi from '../api/financailFile';
 import AppConfirmModal from '../components/AppConfirmModal';
@@ -16,10 +16,8 @@ import { Action, SimpleResponse, Option } from '../util/Interface';
 import { StockType } from '../util/Enum';
 import { DATA_COUNT_PER_PAGE } from '../util/Constant';
 import currencyIcon from '../assets/currency';
-import account from '../api/account';
 
 export interface AccountPageProps {
-    userId: string,
     accountList: Account[],
     accountRecordDeletable: boolean,
     stockType: StockType,
@@ -256,8 +254,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private fetchAccounts = async () => {
-        const { userId, setAccountList } = this.props;
-        const response = await AccountApi.getAccounts(userId);
+        const { setAccountList } = this.props;
+        const response = await AccountApi.getAccounts();
         const { success, data } = response;
         if (success) {
             setAccountList(data);
@@ -985,8 +983,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     private getFilesByDate = async (date: Date): Promise<Option[]> => {
-        const { userId } = this.props;
-        const response = await FinancailFileApi.list(userId, date);
+        const response = await FinancailFileApi.list(date);
         const { success, data } = response;
         if (success) {
             return data.map(f => ({ key: f.id, value: f.filename }));
@@ -1185,7 +1182,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        userId: getAuthTokenId(state),
         accountList: getAccountList(state),
         accountRecordDeletable: isAccountRecordDeletable(state),
         stockType: getStockType(state),

@@ -1,7 +1,7 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
-import { ReduxState, getAuthTokenId, getAuthTokenName, getRecordTypes, getUserSetting } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenName, getRecordTypes, getUserSetting } from '../../reducer/Selector';
 import { SetNotifyDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
 import AuthApi, { UserSetting } from '../../api/auth';
 import * as AppUtil from '../../util/AppUtil';
@@ -9,7 +9,6 @@ import { Action, Option } from '../../util/Interface';
 import { StockType } from '../../util/Enum';
 
 export interface SettingPageProps {
-    userId: string;
     username: string;
     userSetting: UserSetting;
     recordTypeOptions: Option[];
@@ -56,13 +55,13 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
     }
 
     private updatePwd = async () => {
-        const { userId, notify } = this.props;
+        const { notify } = this.props;
         const { userForm } = this.state;
         if (userForm.userPwd !== userForm.conmfirmPwd) {
             notify('Please check field \'Confirm Password\' and \'New Password\' values are the same.');
             return;
         }
-        const response = await AuthApi.changePwd(userId, userForm.userPwd);
+        const response = await AuthApi.changePwd(userForm.userPwd);
         const { message } = response;
         notify(message);
         this.setState({ userForm: { ...userForm, userPwd: '', conmfirmPwd: '' } });
@@ -339,7 +338,6 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        userId: getAuthTokenId(state),
         username: getAuthTokenName(state),
         userSetting: getUserSetting(state),
         recordTypeOptions: getRecordTypes(state)

@@ -16,8 +16,8 @@ export interface FinancialFile {
 export interface FinancialFileResponse extends ApiResponse<FinancialFile> { }
 export interface FinancialFileListResponse extends ApiResponse<FinancialFile[]> { }
 
-const list = async (userId: string, date?: Date, type?: string): Promise<FinancialFileListResponse> => {
-    const response = await axios.get(FINANCIAL_FILE_LIST_PATH, { params: { userId, type, date: AppUtil.toDateStr(date) } });
+const list = async (date?: Date, type?: string): Promise<FinancialFileListResponse> => {
+    const response = await axios.get(FINANCIAL_FILE_LIST_PATH, { params: { type, date: AppUtil.toDateStr(date) } });
     const data: FinancialFileListResponse = response.data;
     data.data = data.data?.map(x => {
         x.date = new Date(x.date);

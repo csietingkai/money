@@ -107,7 +107,7 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
     }
 
     if (tokenString) {
-        apis.push(AccountApi.getAccounts(getAuthTokenId(getState())));
+        apis.push(AccountApi.getAccounts());
         responseHandlers.push((response: AccountListResponse) => {
             const { success, data } = response;
             if (success) {

@@ -1,6 +1,5 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilChevronDoubleRight, cilSync } from '@coreui/icons';

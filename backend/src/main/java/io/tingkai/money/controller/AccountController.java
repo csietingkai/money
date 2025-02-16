@@ -51,8 +51,8 @@ public class AccountController {
 	private AccountService accountService;
 
 	@RequestMapping(value = AccountController.GET_ALL_PATH, method = RequestMethod.GET)
-	public AccountResponse<List<Account>> getAccounts(@RequestParam UUID userId) {
-		List<Account> entities = this.accountService.getAll(userId);
+	public AccountResponse<List<Account>> getAccounts() {
+		List<Account> entities = this.accountService.getAll();
 		return new AccountResponse<List<Account>>(true, entities, MessageConstant.ACCOUNT_GET_ALL_SUCCESS);
 	}
 

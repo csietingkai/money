@@ -39,8 +39,8 @@ const login = async (username: string, password: string): Promise<AuthResponse> 
     return data;
 };
 
-const changePwd = async (userId: string, password: string): Promise<AuthResponse> => {
-    const response = await axios.post(AUTH_CHANGE_PWD_PATH, null, { params: { userId, password } });
+const changePwd = async (password: string): Promise<AuthResponse> => {
+    const response = await axios.post(AUTH_CHANGE_PWD_PATH, null, { params: { password } });
     const data: AuthResponse = response.data;
     return data;
 };
@@ -51,8 +51,8 @@ const validate = async (tokenString: string): Promise<AuthResponse> => {
     return data;
 };
 
-const logout = async (userId: string, tokenString: string): Promise<AuthResponse> => {
-    const response = await axios.post(AUTH_LOGOUT_PATH, null, { params: { userId, tokenString } });
+const logout = async (tokenString: string): Promise<AuthResponse> => {
+    const response = await axios.post(AUTH_LOGOUT_PATH, null, { params: { tokenString } });
     const data: AuthResponse = response.data;
     return data;
 };

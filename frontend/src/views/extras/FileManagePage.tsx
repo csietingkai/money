@@ -14,7 +14,6 @@ import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 import { Action, Option } from '../../util/Interface';
 
 export interface FileManagePageProps {
-    userId: string,
     fileTypeOptions: Option[];
     isMobile: boolean;
     notify: (message: string) => void;
@@ -67,8 +66,8 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
     }
 
     private init = async () => {
-        const { userId, notify } = this.props;
-        const response = await FinancailFileApi.list(userId);
+        const { notify } = this.props;
+        const response = await FinancailFileApi.list();
         const { success, data, message } = response;
         if (success) {
             this.setState({ files: data });
@@ -397,7 +396,6 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
 
 const mapStateToProps = (state: ReduxState) => {
     return {
-        userId: getAuthTokenId(state),
         fileTypeOptions: getFileTypes(state),
         isMobile: isMobile(state)
     };
