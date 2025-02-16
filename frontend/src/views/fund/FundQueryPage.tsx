@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilSync } from '@coreui/icons';
+import { cilChevronDoubleRight, cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
 import AppPriceChart from '../../components/AppPriceChart';
 import { ReduxState, getAuthTokenId, getFundQueryCondition } from '../../reducer/Selector';
@@ -115,6 +115,12 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
         const { queryForm } = this.state;
         return (
             <CCard className='mb-4'>
+                <CCardHeader>
+                    <div className='d-flex'>
+                        <CIcon size='lg' className='my-auto' icon={cilChevronDoubleRight}/>
+                        <strong className='ms-2'>Search Condition</strong>
+                    </div>
+                </CCardHeader>
                 <CCardBody>
                     <CForm onKeyDown={AppUtil.bindEnterKey(this.search)}>
                         <CRow className='mb-2'>
