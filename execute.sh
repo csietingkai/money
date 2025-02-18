@@ -54,7 +54,7 @@ if [ "$1" = 'build' ]; then
 		docker container rm $frontend_container_name
 		cd ..
 		cd frontend
-		docker build --no-cache . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
+		docker build . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
 		docker push $frontend_image_name:latest
 		docker push $frontend_image_name:$version
 		docker image rm $frontend_image_name:latest $frontend_image_name:$version
