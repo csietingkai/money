@@ -25,7 +25,7 @@ $colors: (
 
 @each $colorname, $color in $colors {
     div.card.detailed-#{$colorname} {
-       box-shadow: 0 0.125rem 0.25rem $color
+        box-shadow: 0 0.125rem 0.25rem $color
     }
 }
 
@@ -35,4 +35,10 @@ $colors: (
 
 .pl-0 {
     padding-left: 0;
+}
+
+label.required::before {
+    content: '*';
+    margin-right: 4px;
+    color: red;
 }

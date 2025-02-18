@@ -165,7 +165,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                     <CForm onKeyDown={AppUtil.bindEnterKey(this.onBuyClick)}>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Stock Code
                                 </CFormLabel>
                             </CCol>
@@ -197,7 +197,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Debit Account
                                 </CFormLabel>
                             </CCol>
@@ -231,7 +231,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Trade Date
                                 </CFormLabel>
                             </CCol>
@@ -250,7 +250,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Price
                                 </CFormLabel>
                             </CCol>
@@ -269,7 +269,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Share
                                 </CFormLabel>
                             </CCol>
@@ -288,7 +288,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Fee
                                 </CFormLabel>
                             </CCol>
@@ -306,7 +306,7 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Total
                                 </CFormLabel>
                             </CCol>
@@ -314,7 +314,9 @@ export default class StockBuyForm extends React.Component<StockBuyFormProps, Sto
                                 <CFormInput
                                     type='text'
                                     value={total}
-                                    onChange={(event) => this.setState({ total: event.target.value as string })}
+                                    onChange={(event) => {
+                                        this.setState({ total: event.target.value as string });
+                                    }}
                                 />
                             </CCol>
                         </CRow>

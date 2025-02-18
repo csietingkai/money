@@ -152,7 +152,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                     <CForm onKeyDown={AppUtil.bindEnterKey(this.onBuyClick)}>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Fund Code
                                 </CFormLabel>
                             </CCol>
@@ -184,7 +184,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Debit Account
                                 </CFormLabel>
                             </CCol>
@@ -204,7 +204,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Account Balance
                                 </CFormLabel>
                             </CCol>
@@ -218,7 +218,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Trade Date
                                 </CFormLabel>
                             </CCol>
@@ -237,7 +237,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Debit Amount
                                 </CFormLabel>
                             </CCol>
@@ -255,7 +255,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Exchange Rate
                                 </CFormLabel>
                             </CCol>
@@ -277,7 +277,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Price
                                 </CFormLabel>
                             </CCol>
@@ -298,7 +298,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Share
                                 </CFormLabel>
                             </CCol>
@@ -312,7 +312,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         </CRow>
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
-                                <CFormLabel className='col-form-label'>
+                                <CFormLabel className='col-form-label required'>
                                     Fee
                                 </CFormLabel>
                             </CCol>

@@ -99,7 +99,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                 <CForm onKeyDown={AppUtil.bindEnterKey(this.onTradeClick)}>
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
-                                            <CFormLabel className='col-form-label'>
+                                            <CFormLabel className='col-form-label required'>
                                                 Currency
                                             </CFormLabel>
                                         </CCol>
@@ -131,7 +131,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     </CRow>
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
-                                            <CFormLabel className='col-form-label'>
+                                            <CFormLabel className='col-form-label required'>
                                                 Account
                                             </CFormLabel>
                                         </CCol>
@@ -199,7 +199,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     </CRow>
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
-                                            <CFormLabel className='col-form-label'>
+                                            <CFormLabel className='col-form-label required'>
                                                 Rate
                                             </CFormLabel>
                                         </CCol>
@@ -214,7 +214,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     </CRow>
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
-                                            <CFormLabel className='col-form-label'>
+                                            <CFormLabel className='col-form-label required'>
                                                 Amount
                                             </CFormLabel>
                                         </CCol>
