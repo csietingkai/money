@@ -91,6 +91,7 @@ export interface AccountPageState {
         fileId?: string;
     };
     fileOptions: Option[];
+    showDeleteAccountModal: boolean;
     showDeleteRecordModal: boolean;
     holdingAccountId: string;
     holdingRecordId: string;
@@ -158,6 +159,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 description: ''
             },
             fileOptions: [],
+            showDeleteAccountModal: false,
             showDeleteRecordModal: false,
             holdingAccountId: '',
             holdingRecordId: ''
@@ -236,6 +238,15 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                     }}
                                 >
                                     <CIcon icon={cilQrCode} className='float-start ms-2' width={22} />
+                                </CLink>
+                            }
+                            {
+                                account.removable &&
+                                <CLink
+                                    className='font-weight-bold font-xs text-body-secondary'
+                                    onClick={() => this.setState({ showDeleteAccountModal: true, holdingAccountId: account.id })}
+                                >
+                                    <CIcon icon={cilTrash} className='float-start ms-2' width={22} />
                                 </CLink>
                             }
                         </CCol>
@@ -538,6 +549,13 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         };
         this.setState({ showQrcodeModal: false, qrcodeForm });
     };
+
+    private removeAccount = async (accountId) => {
+        const { notify } = this.props;
+        const response = await AccountApi.deleteAccount(accountId);
+        const { message } = response;
+        notify(message);
+    }
 
     private fetchAccountRecords = async (accountId: string) => {
         const response = await AccountApi.getRecords(accountId);
@@ -1006,7 +1024,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
 
     render(): React.ReactNode {
         const { accountList, accountRecordDeletable } = this.props;
-        const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteRecordModal } = this.state;
+        const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteAccountModal, showDeleteRecordModal } = this.state;
         const hasHiddenAccount: boolean = accountList.some(x => !x.shown);
         const showAccountRecords = currentAccountRecords.slice((accountRecordsPage - 1) * DATA_COUNT_PER_PAGE, accountRecordsPage * DATA_COUNT_PER_PAGE);
         return (
@@ -1161,6 +1179,18 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 {this.getIncomeModal()}
                 {this.getTransferModal()}
                 {this.getExpendModal()}
+                <AppConfirmModal
+                    showModal={showDeleteAccountModal}
+                    headerText='Remove Account'
+                    onConfirm={async (result: boolean) => {
+                        if (result) {
+                            const { holdingAccountId } = this.state;
+                            await this.removeAccount(holdingAccountId);
+                            this.fetchAccounts();
+                        }
+                        this.setState({ showDeleteAccountModal: false, holdingAccountId: '' });
+                    }}
+                />
                 <AppConfirmModal
                     showModal={showDeleteRecordModal}
                     headerText='Remove Record'

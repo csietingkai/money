@@ -90,7 +90,7 @@ public class UserFundService {
 		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnFund();
 		List<UserFund> ownList = this.userFundFacade.queryByUserId(userId);
 		if (onlyShowOwn) {
-			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
+			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).toList();
 		}
 		Map<String, String> fundNames = this.fundFacade.queryAll().stream().collect(Collectors.toMap(Fund::getCode, Fund::getName));
 		List<UserFundVo> vos = new ArrayList<UserFundVo>();

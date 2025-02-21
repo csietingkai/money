@@ -65,6 +65,7 @@ public class MessageConstant {
 	public static final String ACCOUNT_GET_ALL_SUCCESS = "Get Accounts Success";
 	public static final String ACCOUNT_INSERT_SUCCESS = "Create Account<{0}> Success";
 	public static final String ACCOUNT_UPDATE_SUCCESS = "Update Account<{0}> Success";
+	public static final String ACCOUNT_DELETE_SUCCESS = "Delete Account Success";
 	public static final String ACCOUNT_GET_RECORDS_SUCCESS = "Get Account<{0}> Records Success";
 	public static final String ACCOUNT_GET_MONTH_BALANCE_SUCCESS = "Get Records Success";
 	public static final String ACCOUNT_INSERT_RECORDS_SUCCESS = "Create Account Records Success";

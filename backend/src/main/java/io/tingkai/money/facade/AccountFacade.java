@@ -91,4 +91,8 @@ public class AccountFacade {
 		}
 		return this.accountDao.save(updateEntity);
 	}
+
+	public void remove(UUID id) {
+		this.accountDao.deleteById(id);
+	}
 }

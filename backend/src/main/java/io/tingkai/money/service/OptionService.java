@@ -58,7 +58,7 @@ public class OptionService {
 					text = o.getEnText();
 				}
 				return OptionVo.of(o.getName(), text);
-			}).collect(Collectors.toList());
+			}).toList();
 			this.appCache.opsForValue().set(catergory, options);
 		}
 		return options;

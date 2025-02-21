@@ -91,7 +91,7 @@ public class UserStockService {
 		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnStock();
 		List<UserStock> ownList = this.userStockFacade.queryByUserId(userId);
 		if (onlyShowOwn) {
-			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
+			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).toList();
 		}
 		Map<String, String> stockNames = this.stockFacade.queryAll().stream().collect(Collectors.toMap(Stock::getCode, Stock::getName));
 		List<UserStockVo> vos = new ArrayList<UserStockVo>();

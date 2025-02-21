@@ -28,6 +28,7 @@ import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
 import io.tingkai.money.model.response.AccountResponse;
 import io.tingkai.money.model.vo.AccountRecordVo;
+import io.tingkai.money.model.vo.AccountVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.service.AccountService;
 
@@ -39,6 +40,7 @@ public class AccountController {
 	public static final String GET_ALL_PATH = "/getAll";
 	public static final String INSERT_PATH = "/insert";
 	public static final String UPDATE_PATH = "/update";
+	public static final String DELETE_PATH = "/delete";
 	public static final String GET_RECORDS_PATH = "/getRecords";
 	public static final String MONTH_BALANCE = "/monthBalance";
 	public static final String INCOME_PATH = "/income";
@@ -51,9 +53,9 @@ public class AccountController {
 	private AccountService accountService;
 
 	@RequestMapping(value = AccountController.GET_ALL_PATH, method = RequestMethod.GET)
-	public AccountResponse<List<Account>> getAccounts() {
-		List<Account> entities = this.accountService.getAll();
-		return new AccountResponse<List<Account>>(true, entities, MessageConstant.ACCOUNT_GET_ALL_SUCCESS);
+	public AccountResponse<List<AccountVo>> getAccounts() {
+		List<AccountVo> entities = this.accountService.getAll();
+		return new AccountResponse<List<AccountVo>>(true, entities, MessageConstant.ACCOUNT_GET_ALL_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.INSERT_PATH, method = RequestMethod.POST)
@@ -66,6 +68,12 @@ public class AccountController {
 	public AccountResponse<Account> update(@RequestBody AccountEditRequest req) throws NotExistException, FieldMissingException {
 		Account updated = this.accountService.update(req);
 		return new AccountResponse<Account>(true, updated, MessageConstant.ACCOUNT_UPDATE_SUCCESS, updated.getName());
+	}
+
+	@RequestMapping(value = AccountController.DELETE_PATH, method = RequestMethod.DELETE)
+	public AccountResponse<Void> remove(@RequestParam UUID id) {
+		this.accountService.remove(id);
+		return new AccountResponse<Void>(true, null, MessageConstant.ACCOUNT_DELETE_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORDS_PATH, method = RequestMethod.GET)

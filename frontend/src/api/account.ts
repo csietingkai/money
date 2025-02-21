@@ -16,6 +16,7 @@ export interface Account {
     bankCode?: string;
     bankNo?: string;
     shown: boolean;
+    removable: boolean;
 }
 
 export interface AccountRecord {

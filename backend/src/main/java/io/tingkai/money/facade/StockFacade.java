@@ -57,8 +57,8 @@ public class StockFacade {
 	}
 
 	public List<Stock> queryByUserStockExist(boolean sort) {
-		List<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).distinct().collect(Collectors.toList());
-		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.indexOf(s.getCode()) >= 0).collect(Collectors.toList());
+		List<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).distinct().toList();
+		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.indexOf(s.getCode()) >= 0).toList();
 		if (sort) {
 			this.sort(entities);
 		}

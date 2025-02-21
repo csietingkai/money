@@ -40,6 +40,7 @@ import io.tingkai.money.model.request.AccountRecordExpendRequest;
 import io.tingkai.money.model.request.AccountRecordIncomeRequest;
 import io.tingkai.money.model.request.AccountRecordTransferRequest;
 import io.tingkai.money.model.vo.AccountRecordVo;
+import io.tingkai.money.model.vo.AccountVo;
 import io.tingkai.money.model.vo.BalanceDetailVo;
 import io.tingkai.money.model.vo.BalanceSumVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
@@ -74,10 +75,16 @@ public class AccountService {
 	@Qualifier(CodeConstants.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> pythonCache;
 
-	public List<Account> getAll() {
+	public List<AccountVo> getAll() {
 		UUID userId = ContextUtil.getUserId();
 		List<Account> entities = this.syncCache(userId);
-		return entities;
+		List<AccountVo> accountVos = entities.stream().map(entity -> {
+			AccountVo accountVo = new AccountVo();
+			accountVo.transform(entity);
+			accountVo.setRemovable(accountRecordFacade.queryAll(entity.getId(), true).size() == 0);
+			return accountVo;
+		}).toList();
+		return accountVos;
 	}
 
 	public Account get(String name, UUID userId) {
@@ -107,6 +114,12 @@ public class AccountService {
 		return this.accountFacade.update(entity);
 	}
 
+	@Transactional
+	public void remove(UUID id) {
+		this.accountFacade.remove(id);
+		this.syncCache(ContextUtil.getUserId());
+	}
+
 	public MonthBalanceVo getAllRecordInMonth(int monthCnt) {
 		UUID userId = ContextUtil.getUserId();
 
@@ -132,7 +145,7 @@ public class AccountService {
 			accountCurrencies.put(account.getId(), rate);
 		}
 
-		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
+		List<UUID> accountIds = accounts.stream().map(Account::getId).toList();
 		LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 		int year = now.getYear();
 		int month = now.getMonthValue();
@@ -141,7 +154,7 @@ public class AccountService {
 			records = records.stream().filter(x -> x.getTransFrom().compareTo(x.getTransTo()) == 0).map(x -> {
 				x.setTransAmount(x.getTransAmount().multiply(accountCurrencies.get(x.getTransFrom())));
 				return x;
-			}).collect(Collectors.toList());
+			}).toList();
 
 			List<AccountRecord> incomes = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0).toList();
 			BigDecimal incomeSum = incomes.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -359,4 +372,5 @@ public class AccountService {
 	private boolean isLinked(UUID recordId) {
 		return this.userStockRecordFacade.queryByAccountRecordId(recordId).size() > 0 || this.userFundRecordFacade.queryByAccountRecordId(recordId).size() > 0;
 	}
+
 }

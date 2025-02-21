@@ -56,8 +56,8 @@ public class FundFacade {
 	}
 
 	public List<Fund> queryByUserFundExist(boolean sort) {
-		List<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).distinct().collect(Collectors.toList());
-		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.indexOf(f.getCode()) >= 0).collect(Collectors.toList());
+		List<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).distinct().toList();
+		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.indexOf(f.getCode()) >= 0).toList();
 		if (sort) {
 			this.sort(entities);
 		}
