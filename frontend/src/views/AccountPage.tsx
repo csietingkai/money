@@ -1105,7 +1105,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                                 <CTableDataCell>
                                                                                     <CButtonGroup role='group'>
                                                                                         {
-                                                                                            r.removable &&
+                                                                                            r.editable &&
                                                                                             <CButton
                                                                                                 color='info'
                                                                                                 variant='outline'

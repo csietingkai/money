@@ -15,5 +15,6 @@ public class AccountRecordVo extends AccountRecord implements Transformable<Acco
 	protected String transToName;
 	protected String transToCurrency;
 	protected BigDecimal transCurrentExchangeRate;
+	protected boolean editable;
 	protected boolean removable;
 }

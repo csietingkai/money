@@ -35,6 +35,7 @@ export interface AccountRecordVo extends AccountRecord {
     transToName: string;
     transToCurrency: string;
     transCurrentExchangeRate: number;
+    editable: boolean;
     removable: boolean;
 }
 

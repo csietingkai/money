@@ -182,6 +182,7 @@ public class AccountService {
 			if (!vo.getTransFrom().equals(vo.getTransTo()) && accountId.equals(vo.getTransFrom())) {
 				vo.setTransAmount(BigDecimal.ZERO.subtract(vo.getTransAmount()));
 			}
+			vo.setEditable(!isSelfTransferTarget(accountId, vo.getTransTo()) && !isLinked(vo.getId()));
 			vo.setRemovable(!isLinked(vo.getId()));
 			vos.add(vo);
 		}
@@ -349,6 +350,10 @@ public class AccountService {
 		});
 		this.userCache.opsForValue().set(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId), entities);
 		return entities;
+	}
+
+	private boolean isSelfTransferTarget(UUID accountId, UUID transTo) {
+		return transTo.compareTo(accountId) == 0;
 	}
 
 	private boolean isLinked(UUID recordId) {
