@@ -195,7 +195,7 @@ public class AccountService {
 			if (!vo.getTransFrom().equals(vo.getTransTo()) && accountId.equals(vo.getTransFrom())) {
 				vo.setTransAmount(BigDecimal.ZERO.subtract(vo.getTransAmount()));
 			}
-			vo.setEditable(!isSelfTransferTarget(accountId, vo.getTransTo()) && !isLinked(vo.getId()));
+			vo.setEditable(!isSelfTransferTarget(accountId, vo) && !isLinked(vo.getId()));
 			vo.setRemovable(!isLinked(vo.getId()));
 			vos.add(vo);
 		}
@@ -365,8 +365,8 @@ public class AccountService {
 		return entities;
 	}
 
-	private boolean isSelfTransferTarget(UUID accountId, UUID transTo) {
-		return transTo.compareTo(accountId) == 0;
+	private boolean isSelfTransferTarget(UUID accountId, AccountRecord accountRecord) {
+		return !accountRecord.getTransFrom().equals(accountRecord.getTransTo()) && accountRecord.getTransTo().compareTo(accountId) == 0;
 	}
 
 	private boolean isLinked(UUID recordId) {
