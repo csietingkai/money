@@ -11,7 +11,7 @@ check_tools () {
 
 declare -a tools=( 'docker' 'git' )
 check_result=0
-for tool in "${tools[@]}" 
+for tool in "${tools[@]}"
 do
 	check_tools $tool
 	if [ $? -eq 1 ]; then
@@ -43,7 +43,7 @@ if [ "$1" = 'build' ]; then
 		docker container rm $backend_container_name
 		cd ..
 		cd backend
-		docker build . --rm --tag=$backend_image_name:latest --tag=$backend_image_name:$version
+		docker build --no-cache . --rm --tag=$backend_image_name:latest --tag=$backend_image_name:$version
 		docker push $backend_image_name:latest
 		docker push $backend_image_name:$version
 		docker image rm $backend_image_name:latest $backend_image_name:$version
@@ -54,7 +54,7 @@ if [ "$1" = 'build' ]; then
 		docker container rm $frontend_container_name
 		cd ..
 		cd frontend
-		docker build . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
+		docker build --no-cache . --rm --tag=$frontend_image_name:latest --tag=$frontend_image_name:$version
 		docker push $frontend_image_name:latest
 		docker push $frontend_image_name:$version
 		docker image rm $frontend_image_name:latest $frontend_image_name:$version
@@ -63,7 +63,7 @@ if [ "$1" = 'build' ]; then
 		docker container stop $python_container_name
 		docker container rm $python_container_name
 		cd python
-		docker build . --rm --tag=$python_image_name:latest --tag=$python_image_name:$version
+		docker build --no-cache . --rm --tag=$python_image_name:latest --tag=$python_image_name:$version
 		docker push $python_image_name:latest
 		docker push $python_image_name:$version
 		docker image rm $python_image_name:latest $python_image_name:$version
