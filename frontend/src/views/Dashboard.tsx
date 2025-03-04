@@ -45,8 +45,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     }
 
     private init = async () => {
-        const responses = await AccountApi.getMonthBalance(6);
-        this.setState({ monthBalance: responses.data });
+        const { success, data } = await AccountApi.getMonthBalance(6);
+        if (success) {
+            this.setState({ monthBalance: data });
+        }
     };
 
     private getTotalAccountBalance = (accountList: Account[]): { value: string, desc: string; }[] => {

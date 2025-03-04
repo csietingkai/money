@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class AuthTokenAuthentication implements Authentication {
 
-	private static final long serialVersionUID = 3476207526350034201L;
+	private static final long serialVersionUID = 1L;
 
 	protected boolean isAuthenticated;
 

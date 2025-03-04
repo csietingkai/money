@@ -1,6 +1,7 @@
 package io.tingkai.money.facade;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,6 @@ import io.tingkai.money.model.exception.AlreadyExistException;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -36,8 +36,8 @@ public class ExchangeRateRecordFacade {
 		return entities;
 	}
 
-	public List<ExchangeRateRecord> queryAll(String currency, long start, long end) {
-		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBetweenOrderByDate(currency, TimeUtil.convertToDateTime(start), TimeUtil.convertToDateTime(end));
+	public List<ExchangeRateRecord> queryAll(String currency, LocalDateTime start, LocalDateTime end) {
+		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBetweenOrderByDate(currency, start, end);
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}
@@ -60,8 +60,8 @@ public class ExchangeRateRecordFacade {
 		return optional.get();
 	}
 
-	public List<ExchangeRateRecord> queryDaysBefore(String currency, int days, long date) {
-		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBeforeOrderByDateDesc(currency, TimeUtil.convertToDateTime(date), PageRequest.of(0, days));
+	public List<ExchangeRateRecord> queryDaysBefore(String currency, int days, LocalDateTime date) {
+		List<ExchangeRateRecord> entities = this.exchangeRateRecordDao.findByCurrencyAndDateBeforeOrderByDateDesc(currency, date, PageRequest.of(0, days));
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD));
 		}

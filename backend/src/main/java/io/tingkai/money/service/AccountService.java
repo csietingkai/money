@@ -46,7 +46,6 @@ import io.tingkai.money.model.vo.BalanceSumVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
-import io.tingkai.money.util.TimeUtil;
 
 @Service
 @Loggable
@@ -205,7 +204,7 @@ public class AccountService {
 	@Transactional
 	public AccountRecord income(AccountRecordIncomeRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		UUID accountId = request.getAccountId();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal amount = request.getAmount();
 		String type = request.getType();
 		String description = request.getDescription();
@@ -232,7 +231,7 @@ public class AccountService {
 	public AccountRecord transfer(AccountRecordTransferRequest request) throws AccountBalanceNotEnoughException, AccountBalanceWrongException, NotExistException, FieldMissingException {
 		UUID fromId = request.getFromId();
 		UUID toId = request.getToId();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal amount = request.getAmount();
 		String type = request.getType();
 		String description = request.getDescription();
@@ -264,7 +263,7 @@ public class AccountService {
 	@Transactional
 	public AccountRecord expend(AccountRecordExpendRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		UUID accountId = request.getAccountId();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal amount = request.getAmount();
 		String type = request.getType();
 		String description = request.getDescription();
@@ -316,7 +315,7 @@ public class AccountService {
 			this.accountFacade.update(toAccount2);
 		}
 
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		String type = request.getType();
 		String description = request.getDescription();
 		UUID fileId = request.getFileId();

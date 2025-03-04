@@ -2,6 +2,7 @@ package io.tingkai.money.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +28,6 @@ import io.tingkai.money.model.response.FileResponse;
 import io.tingkai.money.service.FinancialFileService;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.FileUtil;
-import io.tingkai.money.util.TimeUtil;
 
 @RestController
 @RequestMapping(value = FinancialFileController.CONTROLLER_PREFIX)
@@ -44,12 +44,12 @@ public class FinancialFileController {
 	private FinancialFileService fileService;
 
 	@RequestMapping(value = FinancialFileController.LIST_PATH, method = RequestMethod.GET)
-	public FileResponse<List<FinancialFile>> list(@RequestParam(required = false) String date, @RequestParam(required = false) String type) {
+	public FileResponse<List<FinancialFile>> list(@RequestParam(required = false) LocalDateTime date, @RequestParam(required = false) String type) {
 		List<FinancialFile> files = null;
 		if (AppUtil.isAllPresent(date, type)) {
-			this.fileService.getAll(TimeUtil.convertToDate(date), type);
+			this.fileService.getAll(date, type);
 		} else if (AppUtil.isPresent(date)) {
-			files = this.fileService.getAll(TimeUtil.convertToDate(date));
+			files = this.fileService.getAll(date);
 		} else if (AppUtil.isPresent(type)) {
 			files = this.fileService.getAll(type);
 		} else {
@@ -59,14 +59,14 @@ public class FinancialFileController {
 	}
 
 	@RequestMapping(value = FinancialFileController.UPLOAD_PATH, method = RequestMethod.POST)
-	public FileResponse<Void> upload(@RequestParam MultipartFile file, @RequestParam String date, @RequestParam String type) throws AlreadyExistException, FieldMissingException, IOException {
-		FinancialFile entity = this.fileService.upload(file, type, TimeUtil.convertToDate(date));
+	public FileResponse<Void> upload(@RequestParam MultipartFile file, @RequestParam LocalDateTime date, @RequestParam String type) throws AlreadyExistException, FieldMissingException, IOException {
+		FinancialFile entity = this.fileService.upload(file, type, date);
 		return new FileResponse<Void>(true, null, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
 	}
 
 	@RequestMapping(value = FinancialFileController.UPDATE_PATH, method = RequestMethod.POST)
-	public FileResponse<Void> update(@RequestParam UUID id, @RequestParam String date, @RequestParam String type) throws NotExistException, FieldMissingException {
-		FinancialFile entity = this.fileService.update(id, type, TimeUtil.convertToDate(date));
+	public FileResponse<Void> update(@RequestParam UUID id, @RequestParam LocalDateTime date, @RequestParam String type) throws NotExistException, FieldMissingException {
+		FinancialFile entity = this.fileService.update(id, type, date);
 		return new FileResponse<Void>(true, null, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
 	}
 

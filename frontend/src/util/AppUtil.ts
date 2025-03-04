@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { StockType } from './Enum';
 
 export const isNull = (obj: any): boolean => {
@@ -85,16 +86,20 @@ export const toDate = (str: any, defaultVal: Date | null = null): Date | null =>
     return defaultVal;
 };
 
-export const toDateStr = (date?: Date): string | undefined => {
+export const toDateStr = (date?: Date, format: string = 'YYYY/MM/DD'): string | undefined => {
     if (!date) {
         console.warn(`parameter date: \'${date}\' is not valid`);
         return undefined;
     }
-    return new Intl.DateTimeFormat('zh-TW', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-    }).format(date);
+    return moment(date).format(format);
+};
+
+export const toDateTimeStr = (date?: Date, format: string = 'YYYY-MM-DDTHH:mm:ss.SSS'): string | undefined => {
+    if (!date) {
+        console.warn(`parameter date: \'${date}\' is not valid`);
+        return undefined;
+    }
+    return moment(date).format(format);
 };
 
 export const isSameDate = (date1: Date, date2: Date): boolean => {

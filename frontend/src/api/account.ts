@@ -106,25 +106,25 @@ const getMonthBalance = async (cnt: number): Promise<AccountMonthBalanceResponse
 };
 
 const income = async (accountId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
+    const response = await axios.post(ACCOUNT_INCOME_RECORD_PATH, { accountId, date: AppUtil.toDateTimeStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };
 
 const transfer = async (fromId: string, toId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_TRANSFER_RECORD_PATH, { fromId, toId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
+    const response = await axios.post(ACCOUNT_TRANSFER_RECORD_PATH, { fromId, toId, date: AppUtil.toDateTimeStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };
 
 const expend = async (accountId: string, date: Date, amount: number, type: string, description: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, { accountId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
+    const response = await axios.post(ACCOUNT_EXPEND_RECORD_PATH, { accountId, date: AppUtil.toDateTimeStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };
 
 const updateRecord = async (recordId: string, date: Date, amount: number, type: string, description: string, toId?: string, fileId?: string): Promise<SimpleResponse> => {
-    const response = await axios.put(ACCOUNT_UPDATE_RECORD_PATH, { recordId, toId, date: AppUtil.toDateStr(date), amount, type, description, fileId });
+    const response = await axios.put(ACCOUNT_UPDATE_RECORD_PATH, { recordId, toId, date: AppUtil.toDateTimeStr(date), amount, type, description, fileId });
     const data: SimpleResponse = response.data;
     return data;
 };

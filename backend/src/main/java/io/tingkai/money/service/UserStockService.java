@@ -52,7 +52,6 @@ import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.ContextUtil;
-import io.tingkai.money.util.TimeUtil;
 
 @Service
 @Loggable
@@ -157,7 +156,7 @@ public class UserStockService {
 	public UserStock buy(StockBuyRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();
@@ -222,7 +221,7 @@ public class UserStockService {
 	public UserStock sell(StockSellRequest request) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();
@@ -276,7 +275,7 @@ public class UserStockService {
 	public UserStock bonus(StockBonusRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();
@@ -325,7 +324,7 @@ public class UserStockService {
 		UUID recordId = request.getRecordId();
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = TimeUtil.convertToDate(request.getDate());
+		LocalDateTime date = request.getDate();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();

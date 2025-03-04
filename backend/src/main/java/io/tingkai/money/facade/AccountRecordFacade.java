@@ -1,8 +1,10 @@
 package io.tingkai.money.facade;
 
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +20,6 @@ import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -43,9 +44,9 @@ public class AccountRecordFacade {
 		LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
 		LocalDateTime endOfMonth = null;
 		if (month == 12) {
-			endOfMonth = TimeUtil.minus(LocalDateTime.of(year + 1, 1, 1, 0, 0), 1, ChronoUnit.MILLIS);
+			endOfMonth = LocalDate.of(year, Month.DECEMBER, 31).atTime(LocalTime.MAX);
 		} else {
-			endOfMonth = TimeUtil.minus(LocalDateTime.of(year, month + 1, 1, 0, 0), 1, ChronoUnit.MILLIS);
+			endOfMonth = LocalDate.of(year, month + 1, 1).minusDays(1).atTime(LocalTime.MAX);
 		}
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromInAndTransToInAndTransDateBetween(accountIds, accountIds, startOfMonth, endOfMonth);
 		if (entities.size() == 0) {

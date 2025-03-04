@@ -18,7 +18,6 @@ import io.tingkai.money.entity.Fund;
 import io.tingkai.money.entity.FundRecord;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
-import io.tingkai.money.enumeration.CompareResult;
 import io.tingkai.money.facade.ExchangeRateFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
 import io.tingkai.money.facade.FundFacade;
@@ -28,7 +27,6 @@ import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.util.AppUtil;
 import io.tingkai.money.util.StringUtil;
-import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -63,7 +61,7 @@ public class ScheduleTaskService {
 
 	@Scheduled(cron = "0 59 23 * * *")
 	public void fetchRecords() {
-		LocalDateTime today = TimeUtil.convertToDateTime(TimeUtil.getCurrentDate());
+		LocalDateTime today = LocalDateTime.now();
 		this.fetchExchangeRatesRecords(today);
 		this.fetchStocksRecords(today);
 		this.fetchFundsRecords(today);
@@ -82,7 +80,7 @@ public class ScheduleTaskService {
 				continue;
 			}
 			ExchangeRateRecord lastRecord = this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency());
-			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
+			if ((AppUtil.isPresent(lastRecord) && today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", exchangeRate.getName(), exchangeRate.getCurrency()));
 				pythonCache.opsForValue().set(CodeConstants.EXCHANGE_RATE_FETCHING_CURRENCY, exchangeRate.getCurrency());
 				pythonFetcherService.fetechExchangeRateRecord(exchangeRate.getCurrency());
@@ -106,7 +104,7 @@ public class ScheduleTaskService {
 		List<Stock> stocks = this.stockFacade.queryByUserStockExist();
 		for (Stock stock : stocks) {
 			StockRecord lastRecord = this.stockRecordFacade.latestRecord(stock.getCode());
-			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDealDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
+			if ((AppUtil.isPresent(lastRecord) && today.toLocalDate().isEqual(lastRecord.getDealDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", stock.getName(), stock.getCode()));
 				pythonCache.opsForValue().set(CodeConstants.STOCK_FETCHING_CODE, stock.getCode());
 				pythonFetcherService.fetchStockRecord(stock.getCode());
@@ -130,7 +128,7 @@ public class ScheduleTaskService {
 		List<Fund> funds = this.fundFacade.queryByUserFundExist(true);
 		for (Fund fund : funds) {
 			FundRecord lastRecord = this.fundRecordFacade.latestRecord(fund.getCode());
-			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
+			if ((AppUtil.isPresent(lastRecord) && today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", fund.getName(), fund.getCode()));
 				pythonCache.opsForValue().set(CodeConstants.FUND_FETCHING_CODE, fund.getCode());
 				pythonFetcherService.fetchFundRecord(fund.getCode());
