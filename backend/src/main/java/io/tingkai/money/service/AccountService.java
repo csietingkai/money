@@ -83,7 +83,7 @@ public class AccountService {
 			accountVo.transform(entity);
 			accountVo.setRemovable(accountRecordFacade.queryAll(entity.getId(), true).size() == 0);
 			return accountVo;
-		}).toList();
+		}).collect(Collectors.toList());
 		return accountVos;
 	}
 
@@ -145,7 +145,7 @@ public class AccountService {
 			accountCurrencies.put(account.getId(), rate);
 		}
 
-		List<UUID> accountIds = accounts.stream().map(Account::getId).toList();
+		List<UUID> accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
 		LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 		int year = now.getYear();
 		int month = now.getMonthValue();
@@ -154,11 +154,11 @@ public class AccountService {
 			records = records.stream().filter(x -> x.getTransFrom().compareTo(x.getTransTo()) == 0).map(x -> {
 				x.setTransAmount(x.getTransAmount().multiply(accountCurrencies.get(x.getTransFrom())));
 				return x;
-			}).toList();
+			}).collect(Collectors.toList());
 
-			List<AccountRecord> incomes = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0).toList();
+			List<AccountRecord> incomes = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0).collect(Collectors.toList());
 			BigDecimal incomeSum = incomes.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-			List<AccountRecord> expends = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) > 0).toList();
+			List<AccountRecord> expends = records.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getTransAmount()) > 0).collect(Collectors.toList());
 			expends.forEach(x -> x.setTransAmount(BigDecimal.ZERO.subtract(x.getTransAmount())));
 			BigDecimal expendSum = expends.stream().map(AccountRecord::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			vo.getSums().add(0, BalanceSumVo.of(year, month, incomeSum, expendSum));

@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,8 +56,8 @@ public class FundFacade {
 	}
 
 	public List<Fund> queryByUserFundExist(boolean sort) {
-		List<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).distinct().toList();
-		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.indexOf(f.getCode()) >= 0).toList();
+		List<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).distinct().collect(Collectors.toList());
+		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.indexOf(f.getCode()) >= 0).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);
 		}

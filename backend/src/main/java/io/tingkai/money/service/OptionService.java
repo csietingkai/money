@@ -1,6 +1,7 @@
 package io.tingkai.money.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,7 +58,7 @@ public class OptionService {
 					text = o.getEnText();
 				}
 				return OptionVo.of(o.getName(), text);
-			}).toList();
+			}).collect(Collectors.toList());
 			this.appCache.opsForValue().set(catergory, options);
 		}
 		return options;

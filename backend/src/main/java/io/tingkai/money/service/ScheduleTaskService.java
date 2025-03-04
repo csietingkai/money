@@ -27,6 +27,7 @@ import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
 import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.util.AppUtil;
+import io.tingkai.money.util.StringUtil;
 import io.tingkai.money.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,6 +78,9 @@ public class ScheduleTaskService {
 
 		List<ExchangeRate> exchangeRates = this.exchangeRateFacade.queryAll();
 		for (ExchangeRate exchangeRate : exchangeRates) {
+			if (StringUtil.equals("TWD", exchangeRate.getCurrency())) {
+				continue;
+			}
 			ExchangeRateRecord lastRecord = this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency());
 			if ((AppUtil.isPresent(lastRecord) && TimeUtil.compare(lastRecord.getDate(), today) != CompareResult.EQUAL) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", exchangeRate.getName(), exchangeRate.getCurrency()));

@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,8 +57,8 @@ public class StockFacade {
 	}
 
 	public List<Stock> queryByUserStockExist(boolean sort) {
-		List<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).distinct().toList();
-		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.indexOf(s.getCode()) >= 0).toList();
+		List<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).distinct().collect(Collectors.toList());
+		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.indexOf(s.getCode()) >= 0).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);
 		}

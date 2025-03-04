@@ -90,7 +90,7 @@ public class UserFundService {
 		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnFund();
 		List<UserFund> ownList = this.userFundFacade.queryByUserId(userId);
 		if (onlyShowOwn) {
-			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).toList();
+			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
 		}
 		Map<String, String> fundNames = this.fundFacade.queryAll().stream().collect(Collectors.toMap(Fund::getCode, Fund::getName));
 		List<UserFundVo> vos = new ArrayList<UserFundVo>();
@@ -125,7 +125,7 @@ public class UserFundService {
 
 	public List<UserFundRecordVo> getOwnFundRecords(UUID userFundId) {
 		List<UserFundRecord> entities = this.userFundRecordFacade.queryAll(userFundId);
-		List<UUID> accountRecordIds = entities.stream().map(UserFundRecord::getAccountRecordId).distinct().toList();
+		List<UUID> accountRecordIds = entities.stream().map(UserFundRecord::getAccountRecordId).distinct().collect(Collectors.toList());
 		List<AccountRecord> accountRecords = this.accountRecordFacade.queryAll(accountRecordIds);
 		Map<UUID, UUID> accountRecordFileIdMap = accountRecords.stream().collect(HashMap::new, (map, accountRecord) -> map.put(accountRecord.getId(), accountRecord.getFileId()), HashMap::putAll);
 		List<UserFundRecordVo> vos = new ArrayList<UserFundRecordVo>();
