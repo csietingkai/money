@@ -80,7 +80,7 @@ public class ScheduleTaskService {
 				continue;
 			}
 			ExchangeRateRecord lastRecord = this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency());
-			if ((AppUtil.isPresent(lastRecord) && today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
+			if ((AppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", exchangeRate.getName(), exchangeRate.getCurrency()));
 				pythonCache.opsForValue().set(CodeConstants.EXCHANGE_RATE_FETCHING_CURRENCY, exchangeRate.getCurrency());
 				pythonFetcherService.fetechExchangeRateRecord(exchangeRate.getCurrency());
@@ -104,7 +104,7 @@ public class ScheduleTaskService {
 		List<Stock> stocks = this.stockFacade.queryByUserStockExist();
 		for (Stock stock : stocks) {
 			StockRecord lastRecord = this.stockRecordFacade.latestRecord(stock.getCode());
-			if ((AppUtil.isPresent(lastRecord) && today.toLocalDate().isEqual(lastRecord.getDealDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
+			if ((AppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDealDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", stock.getName(), stock.getCode()));
 				pythonCache.opsForValue().set(CodeConstants.STOCK_FETCHING_CODE, stock.getCode());
 				pythonFetcherService.fetchStockRecord(stock.getCode());
@@ -128,7 +128,7 @@ public class ScheduleTaskService {
 		List<Fund> funds = this.fundFacade.queryByUserFundExist(true);
 		for (Fund fund : funds) {
 			FundRecord lastRecord = this.fundRecordFacade.latestRecord(fund.getCode());
-			if ((AppUtil.isPresent(lastRecord) && today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
+			if ((AppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", fund.getName(), fund.getCode()));
 				pythonCache.opsForValue().set(CodeConstants.FUND_FETCHING_CODE, fund.getCode());
 				pythonFetcherService.fetchFundRecord(fund.getCode());
