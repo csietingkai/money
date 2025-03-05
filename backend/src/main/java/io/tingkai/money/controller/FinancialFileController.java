@@ -18,16 +18,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.base.util.BaseFileUtil;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.FinancialFile;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FinancialFileNotFoundException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.response.FileResponse;
 import io.tingkai.money.service.FinancialFileService;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.FileUtil;
 
 @RestController
 @RequestMapping(value = FinancialFileController.CONTROLLER_PREFIX)
@@ -46,11 +46,11 @@ public class FinancialFileController {
 	@RequestMapping(value = FinancialFileController.LIST_PATH, method = RequestMethod.GET)
 	public FileResponse<List<FinancialFile>> list(@RequestParam(required = false) LocalDateTime date, @RequestParam(required = false) String type) {
 		List<FinancialFile> files = null;
-		if (AppUtil.isAllPresent(date, type)) {
+		if (BaseAppUtil.isAllPresent(date, type)) {
 			this.fileService.getAll(date, type);
-		} else if (AppUtil.isPresent(date)) {
+		} else if (BaseAppUtil.isPresent(date)) {
 			files = this.fileService.getAll(date);
-		} else if (AppUtil.isPresent(type)) {
+		} else if (BaseAppUtil.isPresent(type)) {
 			files = this.fileService.getAll(type);
 		} else {
 			files = this.fileService.getAll();
@@ -74,7 +74,7 @@ public class FinancialFileController {
 	public ResponseEntity<Resource> download(@RequestParam UUID fileId) throws UnsupportedEncodingException, FinancialFileNotFoundException {
 		FinancialFile entity = this.fileService.get(fileId);
 		InputStreamResource resource = this.fileService.download(fileId);
-		HttpHeaders header = FileUtil.getFileHeader(entity.getFilename());
+		HttpHeaders header = BaseFileUtil.getFileHeader(entity.getFilename());
 		return ResponseEntity.ok().headers(header).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
 	}
 

@@ -1,13 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS users (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
-	name VARCHAR NOT NULL UNIQUE,
-	pwd VARCHAR NOT NULL,
-	role VARCHAR NOT NULL,
-	PRIMARY KEY (id)
-);
-
 CREATE TABLE IF NOT EXISTS exchange_rate (
 	currency VARCHAR NOT NULL,
 	name VARCHAR NOT NULL,
@@ -55,7 +47,6 @@ CREATE TABLE IF NOT EXISTS account (
 	shown BOOLEAN DEFAULT true NULL,
 	PRIMARY KEY (id),
 	UNIQUE (name, user_id),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_currency FOREIGN KEY (currency) REFERENCES exchange_rate(currency),
 	CONSTRAINT fk_bank_code FOREIGN KEY (bank_code) REFERENCES public.bank_info(code)
 );
@@ -85,8 +76,7 @@ CREATE TABLE IF NOT EXISTS user_setting (
 	account_record_deletable BOOLEAN NOT NULL DEFAULT false,
 	only_show_own_stock BOOLEAN NOT NULL DEFAULT true,
 	only_show_own_fund BOOLEAN NOT NULL DEFAULT true,
-	PRIMARY KEY (id),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id)
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS financial_file (
@@ -95,8 +85,7 @@ CREATE TABLE IF NOT EXISTS financial_file (
 	filename VARCHAR NOT NULL,
 	type VARCHAR NOT NULL,
 	date TIMESTAMP NOT NULL,
-	PRIMARY KEY (id),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id)
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS stock (
@@ -135,7 +124,6 @@ CREATE TABLE IF NOT EXISTS user_tracking_stock (
 	stock_code VARCHAR NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE (user_id, stock_code),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_stock_code FOREIGN KEY (stock_code) REFERENCES stock(code)
 );
 
@@ -146,7 +134,6 @@ CREATE TABLE IF NOT EXISTS user_stock (
 	amount NUMERIC NOT NULL DEFAULT 0, --持有股數
 	PRIMARY KEY (id),
 	UNIQUE (user_id, stock_code),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_stock_code FOREIGN KEY (stock_code) REFERENCES stock(code)
 );
 
@@ -197,7 +184,6 @@ CREATE TABLE IF NOT EXISTS user_tracking_fund (
 	fund_code VARCHAR NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE (user_id, fund_code),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
 );
 
@@ -208,7 +194,6 @@ CREATE TABLE IF NOT EXISTS user_fund (
 	amount NUMERIC NOT NULL DEFAULT 0, --持有股數
 	PRIMARY KEY (id),
 	UNIQUE (user_id, fund_code),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
 	CONSTRAINT fk_fund_code FOREIGN KEY (fund_code) REFERENCES fund(code)
 );
 

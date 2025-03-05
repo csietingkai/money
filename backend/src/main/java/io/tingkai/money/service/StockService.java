@@ -9,16 +9,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.base.constant.BaseCodeConstant;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.base.util.BaseStringUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
-import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.vo.StockRecordVo;
 import io.tingkai.money.model.vo.StockVo;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.StringUtil;
 
 @Service
 @Loggable
@@ -34,7 +35,7 @@ public class StockService {
 		List<Stock> stocks = this.stockFacade.queryAll(sort);
 		List<StockVo> vos = new ArrayList<StockVo>();
 		for (Stock stock : stocks) {
-			if ((!StringUtil.isBlank(code) && !stock.getCode().equals(code)) || (!StringUtil.isBlank(name) && !stock.getName().toUpperCase().contains(name.toUpperCase()))) {
+			if ((!BaseStringUtil.isBlank(code) && !stock.getCode().equals(code)) || (!BaseStringUtil.isBlank(name) && !stock.getName().toUpperCase().contains(name.toUpperCase()))) {
 				continue;
 			}
 			StockVo vo = new StockVo();
@@ -44,7 +45,7 @@ public class StockService {
 		}
 		if (vos.size() == 0) {
 			StockVo vo = this.get(code);
-			if (AppUtil.isPresent(vo)) {
+			if (BaseAppUtil.isPresent(vo)) {
 				vos.add(vo);
 			}
 		}
@@ -78,38 +79,38 @@ public class StockService {
 				sums[j] = sums[j].add(record.getClosePrice());
 			}
 			int di = 0;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa5(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getClosePrice());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa5(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getClosePrice());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa10(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getClosePrice());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa10(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getClosePrice());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				BigDecimal ma20 = sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]));
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				BigDecimal ma20 = sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]));
 				// standard deviaction
 				BigDecimal total = BigDecimal.ZERO;
-				for (int j = 0; j < CodeConstants.MA_DAYS[di]; j++) {
+				for (int j = 0; j < CodeConstant.MA_DAYS[di]; j++) {
 					total = total.add(BigDecimal.valueOf(Math.pow(records.get(i - j).getClosePrice().subtract(ma20).doubleValue(), 2)));
 				}
-				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]), CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP).doubleValue());
+				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]), BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP).doubleValue());
 				vo.setMa20(ma20);
-				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getClosePrice());
+				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getClosePrice());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa40(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getClosePrice());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa40(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getClosePrice());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa60(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]), CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getClosePrice());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa60(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]), BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getClosePrice());
 			}
 			vos.add(vo);
 		}
@@ -118,7 +119,7 @@ public class StockService {
 
 	private LocalDateTime getUpdateTime(String code, LocalDateTime defaultTime) {
 		StockRecord record = this.stockRecordFacade.latestRecord(code);
-		if (AppUtil.isPresent(record)) {
+		if (BaseAppUtil.isPresent(record)) {
 			return record.getDealDate();
 		}
 		return defaultTime;

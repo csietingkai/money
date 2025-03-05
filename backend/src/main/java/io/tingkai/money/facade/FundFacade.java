@@ -11,16 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.netty.util.internal.StringUtil;
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.FundDao;
 import io.tingkai.money.dao.UserFundDao;
 import io.tingkai.money.entity.Fund;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.service.DataFetcherService;
-import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -46,7 +46,7 @@ public class FundFacade {
 			this.sort(entities);
 		}
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_FUND));
 		}
 		return entities;
 	}
@@ -62,7 +62,7 @@ public class FundFacade {
 			this.sort(entities);
 		}
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_FUND));
 		}
 		return entities;
 	}
@@ -74,13 +74,13 @@ public class FundFacade {
 		}
 		optional = this.fundDao.findByCode(code);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_FUND));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_FUND));
 		}
 		return optional.get();
 	}
 
 	public Fund insert(Fund entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate())) {
 			throw new FieldMissingException();
 		}
 		Optional<Fund> optional = this.fundDao.findByCode(entity.getCode());
@@ -91,7 +91,7 @@ public class FundFacade {
 	}
 
 	public List<Fund> insertAll(List<Fund> entities) throws AlreadyExistException, FieldMissingException {
-		long hasFieldMissingCount = entities.stream().filter(entity -> !AppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate())).count();
+		long hasFieldMissingCount = entities.stream().filter(entity -> !BaseAppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate())).count();
 		if (hasFieldMissingCount > 0L) {
 			throw new FieldMissingException();
 		}
@@ -99,7 +99,7 @@ public class FundFacade {
 	}
 
 	public Fund update(Fund entity) throws NotExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getId())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getId())) {
 			throw new FieldMissingException();
 		}
 		Optional<Fund> optional = this.fundDao.findById(entity.getId());
@@ -116,7 +116,7 @@ public class FundFacade {
 	}
 
 	public void delete(UUID id) throws NotExistException {
-		if (AppUtil.isEmpty(id) || StringUtil.isNullOrEmpty(id.toString())) {
+		if (BaseAppUtil.isEmpty(id) || StringUtil.isNullOrEmpty(id.toString())) {
 			throw new NotExistException();
 		}
 		Optional<Fund> optional = this.fundDao.findById(id);

@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import io.tingkai.money.constant.AppConstants;
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.money.constant.AppConstant;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.ExchangeRate;
-import io.tingkai.money.logging.Loggable;
+import io.tingkai.base.log.Loggable;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -33,20 +33,20 @@ public class DataFetcherService {
 	private RestTemplate restTemplate;
 
 	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
+	@Qualifier(CodeConstant.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> exchangeRateCache;
 
 	/**
 	 * save each currency update time
 	 */
 	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
+	@Qualifier(CodeConstant.PYTHON_CACHE)
 	private RedisTemplate<String, Map<String, Long>> exchangeRateRecordCache;
 
 	public void fetechExchangeRateRecord(String currency) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_EXCHANGE_RATE_RECORDS_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_EXCHANGE_RATE_RECORDS_PATH)
 				.queryParam("currency", currency);
 		// @formatter:on
 		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
@@ -58,7 +58,7 @@ public class DataFetcherService {
 	public void fetchStock(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_PATH)
 				.queryParam("code", code);
 		// @formatter:on
 		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
@@ -70,7 +70,7 @@ public class DataFetcherService {
 	public void fetchStockRecord(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_RECORDS_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_RECORDS_PATH)
 				.queryParam("code", code);
 		// @formatter:on
 		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
@@ -82,7 +82,7 @@ public class DataFetcherService {
 	public void fetchFund(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_FUND_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_FUND_PATH)
 				.queryParam("code", code);
 		// @formatter:on
 		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
@@ -94,7 +94,7 @@ public class DataFetcherService {
 	public void fetchFundRecord(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_FETCH_FUND_RECORDS_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_FUND_RECORDS_PATH)
 				.queryParam("code", code);
 		// @formatter:on
 		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);

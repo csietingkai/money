@@ -17,59 +17,46 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.money.constant.CodeConstant;
 
 @Configuration
 public class RedisConfig {
 
-	@Value("${spring.redis.host}")
+	@Value("${spring.redis.money.host}")
 	private String host;
 
-	@Value("${spring.redis.port}")
+	@Value("${spring.redis.money.port}")
 	private int port;
 
-	@Value("${spring.redis.password}")
+	@Value("${spring.redis.money.password}")
 	private String password;
 
-	@Value("${spring.redis.database}")
-	private int database;
+	@Value("${spring.redis.money.app.database}")
+	private int appDatabase;
 
-	@Value("${spring.redis.python-database}")
+	@Value("${spring.redis.money.python.database}")
 	private int pythonDatabase;
 
-	@Value("${spring.redis.user-database}")
-	private int userDatabase;
-
-	@Bean(name = CodeConstants.APP_CACHE)
 	@Primary
+	@Bean(name = CodeConstant.APP_CACHE)
 	public RedisTemplate<?, ?> appCache() {
-		return this.newRedisTemplate(appConnectionFactory());
+		return newRedisTemplate(appConnectionFactory());
 	}
 
-	@Bean(name = CodeConstants.PYTHON_CACHE)
+	@Bean(name = CodeConstant.PYTHON_CACHE)
 	public RedisTemplate<?, ?> pythonCache() {
-		return this.newRedisTemplate(pythonConnectionFactory());
+		return newRedisTemplate(pythonConnectionFactory());
 	}
 
-	@Bean(name = CodeConstants.USER_CACHE)
-	public RedisTemplate<?, ?> userCache() {
-		return this.newRedisTemplate(userConnectionFactory());
-	}
-
-	@Bean(name = CodeConstants.APP_CACHE + "_conectionFactory")
 	@Primary
+	@Bean(name = CodeConstant.APP_CACHE + "_conectionFactory")
 	public LettuceConnectionFactory appConnectionFactory() {
-		return this.connectionFactory(database);
+		return connectionFactory(appDatabase);
 	}
 
-	@Bean(name = CodeConstants.PYTHON_CACHE + "_conectionFactory")
+	@Bean(name = CodeConstant.PYTHON_CACHE + "_conectionFactory")
 	public LettuceConnectionFactory pythonConnectionFactory() {
-		return this.connectionFactory(pythonDatabase);
-	}
-
-	@Bean(name = CodeConstants.USER_CACHE + "_conectionFactory")
-	public LettuceConnectionFactory userConnectionFactory() {
-		return this.connectionFactory(userDatabase);
+		return connectionFactory(pythonDatabase);
 	}
 
 	private RedisTemplate<byte[], byte[]> newRedisTemplate(LettuceConnectionFactory connectionFactory) {

@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import io.tingkai.money.constant.AppConstants;
-import io.tingkai.money.constant.CodeConstants;
-import io.tingkai.money.logging.Loggable;
+import io.tingkai.base.constant.BaseCodeConstant;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.AppConstant;
 import io.tingkai.money.model.vo.PredictResultVo;
-import io.tingkai.money.util.AppUtil;
 
 @Service
 @Loggable
@@ -32,7 +32,7 @@ public class PredictService {
 	public List<PredictResultVo> predictStock(String code, int days) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_PREDICT_STOCK_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_PREDICT_STOCK_PATH)
 				.queryParam("code", code)
 				.queryParam("days", days);
 		// @formatter:on
@@ -44,7 +44,7 @@ public class PredictService {
 	public List<PredictResultVo> predictFund(String code, int days) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstants.PYTHON_BASE_URL + PYTHON_PREDICT_FUND_PATH)
+				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_PREDICT_FUND_PATH)
 				.queryParam("code", code)
 				.queryParam("days", days);
 		// @formatter:on
@@ -56,7 +56,7 @@ public class PredictService {
 	@SuppressWarnings("unchecked")
 	private List<PredictResultVo> handlePredictResponse(JSONObject response) {
 		List<PredictResultVo> vos = new ArrayList<PredictResultVo>();
-		if (AppUtil.isPresent(response.get("data"))) {
+		if (BaseAppUtil.isPresent(response.get("data"))) {
 			Object data = response.get("data");
 			if (data instanceof List<?>) {
 				List<Map<String, Double>> list = (List<Map<String, Double>>) data;
@@ -69,9 +69,9 @@ public class PredictService {
 				}
 			}
 			for (PredictResultVo vo : vos) {
-				vo.setLower(vo.getLower().setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				vo.setPrice(vo.getPrice().setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				vo.setUpper(vo.getUpper().setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				vo.setLower(vo.getLower().setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				vo.setPrice(vo.getPrice().setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				vo.setUpper(vo.getUpper().setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
 			}
 		}
 		return vos;

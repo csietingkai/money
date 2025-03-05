@@ -11,7 +11,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.base.util.BaseStringUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.entity.Fund;
@@ -24,9 +27,6 @@ import io.tingkai.money.facade.FundFacade;
 import io.tingkai.money.facade.FundRecordFacade;
 import io.tingkai.money.facade.StockFacade;
 import io.tingkai.money.facade.StockRecordFacade;
-import io.tingkai.money.logging.Loggable;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -56,7 +56,7 @@ public class ScheduleTaskService {
 	private DataFetcherService pythonFetcherService;
 
 	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
+	@Qualifier(CodeConstant.PYTHON_CACHE)
 	private RedisTemplate<String, String> pythonCache;
 
 	@Scheduled(cron = "0 59 23 * * *")
@@ -68,21 +68,21 @@ public class ScheduleTaskService {
 	}
 
 	private void fetchExchangeRatesRecords(LocalDateTime today) {
-		String currency = pythonCache.opsForValue().get(CodeConstants.EXCHANGE_RATE_FETCHING_CURRENCY);
-		if (AppUtil.isPresent(currency)) {
+		String currency = pythonCache.opsForValue().get(CodeConstant.EXCHANGE_RATE_FETCHING_CURRENCY);
+		if (BaseAppUtil.isPresent(currency)) {
 			log.debug(MessageFormat.format("Still fetching Exchange Rate<{0}>", currency));
 			return;
 		}
 
 		List<ExchangeRate> exchangeRates = this.exchangeRateFacade.queryAll();
 		for (ExchangeRate exchangeRate : exchangeRates) {
-			if (StringUtil.equals("TWD", exchangeRate.getCurrency())) {
+			if (BaseStringUtil.equals("TWD", exchangeRate.getCurrency())) {
 				continue;
 			}
 			ExchangeRateRecord lastRecord = this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency());
-			if ((AppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
+			if ((BaseAppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || BaseAppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", exchangeRate.getName(), exchangeRate.getCurrency()));
-				pythonCache.opsForValue().set(CodeConstants.EXCHANGE_RATE_FETCHING_CURRENCY, exchangeRate.getCurrency());
+				pythonCache.opsForValue().set(CodeConstant.EXCHANGE_RATE_FETCHING_CURRENCY, exchangeRate.getCurrency());
 				pythonFetcherService.fetechExchangeRateRecord(exchangeRate.getCurrency());
 				try {
 					TimeUnit.SECONDS.sleep(3);
@@ -91,12 +91,12 @@ public class ScheduleTaskService {
 				}
 			}
 		}
-		pythonCache.delete(CodeConstants.EXCHANGE_RATE_FETCHING_CURRENCY);
+		pythonCache.delete(CodeConstant.EXCHANGE_RATE_FETCHING_CURRENCY);
 	}
 
 	private void fetchStocksRecords(LocalDateTime today) {
-		String fetchingCode = pythonCache.opsForValue().get(CodeConstants.STOCK_FETCHING_CODE);
-		if (AppUtil.isPresent(fetchingCode)) {
+		String fetchingCode = pythonCache.opsForValue().get(CodeConstant.STOCK_FETCHING_CODE);
+		if (BaseAppUtil.isPresent(fetchingCode)) {
 			log.debug(MessageFormat.format("Still fetching Stock<{0}>", fetchingCode));
 			return;
 		}
@@ -104,9 +104,9 @@ public class ScheduleTaskService {
 		List<Stock> stocks = this.stockFacade.queryByUserStockExist();
 		for (Stock stock : stocks) {
 			StockRecord lastRecord = this.stockRecordFacade.latestRecord(stock.getCode());
-			if ((AppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDealDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
+			if ((BaseAppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDealDate().toLocalDate())) || BaseAppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", stock.getName(), stock.getCode()));
-				pythonCache.opsForValue().set(CodeConstants.STOCK_FETCHING_CODE, stock.getCode());
+				pythonCache.opsForValue().set(CodeConstant.STOCK_FETCHING_CODE, stock.getCode());
 				pythonFetcherService.fetchStockRecord(stock.getCode());
 				try {
 					TimeUnit.SECONDS.sleep(3);
@@ -115,12 +115,12 @@ public class ScheduleTaskService {
 				}
 			}
 		}
-		pythonCache.delete(CodeConstants.STOCK_FETCHING_CODE);
+		pythonCache.delete(CodeConstant.STOCK_FETCHING_CODE);
 	}
 
 	private void fetchFundsRecords(LocalDateTime today) {
-		String fetchingCode = pythonCache.opsForValue().get(CodeConstants.FUND_FETCHING_CODE);
-		if (AppUtil.isPresent(fetchingCode)) {
+		String fetchingCode = pythonCache.opsForValue().get(CodeConstant.FUND_FETCHING_CODE);
+		if (BaseAppUtil.isPresent(fetchingCode)) {
 			log.debug(MessageFormat.format("Still fetching Fund<{0}>", fetchingCode));
 			return;
 		}
@@ -128,9 +128,9 @@ public class ScheduleTaskService {
 		List<Fund> funds = this.fundFacade.queryByUserFundExist(true);
 		for (Fund fund : funds) {
 			FundRecord lastRecord = this.fundRecordFacade.latestRecord(fund.getCode());
-			if ((AppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || AppUtil.isEmpty(lastRecord)) {
+			if ((BaseAppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || BaseAppUtil.isEmpty(lastRecord)) {
 				log.info(MessageFormat.format("Fetching {0}<{1}> records", fund.getName(), fund.getCode()));
-				pythonCache.opsForValue().set(CodeConstants.FUND_FETCHING_CODE, fund.getCode());
+				pythonCache.opsForValue().set(CodeConstant.FUND_FETCHING_CODE, fund.getCode());
 				pythonFetcherService.fetchFundRecord(fund.getCode());
 				try {
 					TimeUnit.SECONDS.sleep(3);
@@ -139,6 +139,6 @@ public class ScheduleTaskService {
 				}
 			}
 		}
-		pythonCache.delete(CodeConstants.FUND_FETCHING_CODE);
+		pythonCache.delete(CodeConstant.FUND_FETCHING_CODE);
 	}
 }

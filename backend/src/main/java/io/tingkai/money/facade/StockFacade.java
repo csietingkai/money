@@ -11,17 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.netty.util.internal.StringUtil;
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.StockDao;
 import io.tingkai.money.dao.UserStockDao;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.enumeration.MarketType;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.service.DataFetcherService;
-import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -47,7 +47,7 @@ public class StockFacade {
 			this.sort(entities);
 		}
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_STOCK));
 		}
 		return entities;
 	}
@@ -63,7 +63,7 @@ public class StockFacade {
 			this.sort(entities);
 		}
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_STOCK));
 		}
 		return entities;
 	}
@@ -75,13 +75,13 @@ public class StockFacade {
 		}
 		optional = this.stockDao.findByCode(code);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_STOCK));
 		}
 		return optional.get();
 	}
 
 	public Stock insert(Stock entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate(), entity.getCfiCode())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate(), entity.getCfiCode())) {
 			throw new FieldMissingException();
 		}
 		Optional<Stock> optional = this.stockDao.findByCode(entity.getCode());
@@ -92,7 +92,7 @@ public class StockFacade {
 	}
 
 	public List<Stock> insertAll(List<Stock> entities) throws AlreadyExistException, FieldMissingException {
-		long hasFieldMissingCount = entities.stream().filter(entity -> !AppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate(), entity.getCfiCode())).count();
+		long hasFieldMissingCount = entities.stream().filter(entity -> !BaseAppUtil.isAllPresent(entity, entity.getCode(), entity.getName(), entity.getIsinCode(), entity.getOfferingDate(), entity.getCfiCode())).count();
 		if (hasFieldMissingCount > 0L) {
 			throw new FieldMissingException();
 		}
@@ -100,7 +100,7 @@ public class StockFacade {
 	}
 
 	public Stock update(Stock entity) throws NotExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getId())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getId())) {
 			throw new FieldMissingException();
 		}
 		Optional<Stock> optional = this.stockDao.findById(entity.getId());
@@ -120,7 +120,7 @@ public class StockFacade {
 	}
 
 	public void delete(UUID id) throws NotExistException {
-		if (AppUtil.isEmpty(id) || StringUtil.isNullOrEmpty(id.toString())) {
+		if (BaseAppUtil.isEmpty(id) || StringUtil.isNullOrEmpty(id.toString())) {
 			throw new NotExistException();
 		}
 		Optional<Stock> optional = this.stockDao.findById(id);

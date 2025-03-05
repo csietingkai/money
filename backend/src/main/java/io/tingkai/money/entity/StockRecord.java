@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.DatabaseConstant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +15,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = DatabaseConstants.TABLE_STOCK_RECORD, uniqueConstraints = { @UniqueConstraint(columnNames = { "code", "dealDate" }) })
+@Table(name = DatabaseConstant.TABLE_STOCK_RECORD, uniqueConstraints = { @UniqueConstraint(columnNames = { "code", "dealDate" }) })
 public class StockRecord {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

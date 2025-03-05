@@ -12,14 +12,14 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.constant.AppConstants;
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.AppConstant;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.AccountRecordDao;
 import io.tingkai.money.entity.AccountRecord;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -32,10 +32,10 @@ public class AccountRecordFacade {
 	public List<AccountRecord> queryAll(List<UUID> ids) {
 		List<AccountRecord> entities = this.accountRecordDao.findByIdIn(ids);
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
-		if (entities.size() > AppConstants.FETCH_MAX_RECORD) {
-			entities = entities.subList(0, AppConstants.FETCH_MAX_RECORD);
+		if (entities.size() > AppConstant.FETCH_MAX_RECORD) {
+			entities = entities.subList(0, AppConstant.FETCH_MAX_RECORD);
 		}
 		return entities;
 	}
@@ -50,7 +50,7 @@ public class AccountRecordFacade {
 		}
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromInAndTransToInAndTransDateBetween(accountIds, accountIds, startOfMonth, endOfMonth);
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
 		return entities;
 	}
@@ -58,15 +58,15 @@ public class AccountRecordFacade {
 	public List<AccountRecord> queryAll(UUID accountId, boolean latestFirstOrder) {
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
 		if (latestFirstOrder) {
 			entities.sort((AccountRecord a, AccountRecord b) -> {
 				return b.getTransDate().compareTo(a.getTransDate());
 			});
 		}
-		if (entities.size() > AppConstants.FETCH_MAX_RECORD) {
-			entities = entities.subList(0, AppConstants.FETCH_MAX_RECORD);
+		if (entities.size() > AppConstant.FETCH_MAX_RECORD) {
+			entities = entities.subList(0, AppConstant.FETCH_MAX_RECORD);
 		}
 		return entities;
 	}
@@ -74,20 +74,20 @@ public class AccountRecordFacade {
 	public AccountRecord query(UUID id) {
 		Optional<AccountRecord> optional = this.accountRecordDao.findById(id);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
 		return optional.get();
 	}
 
 	public AccountRecord insert(AccountRecord entity) throws FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getTransDate(), entity.getTransAmount(), entity.getTransFrom(), entity.getTransTo(), entity.getRecordType())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getTransDate(), entity.getTransAmount(), entity.getTransFrom(), entity.getTransTo(), entity.getRecordType())) {
 			throw new FieldMissingException();
 		}
 		return this.accountRecordDao.save(entity);
 	}
 
 	public AccountRecord update(AccountRecord entity) throws NotExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getId(), entity.getTransDate(), entity.getTransAmount(), entity.getTransFrom(), entity.getTransTo(), entity.getRecordType())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getId(), entity.getTransDate(), entity.getTransAmount(), entity.getTransFrom(), entity.getTransTo(), entity.getRecordType())) {
 			throw new FieldMissingException();
 		}
 		Optional<AccountRecord> optional = this.accountRecordDao.findById(entity.getId());
@@ -105,7 +105,7 @@ public class AccountRecordFacade {
 	}
 
 	public void delete(UUID id) throws NotExistException {
-		if (!AppUtil.isAllPresent(id)) {
+		if (!BaseAppUtil.isAllPresent(id)) {
 			throw new NotExistException();
 		}
 		Optional<AccountRecord> optional = this.accountRecordDao.findById(id);

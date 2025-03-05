@@ -3,7 +3,7 @@ package io.tingkai.money.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.enumeration.MarketType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +17,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = DatabaseConstants.TABLE_STOCK)
+@Table(name = DatabaseConstant.TABLE_STOCK)
 public class Stock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

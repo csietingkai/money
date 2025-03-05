@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.DatabaseConstant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = DatabaseConstants.TABLE_EXCHANGE_RATE_RECORD, uniqueConstraints = { @UniqueConstraint(columnNames = { "currency", "date" }) })
+@Table(name = DatabaseConstant.TABLE_EXCHANGE_RATE_RECORD, uniqueConstraints = { @UniqueConstraint(columnNames = { "currency", "date" }) })
 public class ExchangeRateRecord {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

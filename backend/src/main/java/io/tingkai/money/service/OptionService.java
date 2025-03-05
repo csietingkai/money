@@ -8,13 +8,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.constant.AppConstants;
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.entity.Option;
 import io.tingkai.money.facade.OptionFacade;
-import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.vo.OptionVo;
-import io.tingkai.money.util.AppUtil;
 
 @Service
 @Loggable
@@ -28,7 +27,7 @@ public class OptionService {
 	private OptionFacade optionFacade;
 
 	@Autowired
-	@Qualifier(CodeConstants.APP_CACHE)
+	@Qualifier(CodeConstant.APP_CACHE)
 	private RedisTemplate<String, List<OptionVo>> appCache;
 
 	public List<OptionVo> getFileTypeOptions() {
@@ -48,15 +47,11 @@ public class OptionService {
 
 	private List<OptionVo> syncCache(String catergory) {
 		List<OptionVo> options = this.appCache.opsForValue().get(catergory);
-		if (AppUtil.isEmpty(options)) {
+		if (BaseAppUtil.isEmpty(options)) {
 			List<Option> entities = this.optionFacade.queryAll(catergory);
 			options = entities.stream().map(o -> {
-				String text = null;
-				if (CodeConstants.OPTION_LANGUAGE_TW.equals(AppConstants.OPTION_LANGUAGE)) {
-					text = o.getTwText();
-				} else if (CodeConstants.OPTION_LANGUAGE_US.equals(AppConstants.OPTION_LANGUAGE)) {
-					text = o.getEnText();
-				}
+				// TODO i18n
+				String text = o.getTwText();
 				return OptionVo.of(o.getName(), text);
 			}).collect(Collectors.toList());
 			this.appCache.opsForValue().set(catergory, options);

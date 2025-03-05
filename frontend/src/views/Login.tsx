@@ -3,14 +3,14 @@ import { connect } from 'react-redux';
 import { CButton, CCard, CCardBody, CCardGroup, CCol, CContainer, CForm, CFormInput, CInputGroup, CInputGroupText, CRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilLockLocked, cilUser } from '@coreui/icons';
-import AuthApi, { AuthResponse, LoginRespVo } from '../api/auth';
+import AuthApi, { AuthResponse, AuthToken } from '../api/auth';
 import { LoginDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import store, { init } from '../reducer/Store';
 import * as AppUtil from '../util/AppUtil';
 import { Action } from '../util/Interface';
 
 export interface LoginProps {
-    login: (vo: LoginRespVo) => void;
+    login: (vo: AuthToken) => void;
     notify: (message: string) => void;
 }
 
@@ -111,7 +111,7 @@ const mapStateToProps = () => {
     return {};
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<LoginRespVo | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<AuthToken | string>>) => {
     return {
         login: LoginDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch)

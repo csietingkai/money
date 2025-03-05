@@ -23,18 +23,18 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 
-import io.tingkai.money.constant.AppConstants;
+import io.tingkai.auth.util.ContextUtil;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.AppConstant;
 import io.tingkai.money.constant.GridFSFileField;
 import io.tingkai.money.entity.FinancialFile;
 import io.tingkai.money.facade.FinacialFileFacade;
-import io.tingkai.money.logging.Loggable;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FinancialFileNotFoundException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.repository.FileRepository;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
@@ -117,7 +117,7 @@ public class FinancialFileService {
 		while (gridfsFileCursor.hasNext()) {
 			fileObjectId = gridfsFileCursor.next().getObjectId();
 		}
-		if (AppUtil.isPresent(fileObjectId)) {
+		if (BaseAppUtil.isPresent(fileObjectId)) {
 			this.getBucket(this.getFileRepository(entity.getType()).getName()).delete(fileObjectId);
 		}
 		return entity;
@@ -139,14 +139,14 @@ public class FinancialFileService {
 		while (gridfsFileCursor.hasNext()) {
 			fileObjectId = gridfsFileCursor.next().getObjectId();
 		}
-		if (AppUtil.isEmpty(fileObjectId)) {
+		if (BaseAppUtil.isEmpty(fileObjectId)) {
 			throw new FinancialFileNotFoundException(entity.getFilename());
 		}
 		return bucket.openDownloadStream(fileObjectId);
 	}
 
 	protected GridFSBucket getBucket(String repositoryName) {
-		MongoDatabase database = this.mongoClient.getDatabase(AppConstants.GRID_FS_DATABASE);
+		MongoDatabase database = this.mongoClient.getDatabase(AppConstant.GRID_FS_DATABASE);
 		return GridFSBuckets.create(database, repositoryName);
 	}
 

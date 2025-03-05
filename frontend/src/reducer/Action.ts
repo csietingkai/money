@@ -1,6 +1,6 @@
 
 import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_TRADE_CONDITION, SET_STOCK_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_IS_MOBILE, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_EXCHANGE_RATES, SET_BANK_INFO_LIST } from './ActionType';
-import { LoginRespVo, UserSetting } from '../api/auth';
+import { AuthToken, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { Action, Option } from '../util/Interface';
 import { ExchangeRateVo } from '../api/exchangeRate';
@@ -15,9 +15,9 @@ import ExchangeRateTradeCondition from '../views/exchangeRate/interface/Exchange
 import { BankInfo } from '../api/bankInfo';
 
 // auth
-export const Login = (payload: LoginRespVo): Action<LoginRespVo> => ({ type: LOGIN, payload });
+export const Login = (payload: AuthToken): Action<AuthToken> => ({ type: LOGIN, payload });
 export const Logout = (): Action<undefined> => ({ type: LOGOUT, payload: undefined });
-export const SetUserSetting = (payload: UserSetting): Action<UserSetting> => ({ type: SET_USER_SETTING, payload });
+export const SetUserSetting = (payload?: UserSetting): Action<UserSetting | undefined> => ({ type: SET_USER_SETTING, payload });
 
 // account
 export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type: SET_ACCOUNT_LIST, payload });

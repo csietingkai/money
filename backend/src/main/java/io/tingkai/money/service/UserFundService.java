@@ -16,7 +16,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.auth.constant.AuthConstant;
+import io.tingkai.auth.util.ContextUtil;
+import io.tingkai.base.constant.BaseCodeConstant;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
@@ -35,12 +43,8 @@ import io.tingkai.money.facade.UserFundFacade;
 import io.tingkai.money.facade.UserFundRecordFacade;
 import io.tingkai.money.facade.UserSettingFacade;
 import io.tingkai.money.facade.UserTrackingFundFacade;
-import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
 import io.tingkai.money.model.exception.FundAmountInvalidException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.FundBonusRequest;
 import io.tingkai.money.model.request.FundBuyRequest;
@@ -49,8 +53,6 @@ import io.tingkai.money.model.request.FundTradeRecordEditRequest;
 import io.tingkai.money.model.vo.UserFundRecordVo;
 import io.tingkai.money.model.vo.UserFundVo;
 import io.tingkai.money.model.vo.UserTrackingFundVo;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
@@ -81,7 +83,7 @@ public class UserFundService {
 	private UserTrackingFundFacade userTrackingFundFacade;
 
 	@Autowired
-	@Qualifier(CodeConstants.USER_CACHE)
+	@Qualifier(AuthConstant.AUTH_CACHE)
 	private RedisTemplate<String, List<UserTrackingFund>> userCache;
 
 	public List<UserFundVo> getOwnFunds() {
@@ -96,9 +98,9 @@ public class UserFundService {
 		ownList.forEach(fund -> {
 			UserFundVo vo = new UserFundVo();
 			vo.transform(fund);
-			vo.setFundName(fundNames.getOrDefault(vo.getFundCode(), CodeConstants.EMPTY_STRING));
+			vo.setFundName(fundNames.getOrDefault(vo.getFundCode(), BaseCodeConstant.EMPTY_STRING));
 			FundRecord fundRecord = this.fundRecordFacade.latestRecord(vo.getFundCode());
-			if (AppUtil.isPresent(fundRecord)) {
+			if (BaseAppUtil.isPresent(fundRecord)) {
 				vo.setPrice(fundRecord.getPrice());
 				vo.setPriceDate(fundRecord.getDate());
 			}
@@ -164,7 +166,7 @@ public class UserFundService {
 			entity = this.userFundFacade.queryByUserIdAndFundCode(userId, fundCode);
 		} catch (Exception e) {
 		}
-		if (AppUtil.isPresent(entity)) {
+		if (BaseAppUtil.isPresent(entity)) {
 			entity.setAmount(entity.getAmount().add(share));
 			entity = this.userFundFacade.update(entity);
 		} else {
@@ -325,7 +327,7 @@ public class UserFundService {
 		}
 
 		UserFundRecord tradeRecord = this.userFundRecordFacade.query(recordId);
-		if (AppUtil.isEmpty(tradeRecord)) {
+		if (BaseAppUtil.isEmpty(tradeRecord)) {
 			throw new NotExistException();
 		}
 		// handle origin account record and user stock record
@@ -394,7 +396,7 @@ public class UserFundService {
 	public void reverseRecord(UUID recordId) throws NotExistException, FieldMissingException {
 		UserFundRecord userFundRecord = this.userFundRecordFacade.query(recordId);
 
-		if (AppUtil.isEmpty(userFundRecord)) {
+		if (BaseAppUtil.isEmpty(userFundRecord)) {
 			throw new NotExistException();
 		}
 
@@ -416,9 +418,9 @@ public class UserFundService {
 
 	public List<UserTrackingFundVo> getUserTrackingFundList() {
 		UUID userId = ContextUtil.getUserId();
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
+		String cacheKey = MessageFormat.format(CodeConstant.USER_TRACKING_FUND_KEY, userId);
 		List<UserTrackingFund> trackingList = this.userCache.opsForValue().get(cacheKey);
-		if (AppUtil.isEmpty(trackingList)) {
+		if (BaseAppUtil.isEmpty(trackingList)) {
 			trackingList = this.userTrackingFundFacade.queryAll(userId);
 			this.userCache.opsForValue().set(cacheKey, trackingList);
 		}
@@ -462,7 +464,7 @@ public class UserFundService {
 	}
 
 	private void syncTrackingCache(UUID userId) {
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_FUND_KEY, userId);
+		String cacheKey = MessageFormat.format(CodeConstant.USER_TRACKING_FUND_KEY, userId);
 		List<UserTrackingFund> trackingList = this.userTrackingFundFacade.queryAll(userId);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}

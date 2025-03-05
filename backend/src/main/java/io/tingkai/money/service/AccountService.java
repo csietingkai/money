@@ -17,7 +17,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.auth.constant.AuthConstant;
+import io.tingkai.auth.util.ContextUtil;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.entity.ExchangeRate;
@@ -27,12 +34,8 @@ import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
 import io.tingkai.money.facade.UserFundRecordFacade;
 import io.tingkai.money.facade.UserStockRecordFacade;
-import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AccountBalanceWrongException;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.request.AccountEditRequest;
 import io.tingkai.money.model.request.AccountInsertRequest;
 import io.tingkai.money.model.request.AccountRecordEditRequest;
@@ -44,8 +47,6 @@ import io.tingkai.money.model.vo.AccountVo;
 import io.tingkai.money.model.vo.BalanceDetailVo;
 import io.tingkai.money.model.vo.BalanceSumVo;
 import io.tingkai.money.model.vo.MonthBalanceVo;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
@@ -67,11 +68,11 @@ public class AccountService {
 	private UserFundRecordFacade userFundRecordFacade;
 
 	@Autowired
-	@Qualifier(CodeConstants.USER_CACHE)
+	@Qualifier(AuthConstant.AUTH_CACHE)
 	private RedisTemplate<String, List<Account>> userCache;
 
 	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
+	@Qualifier(CodeConstant.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> pythonCache;
 
 	public List<AccountVo> getAll() {
@@ -124,15 +125,15 @@ public class AccountService {
 
 		MonthBalanceVo vo = new MonthBalanceVo();
 
-		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId));
-		if (AppUtil.isEmpty(accounts)) {
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstant.ACCOUNT_LIST, userId));
+		if (BaseAppUtil.isEmpty(accounts)) {
 			accounts = this.accountFacade.queryAll(userId);
-			this.userCache.opsForValue().set(CodeConstants.ACCOUNT_LIST, accounts);
+			this.userCache.opsForValue().set(CodeConstant.ACCOUNT_LIST, accounts);
 		}
 
 		Map<UUID, BigDecimal> accountCurrencies = new HashMap<UUID, BigDecimal>();
 		Map<String, BigDecimal> currencies = new HashMap<String, BigDecimal>();
-		currencies.put(CodeConstants.BASE_EXCHANGE_RATE, BigDecimal.ONE);
+		currencies.put(CodeConstant.BASE_EXCHANGE_RATE, BigDecimal.ONE);
 		for (Account account : accounts) {
 			BigDecimal rate;
 			if (!currencies.containsKey(account.getCurrency())) {
@@ -180,7 +181,7 @@ public class AccountService {
 		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountId, latestFirstOrder);
 
 		Account account = this.accountFacade.query(accountId);
-		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstants.ACCOUNT_LIST, account.getUserId()));
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstant.ACCOUNT_LIST, account.getUserId()));
 		Map<UUID, Account> accountMap = accounts.stream().collect(Collectors.toMap(Account::getId, acc -> acc));
 
 		List<AccountRecordVo> vos = new ArrayList<AccountRecordVo>();
@@ -291,7 +292,7 @@ public class AccountService {
 		UUID recordId = request.getRecordId();
 		AccountRecord record = this.accountRecordFacade.query(recordId);
 
-		if (AppUtil.isEmpty(record)) {
+		if (BaseAppUtil.isEmpty(record)) {
 			throw new NotExistException();
 		}
 
@@ -322,7 +323,7 @@ public class AccountService {
 
 		record.setTransDate(date);
 		record.setTransAmount(amount);
-		if (AppUtil.isPresent(toId)) {
+		if (BaseAppUtil.isPresent(toId)) {
 			record.setTransTo(toId);
 		}
 		record.setRecordType(type);
@@ -360,7 +361,7 @@ public class AccountService {
 		entities.sort((Account a, Account b) -> {
 			return a.getName().compareToIgnoreCase(b.getName());
 		});
-		this.userCache.opsForValue().set(MessageFormat.format(CodeConstants.ACCOUNT_LIST, userId), entities);
+		this.userCache.opsForValue().set(MessageFormat.format(CodeConstant.ACCOUNT_LIST, userId), entities);
 		return entities;
 	}
 

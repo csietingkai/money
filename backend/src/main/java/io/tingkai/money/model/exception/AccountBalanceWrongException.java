@@ -2,6 +2,7 @@ package io.tingkai.money.model.exception;
 
 import java.math.BigDecimal;
 
+import io.tingkai.base.model.exception.BaseException;
 import io.tingkai.money.constant.MessageConstant;
 
 public class AccountBalanceWrongException extends BaseException {

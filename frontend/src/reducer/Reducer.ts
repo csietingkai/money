@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import axios from 'axios';
-import { AuthToken, LoginRespVo, UserSetting } from '../api/auth';
+import { AuthToken, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
@@ -17,15 +17,14 @@ import ExchangeRateQueryCondition from '../views/exchangeRate/interface/Exchange
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
 import { BankInfo } from '../api/bankInfo';
 
-const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: Action<LoginRespVo | AuthToken | UserSetting>): ReduxAuthState => {
+const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: Action<AuthToken | UserSetting>): ReduxAuthState => {
     const newState: ReduxAuthState = { ...state };
     const { type, payload } = action;
     if (type === LOGIN) {
         if (payload) {
-            const { authToken, setting } = payload as LoginRespVo;
+            const authToken = payload as AuthToken;;
             setAuthToken(authToken);
             newState.authToken = authToken;
-            newState.userSetting = setting;
             axios.defaults.headers['X-Auth-Token'] = authToken.tokenString;
             const { href } = window.location;
             if (href.indexOf('login') >= 0) {

@@ -1,5 +1,6 @@
 package io.tingkai.money.model.exception;
 
+import io.tingkai.base.model.exception.BaseException;
 import io.tingkai.money.constant.MessageConstant;
 
 public class AccountBalanceNotEnoughException extends BaseException {

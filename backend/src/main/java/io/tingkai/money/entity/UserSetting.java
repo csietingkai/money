@@ -3,7 +3,7 @@ package io.tingkai.money.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.DatabaseConstant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = DatabaseConstants.TABLE_USER_SETTING)
+@Table(name = DatabaseConstant.TABLE_USER_SETTING)
 public class UserSetting {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

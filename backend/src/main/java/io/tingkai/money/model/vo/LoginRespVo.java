@@ -1,7 +1,7 @@
 package io.tingkai.money.model.vo;
 
+import io.tingkai.auth.security.AuthToken;
 import io.tingkai.money.entity.UserSetting;
-import io.tingkai.money.security.AuthToken;
 import lombok.Data;
 
 @Data

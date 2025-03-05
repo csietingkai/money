@@ -344,7 +344,7 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<string | UserSetting>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<string | UserSetting | undefined>>) => {
     return {
         notify: SetNotifyDispatcher(dispatch),
         setUserSetting: SetUserSettingDispatcher(dispatch)

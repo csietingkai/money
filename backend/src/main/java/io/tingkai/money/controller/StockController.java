@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.UserStock;
 import io.tingkai.money.entity.UserStockRecord;
 import io.tingkai.money.enumeration.DealType;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.StockBonusRequest;
 import io.tingkai.money.model.request.StockBuyRequest;

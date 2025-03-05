@@ -1,9 +1,7 @@
-version: "3"
-
 # port for this project used: 1076 ~ 1200
 
 services:
-  postgres:
+  money-postgres:
     image: ${POSTGRES_SERVICE}:${POSTGRES_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${POSTGRES_SERVICE}
     restart: always
@@ -13,7 +11,7 @@ services:
       - ${POSTGRES_DIR}:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
-  mongo:
+  money-mongo:
     image: mongo:${MONGO_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${MONGO_SERVICE}
     restart: always
@@ -25,7 +23,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-  redis:
+  money-redis:
     image: redis:${REDIS_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${REDIS_SERVICE}
     restart: always
@@ -34,14 +32,14 @@ services:
       - ${REDIS_PORT}:${REDIS_INTERNEL_PORT}
     volumes:
       - ${REDIS_DIR}:/data
-  python:
+  money-python:
     image: tingkai/money-python:${PYTHON_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${PYTHON_SERVICE}
     restart: always
     ports:
       - ${PYTHON_PORT}:${PYTHON_INTERNEL_PORT}
     depends_on:
-      - postgres
+      - money-postgres
     environment:
       - DATASOURCE_HOST=${POSTGRES_SERVICE}
       - DATASOURCE_PORT=${POSTGRES_INTERNEL_PORT}
@@ -49,41 +47,56 @@ services:
       - DATASOURCE_USERNAME=postgres
       - DATASOURCE_PASSWORD=${POSTGRES_ROOT_PASSWORD}
       - PYTHONUNBUFFERED=1
-  backend:
+  money-backend:
     image: tingkai/money-backend:${BACKEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${BACKEND_SERVICE}
-    restart: always
     ports:
-      - ${BACKEND_PORT}:${BACKEND_INTERNEL_PORT}
+      - 8080:8080
     depends_on:
-      - python
-      - mongo
-      - redis
+      - money-python
+      - money-mongo
+      - money-redis
+    networks:
+      - default
+      - tkauth_default
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_SERVICE}:${POSTGRES_INTERNEL_PORT}/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_ROOT_PASSWORD}
-      - SPRING_DATA_MONGODB_HOST=${MONGO_SERVICE}
+      - SPRING_DATASOURCE_AUTH_JDBCURL=jdbc:postgresql://auth-postgres:5432/postgres
+      - SPRING_DATASOURCE_AUTH_USERNAME=postgres
+      - SPRING_DATASOURCE_AUTH_PASSWORD=${POSTGRES_ROOT_PASSWORD}
+      - SPRING_DATASOURCE_MONEY_JDBCURL=jdbc:postgresql://money-postgres:${POSTGRES_INTERNEL_PORT}/postgres
+      - SPRING_DATASOURCE_MONEY_USERNAME=postgres
+      - SPRING_DATASOURCE_MONEY_PASSWORD=${POSTGRES_ROOT_PASSWORD}
+      - SPRING_DATA_MONGODB_HOST=money-mongo
       - SPRING_DATA_MONGODB_PORT=${MONGO_INTERNEL_PORT}
       - SPRING_DATA_MONGODB_AUTHENTICATION-database=admin
       - SPRING_DATA_MONGODB_DATABASE=money
       - SPRING_DATA_MONGODB_GRID_FS_DATABASE=money
       - SPRING_DATA_MONGODB_USERNAME=${MONGO_ROOT_USERNAME}
       - SPRING_DATA_MONGODB_PASSWORD=${MONGO_ROOT_PASSWORD}
-      - SPRING_REDIS_HOST=${REDIS_SERVICE}
-      - SPRING_REDIS_PORT=${REDIS_INTERNEL_PORT}
-      - SPRING_REDIS_PASSWORD=${REDIS_ROOT_PASSWORD}
-      - SPRING_REDIS_DATABASE=${REDIS_DATABASE}
-      - PYTHON_BASE_URL=http://python:${PYTHON_INTERNEL_PORT}
-      - PYTHON_FETCH_PATH=/fetch
-  frontend:
+      - SPRING_REDIS_AUTH_HOST=auth-redis
+      - SPRING_REDIS_AUTH_PORT=${REDIS_INTERNEL_PORT}
+      - SPRING_REDIS_AUTH_PASSWORD=${REDIS_ROOT_PASSWORD}
+      - SPRING_REDIS_AUTH_DATABASE=0
+      - SPRING_REDIS_MONEY_HOST=money-${REDIS_SERVICE}
+      - SPRING_REDIS_MONEY_PORT=${REDIS_INTERNEL_PORT}
+      - SPRING_REDIS_MONEY_PASSWORD=${REDIS_ROOT_PASSWORD}
+      - SPRING_REDIS_MONEY_APP_DATABASE=0
+      - SPRING_REDIS_MONEY_PYTHON_DATABASE=1
+      - PYTHON_BASE_URL=http://money-python:${PYTHON_INTERNEL_PORT}
+  money-frontend:
     image: tingkai/money-frontend:${FRONTEND_VERSION}
     container_name: ${CONTAINER_NAME_PREFIX}-${FRONTEND_SERVICE}
     restart: always
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_INTERNEL_PORT}
     depends_on:
-      - backend
+      - money-backend
     environment:
       - NODE_ENV=production
       - API_URL=http://localhost:${BACKEND_PORT}/api
+
+networks:
+  default:
+    driver: bridge
+  tkauth_default:
+    external: true

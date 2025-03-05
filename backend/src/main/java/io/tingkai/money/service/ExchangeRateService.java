@@ -14,7 +14,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.base.constant.BaseCodeConstant;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
@@ -25,15 +31,10 @@ import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.ExchangeRateFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
-import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.request.ExchangeRateTradeRequest;
 import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
-import io.tingkai.money.util.AppUtil;
 
 @Service
 @Loggable
@@ -52,21 +53,21 @@ public class ExchangeRateService {
 	private AccountRecordFacade accountRecordFacade;
 
 	@Autowired
-	@Qualifier(CodeConstants.PYTHON_CACHE)
+	@Qualifier(CodeConstant.PYTHON_CACHE)
 	private RedisTemplate<String, List<ExchangeRate>> cache;
 
 	public List<ExchangeRateVo> getAll() {
-		List<ExchangeRate> exchangeRates = this.cache.opsForValue().get(CodeConstants.EXCHANGE_RATE_LIST_KEY);
-		if (AppUtil.isEmpty(exchangeRates)) {
+		List<ExchangeRate> exchangeRates = this.cache.opsForValue().get(CodeConstant.EXCHANGE_RATE_LIST_KEY);
+		if (BaseAppUtil.isEmpty(exchangeRates)) {
 			exchangeRates = this.exchangeRateFacade.queryAll();
-			this.cache.opsForValue().set(CodeConstants.EXCHANGE_RATE_LIST_KEY, exchangeRates);
+			this.cache.opsForValue().set(CodeConstant.EXCHANGE_RATE_LIST_KEY, exchangeRates);
 		}
 		List<ExchangeRateVo> vos = new ArrayList<ExchangeRateVo>();
 		for (ExchangeRate exchangeRate : exchangeRates) {
 			ExchangeRateVo vo = new ExchangeRateVo();
 			vo.transform(exchangeRate);
 			vo.setRecord(this.exchangeRateRecordFacade.latestRecord(exchangeRate.getCurrency()));
-			vo.setUpdateTime(this.getUpdateTime(exchangeRate.getCurrency(), CodeConstants.EXCHANGE_RATE_FETCH_START_DATETIME));
+			vo.setUpdateTime(this.getUpdateTime(exchangeRate.getCurrency(), CodeConstant.EXCHANGE_RATE_FETCH_START_DATETIME));
 			vos.add(vo);
 		}
 		return vos;
@@ -132,38 +133,38 @@ public class ExchangeRateService {
 				sums[j] = sums[j].add(record.getCashSell());
 			}
 			int di = 0;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa5(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getCashSell());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa5(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa10(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getCashSell());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa10(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				BigDecimal ma20 = sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]));
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				BigDecimal ma20 = sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]));
 				// standard deviaction
 				BigDecimal total = BigDecimal.ZERO;
-				for (int j = 0; j < CodeConstants.MA_DAYS[di]; j++) {
+				for (int j = 0; j < CodeConstant.MA_DAYS[di]; j++) {
 					total = total.add(BigDecimal.valueOf(Math.pow(records.get(i - j).getCashSell().subtract(ma20).doubleValue(), 2)));
 				}
-				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]), CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP).doubleValue());
+				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]), BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP).doubleValue());
 				vo.setMa20(ma20);
-				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(CodeConstants.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getCashSell());
+				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa40(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getCashSell());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa40(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
 			}
 			di++;
-			if (i >= CodeConstants.MA_DAYS[di] - 1) {
-				vo.setMa60(sums[di].divide(BigDecimal.valueOf(CodeConstants.MA_DAYS[di]), 5, RoundingMode.HALF_UP));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstants.MA_DAYS[di] + 1).getCashSell());
+			if (i >= CodeConstant.MA_DAYS[di] - 1) {
+				vo.setMa60(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]), 5, RoundingMode.HALF_UP));
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
 			}
 			vos.add(vo);
 		}
@@ -172,7 +173,7 @@ public class ExchangeRateService {
 
 	private LocalDateTime getUpdateTime(String currency, LocalDateTime defaultTime) {
 		ExchangeRateRecord record = this.exchangeRateRecordFacade.latestRecord(currency);
-		if (AppUtil.isPresent(record)) {
+		if (BaseAppUtil.isPresent(record)) {
 			return record.getDate();
 		}
 		return defaultTime;

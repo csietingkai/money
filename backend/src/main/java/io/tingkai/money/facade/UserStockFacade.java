@@ -8,14 +8,14 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.UserStockDao;
 import io.tingkai.money.entity.UserStock;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.util.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -28,7 +28,7 @@ public class UserStockFacade {
 	public List<UserStock> queryAll() {
 		List<UserStock> entities = this.userStockDao.findAll();
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_USER_STOCK));
 		}
 		return entities;
 	}
@@ -36,7 +36,7 @@ public class UserStockFacade {
 	public List<UserStock> queryByUserId(UUID userId) {
 		List<UserStock> entities = this.userStockDao.findByUserId(userId);
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_USER_STOCK));
 		}
 		return entities;
 	}
@@ -44,7 +44,7 @@ public class UserStockFacade {
 	public UserStock query(UUID id) {
 		Optional<UserStock> optional = this.userStockDao.findById(id);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_USER_STOCK));
 		}
 		return optional.get();
 	}
@@ -52,13 +52,13 @@ public class UserStockFacade {
 	public UserStock queryByUserIdAndStockCode(UUID userId, String stockCode) {
 		Optional<UserStock> optional = this.userStockDao.findByUserIdAndStockCode(userId, stockCode);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_USER_STOCK));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_USER_STOCK));
 		}
 		return optional.get();
 	}
 
 	public UserStock insert(UserStock entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getUserId(), entity.getStockCode(), entity.getAmount())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getUserId(), entity.getStockCode(), entity.getAmount())) {
 			throw new FieldMissingException();
 		}
 		Optional<UserStock> optional = this.userStockDao.findByUserIdAndStockCode(entity.getUserId(), entity.getStockCode());
@@ -69,7 +69,7 @@ public class UserStockFacade {
 	}
 
 	public UserStock update(UserStock entity) throws NotExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getId())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getId())) {
 			throw new FieldMissingException();
 		}
 		Optional<UserStock> optional = this.userStockDao.findById(entity.getId());
@@ -81,7 +81,7 @@ public class UserStockFacade {
 	}
 
 	public void delete(UUID id) throws NotExistException {
-		if (!AppUtil.isAllPresent(id)) {
+		if (!BaseAppUtil.isAllPresent(id)) {
 			throw new NotExistException();
 		}
 		Optional<UserStock> optional = this.userStockDao.findById(id);

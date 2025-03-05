@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.BankInfoDao;
 import io.tingkai.money.entity.BankInfo;
@@ -23,7 +23,7 @@ public class BankInfoFacade {
 	public List<BankInfo> queryAll() {
 		List<BankInfo> entities = this.BankInfoDao.findAll();
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_BANK_INFO));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_BANK_INFO));
 		}
 		return entities;
 	}
@@ -31,7 +31,7 @@ public class BankInfoFacade {
 	public BankInfo query(String id) {
 		Optional<BankInfo> optional = this.BankInfoDao.findById(id);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_BANK_INFO));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_BANK_INFO));
 		}
 		return optional.get();
 	}

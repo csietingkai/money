@@ -17,7 +17,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.tingkai.money.constant.CodeConstants;
+import io.tingkai.auth.constant.AuthConstant;
+import io.tingkai.auth.util.ContextUtil;
+import io.tingkai.base.constant.BaseCodeConstant;
+import io.tingkai.base.log.Loggable;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
@@ -37,11 +45,7 @@ import io.tingkai.money.facade.UserSettingFacade;
 import io.tingkai.money.facade.UserStockFacade;
 import io.tingkai.money.facade.UserStockRecordFacade;
 import io.tingkai.money.facade.UserTrackingStockFacade;
-import io.tingkai.money.logging.Loggable;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
 import io.tingkai.money.model.exception.StockAmountInvalidException;
 import io.tingkai.money.model.request.StockBonusRequest;
 import io.tingkai.money.model.request.StockBuyRequest;
@@ -50,8 +54,6 @@ import io.tingkai.money.model.request.StockTradeRecordEditRequest;
 import io.tingkai.money.model.vo.UserStockRecordVo;
 import io.tingkai.money.model.vo.UserStockVo;
 import io.tingkai.money.model.vo.UserTrackingStockVo;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.ContextUtil;
 
 @Service
 @Loggable
@@ -82,7 +84,7 @@ public class UserStockService {
 	private UserTrackingStockFacade userTrackingStockFacade;
 
 	@Autowired
-	@Qualifier(CodeConstants.USER_CACHE)
+	@Qualifier(AuthConstant.AUTH_CACHE)
 	private RedisTemplate<String, List<UserTrackingStock>> userCache;
 
 	public List<UserStockVo> getOwnStocks() {
@@ -97,9 +99,9 @@ public class UserStockService {
 		ownList.forEach(stock -> {
 			UserStockVo vo = new UserStockVo();
 			vo.transform(stock);
-			vo.setStockName(stockNames.getOrDefault(vo.getStockCode(), CodeConstants.EMPTY_STRING));
+			vo.setStockName(stockNames.getOrDefault(vo.getStockCode(), BaseCodeConstant.EMPTY_STRING));
 			StockRecord stockRecord = this.stockRecordFacade.latestRecord(vo.getStockCode());
-			if (AppUtil.isPresent(stockRecord)) {
+			if (BaseAppUtil.isPresent(stockRecord)) {
 				vo.setPrice(stockRecord.getClosePrice());
 				vo.setPriceDate(stockRecord.getDealDate());
 			}
@@ -177,7 +179,7 @@ public class UserStockService {
 			entity = this.userStockFacade.queryByUserIdAndStockCode(userId, stockCode);
 		} catch (Exception e) {
 		}
-		if (AppUtil.isPresent(entity)) {
+		if (BaseAppUtil.isPresent(entity)) {
 			entity.setAmount(entity.getAmount().add(share));
 			entity = this.userStockFacade.update(entity);
 		} else {
@@ -339,7 +341,7 @@ public class UserStockService {
 		}
 
 		UserStockRecord tradeRecord = this.userStockRecordFacade.query(recordId);
-		if (AppUtil.isEmpty(tradeRecord)) {
+		if (BaseAppUtil.isEmpty(tradeRecord)) {
 			throw new NotExistException();
 		}
 		// handle origin account record and user stock record
@@ -410,7 +412,7 @@ public class UserStockService {
 	public void reverseRecord(UUID recordId) throws NotExistException, FieldMissingException {
 		UserStockRecord userStockRecord = this.userStockRecordFacade.query(recordId);
 
-		if (AppUtil.isEmpty(userStockRecord)) {
+		if (BaseAppUtil.isEmpty(userStockRecord)) {
 			throw new NotExistException();
 		}
 
@@ -432,9 +434,9 @@ public class UserStockService {
 
 	public List<UserTrackingStockVo> getUserTrackingStockList() {
 		UUID userId = ContextUtil.getUserId();
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
+		String cacheKey = MessageFormat.format(CodeConstant.USER_TRACKING_STOCK_KEY, userId);
 		List<UserTrackingStock> trackingList = this.userCache.opsForValue().get(cacheKey);
-		if (AppUtil.isEmpty(trackingList)) {
+		if (BaseAppUtil.isEmpty(trackingList)) {
 			trackingList = this.userTrackingStockFacade.queryAll(userId);
 			this.userCache.opsForValue().set(cacheKey, trackingList);
 		}
@@ -478,10 +480,10 @@ public class UserStockService {
 	}
 
 	private BigDecimal calcFee(BigDecimal price, BigDecimal share, BigDecimal discount) {
-		BigDecimal fee = CodeConstants.FEE_RATE.multiply(price).multiply(share).multiply(discount);
-		BigDecimal minFee = CodeConstants.MIN_FEE;
-		if (!AppUtil.isMultipleNumber(share, BigDecimal.valueOf(1000))) {
-			minFee = CodeConstants.MIN_SMALL_FEE;
+		BigDecimal fee = CodeConstant.FEE_RATE.multiply(price).multiply(share).multiply(discount);
+		BigDecimal minFee = CodeConstant.MIN_FEE;
+		if (!BaseAppUtil.isMultipleNumber(share, BigDecimal.valueOf(1000))) {
+			minFee = CodeConstant.MIN_SMALL_FEE;
 		}
 		if (minFee.compareTo(fee) > 0 && BigDecimal.ZERO.compareTo(fee) != 0) {
 			fee = minFee;
@@ -491,14 +493,14 @@ public class UserStockService {
 	}
 
 	private BigDecimal calcTax(BigDecimal price, BigDecimal share) {
-		BigDecimal tax = CodeConstants.TAX_RATE.multiply(price).multiply(share);
+		BigDecimal tax = CodeConstant.TAX_RATE.multiply(price).multiply(share);
 		;
 		tax = tax.setScale(0, RoundingMode.FLOOR);
 		return tax;
 	}
 
 	private void syncTrackingCache(UUID userId) {
-		String cacheKey = MessageFormat.format(CodeConstants.USER_TRACKING_STOCK_KEY, userId);
+		String cacheKey = MessageFormat.format(CodeConstant.USER_TRACKING_STOCK_KEY, userId);
 		List<UserTrackingStock> trackingList = this.userTrackingStockFacade.queryAll(userId);
 		this.userCache.opsForValue().set(cacheKey, trackingList);
 	}

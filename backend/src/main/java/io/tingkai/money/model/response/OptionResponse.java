@@ -2,6 +2,7 @@ package io.tingkai.money.model.response;
 
 import java.util.List;
 
+import io.tingkai.base.model.response.BaseResponse;
 import io.tingkai.money.model.vo.OptionVo;
 
 public class OptionResponse extends BaseResponse<List<OptionVo>> {

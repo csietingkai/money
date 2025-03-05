@@ -9,15 +9,15 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.tingkai.money.constant.DatabaseConstants;
+import io.tingkai.base.model.exception.AlreadyExistException;
+import io.tingkai.base.model.exception.FieldMissingException;
+import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.base.util.BaseStringUtil;
+import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.AccountDao;
 import io.tingkai.money.entity.Account;
-import io.tingkai.money.model.exception.AlreadyExistException;
-import io.tingkai.money.model.exception.FieldMissingException;
-import io.tingkai.money.model.exception.NotExistException;
-import io.tingkai.money.util.AppUtil;
-import io.tingkai.money.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -30,7 +30,7 @@ public class AccountFacade {
 	public List<Account> queryAll(UUID userId) {
 		List<Account> entities = this.accountDao.findByUserId(userId);
 		if (entities.size() == 0) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
 		return entities;
 	}
@@ -38,7 +38,7 @@ public class AccountFacade {
 	public Account query(UUID id) {
 		Optional<Account> optional = this.accountDao.findById(id);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
 		return optional.get();
 	}
@@ -46,16 +46,16 @@ public class AccountFacade {
 	public Account query(String name, UUID userId) {
 		Optional<Account> optional = this.accountDao.findByNameAndUserId(name, userId);
 		if (optional.isEmpty()) {
-			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstants.TABLE_ACCOUNT));
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
 		return optional.get();
 	}
 
 	public Account insert(Account entity) throws AlreadyExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getUserId(), entity.getName(), entity.getCurrency())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getUserId(), entity.getName(), entity.getCurrency())) {
 			throw new FieldMissingException();
 		}
-		if (!AppUtil.isAllPresent(entity.getBalance())) {
+		if (!BaseAppUtil.isAllPresent(entity.getBalance())) {
 			entity.setBalance(BigDecimal.ZERO);
 		}
 		Optional<Account> optional = this.accountDao.findByNameAndUserId(entity.getName(), entity.getUserId());
@@ -63,10 +63,10 @@ public class AccountFacade {
 			throw new AlreadyExistException();
 		}
 
-		if (StringUtil.isBlank(entity.getBankCode())) {
+		if (BaseStringUtil.isBlank(entity.getBankCode())) {
 			entity.setBankCode(null);
 		}
-		if (StringUtil.isBlank(entity.getBankNo())) {
+		if (BaseStringUtil.isBlank(entity.getBankNo())) {
 			entity.setBankNo(null);
 		}
 
@@ -74,7 +74,7 @@ public class AccountFacade {
 	}
 
 	public Account update(Account entity) throws NotExistException, FieldMissingException {
-		if (!AppUtil.isAllPresent(entity, entity.getId(), entity.getUserId(), entity.getName(), entity.getCurrency())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getId(), entity.getUserId(), entity.getName(), entity.getCurrency())) {
 			throw new FieldMissingException();
 		}
 		Optional<Account> optional = this.accountDao.findById(entity.getId());
@@ -83,10 +83,10 @@ public class AccountFacade {
 		}
 		Account updateEntity = optional.get();
 		updateEntity.setName(entity.getName());
-		if (StringUtil.isBlank(entity.getBankCode())) {
+		if (BaseStringUtil.isBlank(entity.getBankCode())) {
 			entity.setBankCode(null);
 		}
-		if (StringUtil.isBlank(entity.getBankNo())) {
+		if (BaseStringUtil.isBlank(entity.getBankNo())) {
 			entity.setBankNo(null);
 		}
 		return this.accountDao.save(updateEntity);

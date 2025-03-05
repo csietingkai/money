@@ -1,5 +1,7 @@
 package io.tingkai.money.model.response;
 
+import io.tingkai.base.model.response.BaseResponse;
+
 public class AccountResponse<T> extends BaseResponse<T> {
 
 	public AccountResponse(boolean success, T t, String pattern) {
