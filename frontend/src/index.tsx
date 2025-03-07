@@ -34,6 +34,5 @@ validateToken(store.dispatch, store.getState);
 createRoot(document.getElementById('root') as Element).render(
     <Provider store={store}>
         <App />
-        <CToaster className='p-3' placement='top-end' />
     </Provider>
 );

@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { CSpinner } from '@coreui/react';
 import { ReduxState, isLoading } from './reducer/Selector';
-import './scss/style.scss';
 import AppLoading from './components/AppLoading';
+import AppNotify from './components/AppNotify';
+import './scss/style.scss';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -48,6 +49,7 @@ class App extends React.Component<AppProps, AppState> {
                     </Suspense>
                 </HashRouter>
                 {isLoading && <AppLoading />}
+                <AppNotify />
             </React.Fragment>
         );
     }

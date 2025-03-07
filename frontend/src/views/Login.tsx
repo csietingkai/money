@@ -40,10 +40,10 @@ class Login extends React.Component<LoginProps, LoginState> {
         const { username, password } = this.state;
         const response: AuthResponse = await AuthApi.login(username, password);
         const { success, data, message } = response;
+        notify(message);
         if (success) {
             login(data);
             init(store.dispatch, store.getState);
-            notify(message);
         } else {
             this.setState({ username: '', password: '' });
         }

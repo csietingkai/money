@@ -3,7 +3,6 @@ import AppContent from '../components/AppContent';
 import AppFooter from '../components/AppFooter';
 import AppHeader from '../components/AppHeader';
 import AppSidebar from '../components/AppSidebar';
-import AppNotify from '../components/AppNotify';
 
 export interface DefaultLayoutProps { }
 
@@ -13,19 +12,16 @@ export default class DefaultLayout extends React.Component<DefaultLayoutProps, D
     render(): React.ReactNode {
 
         return (
-            <React.Fragment>
-                <div>
-                    <AppSidebar />
-                    <div className='wrapper d-flex flex-column min-vh-100'>
-                        <AppHeader />
-                        <div className='body flex-grow-1'>
-                            <AppContent />
-                        </div>
-                        <AppFooter />
+            <div>
+                <AppSidebar />
+                <div className='wrapper d-flex flex-column min-vh-100'>
+                    <AppHeader />
+                    <div className='body flex-grow-1'>
+                        <AppContent />
                     </div>
+                    <AppFooter />
                 </div>
-                <AppNotify />
-            </React.Fragment>
+            </div>
         );
     }
 }
