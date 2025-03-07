@@ -205,7 +205,7 @@ public class AccountService {
 	@Transactional
 	public AccountRecord income(AccountRecordIncomeRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		UUID accountId = request.getAccountId();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal amount = request.getAmount();
 		String type = request.getType();
 		String description = request.getDescription();
@@ -232,7 +232,7 @@ public class AccountService {
 	public AccountRecord transfer(AccountRecordTransferRequest request) throws AccountBalanceNotEnoughException, AccountBalanceWrongException, NotExistException, FieldMissingException {
 		UUID fromId = request.getFromId();
 		UUID toId = request.getToId();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal amount = request.getAmount();
 		String type = request.getType();
 		String description = request.getDescription();
@@ -264,7 +264,7 @@ public class AccountService {
 	@Transactional
 	public AccountRecord expend(AccountRecordExpendRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		UUID accountId = request.getAccountId();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal amount = request.getAmount();
 		String type = request.getType();
 		String description = request.getDescription();
@@ -316,7 +316,7 @@ public class AccountService {
 			this.accountFacade.update(toAccount2);
 		}
 
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		String type = request.getType();
 		String description = request.getDescription();
 		UUID fileId = request.getFileId();

@@ -83,7 +83,7 @@ public class ExchangeRateService {
 	public void trade(ExchangeRateTradeRequest request) throws NotExistException, FieldMissingException, AccountBalanceNotEnoughException, AlreadyExistException {
 		final UUID fromAccountId = request.getFromAccountId();
 		final UUID toAccountId = request.getToAccountId();
-		final LocalDateTime date = request.getDate();
+		final LocalDateTime date = request.getDate().atStartOfDay();
 		final BigDecimal rate = request.getRate();
 		final BigDecimal srcPayment = request.getSrcPayment();
 		final BigDecimal targetPayment = request.getTargetPayment();

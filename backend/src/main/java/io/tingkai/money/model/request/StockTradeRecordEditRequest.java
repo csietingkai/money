@@ -1,7 +1,7 @@
 package io.tingkai.money.model.request;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import org.springframework.lang.Nullable;
@@ -13,7 +13,7 @@ public class StockTradeRecordEditRequest {
 	protected UUID recordId;
 	protected UUID accountId;
 	protected String stockCode;
-	protected LocalDateTime date;
+	protected LocalDate date;
 	protected BigDecimal share;
 	protected BigDecimal price;
 	protected BigDecimal fee;

@@ -94,14 +94,6 @@ export const toDateStr = (date?: Date, format: string = 'YYYY/MM/DD'): string | 
     return moment(date).format(format);
 };
 
-export const toDateTimeStr = (date?: Date, format: string = 'YYYY-MM-DDTHH:mm:ss.SSS'): string | undefined => {
-    if (!date) {
-        console.warn(`parameter date: \'${date}\' is not valid`);
-        return undefined;
-    }
-    return moment(date).format(format);
-};
-
 export const isSameDate = (date1: Date, date2: Date): boolean => {
     return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
 };

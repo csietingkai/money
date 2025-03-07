@@ -158,7 +158,7 @@ public class UserStockService {
 	public UserStock buy(StockBuyRequest request) throws AccountBalanceNotEnoughException, StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();
@@ -223,7 +223,7 @@ public class UserStockService {
 	public UserStock sell(StockSellRequest request) throws StockAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();
@@ -277,7 +277,7 @@ public class UserStockService {
 	public UserStock bonus(StockBonusRequest request) throws StockAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();
@@ -326,7 +326,7 @@ public class UserStockService {
 		UUID recordId = request.getRecordId();
 		UUID accountId = request.getAccountId();
 		String stockCode = request.getStockCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal fee = request.getFee();

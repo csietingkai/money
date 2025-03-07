@@ -143,7 +143,7 @@ public class UserFundService {
 	public UserFund buy(FundBuyRequest request) throws AccountBalanceNotEnoughException, FundAmountInvalidException, NotExistException, FieldMissingException, AlreadyExistException {
 		UUID accountId = request.getAccountId();
 		String fundCode = request.getFundCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal rate = request.getRate();
@@ -210,7 +210,7 @@ public class UserFundService {
 	public UserFund sell(FundSellRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		UUID accountId = request.getAccountId();
 		String fundCode = request.getFundCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal rate = request.getRate();
@@ -263,7 +263,7 @@ public class UserFundService {
 	public UserFund bonus(FundBonusRequest request) throws FundAmountInvalidException, AlreadyExistException, FieldMissingException, NotExistException {
 		UUID accountId = request.getAccountId();
 		String fundCode = request.getFundCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal rate = request.getRate();
@@ -312,7 +312,7 @@ public class UserFundService {
 		UUID recordId = request.getRecordId();
 		UUID accountId = request.getAccountId();
 		String fundCode = request.getFundCode();
-		LocalDateTime date = request.getDate();
+		LocalDateTime date = request.getDate().atStartOfDay();
 		BigDecimal share = request.getShare();
 		BigDecimal price = request.getPrice();
 		BigDecimal rate = request.getRate();
