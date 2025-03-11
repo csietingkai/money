@@ -2,6 +2,7 @@ package io.tingkai.money.model.vo;
 
 import java.util.UUID;
 
+import io.tingkai.base.model.vo.Transformable;
 import io.tingkai.money.entity.UserFundRecord;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

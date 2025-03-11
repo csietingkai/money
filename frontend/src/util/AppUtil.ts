@@ -114,26 +114,6 @@ export const reverseNumberComma = (str: string): number => {
     return 0;
 };
 
-export const handleRequestDate = (data: any): any => {
-    if (!data || typeof data !== 'object') {
-        return data;
-    }
-    for (const key in data) {
-        if (Object.prototype.hasOwnProperty.call(data, key)) {
-            const value = data[key];
-            if (value && value instanceof Date) {
-                const date = new Date(value);
-                // TODO time zone in config?
-                date.setHours(date.getHours() + 8);
-                data[key] = date.toISOString();
-            } else if (typeof value === 'object') {
-                data[key] = handleRequestDate(data[key]);
-            }
-        }
-    }
-    return data;
-};
-
 export const getBenifitColor = (num: number, stockType: StockType): string => {
     if (num === 0) {
         return 'secondary';

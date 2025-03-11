@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import io.tingkai.base.model.vo.Transformable;
 import io.tingkai.money.entity.UserStockRecord;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

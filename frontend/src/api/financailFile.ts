@@ -17,7 +17,7 @@ export interface FinancialFileResponse extends ApiResponse<FinancialFile> { }
 export interface FinancialFileListResponse extends ApiResponse<FinancialFile[]> { }
 
 const list = async (date?: Date, type?: string): Promise<FinancialFileListResponse> => {
-    const response = await axios.get(FINANCIAL_FILE_LIST_PATH, { params: { type, date: AppUtil.toDateStr(date) } }, 'YYYY-MM-DD');
+    const response = await axios.get(FINANCIAL_FILE_LIST_PATH, { params: { type, date: AppUtil.toDateStr(date, 'YYYY-MM-DD') } });
     const data: FinancialFileListResponse = response.data;
     data.data = data.data?.map(x => {
         x.date = new Date(x.date);
@@ -29,7 +29,7 @@ const list = async (date?: Date, type?: string): Promise<FinancialFileListRespon
 const upload = async (file: any, date: Date, type: string): Promise<FileUploadResponse> => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('date', AppUtil.toDateStr(date) || '', 'YYYY-MM-DD');
+    formData.append('date', AppUtil.toDateStr(date, 'YYYY-MM-DD') || '');
     formData.append('type', type);
     const response = await axios.post(FINANCIAL_FILE_UPLOAD_PATH, formData, { headers: { 'content-type': 'multipart/form-data' } });
     const data: FileUploadResponse = response.data;
@@ -37,7 +37,7 @@ const upload = async (file: any, date: Date, type: string): Promise<FileUploadRe
 };
 
 const update = async (id: string, type: string, date: Date): Promise<FileUploadResponse> => {
-    const response = await axios.post(FINANCIAL_FILE_UPDATE_PATH, null, { params: { id, type, date: AppUtil.toDateStr(date) } }, 'YYYY-MM-DD');
+    const response = await axios.post(FINANCIAL_FILE_UPDATE_PATH, null, { params: { id, type, date: AppUtil.toDateStr(date, 'YYYY-MM-DD') } });
     const data: FileUploadResponse = response.data;
     return data;
 };

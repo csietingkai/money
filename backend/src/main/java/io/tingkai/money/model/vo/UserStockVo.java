@@ -3,6 +3,7 @@ package io.tingkai.money.model.vo;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import io.tingkai.base.model.vo.Transformable;
 import io.tingkai.money.entity.UserStock;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

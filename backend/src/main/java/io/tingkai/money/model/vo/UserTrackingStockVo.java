@@ -2,6 +2,7 @@ package io.tingkai.money.model.vo;
 
 import java.math.BigDecimal;
 
+import io.tingkai.base.model.vo.Transformable;
 import io.tingkai.money.entity.StockRecord;
 import io.tingkai.money.entity.UserTrackingStock;
 import lombok.Data;

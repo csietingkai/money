@@ -1,5 +1,6 @@
 package io.tingkai.money.model.vo;
 
+import io.tingkai.base.model.vo.Transformable;
 import io.tingkai.money.entity.Account;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

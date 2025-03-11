@@ -1,4 +1,4 @@
-package io.tingkai.money.model.vo;
+package io.tingkai.base.model.vo;
 
 import org.springframework.beans.BeanUtils;
 
