@@ -63,7 +63,7 @@ class AppPagination extends React.Component<AppPaginationProps, AppPaginationSta
 				{hasStartEllpsis ? <CPaginationItem disabled>…</CPaginationItem> : <React.Fragment></React.Fragment>}
 				{pages}
 				{hasEndEllpsis ? <CPaginationItem disabled>…</CPaginationItem> : <React.Fragment></React.Fragment>}
-				<CPaginationItem aria-label='Next' disabled={currentPage === maxPage} onClick={() => onChange(currentPage + 1)}>
+				<CPaginationItem aria-label='Next' disabled={currentPage === maxPage || totalDataCount === 0} onClick={() => onChange(currentPage + 1)}>
 					<span aria-hidden='true'>
 						<CIcon icon={cilChevronRight}></CIcon></span>
 				</CPaginationItem>
