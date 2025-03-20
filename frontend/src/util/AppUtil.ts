@@ -131,7 +131,7 @@ export const getBenifitColor = (num: number, stockType: StockType): string => {
 };
 
 export const bindEnterKey = (onEnterKeyDown: () => void) => (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Enter' && ['file', 'select-one'].indexOf(event.target['type']) < 0) {
+    if (event.key === 'Enter' && ['file', 'select-one', 'textarea'].indexOf(event.target['type']) < 0) {
         onEnterKeyDown();
     }
 }
