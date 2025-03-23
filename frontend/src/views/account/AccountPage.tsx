@@ -5,17 +5,18 @@ import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
 import qrcode from 'qrcode';
-import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
-import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../reducer/Selector';
-import AccountApi, { Account, AccountRecordVo } from '../api/account';
-import FinancailFileApi from '../api/financailFile';
-import AppConfirmModal from '../components/AppConfirmModal';
-import AppPagination from '../components/AppPagination';
-import * as AppUtil from '../util/AppUtil';
-import { Action, SimpleResponse, Option } from '../util/Interface';
-import { StockType } from '../util/Enum';
-import { DATA_COUNT_PER_PAGE } from '../util/Constant';
-import currencyIcon from '../assets/currency';
+import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
+import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../../reducer/Selector';
+import AccountApi, { Account, AccountRecordVo } from '../../api/account';
+import FinancailFileApi from '../../api/financailFile';
+import AppConfirmModal from '../../components/AppConfirmModal';
+import AppPagination from '../../components/AppPagination';
+import * as AppUtil from '../../util/AppUtil';
+import { Action, SimpleResponse, Option } from '../../util/Interface';
+import { StockType } from '../../util/Enum';
+import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
+import currencyIcon from '../../assets/currency';
+import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecordModal';
 
 export interface AccountPageProps {
     accountList: Account[],
@@ -60,39 +61,11 @@ export interface AccountPageState {
     currentAccountRecords: AccountRecordVo[];
     accountRecordsPage: number;
     showRecordIncomeModal: boolean;
-    incomeForm: {
-        accountId: string;
-        recordId: string;
-        date: Date;
-        type: string;
-        amount: number;
-        description: string;
-        fileId?: string;
-    };
     showRecordTransferModal: boolean;
-    transferForm: {
-        accountId: string;
-        recordId: string;
-        to: string;
-        date: Date;
-        type: string;
-        amount: number;
-        description: string;
-        fileId?: string;
-    };
     showRecordExpendModal: boolean;
-    expendForm: {
-        accountId: string;
-        recordId: string;
-        date: Date;
-        type: string;
-        amount: number;
-        description: string;
-        fileId?: string;
-    };
-    fileOptions: Option[];
     showDeleteAccountModal: boolean;
     showDeleteRecordModal: boolean;
+    currentRecordMode: AccountRecordModalMode;
     holdingAccountId: string;
     holdingRecordId: string;
 }
@@ -131,36 +104,11 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             currentAccountRecords: [],
             accountRecordsPage: 1,
             showRecordIncomeModal: false,
-            incomeForm: {
-                accountId: '',
-                recordId: '',
-                date: new Date(),
-                type: props.defaultRecordType,
-                amount: 0,
-                description: ''
-            },
             showRecordTransferModal: false,
-            transferForm: {
-                accountId: '',
-                recordId: '',
-                date: new Date(),
-                to: '',
-                type: props.defaultRecordType,
-                amount: 0,
-                description: ''
-            },
             showRecordExpendModal: false,
-            expendForm: {
-                accountId: '',
-                recordId: '',
-                date: new Date(),
-                type: props.defaultRecordType,
-                amount: 0,
-                description: ''
-            },
-            fileOptions: [],
             showDeleteAccountModal: false,
             showDeleteRecordModal: false,
+            currentRecordMode: '',
             holdingAccountId: '',
             holdingRecordId: ''
         };
@@ -555,7 +503,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         const response = await AccountApi.deleteAccount(accountId);
         const { message } = response;
         notify(message);
-    }
+    };
 
     private fetchAccountRecords = async (accountId: string) => {
         const response = await AccountApi.getRecords(accountId);
@@ -565,448 +513,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         }
     };
 
-    private getIncomeModal = (): React.ReactNode => {
-        const { recordTypeOptions } = this.props;
-        const { showRecordIncomeModal, incomeForm, fileOptions } = this.state;
-        return (
-            <CModal size='lg' alignment='center' visible={showRecordIncomeModal} onClose={this.closeIncomeModal}>
-                <CModalHeader>
-                    <CModalTitle>Income</CModalTitle>
-                </CModalHeader>
-                <CModalBody>
-                    <CForm onKeyDown={AppUtil.bindEnterKey(this.income)}>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='income-date' className='col-sm-4 col-form-label'>
-                                Transaction Date
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <input
-                                    type='date'
-                                    id='income-date'
-                                    className='form-control'
-                                    value={moment(incomeForm.date).format('YYYY-MM-DD')}
-                                    onChange={async (event) => {
-                                        const d = new Date(event.target.value);
-                                        const fs = await this.getFilesByDate(d);
-                                        this.setState({ incomeForm: { ...incomeForm, date: d, fileId: '' }, fileOptions: fs });
-                                    }}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='income-record-type' className='col-sm-4 col-form-label'>
-                                Record Type
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={incomeForm.type}
-                                    id='income-record-type'
-                                    onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, type: event.target.value as string } })}
-                                >
-                                    {recordTypeOptions.map(o => <option key={`income-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='income-amount' className='col-sm-4 col-form-label'>
-                                Transaction Amount
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormInput
-                                    type='number'
-                                    id='income-amount'
-                                    value={incomeForm.amount}
-                                    onChange={(event) => this.setState({ incomeForm: { ...incomeForm, amount: AppUtil.toNumber(event.target.value) } })}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='income-description' className='col-sm-4 col-form-label'>
-                                Description
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormInput
-                                    type='text'
-                                    id='income-description'
-                                    value={incomeForm.description}
-                                    onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, description: event.target.value as string } })}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='income-file' className='col-sm-4 col-form-label'>
-                                Linked File
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={incomeForm.fileId}
-                                    id='income-file'
-                                    onChange={(event: any) => this.setState({ incomeForm: { ...incomeForm, fileId: event.target.value as string } })}
-                                >
-                                    <option value=''></option>
-                                    {fileOptions.map(o => <option key={`income-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                    </CForm>
-                </CModalBody>
-                <CModalFooter>
-                    <CButton color='primary' onClick={this.income}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeIncomeModal}>Close</CButton>
-                </CModalFooter>
-            </CModal>
-        );
-    };
-
-    private openIncomeModal = (accountId: string, recordId: string = '') => async () => {
-        const { currentAccountRecords, incomeForm } = this.state;
-        let transDate = new Date();
-        if (recordId) {
-            const accountRecord = currentAccountRecords.find(x => x.id === recordId);
-            if (accountRecord) {
-                incomeForm.date = accountRecord.transDate;
-                incomeForm.type = accountRecord.recordType;
-                incomeForm.amount = Math.abs(accountRecord.transAmount);
-                incomeForm.description = accountRecord.description || '';
-                incomeForm.fileId = accountRecord.fileId;
-            }
-        }
-        const fileOptions = await this.getFilesByDate(transDate);
-        this.setState({ showRecordIncomeModal: true, incomeForm: { ...incomeForm, accountId, recordId }, fileOptions });
-    };
-
-    private income = async () => {
-        const { notify } = this.props;
-        const { incomeForm } = this.state;
-        const { accountId, recordId, date, amount, type, description, fileId } = incomeForm;
-        let api: Promise<SimpleResponse>;
-        if (!recordId) {
-            api = AccountApi.income(accountId, date, amount, type, description, fileId);
-        } else {
-            api = AccountApi.updateRecord(recordId, date, amount, type, description, undefined, fileId);
-        }
-        const resposne: SimpleResponse = await api;
-        const { success, message } = resposne;
-        notify(message);
-        if (success) {
-            this.fetchAccounts();
-            this.fetchAccountRecords(accountId);
-            this.closeIncomeModal();
-        }
-    };
-
-    private closeIncomeModal = () => {
-        const { defaultRecordType } = this.props;
-        this.setState({ showRecordIncomeModal: false, incomeForm: { accountId: '', recordId: '', date: new Date(), type: defaultRecordType, amount: 0, description: '' } });
-    };
-
-    private getTransferModal = (): React.ReactNode => {
-        const { recordTypeOptions, accountList } = this.props;
-        const { showRecordTransferModal, transferForm, fileOptions } = this.state;
-        const currAccount = accountList.find(a => a.id === transferForm.accountId);
-        const showAccountList = accountList.filter(a => a.id !== transferForm.accountId && a.currency === currAccount?.currency);
-        return (
-            <CModal size='lg' alignment='center' visible={showRecordTransferModal} onClose={this.closeTransferModal}>
-                <CModalHeader>
-                    <CModalTitle>Transfer</CModalTitle>
-                </CModalHeader>
-                <CModalBody>
-                    <CForm onKeyDown={AppUtil.bindEnterKey(this.transfer)}>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='transfer-to' className='col-sm-4 col-form-label'>
-                                Transfer To
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={transferForm.to}
-                                    id='transfer-to'
-                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, to: event.target.value as string } })}
-                                >
-                                    {showAccountList.map(a => <option key={`transfer-to-option-${a.id}`} value={a.id}>{a.name}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='transfer-date' className='col-sm-4 col-form-label'>
-                                Transaction Date
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <input
-                                    type='date'
-                                    id='transfer-date'
-                                    className='form-control'
-                                    value={moment(transferForm.date).format('YYYY-MM-DD')}
-                                    onChange={async (event) => {
-                                        const d = new Date(event.target.value);
-                                        const fs = await this.getFilesByDate(d);
-                                        this.setState({ transferForm: { ...transferForm, date: d, fileId: '' }, fileOptions: fs });
-                                    }}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='transfer-record-type' className='col-sm-4 col-form-label'>
-                                Record Type
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={transferForm.type}
-                                    id='transfer-record-type'
-                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, type: event.target.value as string } })}
-                                >
-                                    {recordTypeOptions.map(o => <option key={`transfer-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='transfer-amount' className='col-sm-4 col-form-label'>
-                                Transaction Amount
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormInput
-                                    type='number'
-                                    id='transfer-amount'
-                                    value={transferForm.amount}
-                                    onChange={(event) => this.setState({ transferForm: { ...transferForm, amount: AppUtil.toNumber(event.target.value) } })}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='transfer-description' className='col-sm-4 col-form-label'>
-                                Description
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormInput
-                                    type='text'
-                                    id='transfer-description'
-                                    value={transferForm.description}
-                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, description: event.target.value as string } })}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='transfer-file' className='col-sm-4 col-form-label'>
-                                Linked File
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={transferForm.fileId}
-                                    id='transfer-file'
-                                    onChange={(event: any) => this.setState({ transferForm: { ...transferForm, fileId: event.target.value as string } })}
-                                >
-                                    <option value=''></option>
-                                    {fileOptions.map(o => <option key={`transfer-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                    </CForm>
-                </CModalBody>
-                <CModalFooter>
-                    <CButton color='primary' onClick={this.transfer}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeTransferModal}>Close</CButton>
-                </CModalFooter>
-            </CModal>
-        );
-    };
-
-    private openTransferModal = (accountId: string, recordId: string = '') => async () => {
-        const { accountList, notify } = this.props;
-        const { currentAccountRecords, transferForm } = this.state;
-        const fileOptions = await this.getFilesByDate(new Date());
-        const currAccount = accountList.find(a => a.id === accountId);
-        const showAccountList = accountList.filter(a => a.id !== accountId && a.currency === currAccount?.currency);
-        if (showAccountList.length) {
-            const newForm = { ...transferForm, accountId, recordId, to: showAccountList[0].id };
-            if (recordId) {
-                const currRecord = currentAccountRecords.find(r => r.id === recordId);
-                if (currRecord) {
-                    newForm.to = currRecord.transTo;
-                    newForm.date = currRecord.transDate;
-                    newForm.type = currRecord.recordType;
-                    newForm.amount = Math.abs(currRecord.transAmount);
-                    newForm.description = currRecord.description || '';
-                    newForm.fileId = currRecord.fileId;
-                }
-            }
-            this.setState({ showRecordTransferModal: true, transferForm: newForm, fileOptions });
-        } else {
-            notify('No Other Account to Transfer.');
-        }
-    };
-
-    private transfer = async () => {
-        const { notify } = this.props;
-        const { transferForm } = this.state;
-        const { accountId, recordId, to, date, amount, type, description, fileId } = transferForm;
-        let api: Promise<SimpleResponse>;
-        if (!recordId) {
-            api = AccountApi.transfer(accountId, to, date, amount, type, description, fileId);
-        } else {
-            api = AccountApi.updateRecord(recordId, date, amount, type, description, to, fileId);
-        }
-        const resposne: SimpleResponse = await api;
-        const { success, message } = resposne;
-        notify(message);
-        if (success) {
-            this.fetchAccounts();
-            this.fetchAccountRecords(accountId);
-            this.closeTransferModal();
-        }
-    };
-
-    private closeTransferModal = () => {
-        const { defaultRecordType } = this.props;
-        this.setState({ showRecordTransferModal: false, transferForm: { accountId: '', recordId: '', date: new Date(), to: '', type: defaultRecordType, amount: 0, description: '' } });
-    };
-
-    private getExpendModal = (): React.ReactNode => {
-        const { recordTypeOptions } = this.props;
-        const { showRecordExpendModal, expendForm, fileOptions } = this.state;
-        return (
-            <CModal size='lg' alignment='center' visible={showRecordExpendModal} onClose={this.closeExpendModal}>
-                <CModalHeader>
-                    <CModalTitle>Expend</CModalTitle>
-                </CModalHeader>
-                <CModalBody>
-                    <CForm onKeyDown={AppUtil.bindEnterKey(this.expend)}>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='expend-date' className='col-sm-4 col-form-label'>
-                                Transaction Date
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <input
-                                    type='date'
-                                    id='expend-date'
-                                    className='form-control'
-                                    value={moment(expendForm.date).format('YYYY-MM-DD')}
-                                    onChange={async (event) => {
-                                        const d = new Date(event.target.value);
-                                        const fs = await this.getFilesByDate(d);
-                                        this.setState({ expendForm: { ...expendForm, date: d, fileId: '' }, fileOptions: fs });
-                                    }}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='expend-record-type' className='col-sm-4 col-form-label'>
-                                Record Type
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={expendForm.type}
-                                    id='expend-record-type'
-                                    onChange={(event: any) => this.setState({ expendForm: { ...expendForm, type: event.target.value as string } })}
-                                >
-                                    {recordTypeOptions.map(o => <option key={`expend-record-type-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='expend-amount' className='col-sm-4 col-form-label'>
-                                Transaction Amount
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormInput
-                                    type='number'
-                                    id='expend-amount'
-                                    value={expendForm.amount}
-                                    onChange={(event) => this.setState({ expendForm: { ...expendForm, amount: AppUtil.toNumber(event.target.value) } })}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='expend-description' className='col-sm-4 col-form-label'>
-                                Description
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormInput
-                                    type='text'
-                                    id='expend-description'
-                                    value={expendForm.description}
-                                    onChange={(event: any) => this.setState({ expendForm: { ...expendForm, description: event.target.value as string } })}
-                                />
-                            </div>
-                        </CRow>
-                        <CRow className='mb-3'>
-                            <CFormLabel htmlFor='expend-file' className='col-sm-4 col-form-label'>
-                                Linked File
-                            </CFormLabel>
-                            <div className='col-sm-8'>
-                                <CFormSelect
-                                    value={expendForm.fileId}
-                                    id='expend-file'
-                                    onChange={(event: any) => this.setState({ expendForm: { ...expendForm, fileId: event.target.value as string } })}
-                                >
-                                    <option value=''></option>
-                                    {fileOptions.map(o => <option key={`expend-file-option-${o.key}`} value={o.key}>{o.value}</option>)}
-                                </CFormSelect>
-                            </div>
-                        </CRow>
-                    </CForm>
-                </CModalBody>
-                <CModalFooter>
-                    <CButton color='primary' onClick={this.expend}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeExpendModal}>Close</CButton>
-                </CModalFooter>
-            </CModal>
-        );
-    };
-
-    private openExpendModal = (accountId: string, recordId: string = '') => async () => {
-        const { currentAccountRecords, expendForm } = this.state;
-        let transDate = new Date();
-        if (recordId) {
-            const accountRecord = currentAccountRecords.find(x => x.id === recordId);
-            if (accountRecord) {
-                expendForm.date = accountRecord.transDate;
-                expendForm.type = accountRecord.recordType;
-                expendForm.amount = Math.abs(accountRecord.transAmount);
-                expendForm.description = accountRecord.description || '';
-                expendForm.fileId = accountRecord.fileId;
-            }
-        }
-        const fileOptions = await this.getFilesByDate(transDate);
-        this.setState({ showRecordExpendModal: true, expendForm: { ...expendForm, accountId, recordId }, fileOptions });
-    };
-
-    private expend = async () => {
-        const { notify } = this.props;
-        const { expendForm } = this.state;
-        const { accountId, recordId, date, amount, type, description, fileId } = expendForm;
-        let api: Promise<SimpleResponse>;
-        if (!recordId) {
-            api = AccountApi.expend(accountId, date, -amount, type, description, fileId);
-        } else {
-            api = AccountApi.updateRecord(recordId, date, -amount, type, description, undefined, fileId);
-        }
-        const resposne: SimpleResponse = await api;
-        const { success, message } = resposne;
-        notify(message);
-        if (success) {
-            this.fetchAccounts();
-            this.fetchAccountRecords(accountId);
-            this.closeExpendModal();
-        }
-    };
-
-    private closeExpendModal = () => {
-        const { defaultRecordType } = this.props;
-        this.setState({ showRecordExpendModal: false, expendForm: { accountId: '', recordId: '', date: new Date(), type: defaultRecordType, amount: 0, description: '' } });
-    };
-
     private removeRecord = async (recordId: string) => {
         const { notify } = this.props;
         const { message } = await AccountApi.deleteRecord(recordId);
         notify(message);
-    };
-
-    private getFilesByDate = async (date: Date): Promise<Option[]> => {
-        const response = await FinancailFileApi.list(date);
-        const { success, data } = response;
-        if (success) {
-            return data.map(f => ({ key: f.id, value: f.filename }));
-        }
-        return [];
     };
 
     private unhideAccount = (accountId: string) => async () => {
@@ -1020,12 +530,14 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 await this.fetchAccounts();
             }
         }
-    }
+    };
 
     render(): React.ReactNode {
-        const { accountList, accountRecordDeletable } = this.props;
-        const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteAccountModal, showDeleteRecordModal } = this.state;
+        const { accountList, accountRecordDeletable, recordTypeOptions, defaultRecordType, notify } = this.props;
+        const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteAccountModal, showDeleteRecordModal, currentRecordMode, holdingAccountId, holdingRecordId } = this.state;
         const hasHiddenAccount: boolean = accountList.some(x => !x.shown);
+        const currAccount = accountList.find(a => a.id === holdingAccountId);
+        const showAccountList = accountList.filter(a => a.id !== holdingAccountId && a.currency === currAccount?.currency);
         const showAccountRecords = currentAccountRecords.slice((accountRecordsPage - 1) * DATA_COUNT_PER_PAGE, accountRecordsPage * DATA_COUNT_PER_PAGE);
         return (
             <React.Fragment>
@@ -1040,14 +552,14 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                             <CDropdown variant='btn-group' className='ms-2'>
                                 <CDropdownToggle color='secondary' variant='outline'>Unhide Account</CDropdownToggle>
                                 <CDropdownMenu>
-                                    { accountList.filter(account => !account.shown).map(account => (
+                                    {accountList.filter(account => !account.shown).map(account => (
                                         <CDropdownItem
                                             key={`hiding-account-${account.id}`}
                                             onClick={this.unhideAccount(account.id)}
                                         >
                                             {account.name}
                                         </CDropdownItem>
-                                    )) }
+                                    ))}
                                 </CDropdownMenu>
                             </CDropdown>
                         }
@@ -1075,21 +587,21 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                 <CButton
                                                                     color='success'
                                                                     variant='outline'
-                                                                    onClick={this.openIncomeModal(account.id)}
+                                                                    onClick={() => this.setState({ currentRecordMode: 'income', holdingAccountId: account.id })}
                                                                 >
                                                                     Income
                                                                 </CButton>
                                                                 <CButton
                                                                     color='info'
                                                                     variant='outline'
-                                                                    onClick={this.openTransferModal(account.id)}
+                                                                    onClick={() => this.setState({ currentRecordMode: 'transfer', holdingAccountId: account.id })}
                                                                 >
                                                                     Transfer
                                                                 </CButton>
                                                                 <CButton
                                                                     color='danger'
                                                                     variant='outline'
-                                                                    onClick={this.openExpendModal(account.id)}
+                                                                    onClick={() => this.setState({ currentRecordMode: 'expend', holdingAccountId: account.id })}
                                                                 >
                                                                     Expend
                                                                 </CButton>
@@ -1131,12 +643,12 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                                                 onClick={() => {
                                                                                                     if (r.transFrom === r.transTo) {
                                                                                                         if (r.transAmount > 0) {
-                                                                                                            this.openIncomeModal(account.id, r.id)();
+                                                                                                            this.setState({ currentRecordMode: 'income', holdingAccountId: account.id, holdingRecordId: r.id });
                                                                                                         } else if (r.transAmount < 0) {
-                                                                                                            this.openExpendModal(account.id, r.id)();
+                                                                                                            this.setState({ currentRecordMode: 'expend', holdingAccountId: account.id, holdingRecordId: r.id });
                                                                                                         }
                                                                                                     } else {
-                                                                                                        this.openTransferModal(account.id, r.id)();
+                                                                                                        this.setState({ currentRecordMode: 'transfer', holdingAccountId: account.id, holdingRecordId: r.id });
                                                                                                     }
                                                                                                 }}
                                                                                             >
@@ -1176,9 +688,20 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 {this.getAddAccountModal()}
                 {this.getEditAccountModal()}
                 {this.getQrcodeModal()}
-                {this.getIncomeModal()}
-                {this.getTransferModal()}
-                {this.getExpendModal()}
+                <AccountRecordModal
+                    mode={currentRecordMode}
+                    accountId={holdingAccountId}
+                    recordId={holdingRecordId}
+                    accountOptions={showAccountList}
+                    recordTypeOptions={recordTypeOptions}
+                    defaultRecordType={defaultRecordType}
+                    notify={notify}
+                    onClose={() => this.setState({ currentRecordMode: '', holdingAccountId: '', holdingRecordId: '' })}
+                    afterSubmit={() => {
+                        this.fetchAccounts();
+                        this.fetchAccountRecords(holdingAccountId);
+                    }}
+                />
                 <AppConfirmModal
                     showModal={showDeleteAccountModal}
                     headerText='Remove Account'
@@ -1205,7 +728,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     }}
                 />
             </React.Fragment>
-
         );
     }
 }

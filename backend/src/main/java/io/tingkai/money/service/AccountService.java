@@ -202,6 +202,27 @@ public class AccountService {
 		return vos;
 	}
 
+	public AccountRecordVo getRecord(UUID recordId) {
+		AccountRecord entity = this.accountRecordFacade.query(recordId);
+
+		Account account = this.accountFacade.query(entity.getTransFrom());
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstant.ACCOUNT_LIST, account.getUserId()));
+		Map<UUID, Account> accountMap = accounts.stream().collect(Collectors.toMap(Account::getId, acc -> acc));
+
+		AccountRecordVo vo = new AccountRecordVo();
+		vo.transform(entity);
+		vo.setTransFromName(accountMap.get(entity.getTransFrom()).getName());
+		vo.setTransFromCurrency(accountMap.get(entity.getTransFrom()).getCurrency());
+		vo.setTransToName(accountMap.get(entity.getTransTo()).getName());
+		vo.setTransToCurrency(accountMap.get(entity.getTransTo()).getCurrency());
+		if (!vo.getTransFrom().equals(vo.getTransTo()) && account.getId().equals(vo.getTransFrom())) {
+			vo.setTransAmount(BigDecimal.ZERO.subtract(vo.getTransAmount()));
+		}
+		vo.setEditable(!isSelfTransferTarget(account.getId(), vo) && !isLinked(vo.getId()));
+		vo.setRemovable(!isLinked(vo.getId()));
+		return vo;
+	}
+
 	@Transactional
 	public AccountRecord income(AccountRecordIncomeRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		UUID accountId = request.getAccountId();

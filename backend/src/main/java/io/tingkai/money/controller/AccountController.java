@@ -42,6 +42,7 @@ public class AccountController {
 	public static final String UPDATE_PATH = "/update";
 	public static final String DELETE_PATH = "/delete";
 	public static final String GET_RECORDS_PATH = "/getRecords";
+	public static final String GET_RECORD_PATH = "/getRecord";
 	public static final String MONTH_BALANCE = "/monthBalance";
 	public static final String INCOME_PATH = "/income";
 	public static final String TRANSFER_PATH = "/transfer";
@@ -80,6 +81,12 @@ public class AccountController {
 	public AccountResponse<List<AccountRecordVo>> getRecords(@RequestParam UUID accountId, @Nullable @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
 		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, latestFirstOrder);
 		return new AccountResponse<List<AccountRecordVo>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS, accountId.toString());
+	}
+
+	@RequestMapping(value = AccountController.GET_RECORD_PATH, method = RequestMethod.GET)
+	public AccountResponse<AccountRecordVo> getRecords(@RequestParam UUID recordId) {
+		AccountRecordVo entity = this.accountService.getRecord(recordId);
+		return new AccountResponse<AccountRecordVo>(true, entity, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.MONTH_BALANCE, method = RequestMethod.GET)

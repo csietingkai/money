@@ -48,11 +48,15 @@ const routes: Route[] = [
         component: React.lazy(() => import('./views/Dashboard'))
     },
     {
+        type: 'title',
+        name: 'Account',
+    },
+    {
         type: 'item',
         name: 'Accounts',
         path: 'account',
         icon: <CIcon icon={cilBank} customClassName='nav-icon' />,
-        component: React.lazy(() => import('./views/AccountPage'))
+        component: React.lazy(() => import('./views/account/AccountPage'))
     },
     {
         type: 'title',

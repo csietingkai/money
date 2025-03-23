@@ -2,7 +2,8 @@ import axios from 'axios';
 import {
     ACCOUNT_CREATE_PATH, ACCOUNT_INCOME_RECORD_PATH, ACCOUNT_DELETE_PATH, ACCOUNT_GET_ALL_PATH, ACCOUNT_GET_RECORDS_PATH,
     ACCOUNT_UPDATE_PATH, ACCOUNT_EXPEND_RECORD_PATH, ACCOUNT_TRANSFER_RECORD_PATH, ACCOUNT_MONTH_BALANCE_PATH,
-    ACCOUNT_UPDATE_RECORD_PATH, ACCOUNT_DELETE_RECORD_PATH
+    ACCOUNT_UPDATE_RECORD_PATH, ACCOUNT_DELETE_RECORD_PATH,
+    ACCOUNT_GET_RECORD_PATH
 } from './Constant';
 import { ApiResponse, SimpleResponse } from '../util/Interface';
 import * as AppUtil from '../util/AppUtil';
@@ -63,6 +64,7 @@ export interface BalanceDetailVo {
 export interface AccountResponse extends ApiResponse<Account> { }
 export interface AccountListResponse extends ApiResponse<Account[]> { }
 export interface AccountRecordListResponse extends ApiResponse<AccountRecordVo[]> { }
+export interface AccountRecordResponse extends ApiResponse<AccountRecordVo> { }
 export interface AccountMonthBalanceResponse extends ApiResponse<MonthBalanceVo> { }
 
 const getAccounts = async (): Promise<AccountListResponse> => {
@@ -96,6 +98,12 @@ const getRecords = async (accountId: string): Promise<AccountRecordListResponse>
         x.transDate = new Date(x.transDate);
         return x;
     });
+    return data;
+};
+
+const getRecord = async (recordId: string): Promise<AccountRecordResponse> => {
+    const response = await axios.get(ACCOUNT_GET_RECORD_PATH, { params: { recordId } });
+    const data: AccountRecordResponse = response.data;
     return data;
 };
 
@@ -135,4 +143,4 @@ const deleteRecord = async (recordId: string): Promise<SimpleResponse> => {
     return data;
 };
 
-export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, getMonthBalance, income, transfer, expend, updateRecord, deleteRecord };
+export default { getAccounts, createAccount, updateAccount, deleteAccount, getRecords, getRecord, getMonthBalance, income, transfer, expend, updateRecord, deleteRecord };
