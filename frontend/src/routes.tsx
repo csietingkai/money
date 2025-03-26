@@ -1,6 +1,6 @@
 import React from 'react';
 import CIcon from '@coreui/icons-react';
-import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilMonitor, cilSearch, cilSpeedometer, cilSwapHorizontal } from '@coreui/icons';
+import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilList, cilMonitor, cilSearch, cilSpeedometer, cilSwapHorizontal } from '@coreui/icons';
 
 export type RouteItem = {
     type: 'item';
@@ -57,6 +57,13 @@ const routes: Route[] = [
         path: 'account',
         icon: <CIcon icon={cilBank} customClassName='nav-icon' />,
         component: React.lazy(() => import('./views/account/AccountPage'))
+    },
+    {
+        type: 'item',
+        name: 'Record Query',
+        path: 'recordQuery',
+        icon: <CIcon icon={cilList} customClassName='nav-icon' />,
+        component: React.lazy(() => import('./views/account/AccountRecordQueryPage'))
     },
     {
         type: 'title',

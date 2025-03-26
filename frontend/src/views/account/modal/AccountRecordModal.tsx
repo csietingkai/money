@@ -1,21 +1,10 @@
-import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
-import CIcon from '@coreui/icons-react';
+import React from 'react';
+import { CButton, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 import moment from 'moment';
-import qrcode from 'qrcode';
-import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../../reducer/PropsMapper';
-import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../../../reducer/Selector';
-import AccountApi, { Account, AccountRecordResponse, AccountRecordVo } from '../../../api/account';
+import AccountApi, { Account, AccountRecordVo } from '../../../api/account';
 import FinancailFileApi from '../../../api/financailFile';
-import AppConfirmModal from '../../../components/AppConfirmModal';
-import AppPagination from '../../../components/AppPagination';
 import * as AppUtil from '../../../util/AppUtil';
-import { Action, SimpleResponse, Option } from '../../../util/Interface';
-import { StockType } from '../../../util/Enum';
-import { DATA_COUNT_PER_PAGE } from '../../../util/Constant';
-import currencyIcon from '../../../assets/currency';
+import { SimpleResponse, Option } from '../../../util/Interface';
 
 export type AccountRecordModalMode = 'income' | 'transfer' | 'expend' | '';
 

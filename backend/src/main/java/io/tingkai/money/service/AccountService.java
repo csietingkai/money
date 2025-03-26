@@ -2,9 +2,11 @@ package io.tingkai.money.service;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,7 +84,7 @@ public class AccountService {
 		List<AccountVo> accountVos = entities.stream().map(entity -> {
 			AccountVo accountVo = new AccountVo();
 			accountVo.transform(entity);
-			accountVo.setRemovable(accountRecordFacade.queryAll(entity.getId(), true).size() == 0);
+			accountVo.setRemovable(accountRecordFacade.queryAll(Arrays.asList(entity.getId()), null, null, null, null, true).size() == 0);
 			return accountVo;
 		}).collect(Collectors.toList());
 		return accountVos;
@@ -177,12 +180,15 @@ public class AccountService {
 		return vo;
 	}
 
-	public List<AccountRecordVo> getAllRecords(UUID accountId, boolean latestFirstOrder) {
-		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountId, latestFirstOrder);
-
-		Account account = this.accountFacade.query(accountId);
-		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstant.ACCOUNT_LIST, account.getUserId()));
+	public List<AccountRecordVo> getAllRecords(@Nullable UUID accountId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable String recordType, @Nullable String desc, boolean latestFirstOrder) {
+		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstant.ACCOUNT_LIST, ContextUtil.getUserId()));
 		Map<UUID, Account> accountMap = accounts.stream().collect(Collectors.toMap(Account::getId, acc -> acc));
+
+		List<UUID> accountIds = Arrays.asList(accountId);
+		if (BaseAppUtil.isEmpty(accountId)) {
+			accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
+		}
+		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountIds, startDate, endDate, recordType, desc, latestFirstOrder);
 
 		List<AccountRecordVo> vos = new ArrayList<AccountRecordVo>();
 		for (AccountRecord record : entities) {
@@ -192,10 +198,10 @@ public class AccountService {
 			vo.setTransFromCurrency(accountMap.get(record.getTransFrom()).getCurrency());
 			vo.setTransToName(accountMap.get(record.getTransTo()).getName());
 			vo.setTransToCurrency(accountMap.get(record.getTransTo()).getCurrency());
-			if (!vo.getTransFrom().equals(vo.getTransTo()) && accountId.equals(vo.getTransFrom())) {
+			if (!vo.getTransFrom().equals(vo.getTransTo()) && BaseAppUtil.isPresent(accountId) && accountId.equals(vo.getTransFrom())) {
 				vo.setTransAmount(BigDecimal.ZERO.subtract(vo.getTransAmount()));
 			}
-			vo.setEditable(!isSelfTransferTarget(accountId, vo) && !isLinked(vo.getId()));
+			vo.setEditable(BaseAppUtil.isPresent(accountId) && !isSelfTransferTarget(accountId, vo) && !isLinked(vo.getId()));
 			vo.setRemovable(!isLinked(vo.getId()));
 			vos.add(vo);
 		}

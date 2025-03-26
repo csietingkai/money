@@ -1,5 +1,6 @@
 package io.tingkai.money.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.mongodb.lang.Nullable;
 
 import io.tingkai.base.model.exception.AlreadyExistException;
 import io.tingkai.base.model.exception.FieldMissingException;
@@ -78,9 +77,9 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public AccountResponse<List<AccountRecordVo>> getRecords(@RequestParam UUID accountId, @Nullable @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
-		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, latestFirstOrder);
-		return new AccountResponse<List<AccountRecordVo>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS, accountId.toString());
+	public AccountResponse<List<AccountRecordVo>> getRecords(@RequestParam(required = false) UUID accountId, @RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate, @RequestParam(required = false) String recordType, @RequestParam(required = false) String desc, @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
+		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, startDate, endDate, recordType, desc, latestFirstOrder);
+		return new AccountResponse<List<AccountRecordVo>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORD_PATH, method = RequestMethod.GET)

@@ -3,17 +3,14 @@ import { connect } from 'react-redux';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
-import moment from 'moment';
 import qrcode from 'qrcode';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
-import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, getStockType, isAccountRecordDeletable } from '../../reducer/Selector';
+import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, isAccountRecordDeletable } from '../../reducer/Selector';
 import AccountApi, { Account, AccountRecordVo } from '../../api/account';
-import FinancailFileApi from '../../api/financailFile';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { Action, SimpleResponse, Option } from '../../util/Interface';
-import { StockType } from '../../util/Enum';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 import currencyIcon from '../../assets/currency';
 import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecordModal';
@@ -21,7 +18,6 @@ import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecor
 export interface AccountPageProps {
     accountList: Account[],
     accountRecordDeletable: boolean,
-    stockType: StockType,
     defaultRecordType: string;
     currencyOptions: Option[];
     recordTypeOptions: Option[];
@@ -736,7 +732,6 @@ const mapStateToProps = (state: ReduxState) => {
     return {
         accountList: getAccountList(state),
         accountRecordDeletable: isAccountRecordDeletable(state),
-        stockType: getStockType(state),
         defaultRecordType: getDefaultRecordType(state),
         currencyOptions: getCurrencies(state),
         recordTypeOptions: getRecordTypes(state),

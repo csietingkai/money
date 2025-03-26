@@ -91,8 +91,8 @@ const deleteAccount = async (id: string): Promise<SimpleResponse> => {
     return data;
 };
 
-const getRecords = async (accountId: string): Promise<AccountRecordListResponse> => {
-    const response = await axios.get(ACCOUNT_GET_RECORDS_PATH, { params: { accountId } });
+const getRecords = async (accountId?: string, startDate?: Date, endDate?: Date, recordType?: string, desc?: string): Promise<AccountRecordListResponse> => {
+    const response = await axios.get(ACCOUNT_GET_RECORDS_PATH, { params: { accountId, startDate: AppUtil.toDateStr(startDate, 'YYYY-MM-DD'), endDate: AppUtil.toDateStr(endDate, 'YYYY-MM-DD'), recordType, desc } });
     const data: AccountRecordListResponse = response.data;
     data.data = data.data?.map(x => {
         x.transDate = new Date(x.transDate);

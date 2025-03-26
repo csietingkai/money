@@ -8,13 +8,16 @@ import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import io.tingkai.base.model.exception.FieldMissingException;
 import io.tingkai.base.model.exception.NotExistException;
 import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.base.util.BaseStringUtil;
 import io.tingkai.money.constant.AppConstant;
 import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
@@ -55,8 +58,20 @@ public class AccountRecordFacade {
 		return entities;
 	}
 
-	public List<AccountRecord> queryAll(UUID accountId, boolean latestFirstOrder) {
-		List<AccountRecord> entities = this.accountRecordDao.findByTransFromOrTransTo(accountId, accountId);
+	public List<AccountRecord> queryAll(List<UUID> accountIds, @Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable String recordType, @Nullable String desc, boolean latestFirstOrder) {
+		List<AccountRecord> entities = this.accountRecordDao.findByTransFromInOrTransToIn(accountIds, accountIds);
+		if (BaseAppUtil.isPresent(startDate)) {
+			entities = entities.stream().filter(x -> x.getTransDate().compareTo(startDate.atStartOfDay()) >= 0).collect(Collectors.toList());
+		}
+		if (BaseAppUtil.isPresent(endDate)) {
+			entities = entities.stream().filter(x -> x.getTransDate().compareTo(endDate.atTime(LocalTime.MAX)) <= 0).collect(Collectors.toList());
+		}
+		if (BaseAppUtil.isPresent(recordType)) {
+			entities = entities.stream().filter(x -> BaseStringUtil.equals(recordType, x.getRecordType())).collect(Collectors.toList());
+		}
+		if (BaseAppUtil.isPresent(desc)) {
+			entities = entities.stream().filter(x -> !BaseStringUtil.isBlank(x.getDescription()) && x.getDescription().indexOf(desc) >= 0).collect(Collectors.toList());
+		}
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
 		}
