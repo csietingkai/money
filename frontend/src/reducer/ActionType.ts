@@ -5,6 +5,7 @@ export const SET_USER_SETTING: string = 'SET_USER_SETTING';
 
 // account
 export const SET_ACCOUNT_LIST: string = 'SET_ACCOUNT_LIST';
+export const SET_ACCOUNT_RECORD_QUERY_CONDITION: string = 'SET_ACCOUNT_RECORD_QUERY_CONDITION';
 
 // bank info
 export const SET_BANK_INFO_LIST: string = 'SET_BANK_INFO_LIST';

@@ -2,13 +2,14 @@ import React, { Dispatch } from 'react';
 import { CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CProgress, CProgressBar, CRow, CTabContent, CTabPane } from '@coreui/react';
 import Chart from 'react-google-charts';
 import CIcon from '@coreui/icons-react';
-import { cilBank } from '@coreui/icons';
+import { cilBank, cilExternalLink } from '@coreui/icons';
 import { connect } from 'react-redux';
-import { SetNotifyDispatcher } from '../reducer/PropsMapper';
+import { SetAccountRecordQueryConditionDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import { ReduxState, getAccountList, getFundOwnList, getStockOwnList } from '../reducer/Selector';
 import AccountApi, { Account, MonthBalanceVo } from '../api/account';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
+import AccountRecordQueryCondition from './account/interface/AccountRecordQueryCondition';
 import * as AppUtil from '../util/AppUtil';
 import { Action } from '../util/Interface';
 import { CHART_COLORS, DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
@@ -24,6 +25,8 @@ export interface DashboardProps {
     accountList: Account[];
     ownStockList: UserStockVo[];
     ownFundList: UserFundVo[];
+    setAccountRecordQueryCondition: (queryCondition: AccountRecordQueryCondition) => void;
+    notify: (message: string) => void;
 }
 
 export interface DashboardState {
@@ -94,6 +97,12 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         data.benifit = AppUtil.toNumber((data.total - cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         data.percentage = AppUtil.toNumber((data.benifit * 100 / cost).toFixed(DEFAULT_DECIMAL_PRECISION));
         return data;
+    };
+
+    private recordQueryPage = (recordType: string, startDate: Date, endDate: Date) => {
+        const { setAccountRecordQueryCondition } = this.props;
+        setAccountRecordQueryCondition({ recordType, startDate, endDate });
+        window.location.assign('/#/recordQuery');
     };
 
     private balanceCard = (key: string, values: AccountBalance[], icon: string[] = cilBank): React.ReactNode => {
@@ -184,7 +193,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                         </CNav>
                         <CTabContent>
                             {
-                                yms.map(r => {
+                                yms.map((r, ri) => {
                                     return (
                                         <CTabPane key={`${key}-${r}-tabcontent`} visible={activeTab[key] === r} className='mt-2 col-xs-12 mx-auto'>
                                             <Chart
@@ -200,7 +209,14 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                     si !== 0 && (
                                                         <div className='progress-group' key={`${key}-${r}-series-${si}`}>
                                                             <div className='progress-group-header'>
-                                                                <span>{series[0]}</span>
+                                                                <span>
+                                                                    {series[0]}
+                                                                    <CIcon icon={cilExternalLink} className='ms-1' onClick={() => {
+                                                                        const startDate = new Date(monthBalance.details[ri].year, monthBalance.details[ri].month - 1, 1);
+                                                                        const endDate = new Date(monthBalance.details[ri].year, monthBalance.details[ri].month, 0);
+                                                                        this.recordQueryPage(series[0], startDate, endDate);
+                                                                    }} />
+                                                                </span>
                                                                 <span className='ms-auto fw-semibold'>
                                                                     {AppUtil.numberComma(series[1])}{' '}
                                                                     <span className='text-body-secondary small'>({series.percent}%)</span>
@@ -294,8 +310,6 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                         {this.monthSumChart()}
                     </CCol>
                 </CRow>
-                {/* TODO 本月消費類別 */}
-                {/* TODO 近六個月支出收入 */}
             </React.Fragment>
         );
     }
@@ -307,8 +321,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<AccountRecordQueryCondition | string>>) => {
     return {
+        setAccountRecordQueryCondition: SetAccountRecordQueryConditionDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch)
     };
 };

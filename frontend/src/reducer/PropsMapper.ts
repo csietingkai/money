@@ -1,5 +1,5 @@
 import { Dispatch } from 'react';
-import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition, SetBankInfoList } from './Action';
+import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition, SetBankInfoList, SetAccountRecordQueryCondition } from './Action';
 import { AuthToken, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { BankInfo } from '../api/bankInfo';
@@ -12,6 +12,7 @@ import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
 import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
 import { Action } from '../util/Interface';
+import AccountRecordQueryCondition from '../views/account/interface/AccountRecordQueryCondition';
 
 // auth
 export const LoginDispatcher = (dispatch: Dispatch<Action<AuthToken>>) => (vo: AuthToken): void => dispatch(Login(vo));
@@ -20,6 +21,7 @@ export const SetUserSettingDispatcher = (dispatch: Dispatch<Action<UserSetting |
 
 // account
 export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) => (accounts: Account[]): void => dispatch(SetAccountList(accounts));
+export const SetAccountRecordQueryConditionDispatcher = (dispatch: Dispatch<Action<AccountRecordQueryCondition>>) => (condition: AccountRecordQueryCondition): void => dispatch(SetAccountRecordQueryCondition(condition));
 
 // bank info
 export const SetBankInfoListDispatcher = (dispatch: Dispatch<Action<BankInfo[]>>) => (bankInfos: BankInfo[]): void => dispatch(SetBankInfoList(bankInfos));

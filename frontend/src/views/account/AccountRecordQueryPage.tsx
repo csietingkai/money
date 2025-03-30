@@ -1,39 +1,41 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-import { cilChevronDoubleRight, cilMediaSkipForward, cilPencil, cilTrash } from '@coreui/icons';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormSelect, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { cilChevronDoubleRight, cilMediaSkipForward } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
-import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
-import { ReduxState, getAccountList, getCurrencies, getDefaultRecordType, getRecordTypes, isAccountRecordDeletable } from '../../reducer/Selector';
+import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
+import { ReduxState, getAccountList, getAccountRecordQueryCondition, getRecordTypes } from '../../reducer/Selector';
 import AccountApi, { Account, AccountRecordVo } from '../../api/account';
-import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
-import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecordModal';
 import * as AppUtil from '../../util/AppUtil';
 import { Action, Option } from '../../util/Interface';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
+import AccountRecordQueryCondition from './interface/AccountRecordQueryCondition';
 
 export interface AccountRecordQueryPageProps {
-    accountList: Account[],
+    accountList: Account[];
+    accountRecordQueryCondition: AccountRecordQueryCondition;
     recordTypeOptions: Option[];
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
 
+interface AccountRecordSearchConditionForm extends AccountRecordQueryCondition {
+    useDateRange: boolean;
+    startDate: Date;
+    endDate: Date;
+    useRecordType: boolean;
+    recordType: string;
+    useAccountId: boolean;
+    accountId: string;
+    useDesc: boolean;
+    desc: string;
+}
+
 export interface AccountRecordQueryPageState {
     recordTypeMap: { [key: string]: string; };
-    searchConditionForm: {
-        useDateRange: boolean;
-        startDate: Date;
-        endDate: Date;
-        useRecordType: boolean;
-        recordType: string;
-        useAccountId: boolean;
-        accountId: string;
-        useDesc: boolean;
-        desc: string;
-    };
+    searchConditionForm: AccountRecordSearchConditionForm;
     isSearchConditionFormValid: {
         startDate: boolean;
         endDate: boolean;
@@ -47,19 +49,10 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
 
     constructor(props: AccountRecordQueryPageProps) {
         super(props);
+        const searchConditionForm: AccountRecordSearchConditionForm = this.handleSearchConditionForm(props.accountRecordQueryCondition)
         this.state = {
             recordTypeMap: props.recordTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
-            searchConditionForm: {
-                useDateRange: false,
-                startDate: new Date(),
-                endDate: new Date(),
-                useRecordType: false,
-                recordType: props.recordTypeOptions[0]?.key,
-                useAccountId: false,
-                accountId: props.accountList[0]?.id,
-                useDesc: false,
-                desc: ''
-            },
+            searchConditionForm,
             isSearchConditionFormValid: {
                 startDate: true,
                 endDate: true,
@@ -70,11 +63,49 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
         };
     }
 
+    private handleSearchConditionForm = (accountRecordQueryCondition: AccountRecordQueryCondition): AccountRecordSearchConditionForm => {
+        const { recordTypeOptions, accountList } = this.props;
+        const searchConditionForm: AccountRecordSearchConditionForm = {
+            useDateRange: false,
+            startDate: new Date(),
+            endDate: new Date(),
+            useRecordType: false,
+            recordType: recordTypeOptions[0]?.key,
+            useAccountId: false,
+            accountId: accountList[0]?.id,
+            useDesc: false,
+            desc: ''
+        };
+
+        const {startDate, endDate, recordType, accountId, desc} = accountRecordQueryCondition;
+        if (AppUtil.isValidDate(startDate)) {
+            searchConditionForm.useDateRange = true;
+            searchConditionForm.startDate = startDate as Date;
+        }
+        if (AppUtil.isValidDate(endDate)) {
+            searchConditionForm.useDateRange = true;
+            searchConditionForm.endDate = endDate as Date;
+        }
+        if (recordType && recordTypeOptions.find(o => o.key === recordType)) {
+            searchConditionForm.useRecordType = true;
+            searchConditionForm.recordType = recordType;
+        }
+        if (accountId && accountList.find(o => o.id === accountId)) {
+            searchConditionForm.useAccountId = true;
+            searchConditionForm.accountId = accountId;
+        }
+        if (desc) {
+            searchConditionForm.useDesc = true;
+            searchConditionForm.desc = desc;
+        }
+        return searchConditionForm;
+    }
+
     private validSearchCondition = (): boolean => {
         const { searchConditionForm, isSearchConditionFormValid } = this.state;
         const { useDateRange, useDesc, startDate, endDate, desc } = searchConditionForm;
-        if (useDateRange && !isNaN((searchConditionForm.startDate as any)?.getTime()) && !isNaN((searchConditionForm.endDate as any)?.getTime())) {
-            const isDateRangeValid = (AppUtil.toDateStr(startDate, 'YYYY-MM-DD') || '') <= (AppUtil.toDateStr(searchConditionForm.endDate, 'YYYY-MM-DD') || '');
+        if (useDateRange && AppUtil.isValidDate(startDate) && AppUtil.isValidDate(endDate)) {
+            const isDateRangeValid = (AppUtil.toDateStr(startDate, 'YYYY-MM-DD') || '') <= (AppUtil.toDateStr(endDate, 'YYYY-MM-DD') || '');
             if (!isDateRangeValid) {
                 this.setState({ isSearchConditionFormValid: { ...isSearchConditionFormValid, startDate: false, endDate: false } });
                 return false;
@@ -144,7 +175,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                                 if (!checked) {
                                                     isSearchConditionFormValid.startDate = true;
                                                     isSearchConditionFormValid.endDate = true;
-                                                } else if (!isNaN((searchConditionForm.startDate as any)?.getTime()) && !isNaN((searchConditionForm.endDate as any)?.getTime())) {
+                                                } else if (AppUtil.isValidDate(searchConditionForm.startDate) && AppUtil.isValidDate(searchConditionForm.endDate)) {
                                                     const isDateRangeValid = (AppUtil.toDateStr(searchConditionForm.startDate, 'YYYY-MM-DD') || '') <= (AppUtil.toDateStr(searchConditionForm.endDate, 'YYYY-MM-DD') || '');
                                                     isSearchConditionFormValid.startDate = isDateRangeValid;
                                                     isSearchConditionFormValid.endDate = isDateRangeValid;
@@ -164,7 +195,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                                     value={moment(searchConditionForm.startDate).format('YYYY-MM-DD')}
                                                     onChange={(event) => {
                                                         const startDate: Date = new Date(event.target.value);
-                                                        if (!isNaN((startDate as any)?.getTime()) && !isNaN((searchConditionForm.endDate as any)?.getTime())) {
+                                                        if (AppUtil.isValidDate(startDate) && AppUtil.isValidDate(searchConditionForm.endDate)) {
                                                             const isDateRangeValid = (AppUtil.toDateStr(startDate, 'YYYY-MM-DD') || '') <= (AppUtil.toDateStr(searchConditionForm.endDate, 'YYYY-MM-DD') || '');
                                                             isSearchConditionFormValid.startDate = isDateRangeValid;
                                                             isSearchConditionFormValid.endDate = isDateRangeValid;
@@ -185,7 +216,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                                     value={moment(searchConditionForm.endDate).format('YYYY-MM-DD')}
                                                     onChange={(event) => {
                                                         const endDate: Date = new Date(event.target.value);
-                                                        if (!isNaN((searchConditionForm.startDate as any)?.getTime()) && !isNaN((endDate as any)?.getTime())) {
+                                                        if (AppUtil.isValidDate(searchConditionForm.startDate) && AppUtil.isValidDate(endDate)) {
                                                             const isDateRangeValid = (AppUtil.toDateStr(searchConditionForm.startDate, 'YYYY-MM-DD') || '') <= (AppUtil.toDateStr(endDate, 'YYYY-MM-DD') || '');
                                                             isSearchConditionFormValid.startDate = isDateRangeValid;
                                                             isSearchConditionFormValid.endDate = isDateRangeValid;
@@ -348,6 +379,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
 const mapStateToProps = (state: ReduxState) => {
     return {
         accountList: getAccountList(state),
+        accountRecordQueryCondition: getAccountRecordQueryCondition(state),
         recordTypeOptions: getRecordTypes(state)
     };
 };

@@ -13,6 +13,7 @@ import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
 import { BankInfo } from '../api/bankInfo';
+import AccountRecordQueryCondition from '../views/account/interface/AccountRecordQueryCondition';
 
 export interface ReduxState {
     auth: ReduxAuthState;
@@ -52,12 +53,15 @@ export const getDefaultRecordType = (state: ReduxState): string => getUserSettin
 // accountReducer
 export interface ReduxAccountState {
     list: Account[];
+    queryCondition: AccountRecordQueryCondition;
 }
 export const DEFAULT_REDUX_ACCOUNT_STATE: ReduxAccountState = {
-    list: []
+    list: [],
+    queryCondition: {}
 };
 const getAccountState = (state: ReduxState): ReduxAccountState => state.account;
 export const getAccountList = (state: ReduxState): Account[] => getAccountState(state)?.list;
+export const getAccountRecordQueryCondition = (state: ReduxState): AccountRecordQueryCondition => getAccountState(state)?.queryCondition;
 
 export interface ReduxBankInfoState {
     list: BankInfo[];
