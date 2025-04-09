@@ -44,12 +44,12 @@ public class AccountRecordFacade {
 	}
 
 	public List<AccountRecord> queryAllInMonth(List<UUID> accountIds, int year, int month) {
-		LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
+		LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0, 0, 0);
 		LocalDateTime endOfMonth = null;
 		if (month == 12) {
-			endOfMonth = LocalDate.of(year, Month.DECEMBER, 31).atTime(LocalTime.MAX);
+			endOfMonth = LocalDateTime.of(year, Month.DECEMBER, 31, 23, 59, 59, 999);
 		} else {
-			endOfMonth = LocalDate.of(year, month + 1, 1).minusDays(1).atTime(LocalTime.MAX);
+			endOfMonth = LocalDateTime.of(year, month + 1, 1, 23, 59, 59, 999).minusDays(1);
 		}
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromInAndTransToInAndTransDateBetween(accountIds, accountIds, startOfMonth, endOfMonth);
 		if (entities.size() == 0) {
