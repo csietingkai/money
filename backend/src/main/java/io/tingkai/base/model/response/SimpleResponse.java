@@ -5,7 +5,11 @@ import io.tingkai.base.constant.BaseMessageConstant;
 public class SimpleResponse extends BaseResponse<Void> {
 
 	public SimpleResponse(boolean success) {
-		super(success, null, (success ? BaseMessageConstant.SUCCESS : BaseMessageConstant.FAIL));
+		this(success, (success ? BaseMessageConstant.SUCCESS : BaseMessageConstant.FAIL));
+	}
+
+	public SimpleResponse(boolean success, String pattern, String... params) {
+		super(success, null, pattern, params);
 	}
 
 	public SimpleResponse(Exception e) {

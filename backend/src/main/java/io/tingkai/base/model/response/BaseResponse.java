@@ -5,7 +5,7 @@ import java.text.MessageFormat;
 import lombok.Data;
 
 @Data
-public abstract class BaseResponse<T> {
+public class BaseResponse<T> {
 
 	private boolean success;
 
