@@ -49,7 +49,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
 
     constructor(props: AccountRecordQueryPageProps) {
         super(props);
-        const searchConditionForm: AccountRecordSearchConditionForm = this.handleSearchConditionForm(props.accountRecordQueryCondition)
+        const searchConditionForm: AccountRecordSearchConditionForm = this.handleSearchConditionForm(props.accountRecordQueryCondition);
         this.state = {
             recordTypeMap: props.recordTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
             searchConditionForm,
@@ -77,7 +77,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             desc: ''
         };
 
-        const {startDate, endDate, recordType, accountId, desc} = accountRecordQueryCondition;
+        const { startDate, endDate, recordType, accountId, desc } = accountRecordQueryCondition;
         if (AppUtil.isValidDate(startDate)) {
             searchConditionForm.useDateRange = true;
             searchConditionForm.startDate = startDate as Date;
@@ -99,7 +99,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             searchConditionForm.desc = desc;
         }
         return searchConditionForm;
-    }
+    };
 
     private validSearchCondition = (): boolean => {
         const { searchConditionForm, isSearchConditionFormValid } = this.state;
@@ -162,7 +162,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                             </div>
                         </CCardHeader>
                         <CCardBody>
-                            <CForm onKeyDown={AppUtil.bindEnterKey(this.search)}>
+                            <CForm onKeyDown={AppUtil.bindEnterKey(this.search)} onSubmit={(event: React.FormEvent<HTMLFormElement>) => event.preventDefault()}>
                                 <CRow className='mb-3'>
                                     <CCol xs={3}>
                                         <CFormSwitch
