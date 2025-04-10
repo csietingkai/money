@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import io.tingkai.base.model.exception.AlreadyExistException;
 import io.tingkai.base.model.exception.FieldMissingException;
 import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.model.response.BaseResponse;
 import io.tingkai.base.model.response.SimpleResponse;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.request.ExchangeRateTradeRequest;
-import io.tingkai.money.model.response.ExchangeRateResponse;
 import io.tingkai.money.model.vo.ExchangeRateRecordVo;
 import io.tingkai.money.model.vo.ExchangeRateVo;
 import io.tingkai.money.service.DataFetcherService;
@@ -40,15 +40,15 @@ public class ExchangeRateController {
 	private DataFetcherService pythonFetcherService;
 
 	@RequestMapping(value = ExchangeRateController.GET_ALL_PATH, method = RequestMethod.GET)
-	public ExchangeRateResponse<List<ExchangeRateVo>> getAll() {
+	public BaseResponse<List<ExchangeRateVo>> getAll() {
 		List<ExchangeRateVo> list = this.exchangeRateService.getAll();
-		return new ExchangeRateResponse<List<ExchangeRateVo>>(true, list, MessageConstant.EXCHANGE_RATE_GET_ALL_SUCCESS);
+		return new BaseResponse<List<ExchangeRateVo>>(true, list, MessageConstant.EXCHANGE_RATE_GET_ALL_SUCCESS);
 	}
 
 	@RequestMapping(value = ExchangeRateController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public ExchangeRateResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency) {
+	public BaseResponse<List<ExchangeRateRecordVo>> getRecords(@RequestParam String currency) {
 		List<ExchangeRateRecordVo> records = this.exchangeRateService.getAllRecords(currency);
-		return new ExchangeRateResponse<List<ExchangeRateRecordVo>>(true, records, MessageConstant.EXCHANGE_RATE_GET_SUCCESS, currency);
+		return new BaseResponse<List<ExchangeRateRecordVo>>(true, records, MessageConstant.EXCHANGE_RATE_GET_SUCCESS, currency);
 	}
 
 	@RequestMapping(value = ExchangeRateController.REFRESH_PATH, method = RequestMethod.POST)

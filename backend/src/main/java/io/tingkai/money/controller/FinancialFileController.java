@@ -21,12 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 import io.tingkai.base.model.exception.AlreadyExistException;
 import io.tingkai.base.model.exception.FieldMissingException;
 import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.model.response.BaseResponse;
+import io.tingkai.base.model.response.SimpleResponse;
 import io.tingkai.base.util.BaseAppUtil;
 import io.tingkai.base.util.BaseFileUtil;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.FinancialFile;
 import io.tingkai.money.model.exception.FinancialFileNotFoundException;
-import io.tingkai.money.model.response.FileResponse;
 import io.tingkai.money.service.FinancialFileService;
 
 @RestController
@@ -44,7 +45,7 @@ public class FinancialFileController {
 	private FinancialFileService fileService;
 
 	@RequestMapping(value = FinancialFileController.LIST_PATH, method = RequestMethod.GET)
-	public FileResponse<List<FinancialFile>> list(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String type) {
+	public BaseResponse<List<FinancialFile>> list(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) String type) {
 		List<FinancialFile> files = null;
 		if (BaseAppUtil.isAllPresent(date, type)) {
 			this.fileService.getAll(date.atStartOfDay(), type);
@@ -55,19 +56,19 @@ public class FinancialFileController {
 		} else {
 			files = this.fileService.getAll();
 		}
-		return new FileResponse<List<FinancialFile>>(true, files, MessageConstant.SUCCESS);
+		return new BaseResponse<List<FinancialFile>>(true, files, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = FinancialFileController.UPLOAD_PATH, method = RequestMethod.POST)
-	public FileResponse<Void> upload(@RequestParam MultipartFile file, @RequestParam LocalDate date, @RequestParam String type) throws AlreadyExistException, FieldMissingException, IOException {
+	public SimpleResponse upload(@RequestParam MultipartFile file, @RequestParam LocalDate date, @RequestParam String type) throws AlreadyExistException, FieldMissingException, IOException {
 		FinancialFile entity = this.fileService.upload(file, type, date.atStartOfDay());
-		return new FileResponse<Void>(true, null, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
+		return new SimpleResponse(true, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
 	}
 
 	@RequestMapping(value = FinancialFileController.UPDATE_PATH, method = RequestMethod.POST)
-	public FileResponse<Void> update(@RequestParam UUID id, @RequestParam LocalDate date, @RequestParam String type) throws NotExistException, FieldMissingException {
+	public SimpleResponse update(@RequestParam UUID id, @RequestParam LocalDate date, @RequestParam String type) throws NotExistException, FieldMissingException {
 		FinancialFile entity = this.fileService.update(id, type, date.atStartOfDay());
-		return new FileResponse<Void>(true, null, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
+		return new SimpleResponse(true, MessageConstant.FILE_UPLOAD_SUCCESS, entity.getFilename());
 	}
 
 	@RequestMapping(value = FinancialFileController.DOWNLOAD_PATH, method = RequestMethod.GET)
@@ -79,8 +80,8 @@ public class FinancialFileController {
 	}
 
 	@RequestMapping(value = FinancialFileController.DELETE_PATH, method = RequestMethod.DELETE)
-	public FileResponse<Void> delete(@RequestParam UUID id) throws NotExistException {
+	public SimpleResponse delete(@RequestParam UUID id) throws NotExistException {
 		FinancialFile entity = this.fileService.delete(id);
-		return new FileResponse<Void>(true, null, MessageConstant.FILE_DELETE_SUCCESS, entity.getFilename());
+		return new SimpleResponse(true, MessageConstant.FILE_DELETE_SUCCESS, entity.getFilename());
 	}
 }

@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.tingkai.base.model.exception.FieldMissingException;
 import io.tingkai.base.model.exception.NotExistException;
+import io.tingkai.base.model.response.BaseResponse;
 import io.tingkai.base.model.response.SimpleResponse;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.UserSetting;
-import io.tingkai.money.model.response.UserResponse;
 import io.tingkai.money.service.UserService;
 
 @RestController
@@ -27,9 +27,9 @@ public class UserController {
 	private UserService userService;
 
 	@RequestMapping(value = UserController.GET_SETTING_PATH, method = RequestMethod.GET)
-	public UserResponse<UserSetting> get(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
+	public BaseResponse<UserSetting> get(@RequestParam(required = false) String code, @RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean sort) {
 		UserSetting setting = userService.getUserSetting();
-		return new UserResponse<UserSetting>(true, setting, MessageConstant.SUCCESS);
+		return new BaseResponse<UserSetting>(true, setting, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = UserController.UPDATE_SETTING_PATH, method = RequestMethod.POST)
