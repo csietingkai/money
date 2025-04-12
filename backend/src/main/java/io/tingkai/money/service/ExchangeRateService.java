@@ -130,17 +130,17 @@ public class ExchangeRateService {
 			ExchangeRateRecordVo vo = new ExchangeRateRecordVo();
 			vo.transform(record);
 			for (int j = 0; j < sums.length; j++) {
-				sums[j] = sums[j].add(record.getCashSell());
+				sums[j] = sums[j].add(record.getSpotSell());
 			}
 			int di = 0;
 			if (i >= CodeConstant.MA_DAYS[di] - 1) {
 				vo.setMa5(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getSpotSell());
 			}
 			di++;
 			if (i >= CodeConstant.MA_DAYS[di] - 1) {
 				vo.setMa10(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getSpotSell());
 			}
 			di++;
 			if (i >= CodeConstant.MA_DAYS[di] - 1) {
@@ -148,23 +148,23 @@ public class ExchangeRateService {
 				// standard deviaction
 				BigDecimal total = BigDecimal.ZERO;
 				for (int j = 0; j < CodeConstant.MA_DAYS[di]; j++) {
-					total = total.add(BigDecimal.valueOf(Math.pow(records.get(i - j).getCashSell().subtract(ma20).doubleValue(), 2)));
+					total = total.add(BigDecimal.valueOf(Math.pow(records.get(i - j).getSpotSell().subtract(ma20).doubleValue(), 2)));
 				}
 				double standardDeviaction = Math.sqrt(total.divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]), BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP).doubleValue());
 				vo.setMa20(ma20);
 				vo.setBbup(ma20.add(BigDecimal.valueOf(standardDeviaction)).add(BigDecimal.valueOf(standardDeviaction)).setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
 				vo.setBbdown(ma20.subtract(BigDecimal.valueOf(standardDeviaction)).subtract(BigDecimal.valueOf(standardDeviaction)).setScale(BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getSpotSell());
 			}
 			di++;
 			if (i >= CodeConstant.MA_DAYS[di] - 1) {
 				vo.setMa40(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di])));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getSpotSell());
 			}
 			di++;
 			if (i >= CodeConstant.MA_DAYS[di] - 1) {
 				vo.setMa60(sums[di].divide(BigDecimal.valueOf(CodeConstant.MA_DAYS[di]), 5, RoundingMode.HALF_UP));
-				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getCashSell());
+				sums[di] = sums[di].subtract(records.get(i - CodeConstant.MA_DAYS[di] + 1).getSpotSell());
 			}
 			vos.add(vo);
 		}

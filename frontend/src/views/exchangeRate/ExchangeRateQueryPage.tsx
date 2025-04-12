@@ -51,6 +51,10 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
 
     private onTabChange = async (currency: string) => {
         const { setLoading } = this.props;
+        const { activeTab } = this.state;
+        if (activeTab === currency) {
+            return;
+        }
         setLoading(true);
         const recordVos = await this.fetchExchangeRateRecords(currency);
         this.setState({ activeTab: currency, exchangeRateRecords: recordVos });
