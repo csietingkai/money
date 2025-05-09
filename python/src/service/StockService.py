@@ -4,6 +4,7 @@ import requests
 import pandas
 import time
 import re
+import yfinance as yf
 from typing import Optional
 
 from entity.Stock import Stock
@@ -12,103 +13,60 @@ from facade import StockFacade, StockRecordFacade
 from util import AppUtil, CodeConstant
 
 MarketTypes = {
-    'LSE': '2',
-	'OTC': '4',
-	'LES': '5'
+    '上市': 'LSE',
+	'上櫃': 'OTC',
+	'興櫃': 'LES'
 }
 
-def fetchStocks(marketType):
+def fetchStock(targetCode):
     try:
-        print('[INFO] fetching stocks with marketType<{marketType}> data...'.format(marketType = marketType))
-        url = CodeConstant.STOCK_LIST_URL.format(mode = MarketTypes[marketType])
-        res = requests.get(url)
-        data = pandas.read_html(res.text)[0]
+        url = CodeConstant.STOCK_LIST_URL.format(owncode = targetCode)
+        data = pandas.read_html(url, encoding='big5')[0]
         length = len(data[0])
         print('[INFO] fetched {length} data, processing...'.format(length = length))
         for row in range(length):
             # skip csv title in first row
-            if row == 0 or len(data[0][row].split()) != 2:
+            if row == 0:
+                continue
+
+            # rowNo = data[0][row]
+            isin = data[1][row]
+            code = data[2][row]
+            name = data[3][row]
+            marketType = data[4][row]
+            # stockType = data[5][row]
+            industryType = data[6][row]
+            createDt = data[7][row]
+            cfiCode = data[8][row]
+            desc = data[9][row]
+
+            if targetCode != code:
                 continue
             # skip if already exist
-            code = data[0][row].split()[0]
-            if isWarrant(code):
-                print('[DEBUG] stock code<{code}> is warrant, skipping...'.format(code = code))
-                continue
+            entity = Stock()
             queryEntity = StockFacade.queryByCode(code)
             if queryEntity:
-                print('[DEBUG] stock code<{code}> already exists, skipping...'.format(code = code))
-                continue
-            name = data[0][row].split()[1]
-            entity = Stock()
+                print('[DEBUG] stock code<{code}> already exists.'.format(code = code))
+                entity.id = queryEntity.id
             entity.code = code
             entity.name = name
-            entity.isin_code = data[1][row]
+            entity.isin_code = isin
             entity.currency = 'TWD'
-            year = data[2][row].split('/')[0]
-            month = data[2][row].split('/')[1]
-            day = data[2][row].split('/')[2]
+            year = createDt.split('/')[0]
+            month = createDt.split('/')[1]
+            day = createDt.split('/')[2]
             entity.offering_date = datetime.datetime(int(year), int(month), int(day))
-            entity.market_type = marketType
-            entity.industry_type = AppUtil.toString(data[4][row], None)
-            entity.cfi_code = AppUtil.toString(data[5][row], None)
-            entity.description = AppUtil.toString(data[6][row], None)
+            entity.market_type = AppUtil.toString(MarketTypes[marketType], None)
+            entity.industry_type = AppUtil.toString(industryType, None)
+            entity.cfi_code = AppUtil.toString(cfiCode, None)
+            entity.description = AppUtil.toString(desc, None)
             print('[INFO] fetching stock<{code}>\'s symbol...'.format(code = code))
-            response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = entity.isin_code), headers = CodeConstant.YAHOO_REQUEST_HEADER)
-            response = response.json()
-            if len(response['quotes']) > 0:
-                entity.symbol = response['quotes'][0]['symbol']
-            StockFacade.insert(entity)
-            time.sleep(3)
-        return 'SUCCESS'
-    except Exception as e:
-        return str(e)
-
-def fetchStock(targetCode):
-    try:
-        for idx, marketType in enumerate(['LES', 'OTC', 'LSE']):
-            print('[INFO] fetching stocks with marketType<{marketType}> data...'.format(marketType = marketType))
-            url = CodeConstant.STOCK_LIST_URL.format(mode = MarketTypes[marketType])
-            res = requests.get(url)
-            data = pandas.read_html(res.text)[0]
-            length = len(data[0])
-            print('[INFO] fetched {length} data, processing...'.format(length = length))
-            for row in range(length):
-                # skip csv title in first row
-                if row == 0 or len(data[0][row].split()) != 2:
-                    continue
-
-                code = data[0][row].split()[0]
-                if targetCode != code:
-                    continue
-                # skip if already exist
-                entity = Stock()
-                queryEntity = StockFacade.queryByCode(code)
-                if queryEntity:
-                    print('[DEBUG] stock code<{code}> already exists, skipping...'.format(code = code))
-                    entity.id = queryEntity.id
-                name = data[0][row].split()[1]
-                entity.code = code
-                entity.name = name
-                entity.isin_code = data[1][row]
-                entity.currency = 'TWD'
-                year = data[2][row].split('/')[0]
-                month = data[2][row].split('/')[1]
-                day = data[2][row].split('/')[2]
-                entity.offering_date = datetime.datetime(int(year), int(month), int(day))
-                entity.market_type = marketType
-                entity.industry_type = AppUtil.toString(data[4][row], None)
-                entity.cfi_code = AppUtil.toString(data[5][row], None)
-                entity.description = AppUtil.toString(data[6][row], None)
-                print('[INFO] fetching stock<{code}>\'s symbol...'.format(code = code))
-                response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = entity.isin_code), headers = CodeConstant.YAHOO_REQUEST_HEADER)
-                response = response.json()
-                if len(response['quotes']) > 0:
-                    entity.symbol = response['quotes'][0]['symbol']
-                # entity has id means update
-                if entity.id:
-                    StockFacade.update(entity)
-                else:
-                    StockFacade.insert(entity)
+            entity.symbol = yf.Ticker(entity.isin_code).ticker
+            # entity has id means update
+            if entity.id:
+                StockFacade.update(entity)
+            else:
+                StockFacade.insert(entity)
         return 'SUCCESS'
     except Exception as e:
         return str(e)
@@ -129,72 +87,51 @@ def fetchStockRecord(code):
         startDate += datetime.timedelta(days = 1)
 
     if stock.symbol:
-        return fetchStockRecordFromYahoo(stock.symbol, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
+        return fetchStockRecordFromYahoo(stock.symbol, startDate, endDate)
     else:
         fetchStockRecordFromTwse(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
         fetchStockRecordFromTpex(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
         return 'SUCCESS'
 
-def fetchStockRecordFromYahoo(symbol: str, start: int, end: int):
+def fetchStockRecordFromYahoo(symbol: str, start: datetime, end: datetime):
     try:
         print('[INFO] fetching stocks<{symbol}>\'s records from yahoo...'.format(symbol = symbol))
         code = StockFacade.queryCodeBySymbol(symbol)
-        url = CodeConstant.STOCK_RECORDS_URL.format(symbol = symbol, start = start, end = end)
-        with requests.Session() as s:
-            noDataDates = []
-            try:
-                download = s.get(url, headers = CodeConstant.YAHOO_REQUEST_HEADER)
+        ticker = yf.Ticker(symbol)
+        data = ticker.history(start = start, end = end)
 
-                decoded_content = download.content.decode('utf-8')
-                response = json.loads(decoded_content)
-                chart = response['chart']
+        data.reset_index(inplace=True)
+        dateLst = data.Date.dt.strftime('%Y-%m-%d')
+        openLst = data.Open
+        closeLst = data.Close
+        highLst = data.High
+        lowLst = data.Low
+        volumeLst = data.Volume
 
-                if chart['error']:
-                    return str(chart['error'])
-
-                dateLst = chart['result'][0]['timestamp']
-                openLst = chart['result'][0]['indicators']['quote'][0]['open']
-                closeLst = chart['result'][0]['indicators']['quote'][0]['close']
-                highLst = chart['result'][0]['indicators']['quote'][0]['high']
-                lowLst = chart['result'][0]['indicators']['quote'][0]['low']
-                volumeLst = chart['result'][0]['indicators']['quote'][0]['volume']
-
-                size = len(dateLst)
-                for i in range(size):
-                    dealDate = datetime.datetime.fromtimestamp(dateLst[i]).replace(hour=0, minute=0)
-                    openPrice = handleYahooPrice(openLst[i])
-                    highPrice = handleYahooPrice(highLst[i])
-                    lowPrice = handleYahooPrice(lowLst[i])
-                    closePrice = handleYahooPrice(closeLst[i])
-                    dealShare = handleYahooPrice(volumeLst[i])
-                    if openPrice == '0.00' or highPrice == '0.00' or lowPrice == '0.00' or closePrice == '0.00':
-                        print('[WARN]: {date} has openPrice<{openPrice}> highPrice<{highPrice}> lowPrice<{lowPrice}> closePrice<{closePrice}>'.format(date = dealDate, openPrice = openPrice, highPrice = highPrice, lowPrice = lowPrice, closePrice = closePrice))
-                        noDataDates.append(dealDate)
-                    else:
-                        entity = StockRecord()
-                        queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
-                        if queryStockRecord:
-                            entity.id = queryStockRecord.id
-                        entity.code = code
-                        entity.deal_date = dealDate
-                        entity.deal_share = dealShare
-                        entity.open_price = openPrice
-                        entity.high_price = highPrice
-                        entity.low_price = lowPrice
-                        entity.close_price = closePrice
-                        # entity has id means update
-                        if entity.id:
-                            StockRecordFacade.update(entity)
-                        else:
-                            StockRecordFacade.insert(entity)
-                for dealDate in noDataDates:
-                    result, dataCnt = fetchStockRecordFromTwse(code, datetime.datetime.timestamp(dealDate))
-                    if result != 'SUCCESS' or dataCnt == 0:
-                        fetchStockRecordFromTpex(code, datetime.datetime.timestamp(dealDate))
-                    time.sleep(3)
-            except Exception as e:
-                print('[ERROR] ' + str(e))
-            s.close()
+        size = len(dateLst)
+        for i in range(size):
+            dealDate = datetime.datetime.strptime(dateLst[i], '%Y-%m-%d').replace(hour=0, minute=0)
+            openPrice = handleYahooPrice(openLst[i])
+            highPrice = handleYahooPrice(highLst[i])
+            lowPrice = handleYahooPrice(lowLst[i])
+            closePrice = handleYahooPrice(closeLst[i])
+            dealShare = handleYahooPrice(volumeLst[i])
+            entity = StockRecord()
+            queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
+            if queryStockRecord:
+                entity.id = queryStockRecord.id
+            entity.code = code
+            entity.deal_date = dealDate
+            entity.deal_share = dealShare
+            entity.open_price = openPrice
+            entity.high_price = highPrice
+            entity.low_price = lowPrice
+            entity.close_price = closePrice
+            # entity has id means update
+            if entity.id:
+                StockRecordFacade.update(entity)
+            else:
+                StockRecordFacade.insert(entity)
         return 'SUCCESS'
     except Exception as e:
         return str(e)

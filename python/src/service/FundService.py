@@ -7,52 +7,6 @@ from entity.FundRecord import FundRecord
 from facade import FundFacade, FundRecordFacade
 from util import AppUtil, CodeConstant
 
-def fetchFunds():
-    hasData = True
-    page = 1
-    while hasData:
-        print('[INFO] fetching page ' + str(page) + ' data...')
-        response = requests.post(CodeConstant.FUND_LIST_URL, json={'page': str(page), 'order': 'isincode-asc'})
-        response = response.json()
-        items = response['items']
-        skipCnt = 0
-        for item in items:
-            entity = Fund()
-            # skip if already exist
-            code = item['fundId']
-            queryEntity = FundFacade.queryByCode(code)
-            if queryEntity:
-                print('[INFO] fund code<' + code + '> already exists, skipping...')
-                skipCnt += 1
-                continue
-            entity.code = code
-            entity.name = item['name']['text']
-            isinCode = item['extent']['isincode']
-            # special condition, sometimes it has two different code but same isin code
-            queryEntity = FundFacade.queryByIsinCode(isinCode)
-            if queryEntity:
-                print('[WARN] fund isinCode<' + isinCode + '> already exists, skipping...')
-                skipCnt += 1
-                continue
-            entity.isin_code = isinCode
-            dateStr = item['hit']['interval']['beginning']
-            offeringDate = datetime.datetime(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:9]))
-            entity.offering_date = offeringDate
-            entity.currency = item['extent']['currency']
-            response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = item['extent']['isincode']), headers = CodeConstant.YAHOO_REQUEST_HEADER)
-            response = response.json()
-            if len(response['quotes']) > 0:
-                entity.symbol = response['quotes'][0]['symbol']
-            FundFacade.insert(entity)
-            time.sleep(3)
-        if len(items) == 10:
-            page += 1
-        else:
-            hasData = False
-        if skipCnt == 10:
-            time.sleep(3)
-    return 'SUCCESS'
-
 def fetchFund(targetCode):
     response = requests.post(CodeConstant.FUND_LIST_URL, json={'order': 'isincode-asc', 'keyword': targetCode}, headers={'User-Agent': 'Mozilla/5.0'})
     response = response.json()
@@ -107,7 +61,6 @@ def fetchFundRecords(code: str):
             response = requests.post(CodeConstant.FUND_RICH_RECORDS_URL, json = requestData, headers = CodeConstant.FUND_RICH_REQUEST_HEADER)
             richData = response.json()
             response.close()
-            print(richData)
             for item in richData['data']['tableRow']['priceHistory']:
                 date = datetime.datetime(int(item['date'][0:4]), int(item['date'][5:7]), int(item['date'][8:10]))
                 entity = FundRecord()

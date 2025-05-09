@@ -11,19 +11,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(username)s:%(password)s@
 
 BaseEntity.db.init_app(app)
 
-@app.route('/fetch/exchangeRates')
-def fetchExchangeRate():
-    return ExchangeRateService.fetchExchangeRates()
-
 @app.route('/fetch/exchangeRateRecords')
 def fetchAllExchangeRateRecord():
     currency = request.args.get('currency')
     return ExchangeRateService.fetchAllExchangeRateRecord(currency)
-
-@app.route('/fetch/stocks')
-def fetchStocks():
-    marketType = request.args.get('marketType')
-    return StockService.fetchStocks(marketType)
 
 @app.route('/fetch/stock')
 def fetchStock():
@@ -34,10 +25,6 @@ def fetchStock():
 def fetchStockRecord():
     code = request.args.get('code')
     return StockService.fetchStockRecord(code)
-
-@app.route('/fetch/funds')
-def fetchFunds():
-    return FundService.fetchFunds()
 
 @app.route('/fetch/fund')
 def fetchFund():

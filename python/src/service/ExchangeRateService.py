@@ -11,26 +11,6 @@ from entity.ExchangeRateRecord import ExchangeRateRecord
 from facade import ExchangeRateFacade, ExchangeRateRecordFacade
 from util import CodeConstant
 
-def fetchExchangeRates():
-    try:
-        if not ExchangeRateFacade.queryByCurrency('TWD'):
-            entity = ExchangeRate()
-            entity.currency = 'TWD'
-            entity.name = '新台幣'
-            ExchangeRateFacade.insert(entity)
-        map = twder.currency_name_dict()
-        for key in map:
-            if not ExchangeRateFacade.queryByCurrency(key):
-                entity = ExchangeRate()
-                entity.currency = key
-                name = map[key]
-                name = re.sub('\(' + key + '\)', '', name)
-                entity.name = name.strip()
-                ExchangeRateFacade.insert(entity)
-        return 'SUCCESS'
-    except Exception as e:
-        return str(e)
-
 def fetchAllExchangeRateRecord(currency: str):
     try:
         print('[INFO] fetching exhcnage rate <{currency}>'.format(currency = currency))
