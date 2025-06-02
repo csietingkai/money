@@ -1,0 +1,303 @@
+{
+    "AppConfirmModal": {
+        "text": "確定要刪除？",
+        "confirmBtn": "確定",
+        "cancelBtn": "取消"
+    },
+    "AppHeader": {
+        "settingText": "設定",
+        "logoutText": "登出"
+    },
+    "AppPriceChart": {
+        "indicators": {
+            "none": "無指標",
+            "ma": "移動平均線",
+            "bb": "布林通道"
+        }
+    },
+    "AppSidebar": {
+        "dashboard": "儀表板",
+        "accountTitle": "帳戶",
+        "account": "個人帳戶",
+        "recordQuery": "交易查詢",
+        "stockTitle": "股票",
+        "stock": "股票庫存",
+        "stockQuery": "股票資訊查詢",
+        "stockTrade": "股票交易",
+        "fundTitle": "基金",
+        "fund": "基金庫存",
+        "fundQuery": "基金資訊查詢",
+        "fundTrade": "基金交易",
+        "currencyTitle": "匯率",
+        "exchangeRateQuery": "匯率走勢查詢",
+        "exchangeRateTrade": "換匯",
+        "extrasTitle": "其他",
+        "files": "對帳單",
+        "setting": "設定",
+        "sourceCode": "程式原始碼"
+    },
+    "Dashboard": {
+        "stock": {
+            "currentValue": "股票現值",
+            "benifit": "預估損益率：{val}%"
+        },
+        "fund": {
+            "currentValue": "基金現值",
+            "benifit": "預估損益率：{val}%"
+        },
+        "monthIncomeDetail": "月收入分類",
+        "monthExpendDetail": "月支出分類",
+        "monthlySummary": {
+            "title": "月結餘報表",
+            "income": "收入",
+            "expend": "支出",
+            "surplus": "結餘"
+        }
+    },
+    "Login": {
+        "title": "登入",
+        "subtitle": "輸入您的帳號密碼",
+        "loginBtn": "登入"
+    },
+    "Page404": {
+        "title": "糟糕！迷路了！",
+        "subtitle": "找不到您的頁面"
+    },
+    "Page500": {
+        "title": "呼叫休士頓，我們遇到麻煩了",
+        "subtitle": "當前頁面暫時無法使用"
+    },
+    "AccountPage": {
+        "addAccountBtn": "新增帳號",
+        "unhideAccountBtn": "取消隱藏帳號",
+        "accountDetail": "帳戶明細",
+        "incomeBtn": "收入",
+        "transferBtn": "轉帳",
+        "expendBtn": "支出",
+        "th": {
+            "date": "日期",
+            "amount": "金額",
+            "from": "轉帳",
+            "to": "收款",
+            "type": "類型",
+            "desc": "備註"
+        },
+        "accountModal": {
+            "add.title": "新增帳號",
+            "edit.title": "編輯帳號",
+            "currency": "幣別",
+            "name": "名稱",
+            "bankCode": "銀行",
+            "bankNo": "銀行帳號",
+            "isShow": "是否顯示",
+            "saveBtn": "儲存",
+            "cancelBtn": "取消",
+            "closeBtn": "關閉"
+        },
+        "AccountRecordModal": {
+            "transferTo": "轉帳至",
+            "transactionDate": "交易日期",
+            "recordType": "類型",
+            "transactionAmount": "交易金額",
+            "description": "備註",
+            "linkedFile": "對帳單",
+            "saveBtn": "儲存",
+            "closeBtn": "關閉"
+        }
+    },
+    "AccountRecordQueryPage": {
+        "searchCondition": {
+            "title": "搜尋條件",
+            "dateRange": "交易時間",
+            "recordType": "交易類型",
+            "account": "帳戶",
+            "description": "備註"
+        },
+        "searchResult": {
+            "title": "查詢結果",
+            "th": {
+                "date": "日期",
+                "amount": "金額",
+                "from": "轉帳",
+                "to": "收款",
+                "type": "類型",
+                "desc": "備註"
+            },
+            "noData": "查無資料"
+        }
+    },
+    "ExchangeRateTradePage": {
+        "currency": "幣別",
+        "account": "帳戶",
+        "balance": "帳戶餘額",
+        "rate": "匯率",
+        "amount": "換匯金額",
+        "tradeBtn": "換匯"
+    },
+    "FileManagePage": {
+        "title": "對帳單",
+        "uploadBtn": "上傳",
+        "fileTypeAll": "全部",
+        "th": {
+            "filename": "名稱",
+            "type": "類別",
+            "date": "日期"
+        },
+        "uploadModal": {
+            "upload.title": "上傳檔案",
+            "edit.title": "編輯檔案",
+            "type": "類別",
+            "date": "日期",
+            "file": "檔案",
+            "saveBtn": "儲存",
+            "closeBtn": "關閉"
+        }
+    },
+    "SettingPage": {
+        "userSetting": {
+            "title": "使用者設定",
+            "name": "名稱",
+            "newPassword": "輸入新密碼",
+            "confirmPassword": "再次輸入新密碼",
+            "saveBtn": "儲存",
+            "clearBtn": "清除"
+        },
+        "investSetting": {
+            "title": "投資設定",
+            "subtitle": "股票 / 基金",
+            "chartStyle": "圖表顏色",
+            "tw": "台股",
+            "us": "美股",
+            "predictDays": "預測天數",
+            "stockFeeRate": "股票手續費率",
+            "fundFeeRate": "基金手續費率",
+            "saveBtn": "儲存",
+            "clearBtn": "清除"
+        },
+        "accountRecordSetting": {
+            "title": "帳戶設定",
+            "defaultRecordType": "預設類別",
+            "recordDeletable": "是否可刪除紀錄？",
+            "yes": "是",
+            "no": "否",
+            "saveBtn": "儲存",
+            "clearBtn": "清除"
+        }
+    },
+    "FundOwnPage": {
+        "onlyShowOwn": "只顯示持有",
+        "record.subtitle": "交易紀錄",
+        "buyBtn": "申購",
+        "sellBtn": "贖回",
+        "bonusBtn": "配息",
+        "th": {
+            "tradeType": "交易類別",
+            "date": "日期",
+            "price": "價格",
+            "share": "單位數",
+            "fee": "手續費",
+            "total": "總計"
+        },
+        "tradeBtn": "申購其他基金"
+    },
+    "FundQueryPage": {
+        "searchCondition": {
+            "title": "查詢條件",
+            "code": "基金代號",
+            "codePlaceHolder": "輸入完整基金代號",
+            "name": "基金名稱",
+            "namePlaceHolder": "模糊查詢基金名稱",
+            "searchBtn": "查詢"
+        },
+        "searchResult": {
+            "buyBtn": "申購",
+            "sellBtn": "贖回",
+            "th": {
+                "code": "基金代號",
+                "name": "名稱",
+                "date": "資料日期"
+            }
+        },
+        "chart": {
+            "subtitle": "日線圖"
+        }
+    },
+    "FundTradePage": {
+        "buyTab": "申購",
+        "sellTab": "贖回",
+        "bonusTab": "配息",
+        "code": "基金代號",
+        "name": "基金名稱",
+        "debitAccount": "扣款帳號",
+        "accountBalance": "帳戶餘額",
+        "tradeDate": "交易日期",
+        "debitAmount": "扣款金額",
+        "exchangeRate": "交易匯率",
+        "price": "價格",
+        "share": "單位數",
+        "fee": "手續費",
+        "total": "總計",
+        "file": "對帳單",
+        "buyBtn": "申購",
+        "sellBtn": "贖回",
+        "bonusBtn": "配息"
+    },
+    "StockOwnPage": {
+        "onlyShowOwn": "只顯示持有",
+        "record.subtitle": "交易紀錄",
+        "buyBtn": "買進",
+        "sellBtn": "賣出",
+        "bonusBtn": "配息",
+        "th": {
+            "tradeType": "交易類別",
+            "date": "日期",
+            "price": "價格",
+            "share": "單位數",
+            "fee": "手續費",
+            "tax": "稅額",
+            "total": "總計"
+        },
+        "tradeBtn": "買進其他股票"
+    },
+    "StockQueryPage": {
+        "searchCondition": {
+            "title": "查詢條件",
+            "code": "股票代號",
+            "codePlaceHolder": "輸入完整股票代號",
+            "name": "股票名稱",
+            "namePlaceHolder": "模糊查詢股票名稱",
+            "searchBtn": "查詢"
+        },
+        "searchResult": {
+            "buyBtn": "買進",
+            "sellBtn": "賣出",
+            "th": {
+                "code": "股票代號",
+                "name": "名稱",
+                "date": "資料日期"
+            }
+        },
+        "chart": {
+            "subtitle": "日線圖"
+        }
+    },
+    "StockTradePage": {
+        "buyTab": "買進",
+        "sellTab": "賣出",
+        "bonusTab": "配息",
+        "code": "股票代號",
+        "name": "股票名稱",
+        "debitAccount": "扣款帳號",
+        "accountBalance": "帳戶餘額",
+        "tradeDate": "交易日期",
+        "price": "價格",
+        "share": "股數",
+        "fee": "手續費",
+        "tax": "交易稅",
+        "total": "總計",
+        "file": "對帳單",
+        "buyBtn": "買進",
+        "sellBtn": "賣出",
+        "bonusBtn": "配息"
+    }
+}

@@ -1,14 +1,16 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
-import { ReduxState, getAuthTokenName, getRecordTypes, getUserSetting } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenName, getLang, getRecordTypes, getUserSetting } from '../../reducer/Selector';
 import { SetNotifyDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
 import AuthApi, { UserSetting } from '../../api/auth';
 import * as AppUtil from '../../util/AppUtil';
-import { Action, Option } from '../../util/Interface';
+import { Action, Lang, Option } from '../../util/Interface';
 import { StockType } from '../../util/Enum';
 
 export interface SettingPageProps {
+    lang: Lang;
     username: string;
     userSetting: UserSetting;
     recordTypeOptions: Option[];
@@ -44,12 +46,12 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                 conmfirmPwd: ''
             },
             settingForm: {
-                stockType: userSetting.stockType,
-                predictDays: userSetting.predictDays,
-                stockFeeRate: userSetting.stockFeeRate,
-                fundFeeRate: userSetting.fundFeeRate,
-                accountRecordType: userSetting.accountRecordType,
-                accountRecordDeletable: userSetting.accountRecordDeletable
+                stockType: userSetting?.stockType,
+                predictDays: userSetting?.predictDays,
+                stockFeeRate: userSetting?.stockFeeRate,
+                fundFeeRate: userSetting?.fundFeeRate,
+                accountRecordType: userSetting?.accountRecordType,
+                accountRecordDeletable: userSetting?.accountRecordDeletable
             }
         };
     }
@@ -112,21 +114,23 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
     };
 
     render(): React.ReactNode {
-        const { recordTypeOptions } = this.props;
+        const { lang, recordTypeOptions } = this.props;
         const { userForm, settingForm } = this.state;
         return (
             <CRow>
                 <CCol sm={6}>
                     <CCard className='mb-4'>
                         <CCardHeader>
-                            <strong>Change User Info</strong>
+                            <strong>
+                                <FormattedMessage id='SettingPage.userSetting.title' />
+                            </strong>
                         </CCardHeader>
                         <CCardBody>
                             <CForm onKeyDown={AppUtil.bindEnterKey(this.updatePwd)}>
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='type' className='col-form-label'>
-                                            Name
+                                            <FormattedMessage id='SettingPage.userSetting.name' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -140,7 +144,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='type' className='col-form-label'>
-                                            New Password
+                                            <FormattedMessage id='SettingPage.userSetting.newPassword' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -155,7 +159,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='type' className='col-form-label'>
-                                            Confirm Password
+                                            <FormattedMessage id='SettingPage.userSetting.confirmPassword' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -171,10 +175,10 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                         </CCardBody>
                         <CCardFooter className='text-end'>
                             <CButton className='me-2' color='success' variant='outline' onClick={this.updatePwd}>
-                                Save
+                                <FormattedMessage id='SettingPage.userSetting.saveBtn' />
                             </CButton>
                             <CButton color='secondary' variant='outline'>
-                                Clear
+                                <FormattedMessage id='SettingPage.userSetting.clearBtn' />
                             </CButton>
                         </CCardFooter>
                     </CCard>
@@ -182,28 +186,37 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                 <CCol sm={6}>
                     <CCard className='mb-4'>
                         <CCardHeader>
-                            <strong>Investment Setting</strong> <small>Stock / Fund</small>
+                            <strong>
+                                <FormattedMessage id='SettingPage.investSetting.title' />
+                            </strong>
+                            &nbsp;
+                            <small>
+                                <FormattedMessage id='SettingPage.investSetting.subtitle' />
+                            </small>
                         </CCardHeader>
                         <CCardBody>
                             <CForm onKeyDown={AppUtil.bindEnterKey(this.updateUserSetting)}>
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='chartStyle' className='col-form-label'>
-                                            Chart Style
+                                            <FormattedMessage id='SettingPage.investSetting.chartStyle' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
                                         {
-                                            ['TW', 'US'].map(style =>
+                                            [
+                                                {value: 'TW', label: AppUtil.getFormattedMessage(lang, 'SettingPage.investSetting.tw')},
+                                                {value: 'US', label: AppUtil.getFormattedMessage(lang, 'SettingPage.investSetting.us')}
+                                            ].map(style =>
                                                 <CFormCheck
-                                                    key={`chartStyle-${style}`}
+                                                    key={`chartStyle-${style.value}`}
                                                     className='col-form-label'
                                                     type='radio'
                                                     name='chartStyle'
-                                                    id={`chartStyle-${style}`}
-                                                    label={style}
-                                                    value={style}
-                                                    checked={style === settingForm.stockType}
+                                                    id={`chartStyle-${style.value}`}
+                                                    label={style.label}
+                                                    value={style.value}
+                                                    checked={style.value === settingForm.stockType}
                                                     inline
                                                     onChange={(event) => this.setState({ settingForm: { ...settingForm, stockType: event.target.value as string } })}
                                                 />
@@ -214,7 +227,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel className='col-form-label'>
-                                            Predict Days
+                                            <FormattedMessage id='SettingPage.investSetting.predictDays' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -230,7 +243,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel className='col-form-label'>
-                                            Stock Fee Rate
+                                            <FormattedMessage id='SettingPage.investSetting.stockFeeRate' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -247,7 +260,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel className='col-form-label'>
-                                            Fund Fee Rate
+                                            <FormattedMessage id='SettingPage.investSetting.fundFeeRate' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -265,10 +278,10 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                         </CCardBody>
                         <CCardFooter className='text-end'>
                             <CButton className='me-2' color='success' variant='outline' onClick={this.updateUserSetting}>
-                                Save
+                                <FormattedMessage id='SettingPage.investSetting.saveBtn' />
                             </CButton>
                             <CButton color='secondary' variant='outline' onClick={this.resetUserSetting('invest')}>
-                                Clear
+                                <FormattedMessage id='SettingPage.investSetting.clearBtn' />
                             </CButton>
                         </CCardFooter>
                     </CCard>
@@ -276,14 +289,16 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                 <CCol sm={6}>
                     <CCard className='mb-4'>
                         <CCardHeader>
-                            <strong>Account Setting</strong>
+                            <strong>
+                                <FormattedMessage id='SettingPage.accountRecordSetting.title' />
+                            </strong>
                         </CCardHeader>
                         <CCardBody>
                             <CForm onKeyDown={AppUtil.bindEnterKey(this.updateUserSetting)}>
                                 <CRow className='mb-3'>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel htmlFor='chartStyle' className='col-form-label'>
-                                            Default Recprd Type
+                                            <FormattedMessage id='SettingPage.accountRecordSetting.defaultRecordType' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -297,7 +312,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                     </CCol>
                                     <CCol xs={5} md={4}>
                                         <CFormLabel className='col-form-label'>
-                                            Record Deletable?
+                                            <FormattedMessage id='SettingPage.accountRecordSetting.recordDeletable' />
                                         </CFormLabel>
                                     </CCol>
                                     <CCol xs={7} md={8}>
@@ -309,7 +324,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                                                     type='radio'
                                                     name='recorddeletable'
                                                     id={`recorddeletable-${d}`}
-                                                    label={d ? 'Yes' : 'No'}
+                                                    label={d ? AppUtil.getFormattedMessage(lang, 'SettingPage.accountRecordSetting.yes') : AppUtil.getFormattedMessage(lang, 'SettingPage.accountRecordSetting.no')}
                                                     value={`${d}`}
                                                     checked={d === settingForm.accountRecordDeletable}
                                                     inline
@@ -323,10 +338,10 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
                         </CCardBody>
                         <CCardFooter className='text-end'>
                             <CButton className='me-2' color='success' variant='outline' onClick={this.updateUserSetting}>
-                                Save
+                                <FormattedMessage id='SettingPage.accountRecordSetting.saveBtn' />
                             </CButton>
                             <CButton color='secondary' variant='outline' onClick={this.resetUserSetting('account')}>
-                                Clear
+                                <FormattedMessage id='SettingPage.accountRecordSetting.clearBtn' />
                             </CButton>
                         </CCardFooter>
                     </CCard>
@@ -338,6 +353,7 @@ class SettingPage extends React.Component<SettingPageProps, SettingPageState> {
 
 const mapStateToProps = (state: ReduxState) => {
     return {
+        lang: getLang(state),
         username: getAuthTokenName(state),
         userSetting: getUserSetting(state),
         recordTypeOptions: getRecordTypes(state)

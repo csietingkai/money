@@ -1,9 +1,10 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
-import { ReduxState, getAuthTokenId, getStockOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getLang, getStockOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import AuthApi, { UserSetting } from '../../api/auth';
 import StockApi, { UserStockRecordVo, UserStockVo } from '../../api/stock';
@@ -13,13 +14,14 @@ import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
 import { StockType } from '../../util/Enum';
-import { Action } from '../../util/Interface';
+import { Action, Lang } from '../../util/Interface';
 import StockTradeCondition, { TradeType } from './interface/StockTradeCondition';
 
 export interface StockOwnPageProps {
     userSetting: UserSetting;
     userId: string;
     stockType: StockType;
+    lang: Lang;
     ownStockList: UserStockVo[];
     setUserSetting: (setting: UserSetting) => void;
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
@@ -137,7 +139,11 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                     <CCol sm={12}>
                         <CCard>
                             <CCardHeader>
-                                <strong>{ownStockInfo.stockName}</strong> <small>trade records</small>
+                                <strong>{ownStockInfo.stockName}</strong>
+                                &nbsp;
+                                <small>
+                                    <FormattedMessage id='StockOwnPage.record.subtitle' />
+                                </small>
                             </CCardHeader>
                             <CCardBody>
                                 <CRow>
@@ -148,21 +154,21 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                                 variant='outline'
                                                 onClick={() => this.tradeStockPage(ownStockInfo, 'buy')}
                                             >
-                                                Buy
+                                                <FormattedMessage id='StockOwnPage.buyBtn' />
                                             </CButton>
                                             <CButton
                                                 color='success'
                                                 variant='outline'
                                                 onClick={() => this.tradeStockPage(ownStockInfo, 'sell')}
                                             >
-                                                Sell
+                                                <FormattedMessage id='StockOwnPage.sellBtn' />
                                             </CButton>
                                             <CButton
                                                 color='info'
                                                 variant='outline'
                                                 onClick={() => this.tradeStockPage(ownStockInfo, 'bonus')}
                                             >
-                                                Bonus
+                                                <FormattedMessage id='StockOwnPage.bonusBtn' />
                                             </CButton>
                                         </CButtonGroup>
                                     </CCol>
@@ -172,13 +178,27 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                         <CTable align='middle' responsive hover>
                                             <CTableHead>
                                                 <CTableRow>
-                                                    <CTableHeaderCell scope='col'>Trade Type</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Date</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Price</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Share</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Fee</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Tax</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Total</CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.tradeType' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.date' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.price' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.share' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.fee' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.tax' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='StockOwnPage.th.total' />
+                                                    </CTableHeaderCell>
                                                     <CTableHeaderCell scope='col'></CTableHeaderCell>
                                                 </CTableRow>
                                             </CTableHead>
@@ -283,7 +303,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     };
 
     render(): React.ReactNode {
-        const { userSetting: { onlyShowOwnStock }, ownStockList } = this.props;
+        const { userSetting: { onlyShowOwnStock }, lang, ownStockList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
@@ -291,7 +311,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                     <CCol sm={12} className='d-flex justify-content-end'>
                         <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnStock)}>
                             <CFormSwitch
-                                label='Only Show Own'
+                                label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.onlyShowOwn')}
                                 checked={onlyShowOwnStock}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleShowOwn(event.target.checked)}
                             />
@@ -308,7 +328,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                         <div className='d-grid gap-2 col-xs-8 col-md-6 mx-auto'>
                             <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.tradeStockPage()}>
                                 <CIcon icon={cilPlus} className='me-2' />
-                                Trade More Stock
+                                <FormattedMessage id='StockOwnPage.tradeBtn' />
                             </CButton>
                         </div>
                     </CCol>
@@ -337,6 +357,7 @@ const mapStateToProps = (state: ReduxState) => {
         userId: getAuthTokenId(state),
         userSetting: getUserSetting(state),
         ownStockList: getStockOwnList(state),
+        lang: getLang(state),
         stockType: getStockType(state)
     };
 };

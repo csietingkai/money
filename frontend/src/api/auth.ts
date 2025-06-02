@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { AUTH_LOGIN_PATH, AUTH_LOGOUT_PATH, AUTH_CHANGE_PWD_PATH, AUTH_VALIDATE_PATH, USER_GET_SETTING_PATH, USER_UPDATE_SETTING_PATH } from './Constant';
 
-import { ApiResponse, SimpleResponse } from '../util/Interface';
+import { ApiResponse, Lang, SimpleResponse } from '../util/Interface';
 import { StockType } from '../util/Enum';
 
 export interface AuthToken {
@@ -24,6 +24,7 @@ export interface UserSetting {
     accountRecordDeletable: boolean;
     onlyShowOwnStock: boolean;
     onlyShowOwnFund: boolean;
+    lang: Lang;
 }
 
 export interface AuthResponse extends ApiResponse<AuthToken> { }

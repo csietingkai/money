@@ -1,5 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
@@ -137,7 +138,13 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                     <CCol sm={12}>
                         <CCard>
                             <CCardHeader>
-                                <strong>{ownFundInfo.fundName}</strong> <small>trade records</small>
+                                <strong>
+                                    {ownFundInfo.fundName}
+                                </strong>
+                                &nbsp;
+                                <small>
+                                    <FormattedMessage id='FundOwnPage.record.subtitle' />
+                                </small>
                             </CCardHeader>
                             <CCardBody>
                                 <CRow>
@@ -148,21 +155,21 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                                 variant='outline'
                                                 onClick={() => this.tradeFundPage(ownFundInfo, 'buy')}
                                             >
-                                                Buy
+                                                <FormattedMessage id='FundOwnPage.buyBtn' />
                                             </CButton>
                                             <CButton
                                                 color='success'
                                                 variant='outline'
                                                 onClick={() => this.tradeFundPage(ownFundInfo, 'sell')}
                                             >
-                                                Sell
+                                                <FormattedMessage id='FundOwnPage.sellBtn' />
                                             </CButton>
                                             <CButton
                                                 color='info'
                                                 variant='outline'
                                                 onClick={() => this.tradeFundPage(ownFundInfo, 'bonus')}
                                             >
-                                                Bonus
+                                                <FormattedMessage id='FundOwnPage.bonusBtn' />
                                             </CButton>
                                         </CButtonGroup>
                                     </CCol>
@@ -172,12 +179,24 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                         <CTable align='middle' responsive hover>
                                             <CTableHead>
                                                 <CTableRow>
-                                                    <CTableHeaderCell scope='col'>Trade Type</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Date</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Price</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Share</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Fee</CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>Total</CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='FundOwnPage.th.tradeType' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='FundOwnPage.th.date' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='FundOwnPage.th.price' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='FundOwnPage.th.share' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='FundOwnPage.th.fee' />
+                                                    </CTableHeaderCell>
+                                                    <CTableHeaderCell scope='col'>
+                                                        <FormattedMessage id='FundOwnPage.th.total' />
+                                                    </CTableHeaderCell>
                                                     <CTableHeaderCell scope='col'></CTableHeaderCell>
                                                 </CTableRow>
                                             </CTableHead>
@@ -298,7 +317,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     };
 
     render(): React.ReactNode {
-        const { userSetting: { onlyShowOwnFund }, ownFundList } = this.props;
+        const { userSetting: { onlyShowOwnFund, lang }, ownFundList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
@@ -306,7 +325,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                     <CCol sm={12} className='d-flex justify-content-end'>
                         <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnFund)}>
                             <CFormSwitch
-                                label='Only Show Own'
+                                label={AppUtil.getFormattedMessage(lang, 'FundOwnPage.onlyShowOwn')}
                                 checked={onlyShowOwnFund}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleShowOwn(event.target.checked)}
                             />
@@ -323,7 +342,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                         <div className='d-grid gap-2 col-xs-8 col-md-6 mx-auto'>
                             <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.tradeFundPage()}>
                                 <CIcon icon={cilPlus} className='me-2' />
-                                Trade More Fund
+                                <FormattedMessage id='FundOwnPage.tradeBtn' />
                             </CButton>
                         </div>
                     </CCol>

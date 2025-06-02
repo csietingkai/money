@@ -27,13 +27,13 @@ public class CodeConstant {
 	// === bank info === //
 	public static final String BANK_INFO_LIST_KEY = "bank-info-list";
 
-	/// === exchange rate === //
+	// === exchange rate === //
 	public static final String BASE_EXCHANGE_RATE = "TWD";
 	public static final String EXCHANGE_RATE_FETCHING_CURRENCY = "fetching-exchange-rate";
 	public static final String EXCHANGE_RATE_LIST_KEY = "exchange-rate-list";
 	public static final LocalDateTime EXCHANGE_RATE_FETCH_START_DATETIME = LocalDateTime.of(LocalDateTime.now().getYear() - 1, Month.JANUARY, 1, 0, 0);
 
-	/// === stock list === //
+	// === stock list === //
 	public static final String STOCK_FETCHING_CODE = "fetching-stock-code";
 	public static final int[] MA_DAYS = { 5, 10, 20, 40, 60 };
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.001425d);
@@ -44,7 +44,7 @@ public class CodeConstant {
 	// === user tracking stock === //
 	public static final String USER_TRACKING_STOCK_KEY = "track-stock-user:{0}";
 
-	/// === fund list === //
+	// === fund list === //
 	public static final String FUND_FETCHING_CODE = "fetching-fund-code";
 
 	// === user tracking fund === //

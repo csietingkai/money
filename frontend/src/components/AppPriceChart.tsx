@@ -6,18 +6,20 @@ import * as AppUtil from '../util/AppUtil';
 import { StockType } from '../util/Enum';
 import { CButton, CCol, CFormSwitch, CRow } from '@coreui/react';
 import { CHART_COLORS } from '../util/Constant';
-import { SupportLineType } from '../util/Interface';
+import { Lang, SupportLineType } from '../util/Interface';
 
-interface AppStockChartProps {
+interface AppPriceChartBaseProps {
+    lang: Lang;
+    info: { name: string; };
+}
+interface AppStockChartProps extends AppPriceChartBaseProps {
     stockType: string;
     chartType: 'stock';
-    info: { name: string; };
     records: StockRecordVo[];
 }
 
-interface AppFundChartProps {
+interface AppFundChartProps extends AppPriceChartBaseProps {
     chartType: 'fund';
-    info: { name: string; };
     records: FundRecordVo[];
 }
 
@@ -66,7 +68,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
                 firstDayData = records.filter(r => r.date.getTime() >= firstDay.getTime())[0];
             }
             if (firstDayData) {
-                const firstDayDataIdx: number = records.findIndex(r => r.id === firstDayData.id);
+                const firstDayDataIdx: number = records.findIndex((r: { id: string; }) => r.id === firstDayData.id);
                 dateDiff = records.length - firstDayDataIdx - 1;
             } else {
                 dateDiff = 0;
@@ -98,7 +100,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
         return series.map(s => ({
             name: s.toUpperCase(),
             type: 'line',
-            data: records.map(r => r[s]),
+            data: records.map((r: { [x: string]: any; }) => r[s]),
             smooth: true,
             showSymbol: false,
             lineStyle: {
@@ -127,7 +129,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
                 textStyle: {
                     color: '#000'
                 },
-                position: (pos, params, el, elRect, size) => {
+                position: (pos: number[], params: any, el: any, elRect: any, size: { viewSize: number[]; }) => {
                     const obj = { top: 10 };
                     obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
                     return obj;
@@ -235,7 +237,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
                     color: upColor
                 }
             ];
-            option.xAxis.forEach(x => {
+            option.xAxis.forEach((x: { data: string[]; }) => {
                 x.data = records.map(r => AppUtil.toDateStr(r.dealDate) || '');
             });
             option.series = [
@@ -259,7 +261,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
                 }
             ];
         } else if (chartType === 'fund') {
-            option.xAxis.forEach(x => {
+            option.xAxis.forEach((x: { data: string[]; }) => {
                 x.data = records.map(r => AppUtil.toDateStr(r.date) || '');
             });
             option.series = [
@@ -275,12 +277,13 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
     };
 
     render(): React.ReactNode {
+        const { lang } = this.props;
         const { dateRange, supportLineType } = this.state;
         const dateRangeRadios: DateRange[] = ['3m', '6m', 'ytd', '1y', '5y', 'all'];
         const supportLineRadios: { label: string, value: SupportLineType; }[] = [
-            { label: 'None', value: '' },
-            { label: 'Moving Average', value: 'ma' },
-            { label: 'Bollinger Bands', value: 'bb' }
+            { label: AppUtil.getFormattedMessage(lang, 'AppPriceChart.indicators.none'), value: '' },
+            { label: AppUtil.getFormattedMessage(lang, 'AppPriceChart.indicators.ma'), value: 'ma' },
+            { label: AppUtil.getFormattedMessage(lang, 'AppPriceChart.indicators.bb'), value: 'bb' }
         ];
         return (
             <React.Fragment>

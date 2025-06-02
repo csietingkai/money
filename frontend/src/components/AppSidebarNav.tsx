@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { FormattedMessage } from 'react-intl';
 import SimpleBar from 'simplebar-react';
 import { CNavGroup, CNavItem, CNavLink, CNavTitle, CSidebarNav } from '@coreui/react';
 import { Route, RouteChildItem } from '../routes';
@@ -18,34 +19,42 @@ export default class AppSidebarNav extends React.Component<AppSidebarNavProps, A
         this.state = {};
     }
 
-    private navItem = (name: string, icon: React.ReactNode, path: string, indent: boolean = false): React.ReactNode => {
+    private navItem = (icon: React.ReactNode, path: string, indent: boolean = false): React.ReactNode => {
         return (
-            <CNavItem as='div' key={`item-${name}`}>
+            <CNavItem as='div' key={`item-${path}`}>
                 <CNavLink to={path} as={NavLink}>
                     {icon}
-                    {name}
+                    <FormattedMessage id={`AppSidebar.${path}`}/>
                 </CNavLink>
             </CNavItem>
         );
     };
 
-    private navGroup = (name: string, icon: React.ReactNode, path: string, items: RouteChildItem[], indent: boolean = false): React.ReactNode => {
+    private navGroup = (icon: React.ReactNode, path: string, items: RouteChildItem[], indent: boolean = false): React.ReactNode => {
         const nodes: React.ReactNode[] = [];
         items.forEach(item => {
             const node = (
-                <CNavItem as='div' key={`item-${item.name}`}>
+                <CNavItem as='div' key={`item-${item.path}`}>
                     <CNavLink to={`/${item.path}`} as={NavLink}>
                         <span className='nav-icon'>
                             <span className='nav-icon-bullet'></span>
                         </span>
-                        {item.name}
+                        <FormattedMessage id={`AppSidebar.${item.path}`}/>
                     </CNavLink>
                 </CNavItem>
             );
             nodes.push(node);
         });
         return (
-            <CNavGroup compact as='div' key={`group-${name}`} toggler={<React.Fragment>{icon}{name}</React.Fragment>}>
+            <CNavGroup
+                compact as='div'
+                key={`group-${path}`}
+                toggler={
+                    <React.Fragment>
+                        {icon}
+                        <FormattedMessage id={`AppSidebar.${path}`}/>
+                    </React.Fragment>
+                }>
                 {nodes}
             </CNavGroup>
         );
@@ -56,7 +65,7 @@ export default class AppSidebarNav extends React.Component<AppSidebarNavProps, A
             <CNavItem as='div' key={`navlink-${name}`}>
                 <CNavLink href={href}>
                     {icon}
-                    {name}
+                    <FormattedMessage id={`AppSidebar.${name}`}/>
                 </CNavLink>
             </CNavItem>
         );
@@ -70,7 +79,7 @@ export default class AppSidebarNav extends React.Component<AppSidebarNavProps, A
                         <span className='nav-icon-bullet'></span>
                     </span>
                 )}
-                {name && name}
+                {name && <FormattedMessage id={`AppSidebar.${name}`}/>}
             </CNavTitle>
         );
     };
@@ -79,9 +88,9 @@ export default class AppSidebarNav extends React.Component<AppSidebarNavProps, A
         const nodes: React.ReactNode[] = [];
         routes.forEach(r => {
             if (r.type === 'item') {
-                nodes.push(this.navItem(r.name, r.icon, r.path, indent));
+                nodes.push(this.navItem(r.icon, r.path, indent));
             } else if (r.type === 'parent') {
-                nodes.push(this.navGroup(r.name, r.icon, r.path, r.items, indent));
+                nodes.push(this.navGroup(r.icon, r.path, r.items, indent));
             } else if (r.type === 'link') {
                 nodes.push(this.navLink(r.name, r.icon, r.href, indent));
             } else if (r.type === 'title') {

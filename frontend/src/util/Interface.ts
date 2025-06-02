@@ -9,6 +9,8 @@ export interface Option {
     value: string;
 }
 
+export type Lang = 'zh' | 'en'
+
 // redux
 export interface Action<T> {
     type: string;

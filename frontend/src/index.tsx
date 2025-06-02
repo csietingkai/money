@@ -2,12 +2,13 @@ import axios from 'axios';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { CToaster } from '@coreui/react';
 import 'core-js';
 import App from './App';
 import { API_URL } from './api/Constant';
 import store, { validateToken } from './reducer/Store';
 import { SetLoading } from './reducer/Action';
+import * as Selector from './reducer/Selector';
+import * as StateHolder from './reducer/StateHolder';
 
 axios.defaults.baseURL = API_URL;
 axios.interceptors.response.use(
@@ -31,8 +32,10 @@ axios.interceptors.response.use(
 
 validateToken(store.dispatch, store.getState);
 
+
+
 createRoot(document.getElementById('root') as Element).render(
     <Provider store={store}>
-        <App />
+        <App locale={Selector.getLang(store.getState()) || StateHolder.getLang()} />
     </Provider>
 );

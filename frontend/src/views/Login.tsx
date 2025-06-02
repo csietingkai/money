@@ -1,5 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardGroup, CCol, CContainer, CForm, CFormInput, CInputGroup, CInputGroupText, CRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilLockLocked, cilUser } from '@coreui/icons';
@@ -7,9 +8,10 @@ import AuthApi, { AuthResponse, AuthToken } from '../api/auth';
 import { LoginDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import store, { init } from '../reducer/Store';
 import * as AppUtil from '../util/AppUtil';
-import { Action } from '../util/Interface';
+import { Action, Lang } from '../util/Interface';
 
 export interface LoginProps {
+    lang: Lang;
     login: (vo: AuthToken) => void;
     notify: (message: string) => void;
 }
@@ -60,8 +62,12 @@ class Login extends React.Component<LoginProps, LoginState> {
                                 <CCard className='p-4'>
                                     <CCardBody>
                                         <CForm onKeyDown={AppUtil.bindEnterKey(this.onLoginClick)}>
-                                            <h1>Login</h1>
-                                            <p className='text-body-secondary'>Sign In to your account</p>
+                                            <h1>
+                                                <FormattedMessage id='Login.title'/>
+                                            </h1>
+                                            <p className='text-body-secondary'>
+                                                <FormattedMessage id='Login.subtitle'/>
+                                            </p>
                                             <CInputGroup className='mb-3'>
                                                 <CInputGroupText>
                                                     <CIcon icon={cilUser} />
@@ -89,7 +95,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                                             <CRow>
                                                 <CCol xs={6}>
                                                     <CButton color='primary' className='px-4' onClick={this.onLoginClick}>
-                                                        Login
+                                                        <FormattedMessage id='Login.loginBtn'/>
                                                     </CButton>
                                                 </CCol>
                                             </CRow>

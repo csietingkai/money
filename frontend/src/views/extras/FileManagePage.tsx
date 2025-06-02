@@ -1,6 +1,7 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilCloudUpload, cilPencil, cilTrash, cilZoom } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -138,13 +139,15 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
         const { showUploadModal, uploadForm } = this.state;
         return (<CModal alignment='center' visible={showUploadModal} onClose={this.closeUploadModal}>
             <CModalHeader>
-                <CModalTitle>Upload New File</CModalTitle>
+                <CModalTitle>
+                    <FormattedMessage id='FileManagePage.uploadModal.upload.title' />
+                </CModalTitle>
             </CModalHeader>
             <CModalBody>
                 <CForm onKeyDown={AppUtil.bindEnterKey(this.upload)}>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor='type' className='col-sm-2 col-form-label'>
-                            Type
+                            <FormattedMessage id='FileManagePage.uploadModal.type' />
                         </CFormLabel>
                         <div className='col-sm-10'>
                             <CFormSelect
@@ -158,7 +161,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     </CRow>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor='date' className='col-sm-2 col-form-label'>
-                            Date
+                            <FormattedMessage id='FileManagePage.uploadModal.date' />
                         </CFormLabel>
                         <div className='col-sm-10'>
                             <input
@@ -172,7 +175,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     </CRow>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor='file' className='col-sm-2 col-form-label'>
-                            File
+                            <FormattedMessage id='FileManagePage.uploadModal.file' />
                         </CFormLabel>
                         <div className='col-sm-10'>
                             <CFormInput
@@ -186,8 +189,12 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                 </CForm>
             </CModalBody>
             <CModalFooter>
-                <CButton color='primary' onClick={this.upload}>Save</CButton>
-                <CButton color='secondary' onClick={this.closeUploadModal}>Close</CButton>
+                <CButton color='primary' onClick={this.upload}>
+                    <FormattedMessage id='FileManagePage.uploadModal.saveBtn' />
+                </CButton>
+                <CButton color='secondary' onClick={this.closeUploadModal}>
+                    <FormattedMessage id='FileManagePage.uploadModal.closeBtn' />
+                </CButton>
             </CModalFooter>
         </CModal>
         );
@@ -199,12 +206,14 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
         return (
             <CModal alignment='center' visible={showEditModal} onClose={this.closeEditModal}>
                 <CModalHeader>
-                    <CModalTitle>Edit File</CModalTitle>
+                    <CModalTitle>
+                        <FormattedMessage id='FileManagePage.uploadModal.edit.title' />
+                    </CModalTitle>
                 </CModalHeader>
                 <CModalBody>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor='type' className='col-sm-2 col-form-label'>
-                            Type
+                            <FormattedMessage id='FileManagePage.uploadModal.type' />
                         </CFormLabel>
                         <div className='col-sm-10'>
                             <CFormSelect
@@ -218,7 +227,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     </CRow>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor='date' className='col-sm-2 col-form-label'>
-                            Date
+                            <FormattedMessage id='FileManagePage.uploadModal.date' />
                         </CFormLabel>
                         <div className='col-sm-10'>
                             <input
@@ -232,7 +241,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     </CRow>
                     <CRow className='mb-3'>
                         <CFormLabel htmlFor='file' className='col-sm-2 col-form-label'>
-                            File
+                            <FormattedMessage id='FileManagePage.uploadModal.file' />
                         </CFormLabel>
                         <div className='col-sm-10'>
                             <CFormInput
@@ -244,8 +253,12 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     </CRow>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='primary' onClick={this.update}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeEditModal}>Close</CButton>
+                    <CButton color='primary' onClick={this.update}>
+                        <FormattedMessage id='FileManagePage.uploadModal.saveBtn' />
+                    </CButton>
+                    <CButton color='secondary' onClick={this.closeEditModal}>
+                        <FormattedMessage id='FileManagePage.uploadModal.closeBtn' />
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );
@@ -261,7 +274,9 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     </CRow>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='secondary' onClick={this.closePreviewModal}>Close</CButton>
+                    <CButton color='secondary' onClick={this.closePreviewModal}>
+                        <FormattedMessage id='FileManagePage.uploadModal.closeBtn' />
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );
@@ -278,7 +293,9 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                     <CCol xs={12}>
                         <CCard className='mb-4'>
                             <CCardHeader>
-                                <strong>Financial Files</strong>
+                                <strong>
+                                    <FormattedMessage id='FileManagePage.title' />
+                                </strong>
                             </CCardHeader>
                             <CCardBody>
                                 <CRow>
@@ -290,7 +307,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                                             onClick={() => this.setState({ showUploadModal: true })}
                                         >
                                             <CIcon icon={cilCloudUpload} className='me-2'></CIcon>
-                                            Upload
+                                            <FormattedMessage id='FileManagePage.uploadBtn' />
                                         </CButton>
                                     </CCol>
                                     <CCol xs={4}>
@@ -301,7 +318,9 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                                                     value={fileType}
                                                     onChange={(event: any) => this.setState({ fileType: event.target.value as string, page: 1 })}
                                                 >
-                                                    <option value=''>ALL</option>
+                                                    <option value=''>
+                                                        <FormattedMessage id='FileManagePage.fileTypeAll' />
+                                                    </option>
                                                     {fileTypeOptions.map(o => <option key={`filetype-option-${o.key}`} value={o.key}>{o.value}</option>)}
                                                 </CFormSelect>
                                                 : <React.Fragment></React.Fragment>
@@ -316,9 +335,15 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                                                     <CTable align='middle' responsive hover>
                                                         <CTableHead>
                                                             <CTableRow>
-                                                                <CTableHeaderCell scope='col'>Filename</CTableHeaderCell>
-                                                                <CTableHeaderCell scope='col'>Type</CTableHeaderCell>
-                                                                <CTableHeaderCell scope='col'>Date</CTableHeaderCell>
+                                                                <CTableHeaderCell scope='col'>
+                                                                    <FormattedMessage id='FileManagePage.th.filename' />
+                                                                </CTableHeaderCell>
+                                                                <CTableHeaderCell scope='col'>
+                                                                    <FormattedMessage id='FileManagePage.th.type' />
+                                                                </CTableHeaderCell>
+                                                                <CTableHeaderCell scope='col'>
+                                                                    <FormattedMessage id='FileManagePage.th.date' />
+                                                                </CTableHeaderCell>
                                                                 <CTableHeaderCell scope='col'></CTableHeaderCell>
                                                             </CTableRow>
                                                         </CTableHead>

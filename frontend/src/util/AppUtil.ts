@@ -1,5 +1,8 @@
+import React from 'react';
 import moment from 'moment';
 import { StockType } from './Enum';
+import { Lang } from './Interface';
+import dictionary from '../assets/locales/dictionary';
 
 export const isNull = (obj: any): boolean => {
     return obj === null || obj === undefined;
@@ -49,7 +52,7 @@ export const substr = (str: string, from: number, length?: number): string => {
     return isStringBlank(str) ? '' : str.substr(from, length);
 };
 
-export const firstDigitUppercase = (str: string): string => {
+export const capitalize = (str: string): string => {
     return substr(str, 0, 1).toUpperCase() + substr(str, 1);
 };
 
@@ -134,4 +137,10 @@ export const bindEnterKey = (onEnterKeyDown: () => void) => (event: React.Keyboa
     if (event.key === 'Enter' && ['file', 'select-one', 'textarea'].indexOf(event.target['type']) < 0) {
         onEnterKeyDown();
     }
+}
+
+export const getFormattedMessage = (lang: Lang, id: string): string => {
+    const messages: Record<string, string> = dictionary[lang];
+    const message: string = messages[id];
+    return message ? message : id;
 }

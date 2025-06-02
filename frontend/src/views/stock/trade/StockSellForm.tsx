@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import AccountApi, { Account } from '../../../api/account';
 import StockApi, { UserStockListResponse, UserStockResponse, UserStockVo } from '../../../api/stock';
@@ -169,7 +170,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Stock Code
+                                    <FormattedMessage id='StockTradePage.code' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -187,7 +188,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>
-                                    Stock Name
+                                    <FormattedMessage id='StockTradePage.name' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -201,7 +202,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Debit Account
+                                    <FormattedMessage id='StockTradePage.debitAccount' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -221,7 +222,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>
-                                    Account Balance
+                                    <FormattedMessage id='StockTradePage.accountBalance' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -235,7 +236,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Trade Date
+                                    <FormattedMessage id='StockTradePage.tradeDate' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -254,7 +255,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Price
+                                    <FormattedMessage id='StockTradePage.price' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -273,7 +274,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Share
+                                    <FormattedMessage id='StockTradePage.share' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -292,7 +293,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Fee
+                                    <FormattedMessage id='StockTradePage.fee' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -310,7 +311,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Tax
+                                    <FormattedMessage id='StockTradePage.tax' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -328,7 +329,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Total
+                                    <FormattedMessage id='StockTradePage.total' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -342,7 +343,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>
-                                    Linked File
+                                    <FormattedMessage id='StockTradePage.file' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -359,7 +360,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
                 </CCardBody>
                 <CCardFooter className='text-end'>
                     <CButton color='success' variant='outline' onClick={this.onSellClick}>
-                        Sell
+                        <FormattedMessage id='StockTradePage.sellBtn' />
                     </CButton>
                 </CCardFooter>
             </CCard>

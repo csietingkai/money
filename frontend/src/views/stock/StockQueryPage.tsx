@@ -1,17 +1,18 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilChevronDoubleRight, cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
 import AppPriceChart from '../../components/AppPriceChart';
-import { ReduxState, getAuthTokenId, getStockQueryCondition, getStockType } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getLang, getStockQueryCondition, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockQueryConditionDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import StockApi, { StockRecordVo, StockVo } from '../../api/stock';
 import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
 import { StockType } from '../../util/Enum';
-import { Action } from '../../util/Interface';
+import { Action, Lang } from '../../util/Interface';
 import StockQueryCondition from './interface/StockQueryCondition';
 import StockTradeCondition from './interface/StockTradeCondition';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
@@ -19,6 +20,7 @@ import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 export interface StockQueryPageProps {
     userId: string;
     queryCondition: StockQueryCondition;
+    lang: Lang;
     stockType: StockType;
     setStockQueryCondition: (queryCondition: StockQueryCondition) => void;
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
@@ -105,13 +107,16 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private getQueryCard = (): React.ReactNode => {
+        const { lang } = this.props;
         const { queryForm } = this.state;
         return (
             <CCard className='mb-4'>
                 <CCardHeader>
                     <div className='d-flex'>
-                        <CIcon size='lg' className='my-auto' icon={cilChevronDoubleRight}/>
-                        <strong className='ms-2'>Search Condition</strong>
+                        <CIcon size='lg' className='my-auto' icon={cilChevronDoubleRight} />
+                        <strong className='ms-2'>
+                            <FormattedMessage id='StockQueryPage.searchCondition.title' />
+                        </strong>
                     </div>
                 </CCardHeader>
                 <CCardBody>
@@ -119,14 +124,14 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                         <CRow className='mb-2'>
                             <CCol xs={4} md={3}>
                                 <CFormLabel className='col-form-label'>
-                                    Code
+                                    <FormattedMessage id='StockQueryPage.searchCondition.code' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={8} md={9}>
                                 <CFormInput
                                     type='text'
                                     value={queryForm.code}
-                                    placeholder='Search by Stock Code'
+                                    placeholder={AppUtil.getFormattedMessage(lang, 'StockQueryPage.searchCondition.codePlaceHolder')}
                                     onChange={(event) => this.onQueryFormChange({ ...queryForm, code: event.target.value as string })}
                                 />
                             </CCol>
@@ -134,14 +139,14 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                         <CRow className='mb-2'>
                             <CCol xs={4} md={3}>
                                 <CFormLabel className='col-form-label'>
-                                    Name
+                                    <FormattedMessage id='StockQueryPage.searchCondition.name' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={8} md={9}>
                                 <CFormInput
                                     type='text'
                                     value={queryForm.name}
-                                    placeholder='Fuzzy Search by Stock Name'
+                                    placeholder={AppUtil.getFormattedMessage(lang, 'StockQueryPage.searchCondition.namePlaceHolder')}
                                     onChange={(event) => this.onQueryFormChange({ ...queryForm, name: event.target.value as string })}
                                 />
                             </CCol>
@@ -150,7 +155,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                 </CCardBody>
                 <CCardFooter className='text-end'>
                     <CButton color='success' variant='outline' onClick={this.search}>
-                        Search
+                        <FormattedMessage id='StockQueryPage.searchCondition.searchBtn' />
                     </CButton>
                 </CCardFooter>
             </CCard>
@@ -158,7 +163,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private getStocksCard = () => {
-        const { stockType } = this.props;
+        const { stockType, lang } = this.props;
         const { stocks, currentStockPage } = this.state;
         if (!stocks.length) {
             return <React.Fragment></React.Fragment>;
@@ -172,9 +177,15 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                             <CTable align='middle' responsive hover>
                                 <CTableHead>
                                     <CTableRow>
-                                        <CTableHeaderCell scope='col'>Code</CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>Name</CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>Update Date</CTableHeaderCell>
+                                        <CTableHeaderCell scope='col'>
+                                            <FormattedMessage id='StockQueryPage.searchResult.th.code' />
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell scope='col'>
+                                            <FormattedMessage id='StockQueryPage.searchResult.th.name' />
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell scope='col'>
+                                            <FormattedMessage id='StockQueryPage.searchResult.th.date' />
+                                        </CTableHeaderCell>
                                         <CTableHeaderCell scope='col'></CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
@@ -197,7 +208,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                                                         </CButton>
                                                         {/* TODO track */}
                                                         <CTooltip
-                                                            content={`Buy ${s.name}`}
+                                                            content={`${AppUtil.getFormattedMessage(lang, 'StockQueryPage.searchResult.buyBtn')} ${s.name}`}
                                                         >
                                                             <CButton
                                                                 color={AppUtil.getBenifitColor(1, stockType)}
@@ -209,7 +220,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                                                             </CButton>
                                                         </CTooltip>
                                                         <CTooltip
-                                                            content={`Sell ${s.name}`}
+                                                            content={`${AppUtil.getFormattedMessage(lang, 'StockQueryPage.searchResult.sellBtn')} ${s.name}`}
                                                         >
                                                             <CButton
                                                                 color={AppUtil.getBenifitColor(-1, stockType)}
@@ -236,7 +247,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private getStockChartCard = (): React.ReactNode => {
-        const { stockType } = this.props;
+        const { lang, stockType } = this.props;
         const { selectedStock, stockRecords } = this.state;
         if (!stockRecords.length) {
             return <React.Fragment></React.Fragment>;
@@ -245,12 +256,15 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
         return (
             <CCard className='mb-4'>
                 <CCardHeader>
-                    <strong>{selectedStock?.name}</strong> <small>details</small>
+                    <strong>{selectedStock?.name}</strong>
+                    &nbsp;
+                    <small><FormattedMessage id='StockQueryPage.chart.subtitle' /></small>
                 </CCardHeader>
                 <CCardBody>
                     {
                         selectedStock &&
                         <AppPriceChart
+                            lang={lang}
                             stockType={stockType}
                             chartType='stock'
                             info={selectedStock}
@@ -285,6 +299,7 @@ const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
         queryCondition: getStockQueryCondition(state),
+        lang: getLang(state),
         stockType: getStockType(state)
     };
 };

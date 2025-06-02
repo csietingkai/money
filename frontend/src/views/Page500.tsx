@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CCol, CContainer, CRow } from '@coreui/react';
 
 export interface Page500Props { }
@@ -15,9 +16,11 @@ class Page500 extends React.Component<Page500Props, Page500State> {
                         <CCol md={6}>
                             <span className='clearfix'>
                                 <h1 className='float-start display-3 me-4'>500</h1>
-                                <h4 className='pt-3'>Houston, we have a problem!</h4>
+                                <h4 className='pt-3'>
+                                    <FormattedMessage id='Page500.title'/>
+                                </h4>
                                 <p className='text-body-secondary float-start'>
-                                    The page you are looking for is temporarily unavailable.
+                                    <FormattedMessage id='Page500.subtitle'/>
                                 </p>
                             </span>
                         </CCol>

@@ -11,6 +11,7 @@ import FundTradeCondition, { TradeType } from './interface/FundTradeCondition';
 import FundBonusForm from './trade/FundBonusForm';
 import FundBuyForm from './trade/FundBuyForm';
 import FundSellForm from './trade/FundSellForm';
+import { FormattedMessage } from 'react-intl';
 
 export interface FundTradePageProps {
     userId: string;
@@ -43,13 +44,19 @@ class FundTradePage extends React.Component<FundTradePageProps, FundTradePageSta
             <React.Fragment>
                 <CNav variant='pills' layout='fill' className='pb-2 border-bottom border-secondary border-bottom-2'>
                     <CNavItem>
-                        <CNavLink active={activeTab === 'buy'} onClick={() => this.setState({ activeTab: 'buy' })}>BUY</CNavLink>
+                        <CNavLink active={activeTab === 'buy'} onClick={() => this.setState({ activeTab: 'buy' })}>
+                            <FormattedMessage id='FundTradePage.buyTab' />
+                        </CNavLink>
                     </CNavItem>
                     <CNavItem>
-                        <CNavLink active={activeTab === 'sell'} onClick={() => this.setState({ activeTab: 'sell' })}>SELL</CNavLink>
+                        <CNavLink active={activeTab === 'sell'} onClick={() => this.setState({ activeTab: 'sell' })}>
+                            <FormattedMessage id='FundTradePage.sellTab' />
+                        </CNavLink>
                     </CNavItem>
                     <CNavItem>
-                        <CNavLink active={activeTab === 'bonus'} onClick={() => this.setState({ activeTab: 'bonus' })}>BONUS</CNavLink>
+                        <CNavLink active={activeTab === 'bonus'} onClick={() => this.setState({ activeTab: 'bonus' })}>
+                            <FormattedMessage id='FundTradePage.bonusTab' />
+                        </CNavLink>
                     </CNavItem>
                 </CNav>
                 <CTabContent>

@@ -1,5 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CContainer, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import { cilMediaSkipForward } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -100,7 +101,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
                                             <CFormLabel className='col-form-label required'>
-                                                Currency
+                                                <FormattedMessage id='ExchangeRateTradePage.currency' />
                                             </CFormLabel>
                                         </CCol>
                                         <CCol xs={9}>
@@ -132,7 +133,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
                                             <CFormLabel className='col-form-label required'>
-                                                Account
+                                                <FormattedMessage id='ExchangeRateTradePage.account' />
                                             </CFormLabel>
                                         </CCol>
                                         <CCol xs={9}>
@@ -172,7 +173,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
                                             <CFormLabel className='col-form-label'>
-                                                Balance
+                                                <FormattedMessage id='ExchangeRateTradePage.balance' />
                                             </CFormLabel>
                                         </CCol>
                                         <CCol xs={9}>
@@ -200,7 +201,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
                                             <CFormLabel className='col-form-label required'>
-                                                Rate
+                                                <FormattedMessage id='ExchangeRateTradePage.rate' />
                                             </CFormLabel>
                                         </CCol>
                                         <CCol xs={9}>
@@ -215,7 +216,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                                     <CRow className='mb-3'>
                                         <CCol xs={3}>
                                             <CFormLabel className='col-form-label required'>
-                                                Amount
+                                                <FormattedMessage id='ExchangeRateTradePage.amount' />
                                             </CFormLabel>
                                         </CCol>
                                         <CCol xs={9}>
@@ -247,7 +248,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                             </CCardBody>
                             <CCardFooter className='text-end'>
                                 <CButton color='success' variant='outline' onClick={this.onTradeClick}>
-                                    Trade
+                                    <FormattedMessage id='ExchangeRateTradePage.tradeBtn' />
                                 </CButton>
                             </CCardFooter>
                         </CCard>

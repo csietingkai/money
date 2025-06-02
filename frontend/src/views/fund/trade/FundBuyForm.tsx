@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardFooter, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react';
 import { UserSetting } from '../../../api/auth';
 import AccountApi, { Account } from '../../../api/account';
@@ -153,7 +154,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Fund Code
+                                    <FormattedMessage id='FundTradePage.code' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -171,7 +172,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>
-                                    Fund Name
+                                    <FormattedMessage id='FundTradePage.name' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -185,7 +186,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Debit Account
+                                    <FormattedMessage id='FundTradePage.debitAccount' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -205,7 +206,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Account Balance
+                                    <FormattedMessage id='FundTradePage.accountBalance' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -219,7 +220,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Trade Date
+                                    <FormattedMessage id='FundTradePage.tradeDate' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -238,7 +239,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Debit Amount
+                                    <FormattedMessage id='FundTradePage.debitAmount' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -256,7 +257,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Exchange Rate
+                                    <FormattedMessage id='FundTradePage.exchangeRate' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -278,7 +279,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Price
+                                    <FormattedMessage id='FundTradePage.price' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -299,7 +300,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Share
+                                    <FormattedMessage id='FundTradePage.share' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -313,7 +314,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label required'>
-                                    Fee
+                                    <FormattedMessage id='FundTradePage.fee' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -331,7 +332,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>
-                                    Total
+                                    <FormattedMessage id='FundTradePage.total' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -345,7 +346,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                         <CRow className='mb-3'>
                             <CCol xs={5} md={4}>
                                 <CFormLabel className='col-form-label'>
-                                    Linked File
+                                    <FormattedMessage id='FundTradePage.file' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={7} md={8}>
@@ -362,7 +363,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                 </CCardBody>
                 <CCardFooter className='text-end'>
                     <CButton color='success' variant='outline' onClick={this.onBuyClick}>
-                        Buy
+                        <FormattedMessage id='FundTradePage.buyBtn' />
                     </CButton>
                 </CCardFooter>
             </CCard>

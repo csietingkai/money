@@ -1,19 +1,20 @@
 import * as StateHolder from './StateHolder';
 import { Account } from '../api/account';
 import { AuthToken, UserSetting } from '../api/auth';
+import { BankInfo } from '../api/bankInfo';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import { ExchangeRateVo } from '../api/exchangeRate';
 import { StockType } from '../util/Enum';
-import { Notification, Option } from '../util/Interface';
+import { Lang, Notification, Option } from '../util/Interface';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
 import StockTradeCondition from '../views/stock/interface/StockTradeCondition';
 import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
 import FundTradeCondition from '../views/fund/interface/FundTradeCondition';
 import ExchangeRateQueryCondition from '../views/exchangeRate/interface/ExchangeRateQueryCondition';
 import ExchangeRateTradeCondition from '../views/exchangeRate/interface/ExchangeRateTradeCondition';
-import { BankInfo } from '../api/bankInfo';
 import AccountRecordQueryCondition from '../views/account/interface/AccountRecordQueryCondition';
+import dictionary from '../assets/locales/dictionary';
 
 export interface ReduxState {
     auth: ReduxAuthState;
@@ -49,6 +50,8 @@ export const getStockFeeRate = (state: ReduxState): number => getUserSetting(sta
 export const getFundFeeRate = (state: ReduxState): number => getUserSetting(state)?.fundFeeRate;
 export const isAccountRecordDeletable = (state: ReduxState): boolean => getUserSetting(state)?.accountRecordDeletable;
 export const getDefaultRecordType = (state: ReduxState): string => getUserSetting(state)?.accountRecordType;
+export const getLang = (state: ReduxState): Lang => getUserSetting(state)?.lang || StateHolder.getLang();
+export const getMessages = (state: ReduxState): Record<string, string> => dictionary[getLang(state)];
 
 // accountReducer
 export interface ReduxAccountState {
@@ -153,7 +156,7 @@ export const DEFAULT_REDUX_SYSTEM_SETTING_STATE: ReduxSystemSettingState = {
     sidebarShow: StateHolder.getSidebarShow(),
     sidebarFoldable: StateHolder.getSidebarFoldable(),
     notifications: [],
-    isMobile: false
+    isMobile: false,
 };
 const getSystemSetting = (state: ReduxState): ReduxSystemSettingState => state.setting;
 export const isLoading = (state: ReduxState): boolean => getSystemSetting(state)?.loading;

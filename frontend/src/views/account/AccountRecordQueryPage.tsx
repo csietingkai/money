@@ -1,5 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormSelect, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilChevronDoubleRight, cilMediaSkipForward } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -158,7 +159,9 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                         <CCardHeader>
                             <div className='d-flex'>
                                 <CIcon size='lg' className='my-auto' icon={cilChevronDoubleRight} />
-                                <strong className='ms-2'>Search Condition</strong>
+                                <strong className='ms-2'>
+                                    <FormattedMessage id='AccountRecordQueryPage.searchCondition.title' />
+                                </strong>
                             </div>
                         </CCardHeader>
                         <CCardBody>
@@ -167,7 +170,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     <CCol xs={3}>
                                         <CFormSwitch
                                             size='xl'
-                                            label='Date Range'
+                                            label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.dateRange' />}
                                             id='use-date-range'
                                             checked={searchConditionForm.useDateRange}
                                             onChange={(event) => {
@@ -233,7 +236,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     <CCol xs={3}>
                                         <CFormSwitch
                                             size='xl'
-                                            label='Record Type'
+                                            label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.recordType' />}
                                             id='use-record-type'
                                             checked={searchConditionForm.useRecordType}
                                             onChange={(event) => this.setState({ searchConditionForm: { ...searchConditionForm, useRecordType: event.target.checked } })}
@@ -253,7 +256,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     <CCol xs={3}>
                                         <CFormSwitch
                                             size='xl'
-                                            label='Account'
+                                            label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.account' />}
                                             id='use-account-id'
                                             checked={searchConditionForm.useAccountId}
                                             onChange={(event) => this.setState({ searchConditionForm: { ...searchConditionForm, useAccountId: event.target.checked } })}
@@ -273,7 +276,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     <CCol xs={3}>
                                         <CFormSwitch
                                             size='xl'
-                                            label='Description'
+                                            label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.description' />}
                                             id='use-desc'
                                             checked={searchConditionForm.useDesc}
                                             onChange={(event) => {
@@ -317,7 +320,9 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                 <CCol>
                     <CCard>
                         <CCardHeader>
-                            <strong>Query Result</strong>
+                            <strong>
+                                <FormattedMessage id='AccountRecordQueryPage.searchResult.title' />
+                            </strong>
                         </CCardHeader>
                         <CCardBody>
                             <CRow>
@@ -325,19 +330,33 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     <CTable align='middle' responsive hover>
                                         <CTableHead>
                                             <CTableRow>
-                                                <CTableHeaderCell scope='col'>Date</CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>Amount</CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>From</CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>To</CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>Type</CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>Description</CTableHeaderCell>
+                                                <CTableHeaderCell scope='col'>
+                                                    <FormattedMessage id='AccountRecordQueryPage.searchResult.th.date' />
+                                                </CTableHeaderCell>
+                                                <CTableHeaderCell scope='col'>
+                                                    <FormattedMessage id='AccountRecordQueryPage.searchResult.th.amount' />
+                                                </CTableHeaderCell>
+                                                <CTableHeaderCell scope='col'>
+                                                    <FormattedMessage id='AccountRecordQueryPage.searchResult.th.from' />
+                                                </CTableHeaderCell>
+                                                <CTableHeaderCell scope='col'>
+                                                    <FormattedMessage id='AccountRecordQueryPage.searchResult.th.to' />
+                                                </CTableHeaderCell>
+                                                <CTableHeaderCell scope='col'>
+                                                    <FormattedMessage id='AccountRecordQueryPage.searchResult.th.type' />
+                                                </CTableHeaderCell>
+                                                <CTableHeaderCell scope='col'>
+                                                    <FormattedMessage id='AccountRecordQueryPage.searchResult.th.desc' />
+                                                </CTableHeaderCell>
                                             </CTableRow>
                                         </CTableHead>
                                         <CTableBody>
                                             {
                                                 accountRecords.length == 0 &&
                                                 <CTableRow>
-                                                    <CTableDataCell colSpan={6} className='text-center'>NO DATA</CTableDataCell>
+                                                    <CTableDataCell colSpan={6} className='text-center'>
+                                                        <FormattedMessage id='AccountRecordQueryPage.searchResult.noData' />
+                                                    </CTableDataCell>
                                                 </CTableRow>
                                             }
                                             {

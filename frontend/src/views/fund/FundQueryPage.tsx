@@ -1,17 +1,18 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilChevronDoubleRight, cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
 import AppPriceChart from '../../components/AppPriceChart';
-import { ReduxState, getAuthTokenId, getFundQueryCondition } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getFundQueryCondition, getLang, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher } from '../../reducer/PropsMapper';
 import FundApi, { FundRecordVo, FundVo } from '../../api/fund';
 import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
 import { StockType } from '../../util/Enum';
-import { Action, SupportLineType } from '../../util/Interface';
+import { Action, Lang, SupportLineType } from '../../util/Interface';
 import FundQueryCondition from './interface/FundQueryCondition';
 import FundTradeCondition from './interface/FundTradeCondition';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
@@ -19,6 +20,7 @@ import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 export interface FundQueryPageProps {
     userId: string;
     queryCondition: FundQueryCondition;
+    lang: Lang;
     stockType: StockType;
     setFundQueryCondition: (queryCondition: FundQueryCondition) => void;
     setFundTradeCondition: (tradeCondition: FundTradeCondition) => void;
@@ -111,13 +113,16 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
     };
 
     private getQueryCard = (): React.ReactNode => {
+        const { lang } = this.props;
         const { queryForm } = this.state;
         return (
             <CCard className='mb-4'>
                 <CCardHeader>
                     <div className='d-flex'>
-                        <CIcon size='lg' className='my-auto' icon={cilChevronDoubleRight}/>
-                        <strong className='ms-2'>Search Condition</strong>
+                        <CIcon size='lg' className='my-auto' icon={cilChevronDoubleRight} />
+                        <strong className='ms-2'>
+                            <FormattedMessage id='FundQueryPage.searchCondition.title' />
+                        </strong>
                     </div>
                 </CCardHeader>
                 <CCardBody>
@@ -125,14 +130,14 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                         <CRow className='mb-2'>
                             <CCol xs={4} md={3}>
                                 <CFormLabel className='col-form-label'>
-                                    Code
+                                    <FormattedMessage id='FundQueryPage.searchCondition.code' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={8} md={9}>
                                 <CFormInput
                                     type='text'
                                     value={queryForm.code}
-                                    placeholder='Search by Fund Code'
+                                    placeholder={AppUtil.getFormattedMessage(lang, 'FundQueryPage.searchCondition.codePlaceHolder')}
                                     onChange={(event) => this.onQueryFormChange({ ...queryForm, code: event.target.value as string })}
                                 />
                             </CCol>
@@ -140,14 +145,14 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                         <CRow className='mb-2'>
                             <CCol xs={4} md={3}>
                                 <CFormLabel className='col-form-label'>
-                                    Name
+                                    <FormattedMessage id='FundQueryPage.searchCondition.name' />
                                 </CFormLabel>
                             </CCol>
                             <CCol xs={8} md={9}>
                                 <CFormInput
                                     type='text'
                                     value={queryForm.name}
-                                    placeholder='Fuzzy Search by Fund Name'
+                                    placeholder={AppUtil.getFormattedMessage(lang, 'FundQueryPage.searchCondition.namePlaceHolder')}
                                     onChange={(event) => this.onQueryFormChange({ ...queryForm, name: event.target.value as string })}
                                 />
                             </CCol>
@@ -156,7 +161,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                 </CCardBody>
                 <CCardFooter className='text-end'>
                     <CButton color='success' variant='outline' onClick={this.search}>
-                        Search
+                        <FormattedMessage id='FundQueryPage.searchCondition.searchBtn' />
                     </CButton>
                 </CCardFooter>
             </CCard>
@@ -164,7 +169,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
     };
 
     private getFundsCard = () => {
-        const { stockType } = this.props;
+        const { stockType, lang } = this.props;
         const { funds, currentFundPage } = this.state;
         if (!funds.length) {
             return <React.Fragment></React.Fragment>;
@@ -178,9 +183,15 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                             <CTable align='middle' responsive hover>
                                 <CTableHead>
                                     <CTableRow>
-                                        <CTableHeaderCell scope='col'>Code</CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>Name</CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>Update Date</CTableHeaderCell>
+                                        <CTableHeaderCell scope='col'>
+                                            <FormattedMessage id='FundQueryPage.searchResult.th.code' />
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell scope='col'>
+                                            <FormattedMessage id='FundQueryPage.searchResult.th.name' />
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell scope='col'>
+                                            <FormattedMessage id='FundQueryPage.searchResult.th.date' />
+                                        </CTableHeaderCell>
                                         <CTableHeaderCell scope='col'></CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
@@ -203,7 +214,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                                                         </CButton>
                                                         {/* TODO track */}
                                                         <CTooltip
-                                                            content={`Buy ${s.name}`}
+                                                            content={`${AppUtil.getFormattedMessage(lang, 'FundQueryPage.searchResult.buyBtn')} ${s.name}`}
                                                         >
                                                             <CButton
                                                                 color={AppUtil.getBenifitColor(1, stockType)}
@@ -215,7 +226,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                                                             </CButton>
                                                         </CTooltip>
                                                         <CTooltip
-                                                            content={`Sell ${s.name}`}
+                                                            content={`${AppUtil.getFormattedMessage(lang, 'FundQueryPage.searchResult.sellBtn')} ${s.name}`}
                                                         >
                                                             <CButton
                                                                 color={AppUtil.getBenifitColor(-1, stockType)}
@@ -242,6 +253,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
     };
 
     private getFundChartCard = (): React.ReactNode => {
+        const { lang } = this.props;
         const { selectedFund, fundRecords } = this.state;
         if (!fundRecords.length) {
             return <React.Fragment></React.Fragment>;
@@ -249,12 +261,17 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
         return (
             <CCard className='mb-4'>
                 <CCardHeader>
-                    <strong>{selectedFund?.name}</strong> <small>details</small>
+                    <strong>{selectedFund?.name}</strong>
+                    &nbsp;
+                    <small>
+                        <FormattedMessage id='FundQueryPage.chart.subtitle' />
+                    </small>
                 </CCardHeader>
                 <CCardBody>
                     {
                         selectedFund &&
                         <AppPriceChart
+                            lang={lang}
                             chartType='fund'
                             info={selectedFund}
                             records={fundRecords}
@@ -287,6 +304,8 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
 const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
+        lang: getLang(state),
+        stockType: getStockType(state),
         queryCondition: getFundQueryCondition(state)
     };
 };

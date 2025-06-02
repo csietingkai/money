@@ -1,27 +1,29 @@
 import React, { Dispatch } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CProgress, CProgressBar, CRow, CTabContent, CTabPane } from '@coreui/react';
 import Chart from 'react-google-charts';
 import CIcon from '@coreui/icons-react';
 import { cilBank, cilExternalLink } from '@coreui/icons';
 import { connect } from 'react-redux';
 import { SetAccountRecordQueryConditionDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
-import { ReduxState, getAccountList, getFundOwnList, getStockOwnList } from '../reducer/Selector';
+import { ReduxState, getAccountList, getFundOwnList, getLang, getStockOwnList } from '../reducer/Selector';
 import AccountApi, { Account, MonthBalanceVo } from '../api/account';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import AccountRecordQueryCondition from './account/interface/AccountRecordQueryCondition';
 import * as AppUtil from '../util/AppUtil';
-import { Action } from '../util/Interface';
+import { Action, Lang } from '../util/Interface';
 import { CHART_COLORS, DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
 import { stock } from '../assets/brand/stock';
 import { fund } from '../assets/brand/fund';
 
 export interface AccountBalance {
     value: string;
-    desc: string;
+    desc: React.ReactNode;
 }
 
 export interface DashboardProps {
+    lang: Lang;
     accountList: Account[];
     ownStockList: UserStockVo[];
     ownFundList: UserFundVo[];
@@ -54,8 +56,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         }
     };
 
-    private getTotalAccountBalance = (accountList: Account[]): { value: string, desc: string; }[] => {
-        const balances: { value: string, desc: string; }[] = [];
+    private getTotalAccountBalance = (accountList: Account[]): AccountBalance[] => {
+        const balances: AccountBalance[] = [];
         const m = {};
         for (const a of accountList) {
             if (!m[a.currency]) {
@@ -142,7 +144,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         const { monthBalance, activeTab } = this.state;
         const yms = monthBalance.details.map(x => `${x.year}${AppUtil.prefixZero(x.month)}`);
         const ymLabels = monthBalance.details.map(x => `${x.year}/${AppUtil.prefixZero(x.month)}`);
-        const dataHeader = ['Record Type', `${key.slice(0, 1).toUpperCase()}${key.slice(1)}`];
+        const dataHeader = ['Record Type', `${AppUtil.capitalize(key)}`];
         const data = {};
         monthBalance.details.forEach(x => {
             const ym = `${x.year}${AppUtil.prefixZero(x.month)}`;
@@ -175,7 +177,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     <CRow className='mb-2'>
                         <CCol sm={12}>
                             <h4 className='mb-0'>
-                                Month {`${key.slice(0, 1).toUpperCase()}${key.slice(1)}`} Detail
+                                <FormattedMessage id={`Dashboard.month${AppUtil.capitalize(key)}Detail`}/>
                             </h4>
                         </CCol>
                     </CRow>
@@ -243,9 +245,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     };
 
     private monthSumChart = (): React.ReactNode => {
+        const { lang } = this.props;
         const { monthBalance } = this.state;
         const data = [
-            ['', 'Income', 'Expend', 'Surplus'],
+            ['', AppUtil.getFormattedMessage(lang, 'Dashboard.monthlySummary.income'), AppUtil.getFormattedMessage(lang, 'Dashboard.monthlySummary.expend'), AppUtil.getFormattedMessage(lang, 'Dashboard.monthlySummary.surplus')],
             ...monthBalance.sums.map(x => [`${x.year}${AppUtil.prefixZero(x.month)}`, x.income, x.expend, x.surplus])
         ];
         const options = {
@@ -258,7 +261,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     <CRow className='mb-3'>
                         <CCol sm={12}>
                             <h4 className='mb-0'>
-                                Monthly Summary
+                                <FormattedMessage id='Dashboard.monthlySummary.title' />
                             </h4>
                         </CCol>
                     </CRow>
@@ -283,19 +286,20 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         return (
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
+
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('account-card', accountBalances)}
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('stock-card', [
-                            { value: AppUtil.numberComma(totalStockValue), desc: 'Current Value' },
-                            { value: AppUtil.numberComma(totalStockBenifit), desc: `Benifit: ${AppUtil.numberComma(totalStockPercentage)}%` }
+                            { value: AppUtil.numberComma(totalStockValue), desc: <FormattedMessage id='Dashboard.stock.currentValue' /> },
+                            { value: AppUtil.numberComma(totalStockBenifit), desc: <FormattedMessage id='Dashboard.stock.benifit' values={{val: `${AppUtil.numberComma(totalStockPercentage)}`}}/> }
                         ], stock)}
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('fund-card', [
-                            { value: AppUtil.numberComma(totalFundValue), desc: 'Current Value' },
-                            { value: AppUtil.numberComma(totalFundBenifit), desc: `Benifit: ${AppUtil.numberComma(totalFundPercentage)}%` }
+                            { value: AppUtil.numberComma(totalFundValue), desc: <FormattedMessage id='Dashboard.fund.currentValue' /> },
+                            { value: AppUtil.numberComma(totalFundBenifit), desc: <FormattedMessage id='Dashboard.fund.benifit' values={{val: `${AppUtil.numberComma(totalStockPercentage)}`}}/> }
                         ], fund)}
                     </CCol>
                 </CRow>
@@ -315,6 +319,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     }
 } const mapStateToProps = (state: ReduxState) => {
     return {
+        lang: getLang(state),
         accountList: getAccountList(state),
         ownStockList: getStockOwnList(state),
         ownFundList: getFundOwnList(state)

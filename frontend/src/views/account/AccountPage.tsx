@@ -14,6 +14,7 @@ import { Action, SimpleResponse, Option } from '../../util/Interface';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 import currencyIcon from '../../assets/currency';
 import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecordModal';
+import { FormattedMessage } from 'react-intl';
 
 export interface AccountPageProps {
     accountList: Account[],
@@ -225,13 +226,15 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         return (
             <CModal alignment='center' visible={showAddAccountModal} onClose={this.closeAddAccountModal}>
                 <CModalHeader>
-                    <CModalTitle>New Account</CModalTitle>
+                    <CModalTitle>
+                        <FormattedMessage id='AccountPage.accountModal.add.title' />
+                    </CModalTitle>
                 </CModalHeader>
                 <CModalBody>
                     <CForm onKeyDown={AppUtil.bindEnterKey(this.addAccount)}>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
-                                Currency
+                                <FormattedMessage id='AccountPage.accountModal.currency' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormSelect
@@ -244,7 +247,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                                Name
+                                <FormattedMessage id='AccountPage.accountModal.name' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormInput
@@ -257,7 +260,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                                Bank
+                                <FormattedMessage id='AccountPage.accountModal.bankCode' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormSelect
@@ -271,7 +274,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                                Bank No.
+                                <FormattedMessage id='AccountPage.accountModal.bankNo' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormInput
@@ -284,7 +287,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-shown' className='col-sm-3 col-form-label'>
-                                Show / Hide
+                                <FormattedMessage id='AccountPage.accountModal.isShow' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormSwitch
@@ -298,8 +301,12 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     </CForm>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='primary' onClick={this.addAccount}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeAddAccountModal}>Close</CButton>
+                    <CButton color='primary' onClick={this.addAccount}>
+                        <FormattedMessage id='AccountPage.accountModal.saveBtn' />
+                    </CButton>
+                    <CButton color='secondary' onClick={this.closeAddAccountModal}>
+                        <FormattedMessage id='AccountPage.accountModal.cancelBtn' />
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );
@@ -336,13 +343,15 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         return (
             <CModal alignment='center' visible={showEditAccountModal} onClose={this.closeEditAccountModal}>
                 <CModalHeader>
-                    <CModalTitle>Edit Account</CModalTitle>
+                    <CModalTitle>
+                        <FormattedMessage id='AccountPage.accountModal.edit.title' />
+                    </CModalTitle>
                 </CModalHeader>
                 <CModalBody>
                     <CForm onKeyDown={AppUtil.bindEnterKey(this.editAccount)}>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='currency' className='col-sm-3 col-form-label'>
-                                Currency
+                                <FormattedMessage id='AccountPage.accountModal.currency' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormSelect
@@ -355,7 +364,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                                Name
+                                <FormattedMessage id='AccountPage.accountModal.name' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormInput
@@ -368,7 +377,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                                Bank
+                                <FormattedMessage id='AccountPage.accountModal.bankCode' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormSelect
@@ -382,7 +391,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-name' className='col-sm-3 col-form-label'>
-                                Bank No.
+                                <FormattedMessage id='AccountPage.accountModal.bankNo' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormInput
@@ -395,7 +404,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CRow>
                         <CRow className='mb-3'>
                             <CFormLabel htmlFor='account-shown' className='col-sm-3 col-form-label'>
-                                Show / Hide
+                                <FormattedMessage id='AccountPage.accountModal.isShow' />
                             </CFormLabel>
                             <div className='col-sm-9'>
                                 <CFormSwitch
@@ -409,8 +418,12 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     </CForm>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='primary' onClick={this.editAccount}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeEditAccountModal}>Close</CButton>
+                    <CButton color='primary' onClick={this.editAccount}>
+                        <FormattedMessage id='AccountPage.accountModal.saveBtn' />
+                    </CButton>
+                    <CButton color='secondary' onClick={this.closeEditAccountModal}>
+                        <FormattedMessage id='AccountPage.accountModal.cancelBtn' />
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );
@@ -452,7 +465,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CRow className='mb-3'>
                         <CCol>
                             <CFormLabel htmlFor='account-name' className='col-form-label'>
-                                Bank
+                                <FormattedMessage id='AccountPage.accountModal.bankCode' />
                             </CFormLabel>
                             <CFormSelect
                                 value={qrcodeForm.bankCode}
@@ -464,7 +477,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         </CCol>
                         <CCol>
                             <CFormLabel htmlFor='account-name' className='col-form-label'>
-                                Bank No.
+                                <FormattedMessage id='AccountPage.accountModal.bankNo' />
                             </CFormLabel>
                             <CFormInput
                                 type='text'
@@ -478,7 +491,9 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     </CRow>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='secondary' onClick={this.closeQrcodeModal}>Close</CButton>
+                    <CButton color='secondary' onClick={this.closeQrcodeModal}>
+                        <FormattedMessage id='AccountPage.accountModal.closeBtn' />
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );
@@ -541,12 +556,14 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <CCol sm={12} className='d-flex justify-content-end'>
                         <CButton color='secondary' variant='outline' onClick={() => this.setState({ showAddAccountModal: true })}>
                             <CIcon icon={cilPlus} className='me-2' />
-                            Add Account
+                            <FormattedMessage id='AccountPage.addAccountBtn' />
                         </CButton>
                         {
                             hasHiddenAccount &&
                             <CDropdown variant='btn-group' className='ms-2'>
-                                <CDropdownToggle color='secondary' variant='outline'>Unhide Account</CDropdownToggle>
+                                <CDropdownToggle color='secondary' variant='outline'>
+                                    <FormattedMessage id='AccountPage.unhideAccountBtn' />
+                                </CDropdownToggle>
                                 <CDropdownMenu>
                                     {accountList.filter(account => !account.shown).map(account => (
                                         <CDropdownItem
@@ -574,7 +591,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                         <CCol sm={12}>
                                             <CCard>
                                                 <CCardHeader>
-                                                    <strong>{account.name}</strong> <small>details</small>
+                                                    <strong>{account.name}</strong> <small><FormattedMessage id='AccountPage.accountDetail' /></small>
                                                 </CCardHeader>
                                                 <CCardBody>
                                                     <CRow>
@@ -585,21 +602,21 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                                     variant='outline'
                                                                     onClick={() => this.setState({ currentRecordMode: 'income', holdingAccountId: account.id })}
                                                                 >
-                                                                    Income
+                                                                    <FormattedMessage id='AccountPage.incomeBtn' />
                                                                 </CButton>
                                                                 <CButton
                                                                     color='info'
                                                                     variant='outline'
                                                                     onClick={() => this.setState({ currentRecordMode: 'transfer', holdingAccountId: account.id })}
                                                                 >
-                                                                    Transfer
+                                                                    <FormattedMessage id='AccountPage.transferBtn' />
                                                                 </CButton>
                                                                 <CButton
                                                                     color='danger'
                                                                     variant='outline'
                                                                     onClick={() => this.setState({ currentRecordMode: 'expend', holdingAccountId: account.id })}
                                                                 >
-                                                                    Expend
+                                                                    <FormattedMessage id='AccountPage.expendBtn' />
                                                                 </CButton>
                                                             </CButtonGroup>
                                                         </CCol>
@@ -609,12 +626,24 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                             <CTable align='middle' responsive hover>
                                                                 <CTableHead>
                                                                     <CTableRow>
-                                                                        <CTableHeaderCell scope='col'>Date</CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>Amount</CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>From</CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>To</CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>Type</CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>Description</CTableHeaderCell>
+                                                                        <CTableHeaderCell scope='col'>
+                                                                            <FormattedMessage id='AccountPage.th.date' />
+                                                                        </CTableHeaderCell>
+                                                                        <CTableHeaderCell scope='col'>
+                                                                            <FormattedMessage id='AccountPage.th.amount' />
+                                                                        </CTableHeaderCell>
+                                                                        <CTableHeaderCell scope='col'>
+                                                                            <FormattedMessage id='AccountPage.th.from' />
+                                                                        </CTableHeaderCell>
+                                                                        <CTableHeaderCell scope='col'>
+                                                                            <FormattedMessage id='AccountPage.th.to' />
+                                                                        </CTableHeaderCell>
+                                                                        <CTableHeaderCell scope='col'>
+                                                                            <FormattedMessage id='AccountPage.th.type' />
+                                                                        </CTableHeaderCell>
+                                                                        <CTableHeaderCell scope='col'>
+                                                                            <FormattedMessage id='AccountPage.th.desc' />
+                                                                        </CTableHeaderCell>
                                                                         <CTableHeaderCell scope='col'></CTableHeaderCell>
                                                                     </CTableRow>
                                                                 </CTableHead>

@@ -1,6 +1,7 @@
 import React from 'react';
-import { CButton, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
+import { FormattedMessage } from 'react-intl';
 import moment from 'moment';
+import { CButton, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 import AccountApi, { Account, AccountRecordVo } from '../../../api/account';
 import FinancailFileApi from '../../../api/financailFile';
 import * as AppUtil from '../../../util/AppUtil';
@@ -185,7 +186,7 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                                 form?.mode === 'transfer' &&
                                 <CRow className='mb-3'>
                                     <CFormLabel htmlFor='transaction-to' className='col-sm-4 col-form-label'>
-                                        Transfer To
+                                        <FormattedMessage id='AccountPage.AccountRecordModal.transferTo' />
                                     </CFormLabel>
                                     <div className='col-sm-8'>
                                         <CFormSelect
@@ -201,7 +202,7 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
 
                             <CRow className='mb-3'>
                                 <CFormLabel htmlFor='transaction-date' className='col-sm-4 col-form-label'>
-                                    Transaction Date
+                                    <FormattedMessage id='AccountPage.AccountRecordModal.transactionDate' />
                                 </CFormLabel>
                                 <div className='col-sm-8'>
                                     <input
@@ -219,7 +220,7 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                             </CRow>
                             <CRow className='mb-3'>
                                 <CFormLabel htmlFor='transaction-record-type' className='col-sm-4 col-form-label'>
-                                    Record Type
+                                    <FormattedMessage id='AccountPage.AccountRecordModal.recordType' />
                                 </CFormLabel>
                                 <div className='col-sm-8'>
                                     <CFormSelect
@@ -233,7 +234,8 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                             </CRow>
                             <CRow className='mb-3'>
                                 <CFormLabel htmlFor='transaction-amount' className='col-sm-4 col-form-label'>
-                                    Transaction Amount
+                                    <FormattedMessage id='AccountPage.AccountRecordModal.transactionAmount' />
+
                                 </CFormLabel>
                                 <div className='col-sm-8'>
                                     <CFormInput
@@ -246,7 +248,7 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                             </CRow>
                             <CRow className='mb-3'>
                                 <CFormLabel htmlFor='transaction-description' className='col-sm-4 col-form-label'>
-                                    Description
+                                    <FormattedMessage id='AccountPage.AccountRecordModal.description' />
                                 </CFormLabel>
                                 <div className='col-sm-8'>
                                     <CFormInput
@@ -259,7 +261,7 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                             </CRow>
                             <CRow className='mb-3'>
                                 <CFormLabel htmlFor='transaction-file' className='col-sm-4 col-form-label'>
-                                    Linked File
+                                    <FormattedMessage id='AccountPage.AccountRecordModal.linkedFile' />
                                 </CFormLabel>
                                 <div className='col-sm-8'>
                                     <CFormSelect
@@ -276,8 +278,12 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                     }
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='primary' onClick={this.submit}>Save</CButton>
-                    <CButton color='secondary' onClick={this.closeModal}>Close</CButton>
+                    <CButton color='primary' onClick={this.submit}>
+                        <FormattedMessage id='AccountPage.AccountRecordModal.saveBtn' />
+                    </CButton>
+                    <CButton color='secondary' onClick={this.closeModal}>
+                        <FormattedMessage id='AccountPage.AccountRecordModal.closeBtn' />
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );

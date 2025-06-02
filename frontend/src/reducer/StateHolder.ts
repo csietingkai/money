@@ -1,4 +1,5 @@
 import { AuthToken } from '../api/auth';
+import { Lang } from '../util/Interface';
 
 const setState = (key: string, value: string) => {
     localStorage.setItem(key, value);
@@ -62,4 +63,16 @@ export const getSidebarFoldable = (): boolean => {
 };
 export const setSidebarFoldable = (val: boolean) => {
     setState(SIDEBAR_FOLDABLE_KEY, `${val}`);
+};
+
+const LANG: string = 'lang';
+export const getLang = (): Lang => {
+    const val: string = getState(LANG);
+    if (val === 'zh' || val === 'en') {
+        return val;
+    }
+    return 'en';
+};
+export const setLang = (val: Lang) => {
+    setState(LANG, val);
 };

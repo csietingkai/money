@@ -1,20 +1,21 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { CCard, CCardBody, CNav, CNavItem, CNavLink, CTabContent, CTabPane } from '@coreui/react';
-import { ReduxState, getAuthTokenId, getExchangeRateList, getExchangeRateQueryCondition, getStockType } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getExchangeRateList, getExchangeRateQueryCondition, getLang, getStockType } from '../../reducer/Selector';
 import { SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
 import ExchangeRateApi, { ExchangeRateVo } from '../../api/exchangeRate';
 import { FundRecordVo } from '../../api/fund';
 import AppPriceChart from '../../components/AppPriceChart';
 import { StockType } from '../../util/Enum';
-import { Action } from '../../util/Interface';
+import { Action, Lang } from '../../util/Interface';
 import ExchangeRateQueryCondition from './interface/ExchangeRateQueryCondition';
 
 export interface ExchangeRateQueryPageProps {
     userId: string;
-    stockType: StockType;
     exchangeRates: ExchangeRateVo[];
     exchangeRateQueryCondition: ExchangeRateQueryCondition;
+    lang: Lang;
+    stockType: StockType;
     setLoading: (isLoading: boolean) => void;
     notify: (message: string) => void;
 }
@@ -42,7 +43,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
     }
 
     private init = async (currency: string) => {
-        const { setLoading, exchangeRateQueryCondition, exchangeRates } = this.props;
+        const { setLoading } = this.props;
         setLoading(true);
         const recordVos = await this.fetchExchangeRateRecords(currency);
         this.setState({ exchangeRateRecords: recordVos });
@@ -83,6 +84,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
     }
 
     render(): React.ReactNode {
+        const { lang } = this.props;
         const { exchangeRates, exchangeRateRecords, activeTab } = this.state;
         const selectedExchangeRate = exchangeRates.find(er => er.currency === activeTab);
         return (
@@ -108,6 +110,7 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
                         <CCard className='mb-4'>
                             <CCardBody>
                                 <AppPriceChart
+                                    lang={lang}
                                     chartType='fund'
                                     info={{ name: selectedExchangeRate?.name || '' }}
                                     records={exchangeRateRecords}
@@ -125,6 +128,7 @@ const mapStateToProps = (state: ReduxState) => {
     return {
         userId: getAuthTokenId(state),
         stockType: getStockType(state),
+        lang: getLang(state),
         exchangeRates: getExchangeRateList(state),
         exchangeRateQueryCondition: getExchangeRateQueryCondition(state)
     };

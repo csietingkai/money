@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import io.tingkai.money.constant.DatabaseConstant;
+import io.tingkai.money.enumeration.Lang;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,4 +30,6 @@ public class UserSetting {
 	protected Boolean accountRecordDeletable;
 	protected Boolean onlyShowOwnStock;
 	protected Boolean onlyShowOwnFund;
+	@Enumerated(EnumType.STRING)
+	protected Lang lang;
 }

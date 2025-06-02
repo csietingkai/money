@@ -1,0 +1,304 @@
+{
+    "AppConfirmModal": {
+        "text": "Are you sure you want to DELETE?",
+        "confirmBtn": "Confirm",
+        "cancelBtn": "Cancel"
+    },
+    "AppHeader": {
+        "settingText": "Setting",
+        "logoutText": "Logout"
+    },
+    "AppPriceChart": {
+        "indicators": {
+            "none": "None",
+            "ma": "Moving Average",
+            "bb": "Bollinger Bands"
+        }
+    },
+    "AppSidebar": {
+        "dashboard": "Dashboard",
+        "accountTitle": "Account",
+        "account": "Accounts",
+        "recordQuery": "Record Query",
+        "stockTitle": "Stock",
+        "stock": "Your Stock",
+        "stockQuery": "Stock Query",
+        "stockTrade": "Stock Trade",
+        "fundTitle": "Fund",
+        "fund": "Your Fund",
+        "fundQuery": "Fund Query",
+        "fundTrade": "Fund Trade",
+        "currencyTitle": "Currency",
+        "exchangeRateQuery": "Currency Query",
+        "exchangeRateTrade": "Currency Trade",
+        "extrasTitle": "Extras",
+        "files": "Financial Files",
+        "setting": "User Setting",
+        "sourceCode": "Source Code"
+    },
+    "Dashboard": {
+        "stock": {
+            "currentValue": "Current Stock",
+            "benifit": "Benifit: {val}%"
+        },
+        "fund": {
+            "currentValue": "Current Fund",
+            "benifit": "Benifit: {val}%"
+        },
+        "monthIncomeDetail": "Month Income Detail",
+        "monthExpendDetail": "Month Expend Detail",
+        "monthlySummary": {
+            "title": "Monthly Summary",
+            "income": "Income",
+            "expend": "Expend",
+            "surplus": "Surplus"
+        }
+    },
+    "Login": {
+        "title": "Login",
+        "subtitle": "Sign In to your account",
+        "loginBtn": "Login"
+    },
+    "Page404": {
+        "title": "Oops! You're lost.",
+        "subtitle": "The page you are looking for was not found."
+    },
+    "Page500": {
+        "title": "Houston, we have a problem!",
+        "subtitle": "The page you are looking for is temporarily unavailable."
+    },
+    "AccountPage": {
+        "addAccountBtn": "Add Account",
+        "unhideAccountBtn": "Unhide Account",
+        "accountDetail": "details",
+        "incomeBtn": "Income",
+        "transferBtn": "Transfer",
+        "expendBtn": "Expend",
+        "th": {
+            "date": "Date",
+            "amount": "Amount",
+            "from": "From",
+            "to": "To",
+            "type": "Type",
+            "desc": "Description"
+        },
+        "accountModal": {
+            "add.title": "New Account",
+            "edit.title": "Edit account",
+            "currency": "Currency",
+            "name": "Name",
+            "bankCode": "Bank",
+            "bankNo": "Bank No.",
+            "isShow": "Show / Hide",
+            "saveBtn": "Save",
+            "cancelBtn": "Cancel",
+            "closeBtn": "Close"
+        },
+        "AccountRecordModal": {
+            "transferTo": "Transfer To",
+            "transactionDate": "Transaction Date",
+            "recordType": "Record Type",
+            "transactionAmount": "Transaction Amount",
+            "description": "Description",
+            "linkedFile": "Linked File",
+            "saveBtn": "Save",
+            "closeBtn": "Close"
+        }
+    },
+    "AccountRecordQueryPage": {
+        "searchCondition": {
+            "title": "Search Condition",
+            "dateRange": "Date Range",
+            "recordType": "Record Type",
+            "account": "Account",
+            "description": "Description"
+        },
+        "searchResult": {
+            "title": "Search Result",
+            "th": {
+                "date": "Date",
+                "amount": "Amount",
+                "from": "From",
+                "to": "To",
+                "type": "Type",
+                "desc": "Description"
+            },
+            "noData": "NO DATA"
+        }
+    },
+    "ExchangeRateTradePage": {
+        "currency": "Currency",
+        "account": "Account",
+        "balance": "Balance",
+        "rate": "Rate",
+        "amount": "Amount",
+        "tradeBtn": "Trade"
+    },
+    "FileManagePage": {
+        "title": "Financial Files",
+        "uploadBtn": "Upload",
+        "fileTypeAll": "ALL",
+        "th": {
+            "filename": "Filename",
+            "type": "Type",
+            "date": "Date"
+        },
+        "uploadModal": {
+            "upload.title": "Upload New File",
+            "edit.title": "Edit File",
+            "type": "Type",
+            "date": "Date",
+            "file": "File",
+            "saveBtn": "Save",
+            "closeBtn": "Close"
+        }
+    },
+    "SettingPage": {
+        "userSetting": {
+            "title": "Change User Info",
+            "name": "Name",
+            "newPassword": "New Password",
+            "confirmPassword": "Confirm Password",
+            "saveBtn": "Save",
+            "clearBtn": "Clear"
+        },
+        "investSetting": {
+            "title": "Investment Setting",
+            "subtitle": "Stock / Fund",
+            "chartStyle": "Chart Style",
+            "tw": "TW",
+            "us": "US",
+            "predictDays": "Predict Days",
+            "stockFeeRate": "Stock Fee Rate",
+            "fundFeeRate": "Fund Fee Rate",
+            "saveBtn": "Save",
+            "clearBtn": "Clear"
+        },
+        "accountRecordSetting": {
+            "title": "Account Setting",
+            "defaultRecordType": "Default Record Type",
+            "recordDeletable": "Record Deletable?",
+            "yes": "Yes",
+            "no": "No",
+            "saveBtn": "Save",
+            "clearBtn": "Clear"
+        }
+    },
+    "FundOwnPage": {
+        "onlyShowOwn": "Only Show Own",
+        "record.subtitle": "trade records",
+        "buyBtn": "Buy",
+        "sellBtn": "Sell",
+        "bonusBtn": "Bonus",
+        "th": {
+            "tradeType": "Trade Type",
+            "date": "Date",
+            "price": "Price",
+            "share": "Share",
+            "fee": "Fee",
+            "total": "Total"
+        },
+        "tradeBtn": "Trade More Fund"
+    },
+    "FundQueryPage": {
+        "searchCondition": {
+            "title": "Search Condition",
+            "code": "Code",
+            "codePlaceHolder": "Search by Fund Code",
+            "name": "Name",
+            "namePlaceHolder": "Fuzzy Search by Fund Name",
+            "searchBtn": "Search"
+        },
+        "searchResult": {
+            "buyBtn": "Buy",
+            "sellBtn": "Sell",
+            "th": {
+                "code": "Code",
+                "name": "Name",
+                "date": "Update Date"
+            }
+        },
+        "chart": {
+            "subtitle": "details"
+        }
+    },
+    "FundTradePage": {
+        "buyTab": "BUY",
+        "sellTab": "SELL",
+        "bonusTab": "BONUS",
+        "code": "Fund Code",
+        "name": "Fund Name",
+        "debitAccount": "Debit Account",
+        "accountBalance": "Account Balance",
+        "tradeDate": "Trade Date",
+        "debitAmount": "Debit Amount",
+        "exchangeRate": "Exchange Rate",
+        "price": "Price",
+        "share": "Share",
+        "fee": "Fee",
+        "total": "Total",
+        "file": "Linked File",
+        "buyBtn": "Buy",
+        "sellBtn": "Sell",
+        "bonusBtn": "Bonus"
+    },
+    "StockOwnPage": {
+        "onlyShowOwn": "Only Show Own",
+        "record.subtitle": "trade records",
+        "buyBtn": "Buy",
+        "sellBtn": "Sell",
+        "bonusBtn": "Bonus",
+        "th": {
+            "tradeType": "Trade Type",
+            "date": "Date",
+            "price": "Price",
+            "share": "Share",
+            "fee": "Fee",
+            "tax": "Tax",
+            "total": "Total"
+        },
+        "tradeBtn": "Trade More Fund"
+    },
+    "StockQueryPage": {
+        "searchCondition": {
+            "title": "Search Condition",
+            "code": "Code",
+            "codePlaceHolder": "Search by Fund Code",
+            "name": "Name",
+            "namePlaceHolder": "Fuzzy Search by Fund Name",
+            "searchBtn": "Search"
+        },
+        "searchResult": {
+            "buyBtn": "Buy",
+            "sellBtn": "Sell",
+            "th": {
+                "code": "Code",
+                "name": "Name",
+                "date": "Update Date"
+            }
+        },
+        "chart": {
+            "subtitle": "details"
+        }
+    },
+    "StockTradePage": {
+        "buyTab": "BUY",
+        "sellTab": "SELL",
+        "bonusTab": "BONUS",
+        "code": "Fund Code",
+        "name": "Fund Name",
+        "debitAccount": "Debit Account",
+        "accountBalance": "Account Balance",
+        "tradeDate": "Trade Date",
+        "exchangeRate": "Exchange Rate",
+        "price": "Price",
+        "share": "Share",
+        "fee": "Fee",
+        "tax": "Tax",
+        "total": "Total",
+        "file": "Linked File",
+        "buyBtn": "Buy",
+        "sellBtn": "Sell",
+        "bonusBtn": "Bonus"
+    }
+}

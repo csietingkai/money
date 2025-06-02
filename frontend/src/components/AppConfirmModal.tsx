@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CCol, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 
 export interface AppConfirmModalProps {
@@ -25,13 +26,17 @@ class AppConfirmModal extends React.Component<AppConfirmModalProps, AppConfirmMo
                 <CModalBody>
                     <CRow className='mb-3'>
                         <CCol sm={12}>
-                            Are you sure you want to <span className='text-red'>DELETE</span>?
+                            <FormattedMessage id='AppConfirmModal.text'/>
                         </CCol>
                     </CRow>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color='primary' onClick={() => onConfirm(true)}>Confirm</CButton>
-                    <CButton color='secondary' onClick={() => onConfirm(false)}>Cancel</CButton>
+                    <CButton color='primary' onClick={() => onConfirm(true)}>
+                        <FormattedMessage id='AppConfirmModal.confirmBtn'/>
+                    </CButton>
+                    <CButton color='secondary' onClick={() => onConfirm(false)}>
+                        <FormattedMessage id='AppConfirmModal.cancelBtn'/>
+                    </CButton>
                 </CModalFooter>
             </CModal>
         );

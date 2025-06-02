@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS user_setting (
 	account_record_deletable BOOLEAN NOT NULL DEFAULT false,
 	only_show_own_stock BOOLEAN NOT NULL DEFAULT true,
 	only_show_own_fund BOOLEAN NOT NULL DEFAULT true,
+	lang VARCHAR(7) NOT NULL DEFAULT true,
 	PRIMARY KEY (id)
 );
 
