@@ -70,6 +70,7 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                 this.setState({ stocks, selectedStock: undefined, stockRecords: [] });
             }
         } else {
+            setLoading(false);
             this.setState({ stocks: [], selectedStock: undefined, stockRecords: [] });
             notify(message);
             return;

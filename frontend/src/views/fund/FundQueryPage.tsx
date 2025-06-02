@@ -72,6 +72,7 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                 this.setState({ funds, selectedFund: undefined, fundRecords: [] });
             }
         } else {
+            setLoading(false);
             this.setState({ funds: [], selectedFund: undefined, fundRecords: [] });
             notify(message);
             return;
