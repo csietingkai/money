@@ -299,7 +299,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('fund-card', [
                             { value: AppUtil.numberComma(totalFundValue), desc: <FormattedMessage id='Dashboard.fund.currentValue' /> },
-                            { value: AppUtil.numberComma(totalFundBenifit), desc: <FormattedMessage id='Dashboard.fund.benifit' values={{val: `${AppUtil.numberComma(totalStockPercentage)}`}}/> }
+                            { value: AppUtil.numberComma(totalFundBenifit), desc: <FormattedMessage id='Dashboard.fund.benifit' values={{val: `${AppUtil.numberComma(totalFundPercentage)}`}}/> }
                         ], fund)}
                     </CCol>
                 </CRow>
