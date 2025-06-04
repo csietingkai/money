@@ -179,25 +179,25 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                         <CTable align='middle' responsive hover>
                                             <CTableHead>
                                                 <CTableRow>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='FundOwnPage.th.tradeType' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='FundOwnPage.th.date' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='FundOwnPage.th.price' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='FundOwnPage.th.share' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='FundOwnPage.th.fee' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='FundOwnPage.th.total' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'></CTableHeaderCell>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'></CTableHeaderCell>
                                                 </CTableRow>
                                             </CTableHead>
                                             <CTableBody>

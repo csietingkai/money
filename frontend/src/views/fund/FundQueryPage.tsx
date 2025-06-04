@@ -184,16 +184,16 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                             <CTable align='middle' responsive hover>
                                 <CTableHead>
                                     <CTableRow>
-                                        <CTableHeaderCell scope='col'>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                             <FormattedMessage id='FundQueryPage.searchResult.th.code' />
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                             <FormattedMessage id='FundQueryPage.searchResult.th.name' />
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                             <FormattedMessage id='FundQueryPage.searchResult.th.date' />
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'></CTableHeaderCell>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'></CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>

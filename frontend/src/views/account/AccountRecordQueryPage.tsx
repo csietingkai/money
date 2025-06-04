@@ -154,7 +154,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
         const { searchConditionForm, isSearchConditionFormValid } = this.state;
         return (
             <CRow>
-                <CCol sm={7} className='mx-auto'>
+                <CCol xs={12} sm={10} md={8} className='mx-auto'>
                     <CCard className='mb-4'>
                         <CCardHeader>
                             <div className='d-flex'>
@@ -167,7 +167,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                         <CCardBody>
                             <CForm onKeyDown={AppUtil.bindEnterKey(this.search)} onSubmit={(event: React.FormEvent<HTMLFormElement>) => event.preventDefault()}>
                                 <CRow className='mb-3'>
-                                    <CCol xs={3}>
+                                    <CCol xs={12} sm={4}>
                                         <CFormSwitch
                                             size='xl'
                                             label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.dateRange' />}
@@ -188,7 +188,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                             }}
                                         />
                                     </CCol>
-                                    <CCol xs={12} sm={9}>
+                                    <CCol xs={12} sm={8}>
                                         <CRow className='justify-content-around'>
                                             <CCol>
                                                 <input
@@ -233,7 +233,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     </CCol>
                                 </CRow>
                                 <CRow className='mb-3'>
-                                    <CCol xs={3}>
+                                    <CCol xs={12} sm={4}>
                                         <CFormSwitch
                                             size='xl'
                                             label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.recordType' />}
@@ -242,7 +242,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                             onChange={(event) => this.setState({ searchConditionForm: { ...searchConditionForm, useRecordType: event.target.checked } })}
                                         />
                                     </CCol>
-                                    <CCol xs={12} sm={9}>
+                                    <CCol xs={12} sm={8}>
                                         <CFormSelect
                                             value={searchConditionForm.recordType}
                                             onChange={(event: any) => this.setState({ searchConditionForm: { ...searchConditionForm, recordType: event.target.value as string } })}
@@ -253,7 +253,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     </CCol>
                                 </CRow>
                                 <CRow className='mb-3'>
-                                    <CCol xs={3}>
+                                    <CCol xs={12} sm={4}>
                                         <CFormSwitch
                                             size='xl'
                                             label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.account' />}
@@ -262,7 +262,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                             onChange={(event) => this.setState({ searchConditionForm: { ...searchConditionForm, useAccountId: event.target.checked } })}
                                         />
                                     </CCol>
-                                    <CCol xs={12} sm={9}>
+                                    <CCol xs={12} sm={8}>
                                         <CFormSelect
                                             value={searchConditionForm.accountId}
                                             onChange={(event: any) => this.setState({ searchConditionForm: { ...searchConditionForm, accountId: event.target.value as string } })}
@@ -273,7 +273,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     </CCol>
                                 </CRow>
                                 <CRow className='mb-3'>
-                                    <CCol xs={3}>
+                                    <CCol xs={12} sm={4}>
                                         <CFormSwitch
                                             size='xl'
                                             label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.description' />}
@@ -286,7 +286,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                             }}
                                         />
                                     </CCol>
-                                    <CCol xs={12} sm={9}>
+                                    <CCol xs={12} sm={8}>
                                         <CFormInput
                                             value={searchConditionForm.desc}
                                             className={`${!isSearchConditionFormValid.desc ? 'is-invalid' : ''}`}
@@ -330,22 +330,22 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                     <CTable align='middle' responsive hover>
                                         <CTableHead>
                                             <CTableRow>
-                                                <CTableHeaderCell scope='col'>
+                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                     <FormattedMessage id='AccountRecordQueryPage.searchResult.th.date' />
                                                 </CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>
+                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                     <FormattedMessage id='AccountRecordQueryPage.searchResult.th.amount' />
                                                 </CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>
+                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                     <FormattedMessage id='AccountRecordQueryPage.searchResult.th.from' />
                                                 </CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>
+                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                     <FormattedMessage id='AccountRecordQueryPage.searchResult.th.to' />
                                                 </CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>
+                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                     <FormattedMessage id='AccountRecordQueryPage.searchResult.th.type' />
                                                 </CTableHeaderCell>
-                                                <CTableHeaderCell scope='col'>
+                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                     <FormattedMessage id='AccountRecordQueryPage.searchResult.th.desc' />
                                                 </CTableHeaderCell>
                                             </CTableRow>

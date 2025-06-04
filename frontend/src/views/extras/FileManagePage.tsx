@@ -335,16 +335,16 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                                                     <CTable align='middle' responsive hover>
                                                         <CTableHead>
                                                             <CTableRow>
-                                                                <CTableHeaderCell scope='col'>
+                                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                     <FormattedMessage id='FileManagePage.th.filename' />
                                                                 </CTableHeaderCell>
-                                                                <CTableHeaderCell scope='col'>
+                                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                     <FormattedMessage id='FileManagePage.th.type' />
                                                                 </CTableHeaderCell>
-                                                                <CTableHeaderCell scope='col'>
+                                                                <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                     <FormattedMessage id='FileManagePage.th.date' />
                                                                 </CTableHeaderCell>
-                                                                <CTableHeaderCell scope='col'></CTableHeaderCell>
+                                                                <CTableHeaderCell className='text-nowrap' scope='col'></CTableHeaderCell>
                                                             </CTableRow>
                                                         </CTableHead>
                                                         <CTableBody>

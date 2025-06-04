@@ -626,25 +626,25 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                             <CTable align='middle' responsive hover>
                                                                 <CTableHead>
                                                                     <CTableRow>
-                                                                        <CTableHeaderCell scope='col'>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                             <FormattedMessage id='AccountPage.th.date' />
                                                                         </CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                             <FormattedMessage id='AccountPage.th.amount' />
                                                                         </CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                             <FormattedMessage id='AccountPage.th.from' />
                                                                         </CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                             <FormattedMessage id='AccountPage.th.to' />
                                                                         </CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                             <FormattedMessage id='AccountPage.th.type' />
                                                                         </CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                                                             <FormattedMessage id='AccountPage.th.desc' />
                                                                         </CTableHeaderCell>
-                                                                        <CTableHeaderCell scope='col'></CTableHeaderCell>
+                                                                        <CTableHeaderCell className='text-nowrap' scope='col'></CTableHeaderCell>
                                                                     </CTableRow>
                                                                 </CTableHead>
                                                                 <CTableBody>

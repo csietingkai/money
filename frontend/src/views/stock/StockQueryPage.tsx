@@ -178,16 +178,16 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                             <CTable align='middle' responsive hover>
                                 <CTableHead>
                                     <CTableRow>
-                                        <CTableHeaderCell scope='col'>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                             <FormattedMessage id='StockQueryPage.searchResult.th.code' />
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                             <FormattedMessage id='StockQueryPage.searchResult.th.name' />
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'>
                                             <FormattedMessage id='StockQueryPage.searchResult.th.date' />
                                         </CTableHeaderCell>
-                                        <CTableHeaderCell scope='col'></CTableHeaderCell>
+                                        <CTableHeaderCell className='text-nowrap' scope='col'></CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>

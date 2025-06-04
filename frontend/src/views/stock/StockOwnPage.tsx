@@ -178,28 +178,28 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                         <CTable align='middle' responsive hover>
                                             <CTableHead>
                                                 <CTableRow>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.tradeType' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.date' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.price' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.share' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.fee' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.tax' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'>
                                                         <FormattedMessage id='StockOwnPage.th.total' />
                                                     </CTableHeaderCell>
-                                                    <CTableHeaderCell scope='col'></CTableHeaderCell>
+                                                    <CTableHeaderCell className='text-nowrap' scope='col'></CTableHeaderCell>
                                                 </CTableRow>
                                             </CTableHead>
                                             <CTableBody>
