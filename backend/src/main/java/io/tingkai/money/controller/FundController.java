@@ -104,13 +104,13 @@ public class FundController {
 		return new BaseResponse<UserFund>(true, result, MessageFormat.format(MessageConstant.USER_FUND_BONUS_SUCCESS, request.getTotal(), request.getFundCode()));
 	}
 
-	@RequestMapping(value = StockController.UPDATE_RECORD_PATH, method = RequestMethod.PUT)
+	@RequestMapping(value = FundController.UPDATE_RECORD_PATH, method = RequestMethod.PUT)
 	public BaseResponse<UserFund> updateRecord(@RequestBody FundTradeRecordEditRequest request) throws NotExistException, FieldMissingException, StockAmountInvalidException {
 		UserFund result = this.userFundService.updateRecord(request);
 		return new BaseResponse<UserFund>(true, result, MessageConstant.USER_FUND_RECORD_UPDATE_SUCCESS);
 	}
 
-	@RequestMapping(value = StockController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
+	@RequestMapping(value = FundController.DELETE_RECORD_PATH, method = RequestMethod.DELETE)
 	public SimpleResponse deleteRecord(@RequestParam UUID recordId) throws NotExistException, FieldMissingException {
 		this.userFundService.reverseRecord(recordId);
 		return new SimpleResponse(true, MessageConstant.USER_FUND_RECORD_DELETE_SUCCESS);
@@ -122,7 +122,7 @@ public class FundController {
 		return new BaseResponse<List<UserFundVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
-	@RequestMapping(value = StockController.GET_OWN_RECORDS_PATH, method = RequestMethod.GET)
+	@RequestMapping(value = FundController.GET_OWN_RECORDS_PATH, method = RequestMethod.GET)
 	public BaseResponse<List<UserFundRecordVo>> getOwnStockRecords(@RequestParam UUID userFundId) {
 		List<UserFundRecordVo> result = this.userFundService.getOwnFundRecords(userFundId);
 		return new BaseResponse<List<UserFundRecordVo>>(true, result, MessageConstant.SUCCESS);
