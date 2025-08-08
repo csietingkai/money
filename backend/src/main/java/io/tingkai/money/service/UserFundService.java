@@ -32,6 +32,7 @@ import io.tingkai.money.entity.Fund;
 import io.tingkai.money.entity.FundRecord;
 import io.tingkai.money.entity.UserFund;
 import io.tingkai.money.entity.UserFundRecord;
+import io.tingkai.money.entity.UserSetting;
 import io.tingkai.money.entity.UserTrackingFund;
 import io.tingkai.money.enumeration.DealType;
 import io.tingkai.money.enumeration.option.RecordType;
@@ -88,7 +89,9 @@ public class UserFundService {
 
 	public List<UserFundVo> getOwnFunds() {
 		UUID userId = ContextUtil.getUserId();
-		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnFund();
+		UserSetting userSetting = this.userSettingFacade.queryByUserId(userId);
+		boolean onlyShowOwn = userSetting.getOnlyShowOwnStock();
+		boolean calcBonusInCost = userSetting.getCalcBonusInCost();
 		List<UserFund> ownList = this.userFundFacade.queryByUserId(userId);
 		if (onlyShowOwn) {
 			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
@@ -110,7 +113,11 @@ public class UserFundService {
 				switch (tradeRecord.getType()) {
 					case BUY -> vo.setCost(vo.getCost().add(tradeRecord.getTotal()));
 					case SELL -> vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
-					case BONUS -> vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+					case BONUS -> {
+						if (calcBonusInCost) {
+							vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+						}
+					}
 				}
 			});
 			vos.add(vo);

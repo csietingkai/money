@@ -75,6 +75,19 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         this.setState({ show, ownStockRecordPage: 1 });
     };
 
+    private toggleCalcBenifitWithBonus = async (checked: boolean) => {
+        const { userSetting, setUserSetting } = this.props;
+        const newSetting: UserSetting = {
+            ...userSetting,
+            calcBonusInCost: checked
+        }
+        const { success } = await AuthApi.updateUserSetting(newSetting);
+        if (success) {
+            setUserSetting(newSetting);
+            this.fetchUserStocks();
+        }
+    };
+
     private toggleShowOwn = async (checked: boolean) => {
         const { userSetting, setUserSetting } = this.props;
         const newSetting: UserSetting = {
@@ -303,12 +316,19 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     };
 
     render(): React.ReactNode {
-        const { userSetting: { onlyShowOwnStock }, lang, ownStockList } = this.props;
+        const { userSetting: { onlyShowOwnStock, calcBonusInCost }, lang, ownStockList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
                 <CRow className='mb-4'>
-                    <CCol sm={12} className='d-flex justify-content-end'>
+                    <CCol sm={12} className='d-grid gap-2 d-flex justify-content-end'>
+                        <CButton className='me-2' color='secondary' variant='outline' onClick={() => this.toggleCalcBenifitWithBonus(!calcBonusInCost)}>
+                            <CFormSwitch
+                                label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.calcBonusInCost')}
+                                checked={calcBonusInCost}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleCalcBenifitWithBonus(event.target.checked)}
+                            />
+                        </CButton>
                         <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnStock)}>
                             <CFormSwitch
                                 label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.onlyShowOwn')}

@@ -89,7 +89,9 @@ public class UserStockService {
 
 	public List<UserStockVo> getOwnStocks() {
 		UUID userId = ContextUtil.getUserId();
-		boolean onlyShowOwn = this.userSettingFacade.queryByUserId(userId).getOnlyShowOwnStock();
+		UserSetting userSetting = this.userSettingFacade.queryByUserId(userId);
+		boolean onlyShowOwn = userSetting.getOnlyShowOwnStock();
+		boolean calcBonusInCost = userSetting.getCalcBonusInCost();
 		List<UserStock> ownList = this.userStockFacade.queryByUserId(userId);
 		if (onlyShowOwn) {
 			ownList = ownList.stream().filter(x -> BigDecimal.ZERO.compareTo(x.getAmount()) < 0).collect(Collectors.toList());
@@ -111,7 +113,11 @@ public class UserStockService {
 				switch (tradeRecord.getType()) {
 					case BUY -> vo.setCost(vo.getCost().add(tradeRecord.getTotal()));
 					case SELL -> vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
-					case BONUS -> vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+					case BONUS -> {
+						if (calcBonusInCost) {
+							vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+						}
+					}
 				}
 			});
 			vos.add(vo);

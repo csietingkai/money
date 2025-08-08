@@ -30,6 +30,7 @@ public class UserSetting {
 	protected Boolean accountRecordDeletable;
 	protected Boolean onlyShowOwnStock;
 	protected Boolean onlyShowOwnFund;
+	protected Boolean calcBonusInCost;
 	@Enumerated(EnumType.STRING)
 	protected Lang lang;
 }

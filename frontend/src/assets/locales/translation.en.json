@@ -250,6 +250,7 @@
     },
     "StockOwnPage": {
         "onlyShowOwn": "Only Show Own",
+        "calcBonusInCost": "Benifit With Bonus",
         "record.subtitle": "trade records",
         "buyBtn": "Buy",
         "sellBtn": "Sell",

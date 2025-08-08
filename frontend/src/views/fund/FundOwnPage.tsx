@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
-import { ReduxState, getAuthTokenId, getFundOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
+import { ReduxState, getAuthTokenId, getFundOwnList, getLang, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import AuthApi, { UserSetting } from '../../api/auth';
 import FundApi, { UserFundRecordVo, UserFundVo } from '../../api/fund';
@@ -14,13 +14,14 @@ import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
 import { StockType } from '../../util/Enum';
-import { Action } from '../../util/Interface';
+import { Action, Lang } from '../../util/Interface';
 import FundTradeCondition, { TradeType } from './interface/FundTradeCondition';
 
 export interface FundOwnPageProps {
     userSetting: UserSetting;
     userId: string;
     stockType: StockType;
+    lang: Lang;
     ownFundList: UserFundVo[];
     setUserSetting: (setting: UserSetting) => void;
     setFundTradeCondition: (tradeCondition?: FundTradeCondition) => void;
@@ -72,6 +73,19 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
             setLoading(false);
         }
         this.setState({ show, ownFundRecordPage: 1 });
+    };
+
+    private toggleCalcBenifitWithBonus = async (checked: boolean) => {
+        const { userSetting, setUserSetting } = this.props;
+        const newSetting: UserSetting = {
+            ...userSetting,
+            calcBonusInCost: checked
+        }
+        const { success } = await AuthApi.updateUserSetting(newSetting);
+        if (success) {
+            setUserSetting(newSetting);
+            this.fetchUserFunds();
+        }
     };
 
     private toggleShowOwn = async (checked: boolean) => {
@@ -317,12 +331,19 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     };
 
     render(): React.ReactNode {
-        const { userSetting: { onlyShowOwnFund, lang }, ownFundList } = this.props;
+        const { userSetting: { onlyShowOwnFund, calcBonusInCost }, lang, ownFundList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
                 <CRow className='mb-4'>
                     <CCol sm={12} className='d-flex justify-content-end'>
+                        <CButton className='me-2' color='secondary' variant='outline' onClick={() => this.toggleCalcBenifitWithBonus(!calcBonusInCost)}>
+                            <CFormSwitch
+                                label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.calcBonusInCost')}
+                                checked={calcBonusInCost}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleCalcBenifitWithBonus(event.target.checked)}
+                            />
+                        </CButton>
                         <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnFund)}>
                             <CFormSwitch
                                 label={AppUtil.getFormattedMessage(lang, 'FundOwnPage.onlyShowOwn')}
@@ -371,6 +392,7 @@ const mapStateToProps = (state: ReduxState) => {
         userSetting: getUserSetting(state),
         userId: getAuthTokenId(state),
         ownFundList: getFundOwnList(state),
+        lang: getLang(state),
         stockType: getStockType(state)
     };
 };

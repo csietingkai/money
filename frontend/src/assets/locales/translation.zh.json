@@ -250,6 +250,7 @@
     },
     "StockOwnPage": {
         "onlyShowOwn": "只顯示持有",
+        "calcBonusInCost": "含息報酬率",
         "record.subtitle": "交易紀錄",
         "buyBtn": "買進",
         "sellBtn": "賣出",

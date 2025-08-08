@@ -24,6 +24,7 @@ export interface UserSetting {
     accountRecordDeletable: boolean;
     onlyShowOwnStock: boolean;
     onlyShowOwnFund: boolean;
+    calcBonusInCost: boolean;
     lang: Lang;
 }
 
