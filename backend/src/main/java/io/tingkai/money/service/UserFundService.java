@@ -107,10 +107,10 @@ public class UserFundService {
 			vo.setCost(BigDecimal.ZERO);
 			List<UserFundRecord> tradeRecords = this.userFundRecordFacade.queryAll(fund.getId());
 			tradeRecords.forEach(tradeRecord -> {
-				if (tradeRecord.getType() == DealType.BUY) {
-					vo.setCost(vo.getCost().add(tradeRecord.getTotal()));
-				} else if (tradeRecord.getType() == DealType.SELL) {
-					vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+				switch (tradeRecord.getType()) {
+					case BUY -> vo.setCost(vo.getCost().add(tradeRecord.getTotal()));
+					case SELL -> vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
+					case BONUS -> vo.setCost(vo.getCost().subtract(tradeRecord.getTotal()));
 				}
 			});
 			vos.add(vo);
