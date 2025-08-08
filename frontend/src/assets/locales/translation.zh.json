@@ -111,7 +111,13 @@
             "dateRange": "交易時間",
             "recordType": "交易類型",
             "account": "帳戶",
-            "description": "備註"
+            "description": "備註",
+            "amount": {
+                "text": "交易類型",
+                "INCOME": "收入",
+                "TRANSFER": "轉帳",
+                "EXPEND": "支出"
+            }
         },
         "searchResult": {
             "title": "查詢結果",

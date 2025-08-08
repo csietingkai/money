@@ -32,6 +32,7 @@ import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
 import io.tingkai.money.entity.ExchangeRate;
 import io.tingkai.money.entity.ExchangeRateRecord;
+import io.tingkai.money.enumeration.AccountRecordTransType;
 import io.tingkai.money.facade.AccountFacade;
 import io.tingkai.money.facade.AccountRecordFacade;
 import io.tingkai.money.facade.ExchangeRateRecordFacade;
@@ -84,7 +85,7 @@ public class AccountService {
 		List<AccountVo> accountVos = entities.stream().map(entity -> {
 			AccountVo accountVo = new AccountVo();
 			accountVo.transform(entity);
-			accountVo.setRemovable(accountRecordFacade.queryAll(Arrays.asList(entity.getId()), null, null, null, null, true).size() == 0);
+			accountVo.setRemovable(accountRecordFacade.queryAll(Arrays.asList(entity.getId()), null, null, null, null, null, true).size() == 0);
 			return accountVo;
 		}).collect(Collectors.toList());
 		return accountVos;
@@ -180,7 +181,7 @@ public class AccountService {
 		return vo;
 	}
 
-	public List<AccountRecordVo> getAllRecords(@Nullable UUID accountId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable String recordType, @Nullable String desc, boolean latestFirstOrder) {
+	public List<AccountRecordVo> getAllRecords(@Nullable UUID accountId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable String recordType, @Nullable String desc, @Nullable List<AccountRecordTransType> amount, boolean latestFirstOrder) {
 		List<Account> accounts = this.userCache.opsForValue().get(MessageFormat.format(CodeConstant.ACCOUNT_LIST, ContextUtil.getUserId()));
 		Map<UUID, Account> accountMap = accounts.stream().collect(Collectors.toMap(Account::getId, acc -> acc));
 
@@ -188,7 +189,7 @@ public class AccountService {
 		if (BaseAppUtil.isEmpty(accountId)) {
 			accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
 		}
-		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountIds, startDate, endDate, recordType, desc, latestFirstOrder);
+		List<AccountRecord> entities = this.accountRecordFacade.queryAll(accountIds, startDate, endDate, recordType, desc, amount, latestFirstOrder);
 
 		List<AccountRecordVo> vos = new ArrayList<AccountRecordVo>();
 		for (AccountRecord record : entities) {

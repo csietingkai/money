@@ -111,7 +111,13 @@
             "dateRange": "Date Range",
             "recordType": "Record Type",
             "account": "Account",
-            "description": "Description"
+            "description": "Description",
+            "amount": {
+                "text": "Trans Type",
+                "INCOME": "Income",
+                "TRANSFER": "Transfer",
+                "EXPEND": "Expend"
+            }
         },
         "searchResult": {
             "title": "Search Result",

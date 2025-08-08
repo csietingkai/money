@@ -1,7 +1,7 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
-import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormSelect, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormCheck, CFormInput, CFormSelect, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilChevronDoubleRight, cilMediaSkipForward } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import moment from 'moment';
@@ -13,6 +13,7 @@ import * as AppUtil from '../../util/AppUtil';
 import { Action, Option } from '../../util/Interface';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 import AccountRecordQueryCondition from './interface/AccountRecordQueryCondition';
+import { AccountRecordTransType } from '../../util/Enum';
 
 export interface AccountRecordQueryPageProps {
     accountList: Account[];
@@ -32,6 +33,8 @@ interface AccountRecordSearchConditionForm extends AccountRecordQueryCondition {
     accountId: string;
     useDesc: boolean;
     desc: string;
+    useAmount: boolean;
+    amount: AccountRecordTransType[];
 }
 
 export interface AccountRecordQueryPageState {
@@ -41,6 +44,7 @@ export interface AccountRecordQueryPageState {
         startDate: boolean;
         endDate: boolean;
         desc: boolean;
+        amount: boolean;
     };
     accountRecords: AccountRecordVo[];
     accountRecordsPage: number;
@@ -57,7 +61,8 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             isSearchConditionFormValid: {
                 startDate: true,
                 endDate: true,
-                desc: true
+                desc: true,
+                amount: true
             },
             accountRecords: [],
             accountRecordsPage: 1
@@ -75,10 +80,12 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             useAccountId: false,
             accountId: accountList[0]?.id,
             useDesc: false,
-            desc: ''
+            desc: '',
+            useAmount: false,
+            amount: []
         };
 
-        const { startDate, endDate, recordType, accountId, desc } = accountRecordQueryCondition;
+        const { startDate, endDate, recordType, accountId, desc, amount } = accountRecordQueryCondition;
         if (AppUtil.isValidDate(startDate)) {
             searchConditionForm.useDateRange = true;
             searchConditionForm.startDate = startDate as Date;
@@ -99,12 +106,16 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             searchConditionForm.useDesc = true;
             searchConditionForm.desc = desc;
         }
+        if (amount?.length) {
+            searchConditionForm.useAmount = true;
+            searchConditionForm.amount = amount;
+        }
         return searchConditionForm;
     };
 
     private validSearchCondition = (): boolean => {
         const { searchConditionForm, isSearchConditionFormValid } = this.state;
-        const { useDateRange, useDesc, startDate, endDate, desc } = searchConditionForm;
+        const { useDateRange, startDate, endDate, useDesc, desc, useAmount, amount } = searchConditionForm;
         if (useDateRange && AppUtil.isValidDate(startDate) && AppUtil.isValidDate(endDate)) {
             const isDateRangeValid = (AppUtil.toDateStr(startDate, 'YYYY-MM-DD') || '') <= (AppUtil.toDateStr(endDate, 'YYYY-MM-DD') || '');
             if (!isDateRangeValid) {
@@ -116,6 +127,10 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             this.setState({ isSearchConditionFormValid: { ...isSearchConditionFormValid, desc: false } });
             return false;
         }
+        if (useAmount && !amount?.length) {
+            this.setState({ isSearchConditionFormValid: { ...isSearchConditionFormValid, amount: false } });
+            return false;
+        }
         return true;
     };
 
@@ -125,8 +140,8 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
             return;
         }
         const { searchConditionForm } = this.state;
-        const { useDateRange, useRecordType, useAccountId, useDesc } = searchConditionForm;
-        let startDate, endDate, recordType, accountId, desc;
+        const { useDateRange, useRecordType, useAccountId, useDesc, useAmount } = searchConditionForm;
+        let startDate, endDate, recordType, accountId, desc, amount;
         if (useDateRange) {
             startDate = searchConditionForm.startDate;
             endDate = searchConditionForm.endDate;
@@ -140,14 +155,16 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
         if (useDesc) {
             desc = searchConditionForm.desc;
         }
-        const { success, data, message } = await AccountApi.getRecords(accountId, startDate, endDate, recordType, desc);
+        if (useAmount) {
+            amount = searchConditionForm.amount;
+        }
+        const { success, data, message } = await AccountApi.getRecords(accountId, startDate, endDate, recordType, desc, amount);
         if (success) {
             this.setState({ accountRecords: data, accountRecordsPage: 1 });
         } else {
             notify(message);
         }
     };
-
 
     private renderSearchCondition = () => {
         const { accountList, recordTypeOptions } = this.props;
@@ -297,6 +314,49 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
                                             }}
                                             disabled={!searchConditionForm.useDesc}
                                         />
+                                    </CCol>
+                                </CRow>
+                                <CRow className='mb-3'>
+                                    <CCol xs={12} sm={4}>
+                                        <CFormSwitch
+                                            size='xl'
+                                            label={<FormattedMessage id='AccountRecordQueryPage.searchCondition.amount.text' />}
+                                            id='use-amount'
+                                            checked={searchConditionForm.useAmount}
+                                            onChange={(event) => {
+                                                const { checked } = event.target;
+                                                isSearchConditionFormValid.amount = !checked || !!searchConditionForm.amount?.length;
+                                                this.setState({ searchConditionForm: { ...searchConditionForm, useAmount: event.target.checked }, isSearchConditionFormValid });
+                                            }}
+                                        />
+                                    </CCol>
+                                    <CCol xs={12} sm={8}>
+                                        {
+                                            Object.values(AccountRecordTransType).map(ct => (
+                                                <CFormCheck
+                                                    key={`account-record-query-amount-${ct}`}
+                                                    className='col-form-label'
+                                                    name='account-record-query-amount'
+                                                    id={`account-record-query-amount-${ct}`}
+                                                    label={<FormattedMessage id={`AccountRecordQueryPage.searchCondition.amount.${ct}`} />}
+                                                    value={ct}
+                                                    checked={searchConditionForm.amount.includes(ct)}
+                                                    inline
+                                                    invalid={!isSearchConditionFormValid.amount}
+                                                    disabled={!searchConditionForm.useAmount}
+                                                    onChange={(event) => {
+                                                        const value = event.target.value as AccountRecordTransType;
+                                                        if (searchConditionForm.amount.includes(value)) {
+                                                            const amount = searchConditionForm.amount;
+                                                            amount.splice(amount.indexOf(value), 1);
+                                                            this.setState({ searchConditionForm: { ...searchConditionForm, amount }, isSearchConditionFormValid: { ...isSearchConditionFormValid, amount: !!amount.length } })
+                                                        } else {
+                                                            this.setState({ searchConditionForm: { ...searchConditionForm, amount: [ ...searchConditionForm.amount, ct ] }, isSearchConditionFormValid: { ...isSearchConditionFormValid, amount: true } })
+                                                        }
+                                                    }}
+                                                />
+                                            ))
+                                        }
                                     </CCol>
                                 </CRow>
                             </CForm>

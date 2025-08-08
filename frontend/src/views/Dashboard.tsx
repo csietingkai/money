@@ -16,6 +16,7 @@ import { Action, Lang } from '../util/Interface';
 import { CHART_COLORS, DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
 import { stock } from '../assets/brand/stock';
 import { fund } from '../assets/brand/fund';
+import { AccountRecordTransType } from '../util/Enum';
 
 export interface AccountBalance {
     value: string;
@@ -101,9 +102,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         return data;
     };
 
-    private recordQueryPage = (recordType: string, startDate: Date, endDate: Date) => {
+    private recordQueryPage = (recordType: string, startDate: Date, endDate: Date, amount: AccountRecordTransType) => {
         const { setAccountRecordQueryCondition } = this.props;
-        setAccountRecordQueryCondition({ recordType, startDate, endDate });
+        setAccountRecordQueryCondition({ recordType, startDate, endDate, amount: [ amount ] });
         window.location.assign('/#/recordQuery');
     };
 
@@ -140,7 +141,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         );
     };
 
-    private monthDetailChart = (key: 'income' | 'expend'): React.ReactNode => {
+    private monthDetailChart = (transType: AccountRecordTransType.INCOME | AccountRecordTransType.EXPEND): React.ReactNode => {
+        const key = transType.toLocaleLowerCase();
         const { monthBalance, activeTab } = this.state;
         const yms = monthBalance.details.map(x => `${x.year}${AppUtil.prefixZero(x.month)}`);
         const ymLabels = monthBalance.details.map(x => `${x.year}/${AppUtil.prefixZero(x.month)}`);
@@ -216,7 +218,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                                     <CIcon icon={cilExternalLink} className='ms-1' onClick={() => {
                                                                         const startDate = new Date(monthBalance.details[ri].year, monthBalance.details[ri].month - 1, 1);
                                                                         const endDate = new Date(monthBalance.details[ri].year, monthBalance.details[ri].month, 0);
-                                                                        this.recordQueryPage(series[0], startDate, endDate);
+                                                                        this.recordQueryPage(series[0], startDate, endDate, transType);
                                                                     }} />
                                                                 </span>
                                                                 <span className='ms-auto fw-semibold'>
@@ -305,10 +307,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                 </CRow>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     <CCol md={6}>
-                        {this.monthDetailChart('income')}
+                        {this.monthDetailChart(AccountRecordTransType.INCOME)}
                     </CCol>
                     <CCol md={6}>
-                        {this.monthDetailChart('expend')}
+                        {this.monthDetailChart(AccountRecordTransType.EXPEND)}
                     </CCol>
                     <CCol>
                         {this.monthSumChart()}

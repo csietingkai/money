@@ -19,6 +19,7 @@ import io.tingkai.base.model.response.SimpleResponse;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.Account;
 import io.tingkai.money.entity.AccountRecord;
+import io.tingkai.money.enumeration.AccountRecordTransType;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.request.AccountEditRequest;
@@ -78,13 +79,13 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORDS_PATH, method = RequestMethod.GET)
-	public BaseResponse<List<AccountRecordVo>> getRecords(@RequestParam(required = false) UUID accountId, @RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate, @RequestParam(required = false) String recordType, @RequestParam(required = false) String desc, @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
-		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, startDate, endDate, recordType, desc, latestFirstOrder);
+	public BaseResponse<List<AccountRecordVo>> getRecords(@RequestParam(required = false) UUID accountId, @RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate, @RequestParam(required = false) String recordType, @RequestParam(required = false) String desc, @RequestParam(required = false) List<AccountRecordTransType> amount, @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
+		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, startDate, endDate, recordType, desc, amount, latestFirstOrder);
 		return new BaseResponse<List<AccountRecordVo>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORD_PATH, method = RequestMethod.GET)
-	public BaseResponse<AccountRecordVo> getRecords(@RequestParam UUID recordId) {
+	public BaseResponse<AccountRecordVo> getRecord(@RequestParam UUID recordId) {
 		AccountRecordVo entity = this.accountService.getRecord(recordId);
 		return new BaseResponse<AccountRecordVo>(true, entity, MessageConstant.SUCCESS);
 	}

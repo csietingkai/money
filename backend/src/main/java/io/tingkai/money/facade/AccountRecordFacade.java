@@ -1,5 +1,6 @@
 package io.tingkai.money.facade;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import io.tingkai.base.model.exception.FieldMissingException;
 import io.tingkai.base.model.exception.NotExistException;
@@ -23,6 +25,7 @@ import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.AccountRecordDao;
 import io.tingkai.money.entity.AccountRecord;
+import io.tingkai.money.enumeration.AccountRecordTransType;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -58,7 +61,7 @@ public class AccountRecordFacade {
 		return entities;
 	}
 
-	public List<AccountRecord> queryAll(List<UUID> accountIds, @Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable String recordType, @Nullable String desc, boolean latestFirstOrder) {
+	public List<AccountRecord> queryAll(List<UUID> accountIds, @Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable String recordType, @Nullable String desc, @Nullable List<AccountRecordTransType> amount, boolean latestFirstOrder) {
 		List<AccountRecord> entities = this.accountRecordDao.findByTransFromInOrTransToIn(accountIds, accountIds);
 		if (BaseAppUtil.isPresent(startDate)) {
 			entities = entities.stream().filter(x -> x.getTransDate().compareTo(startDate.atStartOfDay()) >= 0).collect(Collectors.toList());
@@ -71,6 +74,17 @@ public class AccountRecordFacade {
 		}
 		if (BaseAppUtil.isPresent(desc)) {
 			entities = entities.stream().filter(x -> !BaseStringUtil.isBlank(x.getDescription()) && x.getDescription().indexOf(desc) >= 0).collect(Collectors.toList());
+		}
+		if (!CollectionUtils.isEmpty(amount)) {
+			entities = entities.stream().filter(x -> {
+				boolean hasIncome = amount.contains(AccountRecordTransType.INCOME);
+				boolean hasTransfer = amount.contains(AccountRecordTransType.TRANSFER);
+				boolean hasExpend = amount.contains(AccountRecordTransType.EXPEND);
+				boolean isTransfer = x.getTransFrom().compareTo(x.getTransTo()) != 0;
+				boolean isIncome = !isTransfer && BigDecimal.ZERO.compareTo(x.getTransAmount()) < 0;
+				boolean isExpend = !isTransfer && BigDecimal.ZERO.compareTo(x.getTransAmount()) > 0;
+				return (hasIncome && isIncome) || (hasTransfer && isTransfer) || (hasExpend && isExpend);
+			}).collect(Collectors.toList());
 		}
 		if (entities.size() == 0) {
 			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_ACCOUNT));
