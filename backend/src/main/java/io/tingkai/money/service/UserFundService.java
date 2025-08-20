@@ -90,7 +90,7 @@ public class UserFundService {
 	public List<UserFundVo> getOwnFunds() {
 		UUID userId = ContextUtil.getUserId();
 		UserSetting userSetting = this.userSettingFacade.queryByUserId(userId);
-		boolean onlyShowOwn = userSetting.getOnlyShowOwnStock();
+		boolean onlyShowOwn = userSetting.getOnlyShowOwnFund();
 		boolean calcBonusInCost = userSetting.getCalcBonusInCost();
 		List<UserFund> ownList = this.userFundFacade.queryByUserId(userId);
 		if (onlyShowOwn) {
@@ -337,7 +337,7 @@ public class UserFundService {
 		if (BaseAppUtil.isEmpty(tradeRecord)) {
 			throw new NotExistException();
 		}
-		// handle origin account record and user stock record
+		// handle origin account record and user fund record
 		{
 			UserFund userFund = this.userFundFacade.query(tradeRecord.getUserFundId());
 			if (tradeRecord.getType() == DealType.BUY) {
