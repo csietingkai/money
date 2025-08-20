@@ -7,8 +7,9 @@ import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus
 import { ReduxState, getAuthTokenId, getLang, getStockOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import AuthApi, { UserSetting } from '../../api/auth';
+import FundApi, { UserFundVo } from '../../api/fund';
 import StockApi, { UserStockRecordVo, UserStockVo } from '../../api/stock';
-import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
+import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
@@ -27,6 +28,7 @@ export interface StockOwnPageProps {
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
     setAccountList: (accountList: Account[]) => void;
     setOwnStockList: (ownStockList: UserStockVo[]) => void;
+    setOwnFundList: (ownFundList: UserFundVo[]) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -85,6 +87,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         if (success) {
             setUserSetting(newSetting);
             this.fetchUserStocks();
+            this.fetchUserFunds();
         }
     };
 
@@ -304,6 +307,16 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         }
     };
 
+    private fetchUserFunds = async () => {
+        const { setOwnFundList } = this.props;
+        const { success, data } = await FundApi.getOwn();
+        if (success) {
+            setOwnFundList(data);
+        } else {
+            setOwnFundList([]);
+        }
+    };
+
     private fetchAccounts = async () => {
         const { setAccountList } = this.props;
         const response = await AccountApi.getAccounts();
@@ -382,12 +395,13 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserSetting | StockTradeCondition | undefined | Account[] | UserStockVo[] | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserSetting | StockTradeCondition | undefined | Account[] | UserStockVo[] | UserFundVo[] | string | boolean>>) => {
     return {
         setUserSetting: SetUserSettingDispatcher(dispatch),
         setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),
         setAccountList: SetAccountListDispatcher(dispatch),
         setOwnStockList: SetOwnStockListDispatcher(dispatch),
+        setOwnFundList: SetOwnFundListDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch)
     };

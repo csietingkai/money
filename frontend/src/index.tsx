@@ -32,8 +32,6 @@ axios.interceptors.response.use(
 
 validateToken(store.dispatch, store.getState);
 
-
-
 createRoot(document.getElementById('root') as Element).render(
     <Provider store={store}>
         <App locale={Selector.getLang(store.getState()) || StateHolder.getLang()} />

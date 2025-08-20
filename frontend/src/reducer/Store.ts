@@ -9,7 +9,7 @@ import OptionApi, { OptionResponse } from '../api/option';
 import FundApi, { UserFundListResponse } from '../api/fund';
 import StockApi, { UserStockListResponse } from '../api/stock';
 import { Login, Logout, SetAccountList, SetBankInfoList, SetExchangeRates, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions, SetUserSetting } from './Action';
-import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getAuthTokenId, getBankInfoList, getBankInfos } from './Selector';
+import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getBankInfoList } from './Selector';
 import { Action, ApiResponse, Option } from '../util/Interface';
 import { getAuthToken } from './StateHolder';
 

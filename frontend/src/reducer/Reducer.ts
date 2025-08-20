@@ -8,7 +8,7 @@ import { ExchangeRateVo } from '../api/exchangeRate';
 import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_BANK_INFO_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_OPTION_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxBankInfoState, ReduxExchangeRateState, ReduxFundState, ReduxOptionState, ReduxStockState, ReduxSystemSettingState } from './Selector';
 import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_IS_MOBILE, SET_EXCHANGE_RATES, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_BANK_INFO_LIST, SET_ACCOUNT_RECORD_QUERY_CONDITION } from './ActionType';
 import { removeAuthToken, setAuthToken, setLang, setSidebarFoldable, setSidebarShow } from './StateHolder';
-import { Action, Lang, Option } from '../util/Interface';
+import { Action, Option } from '../util/Interface';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
 import StockTradeCondition from '../views/stock/interface/StockTradeCondition';
 import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
@@ -154,7 +154,7 @@ const systemReducer = (state: ReduxSystemSettingState = DEFAULT_REDUX_SYSTEM_SET
     return newState;
 };
 
-const reducers = [
+const reducers: { key: string, reducer: any }[] = [
     { key: 'auth', reducer: authReducer },
     { key: 'account', reducer: accountReducer },
     { key: 'bankInfo', reducer: bankInfoReducer },

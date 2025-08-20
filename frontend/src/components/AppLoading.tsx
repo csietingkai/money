@@ -11,7 +11,7 @@ export default class AppLoading extends React.Component<AppLoadingProps, AppLoad
         this.state = {};
     }
 
-    render(): JSX.Element {
+    render(): React.ReactElement {
         return (
             <div className='loading-overlay'>
                 <div className='spinner-border' style={{ width: '5rem', height: '5rem' }} role='status' />

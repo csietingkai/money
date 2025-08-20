@@ -48,8 +48,11 @@ export const getStockType = (state: ReduxState): StockType => getUserSetting(sta
 export const getPredictDays = (state: ReduxState): number => getUserSetting(state)?.predictDays;
 export const getStockFeeRate = (state: ReduxState): number => getUserSetting(state)?.stockFeeRate;
 export const getFundFeeRate = (state: ReduxState): number => getUserSetting(state)?.fundFeeRate;
-export const isAccountRecordDeletable = (state: ReduxState): boolean => getUserSetting(state)?.accountRecordDeletable;
 export const getDefaultRecordType = (state: ReduxState): string => getUserSetting(state)?.accountRecordType;
+export const isAccountRecordDeletable = (state: ReduxState): boolean => getUserSetting(state)?.accountRecordDeletable;
+export const isOnlyShowOwnStock = (state: ReduxState): boolean => getUserSetting(state)?.onlyShowOwnStock;
+export const isOnlyShowOwnFund = (state: ReduxState): boolean => getUserSetting(state)?.onlyShowOwnFund;
+export const isCalcBonusInCost = (state: ReduxState): boolean => getUserSetting(state)?.calcBonusInCost;
 export const getLang = (state: ReduxState): Lang => getUserSetting(state)?.lang || StateHolder.getLang();
 export const getMessages = (state: ReduxState): Record<string, string> => dictionary[getLang(state)];
 
