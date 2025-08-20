@@ -1,5 +1,4 @@
 import datetime
-import json
 import requests
 import pandas
 import time

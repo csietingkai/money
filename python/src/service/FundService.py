@@ -1,6 +1,6 @@
 import datetime
 import requests
-import time
+import yfinance as yf
 
 from entity.Fund import Fund
 from entity.FundRecord import FundRecord
@@ -33,10 +33,8 @@ def fetchFund(targetCode):
         offeringDate = datetime.datetime(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:9]))
         entity.offering_date = offeringDate
         entity.currency = item['extent']['currency']
-        response = requests.get(CodeConstant.YAHOO_ISIN_TO_SYMBOL_URL.format(isinCode = item['extent']['isincode']), headers = CodeConstant.YAHOO_REQUEST_HEADER)
-        response = response.json()
-        if len(response['quotes']) > 0:
-            entity.symbol = response['quotes'][0]['symbol']
+        print('[INFO] fetching fund<{code}>\'s symbol...'.format(code = code))
+        entity.symbol = yf.Ticker(entity.isin_code).ticker
         FundFacade.insert(entity)
         return 'SUCCESS'
     else:
