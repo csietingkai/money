@@ -3,13 +3,13 @@ import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilOptions, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
+import { cilArrowCircleBottom, cilArrowCircleTop, cilListNumbered, cilPencil, cilPlus, cilSearch, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getLang, getStockOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import AuthApi, { UserSetting } from '../../api/auth';
 import FundApi, { UserFundVo } from '../../api/fund';
 import StockApi, { UserStockRecordVo, UserStockVo } from '../../api/stock';
-import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher, SetStockTradeConditionDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
+import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher, SetOwnStockListDispatcher, SetStockQueryConditionDispatcher, SetStockTradeConditionDispatcher, SetUserSettingDispatcher } from '../../reducer/PropsMapper';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
@@ -17,6 +17,7 @@ import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Const
 import { StockType } from '../../util/Enum';
 import { Action, Lang } from '../../util/Interface';
 import StockTradeCondition, { TradeType } from './interface/StockTradeCondition';
+import StockQueryCondition from './interface/StockQueryCondition';
 
 export interface StockOwnPageProps {
     userSetting: UserSetting;
@@ -25,6 +26,7 @@ export interface StockOwnPageProps {
     lang: Lang;
     ownStockList: UserStockVo[];
     setUserSetting: (setting: UserSetting) => void;
+    setStockQueryCondition: (queryCondition: StockQueryCondition) => void;
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
     setAccountList: (accountList: Account[]) => void;
     setOwnStockList: (ownStockList: UserStockVo[]) => void;
@@ -59,7 +61,13 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         };
     }
 
-    private toggleInfo = async (ownStockInfo: UserStockVo) => {
+    private toQueryPage = (stockCode: string) => {
+        const { setStockQueryCondition } = this.props;
+        setStockQueryCondition({ code: stockCode, name: '' });
+        window.location.assign('/#/stockQuery');
+    }
+
+    private toggleRecords = async (ownStockInfo: UserStockVo) => {
         const { setLoading } = this.props;
         const { show } = this.state;
         const { id, stockCode } = ownStockInfo;
@@ -143,8 +151,11 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                 </div>
                             </div>
                             <CDropdown alignment='end'>
-                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0' onClick={() => this.toggleInfo(ownStockInfo)}>
-                                    <CIcon icon={cilOptions} />
+                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0 me-2' onClick={() => this.toQueryPage(ownStockInfo.stockCode)}>
+                                    <CIcon icon={cilSearch} />
+                                </CDropdownToggle>
+                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0' onClick={() => this.toggleRecords(ownStockInfo)}>
+                                    <CIcon icon={cilListNumbered} />
                                 </CDropdownToggle>
                             </CDropdown>
                         </CCardBody>
@@ -395,9 +406,10 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<UserSetting | StockTradeCondition | undefined | Account[] | UserStockVo[] | UserFundVo[] | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<UserSetting | StockQueryCondition | StockTradeCondition | undefined | Account[] | UserStockVo[] | UserFundVo[] | string | boolean>>) => {
     return {
         setUserSetting: SetUserSettingDispatcher(dispatch),
+        setStockQueryCondition: SetStockQueryConditionDispatcher(dispatch),
         setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),
         setAccountList: SetAccountListDispatcher(dispatch),
         setOwnStockList: SetOwnStockListDispatcher(dispatch),
