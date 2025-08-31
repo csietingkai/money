@@ -329,23 +329,23 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     };
 
     render(): React.ReactNode {
-        const { userSetting: { onlyShowOwnStock, calcBonusInCost }, lang, ownStockList } = this.props;
+        const { userSetting, lang, ownStockList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
                 <CRow className='mb-4'>
                     <CCol sm={12} className='d-grid gap-2 d-flex justify-content-end'>
-                        <CButton className='me-2' color='secondary' variant='outline' onClick={() => this.toggleCalcBenifitWithBonus(!calcBonusInCost)}>
+                        <CButton className='me-2' color='secondary' variant='outline' onClick={() => this.toggleCalcBenifitWithBonus(!userSetting?.calcBonusInCost)}>
                             <CFormSwitch
                                 label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.calcBonusInCost')}
-                                checked={calcBonusInCost}
+                                checked={userSetting?.calcBonusInCost}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleCalcBenifitWithBonus(event.target.checked)}
                             />
                         </CButton>
-                        <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnStock)}>
+                        <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!userSetting?.onlyShowOwnStock)}>
                             <CFormSwitch
                                 label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.onlyShowOwn')}
-                                checked={onlyShowOwnStock}
+                                checked={userSetting?.onlyShowOwnStock}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleShowOwn(event.target.checked)}
                             />
                         </CButton>

@@ -344,23 +344,23 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     };
 
     render(): React.ReactNode {
-        const { userSetting: { onlyShowOwnFund, calcBonusInCost }, lang, ownFundList } = this.props;
+        const { userSetting, lang, ownFundList } = this.props;
         const { showDeleteRecordModal } = this.state;
         return (
             <React.Fragment>
                 <CRow className='mb-4'>
                     <CCol sm={12} className='d-flex justify-content-end'>
-                        <CButton className='me-2' color='secondary' variant='outline' onClick={() => this.toggleCalcBenifitWithBonus(!calcBonusInCost)}>
+                        <CButton className='me-2' color='secondary' variant='outline' onClick={() => this.toggleCalcBenifitWithBonus(!userSetting?.calcBonusInCost)}>
                             <CFormSwitch
                                 label={AppUtil.getFormattedMessage(lang, 'StockOwnPage.calcBonusInCost')}
-                                checked={calcBonusInCost}
+                                checked={userSetting?.calcBonusInCost}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleCalcBenifitWithBonus(event.target.checked)}
                             />
                         </CButton>
-                        <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!onlyShowOwnFund)}>
+                        <CButton color='secondary' variant='outline' onClick={() => this.toggleShowOwn(!userSetting?.onlyShowOwnFund)}>
                             <CFormSwitch
                                 label={AppUtil.getFormattedMessage(lang, 'FundOwnPage.onlyShowOwn')}
-                                checked={onlyShowOwnFund}
+                                checked={userSetting?.onlyShowOwnFund}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.toggleShowOwn(event.target.checked)}
                             />
                         </CButton>
