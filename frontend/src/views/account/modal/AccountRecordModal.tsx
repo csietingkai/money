@@ -235,7 +235,6 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
                             <CRow className='mb-3'>
                                 <CFormLabel htmlFor='transaction-amount' className='col-sm-4 col-form-label'>
                                     <FormattedMessage id='AccountPage.AccountRecordModal.transactionAmount' />
-
                                 </CFormLabel>
                                 <div className='col-sm-8'>
                                     <CFormInput
