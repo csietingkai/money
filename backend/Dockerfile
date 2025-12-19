@@ -11,7 +11,7 @@ COPY src/main/java /app/src/main/java
 COPY pom.xml /app
 RUN mvn -B -e clean package
 
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17.0.17_10-jdk-noble
 COPY --from=build /app/target/money.jar /api.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=container","/api.jar"]
