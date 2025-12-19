@@ -23,8 +23,6 @@ CREATE TABLE IF NOT EXISTS options (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	catergory VARCHAR NOT NULL,
 	name VARCHAR NOT NULL,
-	en_text VARCHAR NOT NULL,
-	tw_text VARCHAR NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE (catergory, name)
 );
@@ -218,30 +216,30 @@ CREATE TABLE IF NOT EXISTS user_fund_record (
 );
 
 insert into options (catergory, name, en_text, tw_text) values
-	('FILE_TYPE', 'STOCK', 'Stock', '股票'),
-	('FILE_TYPE', 'FUND', 'Fund', '基金'),
-	('FILE_TYPE', 'CREDIT_CARD', 'Credit Card', '信用卡'),
-	('FILE_TYPE', 'PASSBOOK', 'Passbook', '存摺'),
-	('FILE_TYPE', 'SALARY_SLIP', 'Salary Slip', '薪資條'),
-	('FILE_TYPE', 'OTHER', 'Other', '其他');
+	('FILE_TYPE', 'STOCK'),
+	('FILE_TYPE', 'FUND'),
+	('FILE_TYPE', 'CREDIT_CARD'),
+	('FILE_TYPE', 'PASSBOOK'),
+	('FILE_TYPE', 'SALARY_SLIP'),
+	('FILE_TYPE', 'OTHER');
 
 insert into options (catergory, name, en_text, tw_text) values
-	('STOCK_TYPE', 'TW', 'TW', 'TW'),
-	('STOCK_TYPE', 'US', 'US', 'US');
+	('STOCK_TYPE', 'TW'),
+	('STOCK_TYPE', 'US');
 
 insert into options (catergory, name, en_text, tw_text) values
-	('RECORD_TYPE', 'SALARY', 'Salary', '薪資'),
-	('RECORD_TYPE', 'BONUS', 'Bonus', '獎金'),
-	('RECORD_TYPE', 'FOOD', 'Food', '食物'),
-	('RECORD_TYPE', 'LIFE', 'Life', '生活費'),
-	('RECORD_TYPE', 'SPORT', 'Sport', '運動'),
-	('RECORD_TYPE', 'INVEST', 'Investment', '投資'),
-	('RECORD_TYPE', 'TRANSPORTATION', 'Transportation', '交通'),
-	('RECORD_TYPE', 'CREDIT_CARD', 'Credit Card', '信用卡費'),
-	('RECORD_TYPE', 'MEDIC', 'Medic', '醫療'),
-	('RECORD_TYPE', 'FEE', 'Fee', '手續費'),
-	('RECORD_TYPE', 'DONATE', 'Donate', '抖內'),
-	('RECORD_TYPE', 'OTHER', 'Other', '其他');
+	('RECORD_TYPE', 'SALARY'),
+	('RECORD_TYPE', 'BONUS'),
+	('RECORD_TYPE', 'FOOD'),
+	('RECORD_TYPE', 'LIFE'),
+	('RECORD_TYPE', 'SPORT'),
+	('RECORD_TYPE', 'INVEST'),
+	('RECORD_TYPE', 'TRANSPORTATION'),
+	('RECORD_TYPE', 'CREDIT_CARD'),
+	('RECORD_TYPE', 'MEDIC'),
+	('RECORD_TYPE', 'FEE'),
+	('RECORD_TYPE', 'DONATE'),
+	('RECORD_TYPE', 'OTHER');
 
 insert into bank_info (code, name) values
 	('004', '臺灣銀行'),

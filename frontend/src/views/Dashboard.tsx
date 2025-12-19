@@ -6,17 +6,17 @@ import CIcon from '@coreui/icons-react';
 import { cilBank, cilExternalLink } from '@coreui/icons';
 import { connect } from 'react-redux';
 import { SetAccountRecordQueryConditionDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
-import { ReduxState, getAccountList, getFundOwnList, getLang, getStockOwnList } from '../reducer/Selector';
+import { ReduxState, getAccountList, getFundOwnList, getLang, getRecordTypes, getStockOwnList } from '../reducer/Selector';
 import AccountApi, { Account, MonthBalanceVo } from '../api/account';
 import { UserStockVo } from '../api/stock';
 import { UserFundVo } from '../api/fund';
 import AccountRecordQueryCondition from './account/interface/AccountRecordQueryCondition';
 import * as AppUtil from '../util/AppUtil';
-import { Action, Lang } from '../util/Interface';
 import { CHART_COLORS, DEFAULT_DECIMAL_PRECISION } from '../util/Constant';
+import { AccountRecordTransType } from '../util/Enum';
+import { Action, Lang, Option } from '../util/Interface';
 import { stock } from '../assets/brand/stock';
 import { fund } from '../assets/brand/fund';
-import { AccountRecordTransType } from '../util/Enum';
 
 export interface AccountBalance {
     value: string;
@@ -28,6 +28,7 @@ export interface DashboardProps {
     accountList: Account[];
     ownStockList: UserStockVo[];
     ownFundList: UserFundVo[];
+    recordTypeOptions: Option[];
     setAccountRecordQueryCondition: (queryCondition: AccountRecordQueryCondition) => void;
     notify: (message: string) => void;
 }
@@ -102,9 +103,13 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         return data;
     };
 
+    private getRecordTypeText = (recordType: string): string => {
+        return this.props.recordTypeOptions.find(x => x.key === recordType)?.value || '';
+    };
+
     private recordQueryPage = (recordType: string, startDate: Date, endDate: Date, amount: AccountRecordTransType) => {
         const { setAccountRecordQueryCondition } = this.props;
-        setAccountRecordQueryCondition({ recordType, startDate, endDate, amount: [ amount ] });
+        setAccountRecordQueryCondition({ recordType, startDate, endDate, amount: [amount] });
         window.location.assign('/#/recordQuery');
     };
 
@@ -152,7 +157,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             const ym = `${x.year}${AppUtil.prefixZero(x.month)}`;
             data[ym] = [[...dataHeader]];
             for (const recordType in x[key]) {
-                data[ym].push([recordType, x[key][recordType]]);
+                data[ym].push([this.getRecordTypeText(recordType), x[key][recordType]]);
+                data[ym][data[ym].length-1].key = recordType
             }
         });
 
@@ -164,6 +170,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             for (let i = 1; i < data[ym].length; i++) {
                 data[ym][i].percent = AppUtil.toNumber((data[ym][i][1] / sum * 100).toFixed(DEFAULT_DECIMAL_PRECISION));
             }
+            data[ym].sort((a, b) => b.percent - a.percent);
         }
 
         const options = {
@@ -179,7 +186,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     <CRow className='mb-2'>
                         <CCol sm={12}>
                             <h4 className='mb-0'>
-                                <FormattedMessage id={`Dashboard.month${AppUtil.capitalize(key)}Detail`}/>
+                                <FormattedMessage id={`Dashboard.month${AppUtil.capitalize(key)}Detail`} />
                             </h4>
                         </CCol>
                     </CRow>
@@ -218,7 +225,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                                     <CIcon icon={cilExternalLink} className='ms-1' onClick={() => {
                                                                         const startDate = new Date(monthBalance.details[ri].year, monthBalance.details[ri].month - 1, 1);
                                                                         const endDate = new Date(monthBalance.details[ri].year, monthBalance.details[ri].month, 0);
-                                                                        this.recordQueryPage(series[0], startDate, endDate, transType);
+                                                                        this.recordQueryPage(series.key, startDate, endDate, transType);
                                                                     }} />
                                                                 </span>
                                                                 <span className='ms-auto fw-semibold'>
@@ -295,13 +302,13 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('stock-card', [
                             { value: AppUtil.numberComma(totalStockValue), desc: <FormattedMessage id='Dashboard.stock.currentValue' /> },
-                            { value: AppUtil.numberComma(totalStockBenifit), desc: <FormattedMessage id='Dashboard.stock.benifit' values={{val: `${AppUtil.numberComma(totalStockPercentage)}`}}/> }
+                            { value: AppUtil.numberComma(totalStockBenifit), desc: <FormattedMessage id='Dashboard.stock.benifit' values={{ val: `${AppUtil.numberComma(totalStockPercentage)}` }} /> }
                         ], stock)}
                     </CCol>
                     <CCol sm={6} xl={4}>
                         {this.balanceCard('fund-card', [
                             { value: AppUtil.numberComma(totalFundValue), desc: <FormattedMessage id='Dashboard.fund.currentValue' /> },
-                            { value: AppUtil.numberComma(totalFundBenifit), desc: <FormattedMessage id='Dashboard.fund.benifit' values={{val: `${AppUtil.numberComma(totalFundPercentage)}`}}/> }
+                            { value: AppUtil.numberComma(totalFundBenifit), desc: <FormattedMessage id='Dashboard.fund.benifit' values={{ val: `${AppUtil.numberComma(totalFundPercentage)}` }} /> }
                         ], fund)}
                     </CCol>
                 </CRow>
@@ -324,7 +331,8 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         lang: getLang(state),
         accountList: getAccountList(state),
         ownStockList: getStockOwnList(state),
-        ownFundList: getFundOwnList(state)
+        ownFundList: getFundOwnList(state),
+        recordTypeOptions: getRecordTypes(state)
     };
 };
 

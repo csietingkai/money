@@ -1,5 +1,6 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -14,7 +15,6 @@ import { Action, SimpleResponse, Option } from '../../util/Interface';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 import currencyIcon from '../../assets/currency';
 import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecordModal';
-import { FormattedMessage } from 'react-intl';
 
 export interface AccountPageProps {
     accountList: Account[],

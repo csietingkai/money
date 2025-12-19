@@ -40,7 +40,6 @@ export interface FileManagePageState {
         file: string;
     };
     page: number;
-    fileTypeMap: { [key: string]: string; };
     pdfData: string;
 }
 
@@ -60,7 +59,6 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
             uploadForm: { type: fileTypeOptions[0].key, date: new Date(), file: null },
             editForm: { id: '', type: fileTypeOptions[0].key, date: new Date(), file: '' },
             page: 1,
-            fileTypeMap: fileTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
             pdfData: ''
         };
         this.init();
@@ -88,6 +86,10 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
         }
         this.closeUploadModal();
     };
+
+    private getFileTypeText = (fileType: string): string => {
+        return this.props.fileTypeOptions.find(x => x.key === fileType)?.value || '';
+    }
 
     private update = async () => {
         const { notify } = this.props;
@@ -284,7 +286,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
 
     render(): React.ReactNode {
         const { fileTypeOptions, isMobile } = this.props;
-        const { files, fileType, showDeleteModal, editForm, page, fileTypeMap } = this.state;
+        const { files, fileType, showDeleteModal, editForm, page } = this.state;
         const filteredFiles = files.filter(f => fileType ? f.type === fileType : true);
         const showFiles = filteredFiles.slice((page - 1) * DATA_COUNT_PER_PAGE, page * DATA_COUNT_PER_PAGE);
         return (
@@ -352,7 +354,7 @@ class FileManagePage extends React.Component<FileManagePageProps, FileManagePage
                                                                 showFiles.map(f =>
                                                                     <CTableRow key={f.id}>
                                                                         <CTableDataCell>{f.filename}</CTableDataCell>
-                                                                        <CTableDataCell>{fileTypeMap[f.type]}</CTableDataCell>
+                                                                        <CTableDataCell>{this.getFileTypeText(f.type)}</CTableDataCell>
                                                                         <CTableDataCell>{AppUtil.toDateStr(f.date)}</CTableDataCell>
                                                                         <CTableDataCell>
                                                                             <CButtonGroup role='group'>

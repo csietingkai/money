@@ -4,9 +4,12 @@ import { FormattedMessage } from 'react-intl';
 import { CContainer, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CHeader, CHeaderNav, CHeaderToggler } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cifTw, cifUs, cilAccountLogout, cilCog, cilMenu, cilTranslate, cilUser } from '@coreui/icons';
+import { SetFileTypeOptions, SetRecordTypeOptions, SetStockTypeOptions } from '../reducer/Action';
 import { ReduxState, getUserSetting, isSidebarShow } from '../reducer/Selector';
+import store from '../reducer/Store';
 import { LogoutDispatcher, SetSidebarShowDispatcher, SetUserSettingDispatcher } from '../reducer/PropsMapper';
 import AuthApi, { UserSetting } from '../api/auth';
+import OptionApi from '../api/option';
 import { Action, Lang } from '../util/Interface';
 
 export interface AppHeaderProps {
@@ -33,6 +36,9 @@ class AppHeader extends React.Component<AppHeaderProps, AppHeaderState> {
         const { success } = response;
         if (success) {
             setUserSetting(newSetting);
+            OptionApi.getFileTypes().then(resp => store.dispatch(SetFileTypeOptions(resp.data)));
+            OptionApi.getStockTypes().then(resp => store.dispatch(SetStockTypeOptions(resp.data)));
+            OptionApi.getRecordTypes().then(resp => store.dispatch(SetRecordTypeOptions(resp.data)));
         }
     }
 

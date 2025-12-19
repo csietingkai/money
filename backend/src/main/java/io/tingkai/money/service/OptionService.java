@@ -1,5 +1,6 @@
 package io.tingkai.money.service;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,11 +9,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import io.tingkai.auth.util.ContextUtil;
+import io.tingkai.base.enumeration.Lang;
 import io.tingkai.base.log.Loggable;
 import io.tingkai.base.util.BaseAppUtil;
+import io.tingkai.base.util.I18nUtil;
 import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.entity.Option;
+import io.tingkai.money.entity.UserSetting;
 import io.tingkai.money.facade.OptionFacade;
+import io.tingkai.money.facade.UserSettingFacade;
 import io.tingkai.money.model.vo.OptionVo;
 
 @Service
@@ -25,6 +31,9 @@ public class OptionService {
 
 	@Autowired
 	private OptionFacade optionFacade;
+
+	@Autowired
+	private UserSettingFacade userSettingFacade;
 
 	@Autowired
 	@Qualifier(CodeConstant.APP_CACHE)
@@ -46,15 +55,14 @@ public class OptionService {
 	}
 
 	private List<OptionVo> syncCache(String catergory) {
-		List<OptionVo> options = this.appCache.opsForValue().get(catergory);
+		UserSetting userSetting = userSettingFacade.queryByUserId(ContextUtil.getUserId());
+		Lang lang = userSetting.getLang();
+		String key = MessageFormat.format("{0}-{1}", lang.name(), catergory);
+		List<OptionVo> options = this.appCache.opsForValue().get(key);
 		if (BaseAppUtil.isEmpty(options)) {
 			List<Option> entities = this.optionFacade.queryAll(catergory);
-			options = entities.stream().map(o -> {
-				// TODO i18n
-				String text = o.getTwText();
-				return OptionVo.of(o.getName(), text);
-			}).collect(Collectors.toList());
-			this.appCache.opsForValue().set(catergory, options);
+			options = entities.stream().map(o -> OptionVo.of(o.getName(), I18nUtil.getMessage(lang, o.getI18nKey()))).collect(Collectors.toList());
+			this.appCache.opsForValue().set(key, options);
 		}
 		return options;
 	}

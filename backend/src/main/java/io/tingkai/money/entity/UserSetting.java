@@ -3,8 +3,8 @@ package io.tingkai.money.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import io.tingkai.base.enumeration.Lang;
 import io.tingkai.money.constant.DatabaseConstant;
-import io.tingkai.money.enumeration.Lang;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

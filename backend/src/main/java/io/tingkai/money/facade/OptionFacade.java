@@ -32,7 +32,7 @@ public class OptionFacade {
 	}
 
 	public Option insert(Option entity) throws FieldMissingException, AlreadyExistException {
-		if (!BaseAppUtil.isAllPresent(entity, entity.getCatergory(), entity.getName(), entity.getEnText(), entity.getTwText())) {
+		if (!BaseAppUtil.isAllPresent(entity, entity.getCatergory(), entity.getName())) {
 			throw new FieldMissingException();
 		}
 		Optional<Option> optional = this.optionDao.findByCatergoryAndName(entity.getCatergory(), entity.getName());

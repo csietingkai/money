@@ -1,5 +1,6 @@
 package io.tingkai.money.entity;
 
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import io.tingkai.money.constant.DatabaseConstant;
@@ -15,21 +16,16 @@ import lombok.Data;
 @Data
 @Table(name = DatabaseConstant.TABLE_OPTION, uniqueConstraints = { @UniqueConstraint(columnNames = { "catergory", "name" }) })
 public class Option {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected UUID id;
+
 	protected String catergory;
+
 	protected String name;
-	protected String enText;
-	protected String twText;
 
-	public Option() {
-	}
-
-	public Option(String catergory, String name, String enText, String twText) {
-		this.catergory = catergory;
-		this.name = name;
-		this.enText = enText;
-		this.twText = twText;
+	public String getI18nKey() {
+		return MessageFormat.format("OPTION.{0}.{1}", catergory, name);
 	}
 }
