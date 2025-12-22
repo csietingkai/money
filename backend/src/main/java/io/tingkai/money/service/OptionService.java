@@ -61,7 +61,7 @@ public class OptionService {
 		List<OptionVo> options = this.appCache.opsForValue().get(key);
 		if (BaseAppUtil.isEmpty(options)) {
 			List<Option> entities = this.optionFacade.queryAll(catergory);
-			options = entities.stream().map(o -> OptionVo.of(o.getName(), I18nUtil.getMessage(lang, o.getI18nKey()))).collect(Collectors.toList());
+			options = entities.stream().map(o -> OptionVo.of(o.getI18nKey(), I18nUtil.getMessage(lang, o.getI18nKey()))).collect(Collectors.toList());
 			this.appCache.opsForValue().set(key, options);
 		}
 		return options;
