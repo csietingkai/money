@@ -95,6 +95,9 @@
             "closeBtn": "Close"
         },
         "AccountRecordModal": {
+            "income.title": "Income",
+            "transfer.title": "Transfer",
+            "expend.title": "Expend",
             "transferTo": "Transfer To",
             "transactionDate": "Transaction Date",
             "recordType": "Record Type",

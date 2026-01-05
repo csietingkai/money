@@ -1,14 +1,11 @@
 from contextlib import closing
 import csv
 import datetime
-import re # Regular Expression
 import io
-import twder
 import urllib
 
-from entity.ExchangeRate import ExchangeRate
 from entity.ExchangeRateRecord import ExchangeRateRecord
-from facade import ExchangeRateFacade, ExchangeRateRecordFacade
+from facade import ExchangeRateRecordFacade
 from util import CodeConstant
 
 def fetchAllExchangeRateRecord(currency: str):

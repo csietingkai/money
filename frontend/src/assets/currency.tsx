@@ -63,4 +63,5 @@ export const hkd = [
     </g>`
 ];
 
-export default { usd, jpy, eur, krw, twd, hkd };
+const currencies: { [key: string]: string[] } = { usd, jpy, eur, krw, twd, hkd }
+export default currencies;

@@ -95,6 +95,9 @@
             "closeBtn": "關閉"
         },
         "AccountRecordModal": {
+            "income.title": "收入",
+            "transfer.title": "轉帳",
+            "expend.title": "支出",
             "transferTo": "轉帳至",
             "transactionDate": "交易日期",
             "recordType": "類型",

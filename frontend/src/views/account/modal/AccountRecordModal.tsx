@@ -113,18 +113,6 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
         this.setState({ form });
     };
 
-    private getModalTitle = (mode?: AccountRecordModalMode) => {
-        const MODAL_TITLE = {
-            'income': 'Income',
-            'transfer': 'Transfer',
-            'expend': 'Expend'
-        };
-        if (mode) {
-            return MODAL_TITLE[mode];
-        }
-        return '';
-    };
-
     private getFilesByDate = async (date: Date): Promise<Option[]> => {
         const response = await FinancailFileApi.list(date);
         const { success, data } = response;
@@ -176,7 +164,9 @@ export default class AccountRecordModal extends React.Component<AccountRecordMod
         return (
             <CModal size='lg' alignment='center' visible={!!(form?.mode)} onClose={this.closeModal}>
                 <CModalHeader>
-                    <CModalTitle>{this.getModalTitle(form?.mode)}</CModalTitle>
+                    <CModalTitle>
+                        <FormattedMessage id={`AccountPage.AccountRecordModal.${form?.mode}.title`} />
+                    </CModalTitle>
                 </CModalHeader>
                 <CModalBody>
                     {

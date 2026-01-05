@@ -72,8 +72,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     constructor(props: AccountPageProps) {
         super(props);
         this.state = {
-            recordTypeMap: props.recordTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
-            showDetail: props.accountList.reduce((acc, curr) => { acc[curr.id] = false; return acc; }, {}),
+            recordTypeMap: props.recordTypeOptions.reduce((acc: { [key: string]: string }, curr: Option) => { acc[curr.key] = curr.value; return acc; }, {}),
+            showDetail: props.accountList.reduce((acc: { [key: string]: boolean }, curr: Account) => { acc[curr.id] = false; return acc; }, {}),
             showAddAccountModal: false,
             addAccountForm: {
                 currency: props.currencyOptions[0]?.key,
@@ -509,7 +509,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         this.setState({ showQrcodeModal: false, qrcodeForm });
     };
 
-    private removeAccount = async (accountId) => {
+    private removeAccount = async (accountId: string) => {
         const { notify } = this.props;
         const response = await AccountApi.deleteAccount(accountId);
         const { message } = response;
