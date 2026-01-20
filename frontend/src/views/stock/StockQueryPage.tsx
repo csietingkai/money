@@ -1,14 +1,14 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilChevronDoubleRight, cilSync } from '@coreui/icons';
+import { cilChevronDoubleRight, cilHighligt, cilLowVision, cilPen, cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
 import AppPriceChart from '../../components/AppPriceChart';
-import { ReduxState, getAuthTokenId, getLang, getStockQueryCondition, getStockType } from '../../reducer/Selector';
-import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockQueryConditionDispatcher, SetStockTradeConditionDispatcher } from '../../reducer/PropsMapper';
-import StockApi, { StockRecordVo, StockVo } from '../../api/stock';
+import { ReduxState, getAuthTokenId, getLang, getStockQueryCondition, getStockTrackings, getStockType } from '../../reducer/Selector';
+import { SetLoadingDispatcher, SetNotifyDispatcher, SetStockQueryConditionDispatcher, SetStockTradeConditionDispatcher, SetTrackingStocksDispatcher } from '../../reducer/PropsMapper';
+import StockApi, { StockRecordVo, StockVo, UserTrackingStockVo } from '../../api/stock';
 import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
 import { StockType } from '../../util/Enum';
@@ -20,10 +20,12 @@ import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 export interface StockQueryPageProps {
     userId: string;
     queryCondition: StockQueryCondition;
+    trackingStocks: UserTrackingStockVo[];
     lang: Lang;
     stockType: StockType;
     setStockQueryCondition: (queryCondition: StockQueryCondition) => void;
     setStockTradeCondition: (tradeCondition?: StockTradeCondition) => void;
+    setTrackingStocks: (trackings: UserTrackingStockVo[]) => void;
     setLoading: (isLoading: boolean) => void;
     notify: (message: string) => void;
 }
@@ -101,6 +103,26 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
         setLoading(false);
     };
 
+    private track = async (code: string) => {
+        const { setLoading, setTrackingStocks } = this.props;
+        setLoading(true);
+        const { success } = await StockApi.track(code);
+        if (success) {
+            StockApi.getTrackingList().then(({ data: trackStocks }) => setTrackingStocks(trackStocks));
+        }
+        setLoading(false);
+    };
+
+    private untrack = async (code: string) => {
+        const { setLoading, setTrackingStocks } = this.props;
+        setLoading(true);
+        const { success } = await StockApi.untrack(code);
+        if (success) {
+            StockApi.getTrackingList().then(({ data: trackStocks }) => setTrackingStocks(trackStocks));
+        }
+        setLoading(false);
+    };
+
     private tradeStock = (stock: StockVo, type: 'buy' | 'sell') => {
         const { code, name, currency } = stock;
         this.props.setStockTradeCondition({ type, code, name, date: new Date(), currency, price: 0, share: 0 });
@@ -164,12 +186,13 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
     };
 
     private getStocksCard = () => {
-        const { stockType, lang } = this.props;
+        const { stockType, lang, trackingStocks } = this.props;
         const { stocks, currentStockPage } = this.state;
         if (!stocks.length) {
             return <React.Fragment></React.Fragment>;
         }
         const showStocks = stocks.slice((currentStockPage - 1) * DATA_COUNT_PER_PAGE, currentStockPage * DATA_COUNT_PER_PAGE);
+        const trackingCodes = trackingStocks.map(ts => ts.stockCode);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -198,41 +221,38 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                                                 <CTableDataCell>{s.name}</CTableDataCell>
                                                 <CTableDataCell>{AppUtil.toDateStr(s.updateTime)}</CTableDataCell>
                                                 <CTableDataCell>
-                                                    <CButtonGroup role='group'>
-                                                        <CButton
-                                                            color='info'
-                                                            variant='outline'
-                                                            size='sm'
-                                                            onClick={() => this.syncRecord(s.code)}
-                                                        >
-                                                            <CIcon icon={cilSync} />
-                                                        </CButton>
-                                                        {/* TODO track */}
-                                                        <CTooltip
-                                                            content={`${AppUtil.getFormattedMessage(lang, 'StockQueryPage.searchResult.buyBtn')} ${s.name}`}
-                                                        >
-                                                            <CButton
-                                                                color={AppUtil.getBenifitColor(1, stockType)}
-                                                                variant='outline'
-                                                                size='sm'
-                                                                onClick={() => this.tradeStock(s, 'buy')}
-                                                            >
-                                                                <CIcon icon={cartIcon.buy} />
-                                                            </CButton>
-                                                        </CTooltip>
-                                                        <CTooltip
-                                                            content={`${AppUtil.getFormattedMessage(lang, 'StockQueryPage.searchResult.sellBtn')} ${s.name}`}
-                                                        >
-                                                            <CButton
-                                                                color={AppUtil.getBenifitColor(-1, stockType)}
-                                                                variant='outline'
-                                                                size='sm'
-                                                                onClick={() => this.tradeStock(s, 'sell')}
-                                                            >
-                                                                <CIcon icon={cartIcon.sell} />
-                                                            </CButton>
-                                                        </CTooltip>
-                                                    </CButtonGroup>
+                                                    <CDropdown variant='btn-group' className='position-static'>
+                                                        <CDropdownToggle color='secondary' variant='outline' size='sm'>
+                                                            <CIcon icon={cilPen} />
+                                                        </CDropdownToggle>
+                                                        <CDropdownMenu>
+                                                            <CDropdownItem onClick={() => this.syncRecord(s.code)}>
+                                                                <CIcon icon={cilSync} className='me-2' />
+                                                                <FormattedMessage id='StockQueryPage.searchResult.th.action.sync' />
+                                                            </CDropdownItem>
+                                                            {
+                                                                trackingCodes.indexOf(s.code) < 0 &&
+                                                                <CDropdownItem onClick={() => this.track(s.code)}>
+                                                                    <CIcon icon={cilHighligt} className='me-2' />
+                                                                    <FormattedMessage id='StockQueryPage.searchResult.th.action.track' />
+                                                                </CDropdownItem>
+                                                            }
+                                                            {
+                                                                trackingCodes.indexOf(s.code) >= 0 &&
+                                                                <CDropdownItem onClick={() => this.untrack(s.code)}>
+                                                                    <CIcon icon={cilLowVision} className='me-2' />
+                                                                    <FormattedMessage id='StockQueryPage.searchResult.th.action.untrack' />
+                                                                </CDropdownItem>
+                                                            }
+                                                            <CDropdownItem onClick={() => this.tradeStock(s, 'buy')}>
+                                                                <CIcon icon={cartIcon.buy} className={`me-2 text-${AppUtil.getBenifitColor(1, stockType)}`} />
+                                                                <FormattedMessage id='StockQueryPage.searchResult.th.action.buy' />
+                                                            </CDropdownItem>
+                                                            <CDropdownItem onClick={() => this.tradeStock(s, 'sell')}>
+                                                                <CIcon icon={cartIcon.sell} className={`me-2 text-${AppUtil.getBenifitColor(-1, stockType)}`} />
+                                                                <FormattedMessage id='StockQueryPage.searchResult.th.action.sell' /></CDropdownItem>
+                                                        </CDropdownMenu>
+                                                    </CDropdown>
                                                 </CTableDataCell>
                                             </CTableRow>
                                         )
@@ -301,14 +321,16 @@ const mapStateToProps = (state: ReduxState) => {
         userId: getAuthTokenId(state),
         queryCondition: getStockQueryCondition(state),
         lang: getLang(state),
-        stockType: getStockType(state)
+        stockType: getStockType(state),
+        trackingStocks: getStockTrackings(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<StockQueryCondition | StockTradeCondition | undefined | boolean | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<StockQueryCondition | StockTradeCondition | UserTrackingStockVo[] | undefined | boolean | string>>) => {
     return {
         setStockQueryCondition: SetStockQueryConditionDispatcher(dispatch),
         setStockTradeCondition: SetStockTradeConditionDispatcher(dispatch),
+        setTrackingStocks: SetTrackingStocksDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch)
     };

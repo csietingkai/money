@@ -1,10 +1,10 @@
 import { Dispatch } from 'react';
-import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition, SetBankInfoList, SetAccountRecordQueryCondition } from './Action';
+import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition, SetBankInfoList, SetAccountRecordQueryCondition, SetTrackingStocks, SetTrackingFunds } from './Action';
 import { AuthToken, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
 import { BankInfo } from '../api/bankInfo';
-import { UserFundVo } from '../api/fund';
-import { UserStockVo } from '../api/stock';
+import { UserFundVo, UserTrackingFundVo } from '../api/fund';
+import { UserStockVo, UserTrackingStockVo } from '../api/stock';
 import StockTradeCondition from '../views/stock/interface/StockTradeCondition';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
 import FundQueryCondition from '../views/fund/interface/FundQueryCondition';
@@ -28,11 +28,13 @@ export const SetBankInfoListDispatcher = (dispatch: Dispatch<Action<BankInfo[]>>
 
 // stock
 export const SetOwnStockListDispatcher = (dispatch: Dispatch<Action<UserStockVo[]>>) => (vos: UserStockVo[]): void => dispatch(SetOwnStockList(vos));
+export const SetTrackingStocksDispatcher = (dispatch: Dispatch<Action<UserTrackingStockVo[]>>) => (vos: UserTrackingStockVo[]): void => dispatch(SetTrackingStocks(vos));
 export const SetStockQueryConditionDispatcher = (dispatch: Dispatch<Action<StockQueryCondition>>) => (condition: StockQueryCondition): void => dispatch(SetStockQueryCondition(condition));
 export const SetStockTradeConditionDispatcher = (dispatch: Dispatch<Action<StockTradeCondition | undefined>>) => (condition?: StockTradeCondition): void => dispatch(SetStockTradeCondition(condition));
 
 // fund
 export const SetOwnFundListDispatcher = (dispatch: Dispatch<Action<UserFundVo[]>>) => (vos: UserFundVo[]): void => dispatch(SetOwnFundList(vos));
+export const SetTrackingFundsDispatcher = (dispatch: Dispatch<Action<UserTrackingFundVo[]>>) => (vos: UserTrackingFundVo[]): void => dispatch(SetTrackingFunds(vos));
 export const SetFundQueryConditionDispatcher = (dispatch: Dispatch<Action<FundQueryCondition>>) => (condition: FundQueryCondition): void => dispatch(SetFundQueryCondition(condition));
 export const SetFundTradeConditionDispatcher = (dispatch: Dispatch<Action<FundTradeCondition | undefined>>) => (condition?: FundTradeCondition): void => dispatch(SetFundTradeCondition(condition));
 

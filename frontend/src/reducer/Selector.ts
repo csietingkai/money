@@ -2,8 +2,8 @@ import * as StateHolder from './StateHolder';
 import { Account } from '../api/account';
 import { AuthToken, UserSetting } from '../api/auth';
 import { BankInfo } from '../api/bankInfo';
-import { UserStockVo } from '../api/stock';
-import { UserFundVo } from '../api/fund';
+import { UserStockVo, UserTrackingStockVo } from '../api/stock';
+import { UserFundVo, UserTrackingFundVo } from '../api/fund';
 import { ExchangeRateVo } from '../api/exchangeRate';
 import { StockType } from '../util/Enum';
 import { Lang, Notification, Option } from '../util/Interface';
@@ -81,32 +81,38 @@ export const getBankInfoList = (state: ReduxState): BankInfo[] => getBankInfoSta
 // stockReducer
 export interface ReduxStockState {
     own: UserStockVo[];
+    trackings: UserTrackingStockVo[];
     queryCondition: StockQueryCondition;
     tradeCondition?: StockTradeCondition;
 }
 export const DEFAULT_REDUX_STOCK_STATE: ReduxStockState = {
     own: [],
+    trackings: [],
     queryCondition: { code: '', name: '' },
     tradeCondition: undefined
 };
 const getStockState = (state: ReduxState): ReduxStockState => state.stock;
 export const getStockOwnList = (state: ReduxState): UserStockVo[] => getStockState(state)?.own;
+export const getStockTrackings = (state: ReduxState): UserTrackingStockVo[] => getStockState(state)?.trackings;
 export const getStockQueryCondition = (state: ReduxState): StockQueryCondition => getStockState(state)?.queryCondition;
 export const getStockTradeCondition = (state: ReduxState): StockTradeCondition | undefined => getStockState(state)?.tradeCondition;
 
 // fundReducer
 export interface ReduxFundState {
     own: UserFundVo[];
+    trackings: UserTrackingFundVo[];
     queryCondition: FundQueryCondition;
     tradeCondition?: FundTradeCondition;
 }
 export const DEFAULT_REDUX_FUND_STATE: ReduxFundState = {
     own: [],
+    trackings: [],
     queryCondition: { code: '', name: '' },
     tradeCondition: undefined
 };
 const getFundState = (state: ReduxState): ReduxFundState => state.fund;
 export const getFundOwnList = (state: ReduxState): UserFundVo[] => getFundState(state)?.own;
+export const getFundTrackings = (state: ReduxState): UserTrackingFundVo[] => getFundState(state)?.trackings;
 export const getFundQueryCondition = (state: ReduxState): FundQueryCondition => getFundState(state)?.queryCondition;
 export const getFundTradeCondition = (state: ReduxState): FundTradeCondition | undefined => getFundState(state)?.tradeCondition;
 

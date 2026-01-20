@@ -6,9 +6,9 @@ import AuthApi, { AuthResponse, AuthToken, UserResponse } from '../api/auth';
 import BankInfoApi, { BankInfo, BankInfoListResponse } from '../api/bankInfo';
 import ExchangeRateApi, { ExchangeRateListResponse } from '../api/exchangeRate';
 import OptionApi, { OptionResponse } from '../api/option';
-import FundApi, { UserFundListResponse } from '../api/fund';
-import StockApi, { UserStockListResponse } from '../api/stock';
-import { Login, Logout, SetAccountList, SetBankInfoList, SetExchangeRates, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions, SetUserSetting } from './Action';
+import FundApi, { FundTrackingsResponse, UserFundListResponse } from '../api/fund';
+import StockApi, { StockTrackingsResponse, UserStockListResponse } from '../api/stock';
+import { Login, Logout, SetAccountList, SetBankInfoList, SetExchangeRates, SetFileTypeOptions, SetIsMobile, SetOwnFundList, SetOwnStockList, SetRecordTypeOptions, SetStockTypeOptions, SetTrackingFunds, SetTrackingStocks, SetUserSetting } from './Action';
 import { ReduxState, getAuthTokenString, getCurrencies, getFileTypes, getStockTypes, getRecordTypes, getBankInfoList } from './Selector';
 import { Action, ApiResponse, Option } from '../util/Interface';
 import { getAuthToken } from './StateHolder';
@@ -143,6 +143,18 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
     }
 
     if (tokenString) {
+        apis.push(StockApi.getTrackingList());
+        responseHandlers.push((response: StockTrackingsResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetTrackingStocks(data));
+            } else {
+                dispatch(SetTrackingStocks([]));
+            }
+        });
+    }
+
+    if (tokenString) {
         apis.push(FundApi.getOwn());
         responseHandlers.push((response: UserFundListResponse) => {
             const { success, data } = response;
@@ -150,6 +162,18 @@ export const init = (dispatch: Dispatch<Action<any>>, getState: () => ReduxState
                 dispatch(SetOwnFundList(data));
             } else {
                 dispatch(SetOwnFundList([]));
+            }
+        });
+    }
+
+    if (tokenString) {
+        apis.push(FundApi.getTrackingList());
+        responseHandlers.push((response: FundTrackingsResponse) => {
+            const { success, data } = response;
+            if (success) {
+                dispatch(SetTrackingFunds(data));
+            } else {
+                dispatch(SetTrackingFunds([]));
             }
         });
     }

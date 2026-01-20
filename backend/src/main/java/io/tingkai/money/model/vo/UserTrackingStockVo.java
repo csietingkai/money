@@ -15,4 +15,5 @@ public class UserTrackingStockVo extends UserTrackingStock implements Transforma
 	protected String stockName;
 	protected StockRecord record;
 	protected BigDecimal amplitude; // 漲跌幅
+	protected BigDecimal amplitudeRate; // 漲跌幅
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import CIcon from '@coreui/icons-react';
-import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilList, cilMonitor, cilSearch, cilSpeedometer, cilSwapHorizontal } from '@coreui/icons';
+import { cilBank, cilCart, cilCode, cilCog, cilDollar, cilList, cilMonitor, cilPin, cilSearch, cilSpeedometer, cilSwapHorizontal } from '@coreui/icons';
 
 export type RouteItem = {
     type: 'item';
@@ -71,6 +71,12 @@ const routes: Route[] = [
     },
     {
         type: 'item',
+        path: 'stockTrack',
+        icon: <CIcon icon={cilPin} customClassName='nav-icon' />,
+        component: React.lazy(() => import('./views/stock/StockTrackPage'))
+    },
+    {
+        type: 'item',
         path: 'stockQuery',
         icon: <CIcon icon={cilSearch} customClassName='nav-icon' />,
         component: React.lazy(() => import('./views/stock/StockQueryPage'))
@@ -81,32 +87,6 @@ const routes: Route[] = [
         icon: <CIcon icon={cilCart} customClassName='nav-icon' />,
         component: React.lazy(() => import('./views/stock/StockTradePage'))
     },
-    // {
-    //     type: 'parent',
-    //     name: 'Icons',
-    //     path: '',
-    //     icon: <CIcon icon={cilStar} customClassName='nav-icon' />,
-    //     items: [
-    //         {
-    //             type: 'child',
-    //             name: 'CoreUI Free',
-    //             path: 'login',
-    //             component: React.lazy(() => import('./views/Login'))
-    //         },
-    //         {
-    //             type: 'child',
-    //             name: 'CoreUI Flags',
-    //             path: '404',
-    //             component: React.lazy(() => import('./views/Page404'))
-    //         },
-    //         {
-    //             type: 'child',
-    //             name: 'CoreUI Brands',
-    //             path: '500',
-    //             component: React.lazy(() => import('./views/Page500'))
-    //         },
-    //     ],
-    // },
     {
         type: 'title',
         name: 'fundTitle',
@@ -116,6 +96,12 @@ const routes: Route[] = [
         path: 'fund',
         icon: <CIcon icon={cilDollar} customClassName='nav-icon' />,
         component: React.lazy(() => import('./views/fund/FundOwnPage'))
+    },
+    {
+        type: 'item',
+        path: 'fundTrack',
+        icon: <CIcon icon={cilPin} customClassName='nav-icon' />,
+        component: React.lazy(() => import('./views/fund/FundTrackPage'))
     },
     {
         type: 'item',

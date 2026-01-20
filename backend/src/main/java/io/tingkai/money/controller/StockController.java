@@ -54,7 +54,7 @@ public class StockController {
 	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
-	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
+	public static final String GET_TRACKINGS_PATH = "/getTrackings";
 	public static final String TRACK_PATH = "/track";
 	public static final String UNTRACK_PATH = "/untrack";
 	public static final String PREDICT_PATH = "/predict";
@@ -137,7 +137,7 @@ public class StockController {
 		return new BaseResponse<List<UserStockRecordVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
-	@RequestMapping(value = StockController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)
+	@RequestMapping(value = StockController.GET_TRACKINGS_PATH, method = RequestMethod.GET)
 	public BaseResponse<List<UserTrackingStockVo>> getAll() {
 		List<UserTrackingStockVo> stocks = this.userStockService.getUserTrackingStockList();
 		return new BaseResponse<List<UserTrackingStockVo>>(true, stocks, MessageConstant.USER_STOCK_GET_TRACKING_LIST_SUCCESS);

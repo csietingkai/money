@@ -51,7 +51,7 @@ public class FundController {
 	public static final String DELETE_RECORD_PATH = "/deleteRecord";
 	public static final String GET_OWN_PATH = "/getOwn";
 	public static final String GET_OWN_RECORDS_PATH = "/getOwnRecords";
-	public static final String GET_TRACKING_LIST_PATH = "/getTrackingList";
+	public static final String GET_TRACKINGS_PATH = "/getTrackings";
 	public static final String TRACK_PATH = "/track";
 	public static final String UNTRACK_PATH = "/untrack";
 	public static final String PREDICT_PATH = "/predict";
@@ -128,7 +128,7 @@ public class FundController {
 		return new BaseResponse<List<UserFundRecordVo>>(true, result, MessageConstant.SUCCESS);
 	}
 
-	@RequestMapping(value = FundController.GET_TRACKING_LIST_PATH, method = RequestMethod.GET)
+	@RequestMapping(value = FundController.GET_TRACKINGS_PATH, method = RequestMethod.GET)
 	public BaseResponse<List<UserTrackingFundVo>> getAll() {
 		List<UserTrackingFundVo> funds = this.userFundService.getUserTrackingFundList();
 		return new BaseResponse<List<UserTrackingFundVo>>(true, funds, MessageConstant.USER_FUND_GET_TRACKING_LIST_SUCCESS);

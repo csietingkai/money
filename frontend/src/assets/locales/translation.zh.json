@@ -22,10 +22,12 @@
         "recordQuery": "交易查詢",
         "stockTitle": "股票",
         "stock": "股票庫存",
+        "stockTrack": "追蹤股票列表",
         "stockQuery": "股票資訊查詢",
         "stockTrade": "股票交易",
         "fundTitle": "基金",
         "fund": "基金庫存",
+        "fundTrack": "追蹤基金列表",
         "fundQuery": "基金資訊查詢",
         "fundTrade": "基金交易",
         "currencyTitle": "匯率",
@@ -209,6 +211,10 @@
         },
         "tradeBtn": "申購其他基金"
     },
+    "FundTrackPage": {
+        "untrack": "取消追蹤",
+        "detail": "詳細資料"
+    },
     "FundQueryPage": {
         "searchCondition": {
             "title": "查詢條件",
@@ -219,12 +225,17 @@
             "searchBtn": "查詢"
         },
         "searchResult": {
-            "buyBtn": "申購",
-            "sellBtn": "贖回",
             "th": {
                 "code": "基金代號",
                 "name": "名稱",
-                "date": "資料日期"
+                "date": "資料日期",
+                "action": {
+                    "sync": "同步為最新",
+                    "track": "加入追蹤清單",
+                    "untrack": "從追蹤清單移除",
+                    "buy": "申購",
+                    "sell": "贖回"
+                }
             }
         },
         "chart": {
@@ -269,6 +280,10 @@
         },
         "tradeBtn": "買進其他股票"
     },
+    "StockTrackPage": {
+        "untrack": "取消追蹤",
+        "detail": "詳細資料"
+    },
     "StockQueryPage": {
         "searchCondition": {
             "title": "查詢條件",
@@ -279,12 +294,17 @@
             "searchBtn": "查詢"
         },
         "searchResult": {
-            "buyBtn": "買進",
-            "sellBtn": "賣出",
             "th": {
                 "code": "股票代號",
                 "name": "名稱",
-                "date": "資料日期"
+                "date": "資料日期",
+                "action": {
+                    "sync": "同步為最新",
+                    "track": "加入追蹤清單",
+                    "untrack": "從追蹤清單移除",
+                    "buy": "申購",
+                    "sell": "贖回"
+                }
             }
         },
         "chart": {

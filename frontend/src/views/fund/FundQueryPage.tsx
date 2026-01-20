@@ -1,14 +1,14 @@
 import React, { Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CTooltip } from '@coreui/react';
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilChevronDoubleRight, cilSync } from '@coreui/icons';
+import { cilChevronDoubleRight, cilHighligt, cilLowVision, cilPen, cilSync } from '@coreui/icons';
 import AppPagination from '../../components/AppPagination';
 import AppPriceChart from '../../components/AppPriceChart';
-import { ReduxState, getAuthTokenId, getFundQueryCondition, getLang, getStockType } from '../../reducer/Selector';
-import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher } from '../../reducer/PropsMapper';
-import FundApi, { FundRecordVo, FundVo } from '../../api/fund';
+import { ReduxState, getAuthTokenId, getFundQueryCondition, getFundTrackings, getLang, getStockType } from '../../reducer/Selector';
+import { SetLoadingDispatcher, SetNotifyDispatcher, SetFundQueryConditionDispatcher, SetFundTradeConditionDispatcher, SetTrackingFundsDispatcher } from '../../reducer/PropsMapper';
+import FundApi, { FundRecordVo, FundVo, UserTrackingFundVo } from '../../api/fund';
 import * as cartIcon from '../../assets/cart';
 import * as AppUtil from '../../util/AppUtil';
 import { StockType } from '../../util/Enum';
@@ -20,10 +20,12 @@ import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
 export interface FundQueryPageProps {
     userId: string;
     queryCondition: FundQueryCondition;
+    trackingFunds: UserTrackingFundVo[];
     lang: Lang;
     stockType: StockType;
     setFundQueryCondition: (queryCondition: FundQueryCondition) => void;
     setFundTradeCondition: (tradeCondition: FundTradeCondition) => void;
+    setTrackingFunds: (trackings: UserTrackingFundVo[]) => void;
     setLoading: (isLoading: boolean) => void;
     notify: (message: string) => void;
 }
@@ -103,6 +105,26 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
         setLoading(false);
     };
 
+    private track = async (code: string) => {
+        const { setLoading, setTrackingFunds } = this.props;
+        setLoading(true);
+        const { success } = await FundApi.track(code);
+        if (success) {
+            FundApi.getTrackingList().then(({ data: trackFunds }) => setTrackingFunds(trackFunds));
+        }
+        setLoading(false);
+    };
+
+    private untrack = async (code: string) => {
+        const { setLoading, setTrackingFunds } = this.props;
+        setLoading(true);
+        const { success } = await FundApi.untrack(code);
+        if (success) {
+            FundApi.getTrackingList().then(({ data: trackFunds }) => setTrackingFunds(trackFunds));
+        }
+        setLoading(false);
+    };
+
     private tradeFund = (fund: FundVo, type: 'buy' | 'sell') => {
         const { code, name } = fund;
         if (type === 'buy') {
@@ -170,12 +192,13 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
     };
 
     private getFundsCard = () => {
-        const { stockType, lang } = this.props;
+        const { stockType, trackingFunds } = this.props;
         const { funds, currentFundPage } = this.state;
         if (!funds.length) {
             return <React.Fragment></React.Fragment>;
         }
         const showFunds = funds.slice((currentFundPage - 1) * DATA_COUNT_PER_PAGE, currentFundPage * DATA_COUNT_PER_PAGE);
+        const trackingCodes = trackingFunds.map(tf => tf.fundCode);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -204,41 +227,38 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                                                 <CTableDataCell><div style={{ minWidth: '120px', overflow: 'hidden' }}>{s.name}</div></CTableDataCell>
                                                 <CTableDataCell>{AppUtil.toDateStr(s.updateTime)}</CTableDataCell>
                                                 <CTableDataCell>
-                                                    <CButtonGroup role='group'>
-                                                        <CButton
-                                                            color='info'
-                                                            variant='outline'
-                                                            size='sm'
-                                                            onClick={() => this.syncRecord(s.code)}
-                                                        >
-                                                            <CIcon icon={cilSync} />
-                                                        </CButton>
-                                                        {/* TODO track */}
-                                                        <CTooltip
-                                                            content={`${AppUtil.getFormattedMessage(lang, 'FundQueryPage.searchResult.buyBtn')} ${s.name}`}
-                                                        >
-                                                            <CButton
-                                                                color={AppUtil.getBenifitColor(1, stockType)}
-                                                                variant='outline'
-                                                                size='sm'
-                                                                onClick={() => this.tradeFund(s, 'buy')}
-                                                            >
-                                                                <CIcon icon={cartIcon.buy} />
-                                                            </CButton>
-                                                        </CTooltip>
-                                                        <CTooltip
-                                                            content={`${AppUtil.getFormattedMessage(lang, 'FundQueryPage.searchResult.sellBtn')} ${s.name}`}
-                                                        >
-                                                            <CButton
-                                                                color={AppUtil.getBenifitColor(-1, stockType)}
-                                                                variant='outline'
-                                                                size='sm'
-                                                                onClick={() => this.tradeFund(s, 'sell')}
-                                                            >
-                                                                <CIcon icon={cartIcon.sell} />
-                                                            </CButton>
-                                                        </CTooltip>
-                                                    </CButtonGroup>
+                                                    <CDropdown variant='btn-group' className='position-static'>
+                                                        <CDropdownToggle color='secondary' variant='outline' size='sm'>
+                                                            <CIcon icon={cilPen} />
+                                                        </CDropdownToggle>
+                                                        <CDropdownMenu>
+                                                            <CDropdownItem onClick={() => this.syncRecord(s.code)}>
+                                                                <CIcon icon={cilSync} className='me-2' />
+                                                                <FormattedMessage id='FundQueryPage.searchResult.th.action.sync' />
+                                                            </CDropdownItem>
+                                                            {
+                                                                trackingCodes.indexOf(s.code) < 0 &&
+                                                                <CDropdownItem onClick={() => this.track(s.code)}>
+                                                                    <CIcon icon={cilHighligt} className='me-2' />
+                                                                    <FormattedMessage id='FundQueryPage.searchResult.th.action.track' />
+                                                                </CDropdownItem>
+                                                            }
+                                                            {
+                                                                trackingCodes.indexOf(s.code) >= 0 &&
+                                                                <CDropdownItem onClick={() => this.untrack(s.code)}>
+                                                                    <CIcon icon={cilLowVision} className='me-2' />
+                                                                    <FormattedMessage id='FundQueryPage.searchResult.th.action.untrack' />
+                                                                </CDropdownItem>
+                                                            }
+                                                            <CDropdownItem onClick={() => this.tradeFund(s, 'buy')}>
+                                                                <CIcon icon={cartIcon.buy} className={`me-2 text-${AppUtil.getBenifitColor(1, stockType)}`} />
+                                                                <FormattedMessage id='FundQueryPage.searchResult.th.action.buy' />
+                                                            </CDropdownItem>
+                                                            <CDropdownItem onClick={() => this.tradeFund(s, 'sell')}>
+                                                                <CIcon icon={cartIcon.sell} className={`me-2 text-${AppUtil.getBenifitColor(-1, stockType)}`} />
+                                                                <FormattedMessage id='FundQueryPage.searchResult.th.action.sell' /></CDropdownItem>
+                                                        </CDropdownMenu>
+                                                    </CDropdown>
                                                 </CTableDataCell>
                                             </CTableRow>
                                         )
@@ -307,14 +327,16 @@ const mapStateToProps = (state: ReduxState) => {
         userId: getAuthTokenId(state),
         lang: getLang(state),
         stockType: getStockType(state),
-        queryCondition: getFundQueryCondition(state)
+        queryCondition: getFundQueryCondition(state),
+        trackingFunds: getFundTrackings(state)
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<FundQueryCondition | FundTradeCondition | undefined | boolean | string>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<FundQueryCondition | FundTradeCondition | UserTrackingFundVo[] | undefined | boolean | string>>) => {
     return {
         setFundQueryCondition: SetFundQueryConditionDispatcher(dispatch),
         setFundTradeCondition: SetFundTradeConditionDispatcher(dispatch),
+        setTrackingFunds: SetTrackingFundsDispatcher(dispatch),
         setLoading: SetLoadingDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch)
     };

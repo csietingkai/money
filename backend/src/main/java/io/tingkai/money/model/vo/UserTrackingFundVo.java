@@ -15,4 +15,5 @@ public class UserTrackingFundVo extends UserTrackingFund implements Transformabl
 	protected String fundName;
 	protected FundRecord record;
 	protected BigDecimal amplitude; // 漲跌幅
+	protected BigDecimal amplitudeRate; // 漲跌幅
 }

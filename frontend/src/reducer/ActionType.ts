@@ -12,11 +12,13 @@ export const SET_BANK_INFO_LIST: string = 'SET_BANK_INFO_LIST';
 
 // stock
 export const SET_OWN_STOCK_LIST: string = 'SET_OWN_STOCK_LIST';
+export const SET_TRACKING_STOCKS: string = 'SET_TRACKING_STOCKS';
 export const SET_STOCK_QUERY_CONDITION: string = 'SET_STOCK_QUERY_CONDITION';
 export const SET_STOCK_TRADE_CONDITION: string = 'SET_STOCK_TRADE_CONDITION';
 
 // fund
 export const SET_OWN_FUND_LIST: string = 'SET_OWN_FUND_LIST';
+export const SET_TRACKING_FUNDS: string = 'SET_TRACKING_FUNDS';
 export const SET_FUND_QUERY_CONDITION: string = 'SET_FUND_QUERY_CONDITION';
 export const SET_FUND_TRADE_CONDITION: string = 'SET_FUND_TRADE_CONDITION';
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { DEFAULT_DECIMAL_PRECISION } from './Constant';
 import { StockType } from './Enum';
 import { Lang } from './Interface';
 import dictionary from '../assets/locales/dictionary';

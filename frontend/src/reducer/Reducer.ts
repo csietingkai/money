@@ -2,11 +2,11 @@ import { combineReducers } from 'redux';
 import axios from 'axios';
 import { AuthToken, UserSetting } from '../api/auth';
 import { Account } from '../api/account';
-import { UserStockVo } from '../api/stock';
-import { UserFundVo } from '../api/fund';
+import { UserStockVo, UserTrackingStockVo } from '../api/stock';
+import { UserFundVo, UserTrackingFundVo } from '../api/fund';
 import { ExchangeRateVo } from '../api/exchangeRate';
 import { DEFAULT_REDUX_ACCOUNT_STATE, DEFAULT_REDUX_AUTH_STATE, DEFAULT_REDUX_BANK_INFO_STATE, DEFAULT_REDUX_EXCHANGE_RATE_STATE, DEFAULT_REDUX_FUND_STATE, DEFAULT_REDUX_OPTION_STATE, DEFAULT_REDUX_STOCK_STATE, DEFAULT_REDUX_SYSTEM_SETTING_STATE, ReduxAccountState, ReduxAuthState, ReduxBankInfoState, ReduxExchangeRateState, ReduxFundState, ReduxOptionState, ReduxStockState, ReduxSystemSettingState } from './Selector';
-import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_IS_MOBILE, SET_EXCHANGE_RATES, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_BANK_INFO_LIST, SET_ACCOUNT_RECORD_QUERY_CONDITION } from './ActionType';
+import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_QUERY_CONDITION, SET_STOCK_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_IS_MOBILE, SET_EXCHANGE_RATES, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_BANK_INFO_LIST, SET_ACCOUNT_RECORD_QUERY_CONDITION, SET_TRACKING_STOCKS, SET_TRACKING_FUNDS } from './ActionType';
 import { removeAuthToken, setAuthToken, setLang, setSidebarFoldable, setSidebarShow } from './StateHolder';
 import { Action, Option } from '../util/Interface';
 import StockQueryCondition from '../views/stock/interface/StockQueryCondition';
@@ -70,11 +70,13 @@ const bankInfoReducer = (state: ReduxBankInfoState = DEFAULT_REDUX_BANK_INFO_STA
     return newState;
 };
 
-const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<UserStockVo[] | StockQueryCondition | StockTradeCondition | undefined>): ReduxStockState => {
+const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action: Action<UserStockVo[] | UserTrackingStockVo[] | StockQueryCondition | StockTradeCondition | undefined>): ReduxStockState => {
     const newState: ReduxStockState = { ...state };
     const { type, payload } = action;
     if (type === SET_OWN_STOCK_LIST) {
         newState.own = payload as UserStockVo[];
+    } else if (type === SET_TRACKING_STOCKS) {
+        newState.trackings = payload as UserTrackingStockVo[];
     } else if (type === SET_STOCK_QUERY_CONDITION) {
         newState.queryCondition = payload as StockQueryCondition;
     } else if (type === SET_STOCK_TRADE_CONDITION) {
@@ -87,12 +89,14 @@ const stockReducer = (state: ReduxStockState = DEFAULT_REDUX_STOCK_STATE, action
     return newState;
 };
 
-const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserFundVo[] | FundQueryCondition | FundTradeCondition | undefined>): ReduxFundState => {
+const fundReducer = (state: ReduxFundState = DEFAULT_REDUX_FUND_STATE, action: Action<UserFundVo[] | UserTrackingFundVo[] | FundQueryCondition | FundTradeCondition | undefined>): ReduxFundState => {
     const newState: ReduxFundState = { ...state };
     const { type, payload } = action;
     if (type === SET_OWN_FUND_LIST) {
         newState.own = payload as UserFundVo[];
-    } else if (type === SET_FUND_QUERY_CONDITION) {
+    } else if (type === SET_TRACKING_FUNDS) {
+        newState.trackings = payload as UserTrackingFundVo[];
+    }  else if (type === SET_FUND_QUERY_CONDITION) {
         newState.queryCondition = payload as FundQueryCondition;
     } else if (type === SET_FUND_TRADE_CONDITION) {
         if (payload) {

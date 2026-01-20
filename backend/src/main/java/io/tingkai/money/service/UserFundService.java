@@ -1,6 +1,7 @@
 package io.tingkai.money.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -447,6 +448,7 @@ public class UserFundService {
 				if (records.size() > 1) {
 					FundRecord r1 = records.get(records.size() - 2);
 					vo.setAmplitude(r0.getPrice().subtract(r1.getPrice()));
+					vo.setAmplitudeRate(vo.getAmplitude().divide(r1.getPrice(), BaseCodeConstant.NUMBER_PERCISION, RoundingMode.HALF_UP));
 				}
 			}
 			list.add(vo);

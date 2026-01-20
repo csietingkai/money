@@ -22,10 +22,12 @@
         "recordQuery": "Record Query",
         "stockTitle": "Stock",
         "stock": "Your Stock",
+        "stockTrack": "Stock Tracking List",
         "stockQuery": "Stock Query",
         "stockTrade": "Stock Trade",
         "fundTitle": "Fund",
         "fund": "Your Fund",
+        "fundTrack": "Fund Tracking List",
         "fundQuery": "Fund Query",
         "fundTrade": "Fund Trade",
         "currencyTitle": "Currency",
@@ -209,6 +211,10 @@
         },
         "tradeBtn": "Trade More Fund"
     },
+    "FundTrackPage": {
+        "untrack": "Untrack",
+        "detail": "Details"
+    },
     "FundQueryPage": {
         "searchCondition": {
             "title": "Search Condition",
@@ -219,12 +225,17 @@
             "searchBtn": "Search"
         },
         "searchResult": {
-            "buyBtn": "Buy",
-            "sellBtn": "Sell",
             "th": {
                 "code": "Code",
                 "name": "Name",
-                "date": "Update Date"
+                "date": "Update Date",
+                "action": {
+                    "sync": "Sync latest data",
+                    "track": "Add to Tracking List",
+                    "untrack": "Remove from Tracking List",
+                    "buy": "Buy",
+                    "sell": "Sell"
+                }
             }
         },
         "chart": {
@@ -269,6 +280,10 @@
         },
         "tradeBtn": "Trade More Stock"
     },
+    "StockTrackPage": {
+        "untrack": "Untrack",
+        "detail": "Details"
+    },
     "StockQueryPage": {
         "searchCondition": {
             "title": "Search Condition",
@@ -279,12 +294,17 @@
             "searchBtn": "Search"
         },
         "searchResult": {
-            "buyBtn": "Buy",
-            "sellBtn": "Sell",
             "th": {
                 "code": "Code",
                 "name": "Name",
-                "date": "Update Date"
+                "date": "Update Date",
+                "action": {
+                    "sync": "Sync latest data",
+                    "track": "Add to Tracking List",
+                    "untrack": "Remove from Tracking List",
+                    "buy": "Buy",
+                    "sell": "Sell"
+                }
             }
         },
         "chart": {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {
-    STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKING_LIST_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH,
+    STOCK_GET_ALL_PATH, STOCK_GET_RECORDS_PATH, STOCK_GET_TRACKINGS_PATH, STOCK_PREDICT_PATH, STOCK_REFRESH_PATH, STOCK_TRACK_PATH,
     STOCK_UNTRACK_PATH, USER_STOCK_BONUS_PATH, USER_STOCK_BUY_PATH, USER_STOCK_DELETE_PATH, USER_STOCK_GET_OWN_PATH, USER_STOCK_GET_OWN_RECORDS_PATH, USER_STOCK_PRECALC_PATH, USER_STOCK_SELL_PATH,
     USER_STOCK_UPDATE_PATH
 } from './Constant';
@@ -87,6 +87,7 @@ export interface UserTrackingStockVo extends UserTrackingStock {
     stockName: string;
     record: StockRecord;
     amplitude: number;
+    amplitudeRate: number;
 }
 
 export interface StockResponse extends ApiResponse<StockVo> { }
@@ -97,7 +98,7 @@ export interface UserStockResponse extends ApiResponse<UserStockVo> { }
 export interface UserStockListResponse extends ApiResponse<UserStockVo[]> { }
 export interface UserStockRecordResponse extends ApiResponse<UserStockRecordVo> { }
 export interface UserStockRecordListResponse extends ApiResponse<UserStockRecordVo[]> { }
-export interface StockTrackingListResponse extends ApiResponse<UserTrackingStockVo[]> { }
+export interface StockTrackingsResponse extends ApiResponse<UserTrackingStockVo[]> { }
 
 const REFRESH_STOCK_MAX_TIME = 30 * 60 * 1000; // 30 mins
 
@@ -184,9 +185,9 @@ const getOwnRecords = async (userStockId: string): Promise<UserStockRecordListRe
     return data;
 };
 
-const getTrackingList = async (): Promise<StockTrackingListResponse> => {
-    const response = await axios.get(STOCK_GET_TRACKING_LIST_PATH, {});
-    const data: StockTrackingListResponse = response.data;
+const getTrackingList = async (): Promise<StockTrackingsResponse> => {
+    const response = await axios.get(STOCK_GET_TRACKINGS_PATH, {});
+    const data: StockTrackingsResponse = response.data;
     return data;
 };
 

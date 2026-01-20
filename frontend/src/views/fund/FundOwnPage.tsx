@@ -36,7 +36,7 @@ export interface FundOwnPageProps {
 }
 
 export interface FundOwnPageState {
-    show: { [stockCode: string]: boolean; };
+    show: { [fundCode: string]: boolean; };
     currentOwnFundRecords: UserFundRecordVo[];
     ownFundRecordPage: number;
     showDeleteRecordModal: boolean;
@@ -49,7 +49,7 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
     constructor(props: FundOwnPageProps) {
         super(props);
         this.state = {
-            show: props.ownFundList.reduce((acc, curr) => {
+            show: props.ownFundList.reduce((acc: { [fundCode: string]: boolean }, curr: UserFundVo) => {
                 acc[curr.fundCode] = false;
                 return acc;
             }, {}),

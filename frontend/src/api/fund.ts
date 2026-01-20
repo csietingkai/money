@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import {
-    FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKING_LIST_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH,
+    FUND_GET_ALL_PATH, FUND_GET_RECORDS_PATH, FUND_GET_TRACKINGS_PATH, FUND_PREDICT_PATH, FUND_REFRESH_PATH, FUND_TRACK_PATH,
     FUND_UNTRACK_PATH, USER_FUND_BOUNS_PATH, USER_FUND_BUY_PATH, USER_FUND_DELETE_PATH, USER_FUND_GET_OWN_PATH, USER_FUND_GET_OWN_RECORDS_PATH, USER_FUND_SELL_PATH,
     USER_FUND_UPDATE_PATH
 } from './Constant';
@@ -82,6 +82,7 @@ export interface UserTrackingFundVo extends UserTrackingFund {
     fundName: string;
     record: FundRecord;
     amplitude: number;
+    amplitudeRate: number;
 }
 
 export interface FundResponse extends ApiResponse<FundVo> { }
@@ -92,7 +93,7 @@ export interface UserFundResponse extends ApiResponse<UserFundVo> { }
 export interface UserFundListResponse extends ApiResponse<UserFundVo[]> { }
 export interface UserFundRecordResponse extends ApiResponse<UserFundRecordVo> { }
 export interface UserFundRecordListResponse extends ApiResponse<UserFundRecordVo[]> { }
-export interface FundTrackingListResponse extends ApiResponse<UserTrackingFundVo[]> { }
+export interface FundTrackingsResponse extends ApiResponse<UserTrackingFundVo[]> { }
 
 const REFRESH_FUND_MAX_TIME = 30 * 60 * 1000; // 30 mins
 
@@ -173,9 +174,9 @@ const getOwnRecords = async (userFundId: string): Promise<UserFundRecordListResp
     return data;
 };
 
-const getTrackingList = async (): Promise<FundTrackingListResponse> => {
-    const response = await axios.get(FUND_GET_TRACKING_LIST_PATH);
-    const data: FundTrackingListResponse = response.data;
+const getTrackingList = async (): Promise<FundTrackingsResponse> => {
+    const response = await axios.get(FUND_GET_TRACKINGS_PATH);
+    const data: FundTrackingsResponse = response.data;
     return data;
 };
 
