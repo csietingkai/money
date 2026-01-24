@@ -3,6 +3,10 @@ package io.tingkai.base.util;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import io.tingkai.base.constant.BaseCodeConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -110,5 +114,10 @@ public class BaseAppUtil {
 	public static boolean isMultipleNumber(BigDecimal big, BigDecimal small) {
 		BigDecimal result = big.divide(small, RoundingMode.CEILING);
 		return result.multiply(small).compareTo(big) == 0;
+	}
+
+	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+		Set<Object> seen = ConcurrentHashMap.newKeySet();
+		return t -> seen.add(keyExtractor.apply(t));
 	}
 }
