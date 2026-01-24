@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.StockDao;
 import io.tingkai.money.dao.UserStockDao;
+import io.tingkai.money.dao.UserTrackingStockDao;
 import io.tingkai.money.entity.Stock;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.service.DataFetcherService;
@@ -33,6 +35,9 @@ public class StockFacade {
 
 	@Autowired
 	private UserStockDao userStockDao;
+
+	@Autowired
+	private UserTrackingStockDao userTrackingStockDao;
 
 	@Autowired
 	private DataFetcherService pythonFetcherService;
@@ -57,8 +62,24 @@ public class StockFacade {
 	}
 
 	public List<Stock> queryByUserStockExist(boolean sort) {
-		List<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).distinct().collect(Collectors.toList());
-		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.indexOf(s.getCode()) >= 0).collect(Collectors.toList());
+		Set<String> userStockCodes = this.userStockDao.findAll().stream().filter(us -> BigDecimal.ZERO.compareTo(us.getAmount()) != 0).map(us -> us.getStockCode()).collect(Collectors.toSet());
+		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userStockCodes.contains(s.getCode())).collect(Collectors.toList());
+		if (sort) {
+			this.sort(entities);
+		}
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_STOCK));
+		}
+		return entities;
+	}
+
+	public List<Stock> queryByUserTrackingStockExist() {
+		return this.queryByUserTrackingStockExist(true);
+	}
+
+	public List<Stock> queryByUserTrackingStockExist(boolean sort) {
+		Set<String> userTrackingStockCodes = this.userTrackingStockDao.findAll().stream().map(us -> us.getStockCode()).collect(Collectors.toSet());
+		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userTrackingStockCodes.contains(s.getCode())).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);
 		}

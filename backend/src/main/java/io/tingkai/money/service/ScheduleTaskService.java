@@ -2,8 +2,10 @@ package io.tingkai.money.service;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -101,7 +103,10 @@ public class ScheduleTaskService {
 			return;
 		}
 
-		List<Stock> stocks = this.stockFacade.queryByUserStockExist();
+		List<Stock> stocks = new ArrayList<>();
+		stocks.addAll(this.stockFacade.queryByUserStockExist());
+		stocks.addAll(this.stockFacade.queryByUserTrackingStockExist());
+		stocks = stocks.stream().filter(BaseAppUtil.distinctByKey(Stock::getId)).collect(Collectors.toList());
 		for (Stock stock : stocks) {
 			StockRecord lastRecord = this.stockRecordFacade.latestRecord(stock.getCode());
 			if ((BaseAppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDealDate().toLocalDate())) || BaseAppUtil.isEmpty(lastRecord)) {
@@ -125,7 +130,10 @@ public class ScheduleTaskService {
 			return;
 		}
 
-		List<Fund> funds = this.fundFacade.queryByUserFundExist(true);
+		List<Fund> funds = new ArrayList<>();
+		funds.addAll(this.fundFacade.queryByUserFundExist());
+		funds.addAll(this.fundFacade.queryByUserTrackingStockExist());
+		funds = funds.stream().filter(BaseAppUtil.distinctByKey(Fund::getId)).collect(Collectors.toList());
 		for (Fund fund : funds) {
 			FundRecord lastRecord = this.fundRecordFacade.latestRecord(fund.getCode());
 			if ((BaseAppUtil.isPresent(lastRecord) && !today.toLocalDate().isEqual(lastRecord.getDate().toLocalDate())) || BaseAppUtil.isEmpty(lastRecord)) {

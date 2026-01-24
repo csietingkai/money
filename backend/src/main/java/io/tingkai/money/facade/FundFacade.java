@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import io.tingkai.money.constant.DatabaseConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.dao.FundDao;
 import io.tingkai.money.dao.UserFundDao;
+import io.tingkai.money.dao.UserTrackingFundDao;
 import io.tingkai.money.entity.Fund;
 import io.tingkai.money.service.DataFetcherService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,9 @@ public class FundFacade {
 
 	@Autowired
 	private UserFundDao userFundDao;
+
+	@Autowired
+	private UserTrackingFundDao userTrackingFundDao;
 
 	@Autowired
 	private DataFetcherService pythonFetcherService;
@@ -56,8 +61,24 @@ public class FundFacade {
 	}
 
 	public List<Fund> queryByUserFundExist(boolean sort) {
-		List<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).distinct().collect(Collectors.toList());
-		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.indexOf(f.getCode()) >= 0).collect(Collectors.toList());
+		Set<String> userFundCodes = this.userFundDao.findAll().stream().filter(uf -> BigDecimal.ZERO.compareTo(uf.getAmount()) != 0).map(uf -> uf.getFundCode()).collect(Collectors.toSet());
+		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.contains(f.getCode())).collect(Collectors.toList());
+		if (sort) {
+			this.sort(entities);
+		}
+		if (entities.size() == 0) {
+			log.trace(MessageFormat.format(MessageConstant.QUERY_NO_DATA, DatabaseConstant.TABLE_FUND));
+		}
+		return entities;
+	}
+
+	public List<Fund> queryByUserTrackingStockExist() {
+		return this.queryByUserFundExist(true);
+	}
+
+	public List<Fund> queryByUserTrackingStockExist(boolean sort) {
+		Set<String> userFundCodes = this.userTrackingFundDao.findAll().stream().map(uf -> uf.getFundCode()).collect(Collectors.toSet());
+		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.contains(f.getCode())).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);
 		}
