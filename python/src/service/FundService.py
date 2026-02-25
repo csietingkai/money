@@ -8,11 +8,12 @@ from facade import FundFacade, FundRecordFacade
 from util import AppUtil, CodeConstant
 
 def fetchFund(targetCode):
-    response = requests.post(CodeConstant.FUND_LIST_URL, json={'order': 'isincode-asc', 'keyword': targetCode}, headers={'User-Agent': 'Mozilla/5.0'})
+    response = requests.post(CodeConstant.FUND_NAME_URL, json={ 'data': { 'fundId': targetCode } }, headers={'User-Agent': 'Mozilla/5.0'})
+    print (response)
     response = response.json()
-    hasResult = len(response['items']) > 0
-    if hasResult:
-        item = response['items'][0]
+    print (response)
+    if response['status'] == 0:
+        item = response['data']
         entity = Fund()
         # skip if already exist
         code = item['fundId']
@@ -21,20 +22,26 @@ def fetchFund(targetCode):
             print('[INFO] fund code<' + code + '> already exists, skipping...')
             return 'CODE_EXIST'
         entity.code = code
-        entity.name = item['name']['text']
-        isinCode = item['extent']['isincode']
-        # special condition, sometimes it has two different code but same isin code
-        queryEntity = FundFacade.queryByIsinCode(isinCode)
-        if queryEntity:
-            print('[WARN] fund isinCode<' + isinCode + '> already exists, skipping...')
-            return 'ISIN_CODE_EXIST'
-        entity.isin_code = isinCode
-        dateStr = item['hit']['interval']['beginning']
-        offeringDate = datetime.datetime(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:9]))
-        entity.offering_date = offeringDate
-        entity.currency = item['extent']['currency']
+        entity.name = item['cName']
+        isinResponse = requests.post(CodeConstant.FUND_INFO_URL, json={ 'data': { 'fundId': targetCode } }, headers={'User-Agent': 'Mozilla/5.0'})
+        isinResponse = isinResponse.json()
+        if isinResponse['status'] == 0:
+            for isinItem in isinResponse['data']:
+                if isinItem['header'] == 'ISIN Code':
+                    isinCode = isinItem['row'][0]
+                    # special condition, sometimes it has two different code but same isin code
+                    queryEntity = FundFacade.queryByIsinCode(isinCode)
+                    if queryEntity:
+                        print('[WARN] fund isinCode<' + isinCode + '> already exists, skipping...')
+                        return 'ISIN_CODE_EXIST'
+                    entity.isin_code = isinCode
+                    entity.symbol = yf.Ticker(entity.isin_code).ticker
+                if isinItem['header'] == '成立日期':
+                    dateStr = isinItem['row'][0]
+                    offeringDate = datetime.datetime(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:9]))
+                    entity.offering_date = offeringDate
+        entity.currency = item['newPriceCurrency']
         print('[INFO] fetching fund<{code}>\'s symbol...'.format(code = code))
-        entity.symbol = yf.Ticker(entity.isin_code).ticker
         FundFacade.insert(entity)
         return 'SUCCESS'
     else:

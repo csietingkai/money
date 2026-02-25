@@ -1,6 +1,7 @@
 EXCHANGE_RATE_RECORD_URL = 'https://rate.bot.com.tw/xrt/flcsv/0/{year}-{month}/{currency}'
 
-FUND_LIST_URL = 'https://apis.fundrich.com.tw/FrsWebApi/Common/ThemeFund/FundsDataInfo'
+FUND_NAME_URL = 'https://apis.fundrich.com.tw/FRSDataCenter/GetFundDetail'
+FUND_INFO_URL = 'https://apis.fundrich.com.tw/FRSDataCenter/GetFundBasicInfo'
 FUND_RICH_RECORDS_URL = 'https://apis.fundrich.com.tw/FRSDataCenter/GetFundChart'
 FUND_RICH_REQUEST_HEADER = {
     'Content-Type': 'application/json',
