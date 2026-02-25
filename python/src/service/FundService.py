@@ -9,9 +9,7 @@ from util import AppUtil, CodeConstant
 
 def fetchFund(targetCode):
     response = requests.post(CodeConstant.FUND_NAME_URL, json={ 'data': { 'fundId': targetCode } }, headers={'User-Agent': 'Mozilla/5.0'})
-    print (response)
     response = response.json()
-    print (response)
     if response['status'] == 0:
         item = response['data']
         entity = Fund()

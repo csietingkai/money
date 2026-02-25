@@ -12,8 +12,9 @@ psycopg2-binary = "==2.9.10"
 requests = "==2.32.3"
 sqlalchemy = "==2.0.40"
 twder = "==0.2.2"
-yfinance = "==0.2.58"
+yfinance = "==0.2.37"
 html5lib = "==1.1"
+multitasking = "==0.0.11"
 
 [dev-packages]
 
