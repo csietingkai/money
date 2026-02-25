@@ -1,6 +1,5 @@
 import React from 'react';
 import moment from 'moment';
-import { DEFAULT_DECIMAL_PRECISION } from './Constant';
 import { StockType } from './Enum';
 import { Lang } from './Interface';
 import dictionary from '../assets/locales/dictionary';
@@ -134,8 +133,8 @@ export const getBenifitColor = (num: number, stockType: StockType): string => {
     return num > 0 ? positive : negitive;
 };
 
-export const bindEnterKey = (onEnterKeyDown: () => void) => (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Enter' && ['file', 'select-one', 'textarea'].indexOf(event.target['type']) < 0) {
+export const bindEnterKey = (onEnterKeyDown: () => void) => (event: React.KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === 'Enter' && ['file', 'select-one', 'textarea'].indexOf((event.target as HTMLFormElement)['type']) < 0) {
         event.preventDefault();
         onEnterKeyDown();
     }
