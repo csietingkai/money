@@ -68,8 +68,10 @@ export default class StockBonusForm extends React.Component<StockBonusFormProps,
             }
             state.price = tradeCondition.price || 0;
             state.share = tradeCondition.share;
-            if (tradeCondition.fee && tradeCondition.total) {
+            if (tradeCondition.fee) {
                 state.fee = tradeCondition.fee;
+            }
+            if (tradeCondition.total) {
                 state.total = AppUtil.numberComma(tradeCondition.total);
             }
         }
