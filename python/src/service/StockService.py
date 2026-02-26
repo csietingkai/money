@@ -1,4 +1,5 @@
 import datetime
+import json
 import requests
 import pandas
 import time
@@ -86,53 +87,62 @@ def fetchStockRecord(code):
         startDate += datetime.timedelta(days = 1)
 
     if stock.symbol:
-        return fetchStockRecordFromYahoo(stock.symbol, startDate, endDate)
+        return fetchStockRecordFromYahoo(stock.code, stock.symbol, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
     else:
         fetchStockRecordFromTwse(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
         fetchStockRecordFromTpex(code, int(datetime.datetime.timestamp(startDate)), int(datetime.datetime.timestamp(endDate)))
         return 'SUCCESS'
 
-def fetchStockRecordFromYahoo(symbol: str, start: datetime, end: datetime):
+def fetchStockRecordFromYahoo(code: str, symbol: str, start: int, end: int):
     try:
         print('[INFO] fetching stocks<{symbol}>\'s records from yahoo...'.format(symbol = symbol))
-        code = StockFacade.queryCodeBySymbol(symbol)
-        ticker = yf.Ticker(symbol)
-        data = ticker.history(start = start, end = end)
 
-        data.reset_index(inplace=True)
-        dateLst = data.Date.dt.strftime('%Y-%m-%d')
-        openLst = data.Open
-        closeLst = data.Close
-        highLst = data.High
-        lowLst = data.Low
-        volumeLst = data.Volume
+        response = requests.get(CodeConstant.STOCK_YAHOO_URL.format(symbol = symbol, start = start, end = end), headers={'User-Agent': 'Mozilla/5.0'})
+        print('[INFO] fetched response status_code: {statusCode}'.format(statusCode = response.status_code))
+        response = response.json()
+        chart = response['chart']
+
+        if chart['error']:
+            return str(chart['error'])
+
+        dateLst = chart['result'][0]['timestamp']
+        openLst = chart['result'][0]['indicators']['quote'][0]['open']
+        closeLst = chart['result'][0]['indicators']['quote'][0]['close']
+        highLst = chart['result'][0]['indicators']['quote'][0]['high']
+        lowLst = chart['result'][0]['indicators']['quote'][0]['low']
+        volumeLst = chart['result'][0]['indicators']['quote'][0]['volume']
 
         size = len(dateLst)
         for i in range(size):
-            dealDate = datetime.datetime.strptime(dateLst[i], '%Y-%m-%d').replace(hour=0, minute=0)
+            dealDate = datetime.datetime.fromtimestamp(dateLst[i]).replace(hour=0, minute=0)
             openPrice = handleYahooPrice(openLst[i])
             highPrice = handleYahooPrice(highLst[i])
             lowPrice = handleYahooPrice(lowLst[i])
             closePrice = handleYahooPrice(closeLst[i])
             dealShare = handleYahooPrice(volumeLst[i])
-            entity = StockRecord()
-            queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
-            if queryStockRecord:
-                entity.id = queryStockRecord.id
-            entity.code = code
-            entity.deal_date = dealDate
-            entity.deal_share = dealShare
-            entity.open_price = openPrice
-            entity.high_price = highPrice
-            entity.low_price = lowPrice
-            entity.close_price = closePrice
-            # entity has id means update
-            if entity.id:
-                StockRecordFacade.update(entity)
+            if openPrice == '0.00' or highPrice == '0.00' or lowPrice == '0.00' or closePrice == '0.00':
+                print('[WARN]: {date} has openPrice<{openPrice}> highPrice<{highPrice}> lowPrice<{lowPrice}> closePrice<{closePrice}>'.format(date = dealDate, openPrice = openPrice, highPrice = highPrice, lowPrice = lowPrice, closePrice = closePrice))
             else:
-                StockRecordFacade.insert(entity)
+                entity = StockRecord()
+                queryStockRecord = StockRecordFacade.queryByCodeAndDealDate(code, dealDate)
+                if queryStockRecord:
+                    entity.id = queryStockRecord.id
+                entity.code = code
+                entity.deal_date = dealDate
+                entity.deal_share = dealShare
+                entity.open_price = openPrice
+                entity.high_price = highPrice
+                entity.low_price = lowPrice
+                entity.close_price = closePrice
+                # entity has id means update
+                if entity.id:
+                    StockRecordFacade.update(entity)
+                else:
+                    StockRecordFacade.insert(entity)
         return 'SUCCESS'
     except Exception as e:
+        e.with_traceback()
+        print(e)
         return str(e)
 
 def fetchStockRecordFromTwse(code: str, start: int, end: Optional[int]):
@@ -258,6 +268,8 @@ def isWarrant(code: str) -> bool:
     return re.search("[0-9]{6}", code) or re.search("[0-9]{5}[PFQCBXY]", code)
 
 def handleYahooPrice(price: float) -> float:
+    if price is None:
+        price = 0
     step, percision = priceStep(price)
     priceStr = ("{:." + str(percision) + "f}").format(price)
     return AppUtil.toNumber(priceStr, percision)
