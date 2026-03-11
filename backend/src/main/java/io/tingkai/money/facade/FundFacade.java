@@ -22,6 +22,7 @@ import io.tingkai.money.dao.FundDao;
 import io.tingkai.money.dao.UserFundDao;
 import io.tingkai.money.dao.UserTrackingFundDao;
 import io.tingkai.money.entity.Fund;
+import io.tingkai.money.entity.UserTrackingFund;
 import io.tingkai.money.service.DataFetcherService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,12 +73,12 @@ public class FundFacade {
 		return entities;
 	}
 
-	public List<Fund> queryByUserTrackingStockExist() {
-		return this.queryByUserFundExist(true);
+	public List<Fund> queryByUserTrackingFundExist() {
+		return this.queryByUserTrackingFundExist(true);
 	}
 
-	public List<Fund> queryByUserTrackingStockExist(boolean sort) {
-		Set<String> userFundCodes = this.userTrackingFundDao.findAll().stream().map(uf -> uf.getFundCode()).collect(Collectors.toSet());
+	public List<Fund> queryByUserTrackingFundExist(boolean sort) {
+		Set<String> userFundCodes = this.userTrackingFundDao.findAll().stream().map(UserTrackingFund::getFundCode).collect(Collectors.toSet());
 		List<Fund> entities = this.fundDao.findAll().stream().filter(f -> userFundCodes.contains(f.getCode())).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);

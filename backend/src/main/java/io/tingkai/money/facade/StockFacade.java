@@ -22,6 +22,7 @@ import io.tingkai.money.dao.StockDao;
 import io.tingkai.money.dao.UserStockDao;
 import io.tingkai.money.dao.UserTrackingStockDao;
 import io.tingkai.money.entity.Stock;
+import io.tingkai.money.entity.UserTrackingStock;
 import io.tingkai.money.enumeration.MarketType;
 import io.tingkai.money.service.DataFetcherService;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +79,7 @@ public class StockFacade {
 	}
 
 	public List<Stock> queryByUserTrackingStockExist(boolean sort) {
-		Set<String> userTrackingStockCodes = this.userTrackingStockDao.findAll().stream().map(us -> us.getStockCode()).collect(Collectors.toSet());
+		Set<String> userTrackingStockCodes = this.userTrackingStockDao.findAll().stream().map(UserTrackingStock::getStockCode).collect(Collectors.toSet());
 		List<Stock> entities = this.stockDao.findAll().stream().filter(s -> userTrackingStockCodes.contains(s.getCode())).collect(Collectors.toList());
 		if (sort) {
 			this.sort(entities);

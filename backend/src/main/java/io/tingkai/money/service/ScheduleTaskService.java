@@ -132,7 +132,7 @@ public class ScheduleTaskService {
 
 		List<Fund> funds = new ArrayList<>();
 		funds.addAll(this.fundFacade.queryByUserFundExist());
-		funds.addAll(this.fundFacade.queryByUserTrackingStockExist());
+		funds.addAll(this.fundFacade.queryByUserTrackingFundExist());
 		funds = funds.stream().filter(BaseAppUtil.distinctByKey(Fund::getId)).collect(Collectors.toList());
 		for (Fund fund : funds) {
 			FundRecord lastRecord = this.fundRecordFacade.latestRecord(fund.getCode());
