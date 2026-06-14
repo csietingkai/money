@@ -2,7 +2,7 @@ package io.tingkai.money.model.request;
 
 import java.util.UUID;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import lombok.Data;
 

@@ -16,7 +16,7 @@ public class I18nUtil {
 	static {
 		Map<Lang, ResourceBundle> bundles = new HashMap<>();
 		for (Lang l : Lang.values()) {
-			bundles.put(l, ResourceBundle.getBundle("locale.message", new Locale(l.name())));
+			bundles.put(l, ResourceBundle.getBundle("locale.message", Locale.of(l.name())));
 		}
 		BUNDLES = Collections.unmodifiableMap(bundles);
 	}

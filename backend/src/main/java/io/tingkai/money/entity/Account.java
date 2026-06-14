@@ -3,7 +3,7 @@ package io.tingkai.money.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import io.tingkai.money.constant.DatabaseConstant;
 import jakarta.persistence.Entity;

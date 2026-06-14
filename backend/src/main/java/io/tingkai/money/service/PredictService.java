@@ -9,7 +9,7 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.tingkai.base.constant.BaseCodeConstant;
@@ -27,16 +27,16 @@ public class PredictService {
 	private static final String PYTHON_PREDICT_FUND_PATH = PYTHON_PREDICT_PATH_PREFIX + "/fund";
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private RestClient restClient;
 
 	public List<PredictResultVo> predictStock(String code, int days) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_PREDICT_STOCK_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_PREDICT_STOCK_PATH)
 				.queryParam("code", code)
 				.queryParam("days", days);
 		// @formatter:on
-		JSONObject response = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
+		JSONObject response = this.restClient.get().uri(builder.toUriString()).retrieve().body(JSONObject.class);
 		List<PredictResultVo> vos = handlePredictResponse(response);
 		return vos;
 	}
@@ -44,11 +44,11 @@ public class PredictService {
 	public List<PredictResultVo> predictFund(String code, int days) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_PREDICT_FUND_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_PREDICT_FUND_PATH)
 				.queryParam("code", code)
 				.queryParam("days", days);
 		// @formatter:on
-		JSONObject response = this.restTemplate.getForObject(builder.toUriString(), JSONObject.class);
+		JSONObject response = this.restClient.get().uri(builder.toUriString()).retrieve().body(JSONObject.class);
 		List<PredictResultVo> vos = handlePredictResponse(response);
 		return vos;
 	}

@@ -13,7 +13,7 @@ public class AppConstant {
 	public static int FETCH_MAX_RECORD;
 	public static Lang LANG;
 
-	@Value("${spring.data.mongodb.grid-fs-database}")
+	@Value("${spring.mongodb.grid-fs-database}")
 	public void setGridFsDatabase(String gridFsDatabase) {
 		AppConstant.GRID_FS_DATABASE = gridFsDatabase;
 	}

@@ -45,7 +45,7 @@ public class SecurityConfig {
 		// @formatter:off
 		return http
 			.csrf(AbstractHttpConfigurer::disable)
-			.cors(cors -> cors.configurationSource(request -> {
+			.cors(cors -> cors.configurationSource(_ -> {
 		        CorsConfiguration configuration = new CorsConfiguration();
 		        configuration.setAllowedOrigins(Arrays.asList("*"));
 		        configuration.setAllowedMethods(Arrays.asList("*"));

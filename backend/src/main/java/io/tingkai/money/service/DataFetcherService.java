@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import io.tingkai.base.log.Loggable;
 import io.tingkai.money.constant.AppConstant;
 import io.tingkai.money.constant.CodeConstant;
 import io.tingkai.money.constant.MessageConstant;
 import io.tingkai.money.entity.ExchangeRate;
-import io.tingkai.base.log.Loggable;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -30,7 +30,7 @@ public class DataFetcherService {
 	private static final String PYTHON_FETCH_FUND_RECORDS_PATH = PYTHON_FETCH_PATH_PREFIX + "/fundRecords";
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private RestClient restClient;
 
 	@Autowired
 	@Qualifier(CodeConstant.PYTHON_CACHE)
@@ -46,10 +46,10 @@ public class DataFetcherService {
 	public void fetechExchangeRateRecord(String currency) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_EXCHANGE_RATE_RECORDS_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_EXCHANGE_RATE_RECORDS_PATH)
 				.queryParam("currency", currency);
 		// @formatter:on
-		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
+		String result = this.restClient.get().uri(builder.toUriString()).retrieve().body(String.class);
 		if (!MessageConstant.SUCCESS.equals(result)) {
 			log.warn(result);
 		}
@@ -58,10 +58,10 @@ public class DataFetcherService {
 	public void fetchStock(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_PATH)
 				.queryParam("code", code);
 		// @formatter:on
-		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
+		String result = this.restClient.get().uri(builder.toUriString()).retrieve().body(String.class);
 		if (!MessageConstant.SUCCESS.equals(result)) {
 			log.warn(result);
 		}
@@ -70,10 +70,10 @@ public class DataFetcherService {
 	public void fetchStockRecord(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_RECORDS_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_STOCK_RECORDS_PATH)
 				.queryParam("code", code);
 		// @formatter:on
-		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
+		String result = this.restClient.get().uri(builder.toUriString()).retrieve().body(String.class);
 		if (!MessageConstant.SUCCESS.equals(result)) {
 			log.warn(result);
 		}
@@ -82,10 +82,10 @@ public class DataFetcherService {
 	public void fetchFund(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_FUND_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_FUND_PATH)
 				.queryParam("code", code);
 		// @formatter:on
-		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
+		String result = this.restClient.get().uri(builder.toUriString()).retrieve().body(String.class);
 		if (!MessageConstant.SUCCESS.equals(result)) {
 			log.warn(result);
 		}
@@ -94,10 +94,10 @@ public class DataFetcherService {
 	public void fetchFundRecord(String code) {
 		// @formatter:off
 		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_FUND_RECORDS_PATH)
+				.fromUriString(AppConstant.PYTHON_BASE_URL + PYTHON_FETCH_FUND_RECORDS_PATH)
 				.queryParam("code", code);
 		// @formatter:on
-		String result = this.restTemplate.getForObject(builder.toUriString(), String.class);
+		String result = this.restClient.get().uri(builder.toUriString()).retrieve().body(String.class);
 		if (!MessageConstant.SUCCESS.equals(result)) {
 			log.warn(result);
 		}
