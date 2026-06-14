@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardGroup, CCol, CContainer, CForm, CFormInput, CInputGroup, CInputGroupText, CRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';

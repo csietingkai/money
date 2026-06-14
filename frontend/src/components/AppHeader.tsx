@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { CContainer, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CHeader, CHeaderNav, CHeaderToggler } from '@coreui/react';
 import CIcon from '@coreui/icons-react';

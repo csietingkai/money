@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';

@@ -4,7 +4,7 @@ import { CCard, CCardBody, CCardHeader, CCol, CNav, CNavItem, CNavLink, CProgres
 import Chart from 'react-google-charts';
 import CIcon from '@coreui/icons-react';
 import { cilBank, cilExternalLink } from '@coreui/icons';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { SetAccountRecordQueryConditionDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import { ReduxState, getAccountList, getFundOwnList, getLang, getRecordTypes, getStockOwnList } from '../reducer/Selector';
 import AccountApi, { Account, MonthBalanceVo } from '../api/account';
@@ -60,7 +60,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
     private getTotalAccountBalance = (accountList: Account[]): AccountBalance[] => {
         const balances: AccountBalance[] = [];
-        const m = {};
+        const m: any = {};
         for (const a of accountList) {
             if (!m[a.currency]) {
                 m[a.currency] = 0;
@@ -147,13 +147,13 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     };
 
     private monthDetailChart = (transType: AccountRecordTransType.INCOME | AccountRecordTransType.EXPEND): React.ReactNode => {
-        const key = transType.toLocaleLowerCase();
+        const key: 'income' | 'expend' = transType.toLocaleLowerCase() as ('income' | 'expend');
         const { monthBalance, activeTab } = this.state;
         const yms = monthBalance.details.map(x => `${x.year}${AppUtil.prefixZero(x.month)}`);
         const ymLabels = monthBalance.details.map(x => `${x.year}/${AppUtil.prefixZero(x.month)}`);
         const dataHeader = ['Record Type', `${AppUtil.capitalize(key)}`];
-        const data = {};
-        monthBalance.details.forEach(x => {
+        const data: any = {};
+        monthBalance.details.forEach((x: any) => {
             const ym = `${x.year}${AppUtil.prefixZero(x.month)}`;
             data[ym] = [[...dataHeader]];
             for (const recordType in x[key]) {
@@ -170,7 +170,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             for (let i = 1; i < data[ym].length; i++) {
                 data[ym][i].percent = AppUtil.toNumber((data[ym][i][1] / sum * 100).toFixed(DEFAULT_DECIMAL_PRECISION));
             }
-            data[ym].sort((a, b) => b.percent - a.percent);
+            data[ym].sort((a: any, b: any) => b.percent - a.percent);
         }
 
         const options = {
@@ -216,7 +216,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                                                 height={'400px'}
                                             />
                                             {
-                                                data[r].map((series, si) =>
+                                                data[r].map((series: any, si: number) =>
                                                     si !== 0 && (
                                                         <div className='progress-group' key={`${key}-${r}-series-${si}`}>
                                                             <div className='progress-group-header'>

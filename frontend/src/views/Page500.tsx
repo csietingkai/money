@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { CCol, CContainer, CRow } from '@coreui/react';
 

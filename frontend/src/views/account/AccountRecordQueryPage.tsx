@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CForm, CFormCheck, CFormInput, CFormSelect, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import { cilChevronDoubleRight, cilMediaSkipForward } from '@coreui/icons';
@@ -56,7 +56,7 @@ class AccountRecordQueryPage extends React.Component<AccountRecordQueryPageProps
         super(props);
         const searchConditionForm: AccountRecordSearchConditionForm = this.handleSearchConditionForm(props.accountRecordQueryCondition);
         this.state = {
-            recordTypeMap: props.recordTypeOptions.reduce((acc, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
+            recordTypeMap: props.recordTypeOptions.reduce((acc: any, curr) => { acc[curr.key] = curr.value; return acc; }, {}),
             searchConditionForm,
             isSearchConditionFormValid: {
                 startDate: true,

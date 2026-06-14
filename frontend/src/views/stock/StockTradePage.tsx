@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { ReduxState, getAccountList, getAuthTokenId, getStockTradeCondition } from '../../reducer/Selector';
 import { CNav, CNavItem, CNavLink, CTabContent, CTabPane } from '@coreui/react';

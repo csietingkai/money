@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
@@ -49,7 +49,7 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
     constructor(props: StockOwnPageProps) {
         super(props);
         this.state = {
-            show: props.ownStockList.reduce((acc, curr) => {
+            show: props.ownStockList.reduce((acc: any, curr) => {
                 acc[curr.stockCode] = false;
                 return acc;
             }, {}),

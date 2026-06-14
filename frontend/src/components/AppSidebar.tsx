@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { CCloseButton, CSidebar, CSidebarBrand, CSidebarFooter, CSidebarHeader, CSidebarToggler } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import AppSidebarNav from './AppSidebarNav';

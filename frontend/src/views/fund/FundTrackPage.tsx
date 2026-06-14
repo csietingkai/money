@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 import { cilArrowCircleBottom, cilArrowCircleRight, cilArrowCircleTop, cilInfo, cilLowVision, cilOptions } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';

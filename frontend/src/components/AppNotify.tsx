@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { CToast, CToastBody, CToastClose, CToaster } from '@coreui/react';
 import { ReduxState, getNotifications } from '../reducer/Selector';
 import { Notification } from '../util/Interface';

@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
 import { CSpinner } from '@coreui/react';

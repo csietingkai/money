@@ -130,7 +130,7 @@ class AppCandleChart extends React.Component<AppPriceChartProps, AppPriceChartSt
                     color: '#000'
                 },
                 position: (pos: number[], params: any, el: any, elRect: any, size: { viewSize: number[]; }) => {
-                    const obj = { top: 10 };
+                    const obj: any = { top: 10 };
                     obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
                     return obj;
                 }

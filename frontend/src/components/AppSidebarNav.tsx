@@ -22,7 +22,7 @@ export default class AppSidebarNav extends React.Component<AppSidebarNavProps, A
     private navItem = (icon: React.ReactNode, path: string, indent: boolean = false): React.ReactNode => {
         return (
             <CNavItem as='div' key={`item-${path}`}>
-                <CNavLink to={path} as={NavLink}>
+                <CNavLink to={`/${path}`} as={NavLink}>
                     {icon}
                     <FormattedMessage id={`AppSidebar.${path}`}/>
                 </CNavLink>

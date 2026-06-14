@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { connect } from 'react-redux';
+import { legacy_connect as connect } from 'react-redux'
 import { ReduxState, getAccountList, getAuthTokenId, getFundTradeCondition, getUserSetting } from '../../reducer/Selector';
 import { CNav, CNavItem, CNavLink, CTabContent, CTabPane } from '@coreui/react';
 import { SetAccountListDispatcher, SetNotifyDispatcher, SetOwnFundListDispatcher } from '../../reducer/PropsMapper';

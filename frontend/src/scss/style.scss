@@ -1,14 +1,111 @@
-// If you want to override variables do it here
-@import "variables";
+@use "@coreui/coreui/scss/coreui" as * with (
+  $enable-deprecation-messages: false,
+);
+@use "vendors/simplebar";
 
-// Import styles
-@import "@coreui/coreui/scss/coreui";
+body {
+  background-color: var(--cui-tertiary-bg);
+}
 
-// Vendors
-@import "vendors/simplebar";
+.wrapper {
+  width: 100%;
+  padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
+  will-change: auto;
+  @include transition(padding .15s);
+}
 
-// Custom styles for this theme
-@import "theme";
+.header > .container-fluid,
+.sidebar-header {
+  min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+}
 
-// If you want to add custom CSS you can put it here
-@import "custom";
+.sidebar-brand-full {
+  margin-left: 3px;
+}
+
+.sidebar-header {
+  .nav-underline-border {
+    --cui-nav-underline-border-link-padding-x: 1rem;
+    --cui-nav-underline-border-gap: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+  }
+}
+
+.sidebar-toggler {
+  margin-inline-start: auto;
+}
+
+.sidebar-narrow,
+.sidebar-narrow-unfoldable:not(:hover) {
+  .sidebar-toggler {
+    margin-inline-end: auto;
+  }
+}
+
+.header > .container-fluid + .container-fluid {
+  min-height: 3rem;
+}
+
+.footer {
+  min-height: calc(3rem + 1px); // stylelint-disable-line function-disallowed-list
+}
+
+@include color-mode(dark) {
+  body {
+    background-color: var(--cui-dark-bg-subtle);
+  }
+
+  .footer {
+    --cui-footer-bg: var(--cui-body-bg);
+  }
+}
+
+// Here you can add other styles
+.loading-overlay {
+    display: flex;
+    background: rgba(255, 255, 255, 0.7);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+}
+
+$colors: (
+    primary: var(--cui-primary),
+    secondary: var(--cui-secondary),
+    success: var(--cui-success),
+    info: var(--cui-info),
+    warning: var(--cui-warning),
+    danger: var(--cui-danger),
+    light: var(--cui-light),
+    dark: var(--cui-dark)
+);
+
+@each $colorname, $color in $colors {
+    div.card.detailed-#{$colorname} {
+        box-shadow: 0 0.125rem 0.25rem $color
+    }
+}
+
+.pr-0 {
+    padding-right: 0;
+}
+
+.pl-0 {
+    padding-left: 0;
+}
+
+label.required::before {
+    content: '*';
+    margin-right: 4px;
+    color: red;
+}
