@@ -8,7 +8,7 @@ from facade import FundFacade, FundRecordFacade
 from util import AppUtil, CodeConstant
 
 def fetchFund(targetCode):
-    response = requests.post(CodeConstant.FUND_NAME_URL, json={ 'data': { 'fundId': targetCode } }, headers={'User-Agent': 'Mozilla/5.0'})
+    response = requests.post(CodeConstant.FUND_NAME_URL, json={ 'data': { 'fundId': targetCode } }, headers=CodeConstant.FUND_RICH_REQUEST_HEADER, verify=False)
     response = response.json()
     if response['status'] == 0:
         item = response['data']
@@ -21,7 +21,7 @@ def fetchFund(targetCode):
             return 'CODE_EXIST'
         entity.code = code
         entity.name = item['cName']
-        isinResponse = requests.post(CodeConstant.FUND_INFO_URL, json={ 'data': { 'fundId': targetCode } }, headers={'User-Agent': 'Mozilla/5.0'})
+        isinResponse = requests.post(CodeConstant.FUND_INFO_URL, json={ 'data': { 'fundId': targetCode } }, headers=CodeConstant.FUND_RICH_REQUEST_HEADER, verify=False)
         isinResponse = isinResponse.json()
         if isinResponse['status'] == 0:
             for isinItem in isinResponse['data']:
@@ -61,7 +61,7 @@ def fetchFundRecords(code: str):
                     'endTime': AppUtil.convertDateToStr(datetime.datetime.now())
                 }
             }
-            response = requests.post(CodeConstant.FUND_RICH_RECORDS_URL, json = requestData, headers = CodeConstant.FUND_RICH_REQUEST_HEADER)
+            response = requests.post(CodeConstant.FUND_RICH_RECORDS_URL, json = requestData, headers = CodeConstant.FUND_RICH_REQUEST_HEADER, verify=False)
             richData = response.json()
             response.close()
             for item in richData['data']['tableRow']['priceHistory']:
