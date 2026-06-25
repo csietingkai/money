@@ -1,6 +1,6 @@
 {
   "name": "tingkai/money-frontend",
-  "version": "v2.18.0",
+  "version": "v2.18.1",
   "description": "Frontend for Tingkai Money App",
   "homepage": ".",
   "bugs": {
@@ -19,10 +19,10 @@
     "start": "vite --host"
   },
   "dependencies": {
-    "@coreui/coreui": "5.7.1",
+    "@coreui/coreui": "5.6.1",
     "@coreui/icons": "3.1.0",
     "@coreui/icons-react": "2.3.0",
-    "@coreui/react": "5.11.0",
+    "@coreui/react": "5.10.0",
     "@coreui/utils": "2.0.2",
     "@popperjs/core": "2.11.8",
     "@types/qrcode": "1.5.6",
