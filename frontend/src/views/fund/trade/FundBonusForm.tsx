@@ -143,8 +143,9 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
     };
 
     render(): React.ReactNode {
-        const { accounts, userSetting: { fundFeeRate } } = this.props;
+        const { accounts } = this.props;
         const { code, name, accountId, balance, tradeDate, rate, share, price, total, fileId, bonusFileOptions } = this.state;
+        const showAccountList = accounts.filter(x => x.shown);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -192,12 +193,12 @@ export default class FundBonusForm extends React.Component<FundBonusFormProps, F
                                     value={accountId}
                                     onChange={(event: any) => {
                                         const newAccountId = event.target.value as string;
-                                        const newBalance = accounts.find(x => x.id === newAccountId)?.balance || 0;
+                                        const newBalance = showAccountList.find(x => x.id === newAccountId)?.balance || 0;
                                         this.setState({ accountId: newAccountId, balance: newAccountId ? AppUtil.numberComma(newBalance) : '' });
                                     }}
                                 >
                                     <option value=''></option>
-                                    {accounts.map(a => <option key={`bonus-account-${a.id}`} value={a.id}>{a.name}</option>)}
+                                    {showAccountList.map(a => <option key={`bonus-account-${a.id}`} value={a.id}>{a.name}</option>)}
                                 </CFormSelect>
                             </CCol>
                         </CRow>

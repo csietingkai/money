@@ -145,6 +145,7 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
     render(): React.ReactNode {
         const { accounts } = this.props;
         const { code, name, accountId, balance, tradeDate, rate, share, price, total, fileId, sellFileOptions } = this.state;
+        const showAccountList = accounts.filter(x => x.shown);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -192,12 +193,12 @@ export default class FundSellForm extends React.Component<FundSellFormProps, Fun
                                     value={accountId}
                                     onChange={(event: any) => {
                                         const accountId = event.target.value as string;
-                                        const balance = accounts.find(x => x.id === accountId)?.balance || 0;
+                                        const balance = showAccountList.find(x => x.id === accountId)?.balance || 0;
                                         this.setState({ accountId, balance: accountId ? AppUtil.numberComma(balance) : '' });
                                     }}
                                 >
                                     <option value=''></option>
-                                    {accounts.map(a => <option key={`sell-account-${a.id}`} value={a.id}>{a.name}</option>)}
+                                    {showAccountList.map(a => <option key={`sell-account-${a.id}`} value={a.id}>{a.name}</option>)}
                                 </CFormSelect>
                             </CCol>
                         </CRow>

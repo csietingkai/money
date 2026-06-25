@@ -89,8 +89,8 @@ class CurrencyQueryPage extends React.Component<ExchangeRateQueryPageProps, Exch
         const { fromCurr, toCurr, fromAccId, toAccId, fromAccBalance, toAccBalance, rate, fromAmount, toAmount } = tradeForm;
         const fromCurrOptions: Option[] = exchangeRates.filter(x => x.currency !== toCurr).map(x => ({ key: x.currency, value: x.name }));
         const toCurrOptions: Option[] = exchangeRates.filter(x => x.currency !== fromCurr).map(x => ({ key: x.currency, value: x.name }));
-        const fromAccOptions: Account[] = accounts.filter(x => x.currency === fromCurr);
-        const toAccOptions: Account[] = accounts.filter(x => x.currency === toCurr);
+        const fromAccOptions: Account[] = accounts.filter(x => x.currency === fromCurr).filter(x => x.shown);
+        const toAccOptions: Account[] = accounts.filter(x => x.currency === toCurr).filter(x => x.shown);
         return (
             <CContainer>
                 <CRow className='justify-content-center'>

@@ -147,6 +147,7 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
     render(): React.ReactNode {
         const { accounts, userSetting: { fundFeeRate } } = this.props;
         const { code, name, accountId, balance, tradeDate, debitAmount, rate, share, price, fee, total, fileId, buyFileOptions } = this.state;
+        const showAccountList = accounts.filter(x => x.shown);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
@@ -194,12 +195,12 @@ export default class FundBuyForm extends React.Component<FundBuyFormProps, FundB
                                     value={accountId}
                                     onChange={(event: any) => {
                                         const newAccountId = event.target.value as string;
-                                        const balance = accounts.find(x => x.id === newAccountId)?.balance || 0;
+                                        const balance = showAccountList.find(x => x.id === newAccountId)?.balance || 0;
                                         this.setState({ accountId: newAccountId, balance: newAccountId ? AppUtil.numberComma(balance) : '' });
                                     }}
                                 >
                                     <option value=''></option>
-                                    {accounts.map(a => <option key={`buy-account-${a.id}`} value={a.id}>{a.name}</option>)}
+                                    {showAccountList.map(a => <option key={`buy-account-${a.id}`} value={a.id}>{a.name}</option>)}
                                 </CFormSelect>
                             </CCol>
                         </CRow>

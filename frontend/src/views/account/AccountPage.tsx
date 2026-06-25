@@ -548,7 +548,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteAccountModal, showDeleteRecordModal, currentRecordMode, holdingAccountId, holdingRecordId } = this.state;
         const hasHiddenAccount: boolean = accountList.some(x => !x.shown);
         const currAccount = accountList.find(a => a.id === holdingAccountId);
-        const showAccountList = accountList.filter(a => a.id !== holdingAccountId && a.currency === currAccount?.currency);
+        const showAccountList = accountList.filter(a => a.id !== holdingAccountId && a.currency === currAccount?.currency).filter(a => a.shown);
         const showAccountRecords = currentAccountRecords.slice((accountRecordsPage - 1) * DATA_COUNT_PER_PAGE, accountRecordsPage * DATA_COUNT_PER_PAGE);
         return (
             <React.Fragment>

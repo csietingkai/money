@@ -162,7 +162,7 @@ export default class StockSellForm extends React.Component<StockSellFormProps, S
     render(): React.ReactNode {
         const { accounts } = this.props;
         const { code, name, currency, accountId, balance, tradeDate, share, price, fee, tax, total, fileId, sellFileOptions } = this.state;
-        const showAccountList = accounts.filter(x => x.currency === currency);
+        const showAccountList = accounts.filter(x => x.currency === currency).filter(x => x.shown);
         return (
             <CCard className='mb-4'>
                 <CCardBody>

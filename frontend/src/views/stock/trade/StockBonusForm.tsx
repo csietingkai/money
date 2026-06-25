@@ -136,7 +136,7 @@ export default class StockBonusForm extends React.Component<StockBonusFormProps,
     render(): React.ReactNode {
         const { accounts } = this.props;
         const { code, name, currency, accountId, balance, tradeDate, share, price, fee, total, fileId, bonusFileOptions } = this.state;
-        const showAccountList = accounts.filter(x => x.currency === currency);
+        const showAccountList = accounts.filter(x => x.currency === currency).filter(x => x.shown);
         return (
             <CCard className='mb-4'>
                 <CCardBody>
