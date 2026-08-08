@@ -1,9 +1,9 @@
 import React, { Dispatch } from 'react';
 import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilListNumbered, cilPencil, cilPlus, cilSearch, cilTrash } from '@coreui/icons';
+import { cilListNumbered, cilMoney, cilOptions, cilPencil, cilPlus, cilSearch, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getLang, getStockOwnList, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import AuthApi, { UserSetting } from '../../api/auth';
@@ -16,6 +16,7 @@ import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
 import { StockType } from '../../util/Enum';
 import { Action, Lang } from '../../util/Interface';
+import * as cartIcon from '../../assets/cart';
 import StockTradeCondition, { TradeType } from './interface/StockTradeCondition';
 import StockQueryCondition from './interface/StockQueryCondition';
 
@@ -137,27 +138,80 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         return (
             <React.Fragment key={`${userId}-${ownStockInfo.stockCode}`}>
                 <CCol sm={6} md={4}>
-                    <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={`bg-${benefitColor} text-white ${show[ownStockInfo.stockCode] ? `detailed-${benefitColor}` : ''}`}>
-                        <CCardBody className='pb-0 mb-3 d-flex justify-content-between align-items-start'>
-                            <div>
-                                <div className='fs-4 fw-semibold'>
-                                    {AppUtil.numberComma(currentValue)}{' '}
-                                    <span className='fs-6 fw-normal'>
-                                        ({postiveSign}{AppUtil.numberComma(benefit)} | {postiveSign}{AppUtil.numberComma(benefitRate)}% <CIcon icon={benefit > 0 ? cilArrowCircleTop : cilArrowCircleBottom} />)
-                                    </span>
-                                </div>
+                    <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={show[ownStockInfo.stockCode] ? `detailed-${benefitColor}` : ''}>
+                        <CCardBody>
+                            <div className='d-flex justify-content-between align-items-start'>
                                 <div>
-                                    {ownStockInfo.stockCode} {ownStockInfo.stockName} | {AppUtil.numberComma(ownStockInfo.amount)}股
+                                    <div className='text-secondary fs-6'>{ownStockInfo.stockCode}</div>
+                                    <div className='fw-bold fs-4'>{ownStockInfo.stockName}</div>
+                                </div>
+                                <CDropdown variant='dropdown' alignment='end'>
+                                    <CDropdownToggle caret={false} className='p-0'>
+                                        <CIcon icon={cilOptions}/>
+                                    </CDropdownToggle>
+                                    <CDropdownMenu>
+                                        <CDropdownItem onClick={() => this.toQueryPage(ownStockInfo.stockCode)}>
+                                            <CIcon icon={cilSearch} className='me-1' />
+                                            <FormattedMessage id='StockOwnPage.queryHistoryPrice' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.toggleRecords(ownStockInfo)}>
+                                            <CIcon icon={cilListNumbered} className='me-1' />
+                                            <FormattedMessage id='StockOwnPage.showHistoryRecords' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.tradeStockPage(ownStockInfo, 'buy')}>
+                                            <CIcon icon={cartIcon.buy} className='me-1' />
+                                            <FormattedMessage id='StockOwnPage.buyBtn' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.tradeStockPage(ownStockInfo, 'sell')}>
+                                            <CIcon icon={cartIcon.sell} className='me-1' />
+                                            <FormattedMessage id='StockOwnPage.sellBtn' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.tradeStockPage(ownStockInfo, 'bonus')}>
+                                            <CIcon icon={cilMoney} className='me-1' />
+                                            <FormattedMessage id='StockOwnPage.bonusBtn' />
+                                        </CDropdownItem>
+                                    </CDropdownMenu>
+                                </CDropdown>
+                            </div>
+                            <div className={`fs-3 fw-bold mt-3 text-${benefitColor}`}>{AppUtil.numberComma(currentValue)}</div>
+                            <hr></hr>
+                            <CRow className='text-center'>
+                                <CCol>
+                                    <div className='text-secondary fs-7'>
+                                        <FormattedMessage id='StockOwnPage.holdings' />
+                                    </div>
+                                    <div className='fw-bold'>{AppUtil.numberComma(ownStockInfo.amount)}</div>
+                                </CCol>
+                                <CCol>
+                                    <div className='text-secondary fs-7'>
+                                        <FormattedMessage id='StockOwnPage.cost' />
+                                    </div>
+                                    <div className='fw-bold'>{AppUtil.numberComma(ownStockInfo.cost)}</div>
+                                </CCol>
+                                <CCol>
+                                    <div className='text-secondary fs-7'>
+                                        <FormattedMessage id='StockOwnPage.marketPrice' />
+                                    </div>
+                                    <div className='fw-bold'>{AppUtil.numberComma(ownStockInfo.price)}</div>
+                                </CCol>
+                            </CRow>
+                            <hr></hr>
+                            <div className='d-flex justify-content-between'>
+                                <div>
+                                    <small className='text-secondary fs-7'>
+                                        <FormattedMessage id='StockOwnPage.unrealizedGainLoss' />
+                                    </small>
+                                    <br />
+                                    <span className={`fw-bold text-${benefitColor}`}>{postiveSign}{AppUtil.numberComma(benefit)}</span>
+                                </div>
+                                <div className='text-end'>
+                                    <small className='text-secondary fs-7'>
+                                        <FormattedMessage id='StockOwnPage.returnRate' />
+                                    </small>
+                                    <br />
+                                    <span className={`fw-bold text-${benefitColor}`}>{postiveSign}{AppUtil.numberComma(benefitRate)}%</span>
                                 </div>
                             </div>
-                            <CDropdown alignment='end'>
-                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0 me-2' onClick={() => this.toQueryPage(ownStockInfo.stockCode)}>
-                                    <CIcon icon={cilSearch} />
-                                </CDropdownToggle>
-                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0' onClick={() => this.toggleRecords(ownStockInfo)}>
-                                    <CIcon icon={cilListNumbered} />
-                                </CDropdownToggle>
-                            </CDropdown>
                         </CCardBody>
                     </CCard>
                 </CCol>
@@ -176,27 +230,6 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                 <CRow>
                                     <CCol xs={12} className='mb-2 d-grid gap-2 d-md-flex justify-content-md-end'>
                                         <CButtonGroup role='group'>
-                                            <CButton
-                                                color='danger'
-                                                variant='outline'
-                                                onClick={() => this.tradeStockPage(ownStockInfo, 'buy')}
-                                            >
-                                                <FormattedMessage id='StockOwnPage.buyBtn' />
-                                            </CButton>
-                                            <CButton
-                                                color='success'
-                                                variant='outline'
-                                                onClick={() => this.tradeStockPage(ownStockInfo, 'sell')}
-                                            >
-                                                <FormattedMessage id='StockOwnPage.sellBtn' />
-                                            </CButton>
-                                            <CButton
-                                                color='info'
-                                                variant='outline'
-                                                onClick={() => this.tradeStockPage(ownStockInfo, 'bonus')}
-                                            >
-                                                <FormattedMessage id='StockOwnPage.bonusBtn' />
-                                            </CButton>
                                         </CButtonGroup>
                                     </CCol>
                                 </CRow>
@@ -366,15 +399,15 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                     {
                         ownStockList.map(s => this.getCard(s))
                     }
-                </CRow>
-                <CRow className='mb-4' xs={{ gutter: 4 }}>
-                    <CCol sm={12}>
-                        <div className='d-grid gap-2 col-xs-8 col-md-6 mx-auto'>
-                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.tradeStockPage()}>
-                                <CIcon icon={cilPlus} className='me-2' />
-                                <FormattedMessage id='StockOwnPage.tradeBtn' />
-                            </CButton>
-                        </div>
+                    <CCol sm={6} md={4}>
+                        <CCard color='transparent' className='border border-3 border-dashed buy-stock-card' onClick={() => this.tradeStockPage()}>
+                            <div className='text-center'>
+                                <div className='fs-3 fw-bold'>＋</div>
+                                <div className='fs-5'>
+                                    <FormattedMessage id='StockOwnPage.tradeBtn' />
+                                </div>
+                            </div>
+                        </CCard>
                     </CCol>
                 </CRow>
                 <AppConfirmModal

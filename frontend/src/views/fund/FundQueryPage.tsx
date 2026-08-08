@@ -256,7 +256,8 @@ class FundQueryPage extends React.Component<FundQueryPageProps, FundQueryPageSta
                                                             </CDropdownItem>
                                                             <CDropdownItem onClick={() => this.tradeFund(s, 'sell')}>
                                                                 <CIcon icon={cartIcon.sell} className={`me-2 text-${AppUtil.getBenifitColor(-1, stockType)}`} />
-                                                                <FormattedMessage id='FundQueryPage.searchResult.th.action.sell' /></CDropdownItem>
+                                                                <FormattedMessage id='FundQueryPage.searchResult.th.action.sell' />
+                                                            </CDropdownItem>
                                                         </CDropdownMenu>
                                                     </CDropdown>
                                                 </CTableDataCell>

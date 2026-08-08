@@ -1,9 +1,9 @@
 import React, { Dispatch } from 'react';
 import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CFormSwitch, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilArrowCircleBottom, cilArrowCircleTop, cilListNumbered, cilPencil, cilPlus, cilSearch, cilTrash } from '@coreui/icons';
+import { cilListNumbered, cilMoney, cilOptions, cilPencil, cilPlus, cilSearch, cilTrash } from '@coreui/icons';
 import { ReduxState, getAuthTokenId, getFundOwnList, getLang, getStockType, getUserSetting } from '../../reducer/Selector';
 import AccountApi, { Account } from '../../api/account';
 import AuthApi, { UserSetting } from '../../api/auth';
@@ -16,6 +16,7 @@ import * as AppUtil from '../../util/AppUtil';
 import { DATA_COUNT_PER_PAGE, DEFAULT_DECIMAL_PRECISION } from '../../util/Constant';
 import { StockType } from '../../util/Enum';
 import { Action, Lang } from '../../util/Interface';
+import * as cartIcon from '../../assets/cart';
 import FundTradeCondition, { TradeType } from './interface/FundTradeCondition';
 import FundQueryCondition from './interface/FundQueryCondition';
 
@@ -137,27 +138,80 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         return (
             <React.Fragment key={`${userId}-${ownFundInfo.fundCode}`}>
                 <CCol sm={6} md={4}>
-                    <CCard key={`own-stock-${ownFundInfo.fundCode}`} className={`bg-${benefitColor} text-white ${show[ownFundInfo.fundCode] ? `detailed-${benefitColor}` : ''}`}>
-                        <CCardBody className='pb-0 mb-3 d-flex justify-content-between align-items-start'>
-                            <div>
-                                <div className='fs-4 fw-semibold'>
-                                    {AppUtil.numberComma(currentValue)}{' '}
-                                    <span className='fs-6 fw-normal'>
-                                        ({postiveSign}{AppUtil.numberComma(benefit)} | {postiveSign}{AppUtil.numberComma(benefitRate)}% <CIcon icon={benefit > 0 ? cilArrowCircleTop : cilArrowCircleBottom} />)
-                                    </span>
-                                </div>
+                    <CCard key={`own-fund-${ownFundInfo.fundCode}`} className={show[ownFundInfo.fundCode] ? `detailed-${benefitColor}` : ''}>
+                        <CCardBody>
+                            <div className='d-flex justify-content-between align-items-start'>
                                 <div>
-                                    {ownFundInfo.fundCode} {ownFundInfo.fundName} | {AppUtil.numberComma(ownFundInfo.amount)}股
+                                    <div className='text-secondary fs-6'>{ownFundInfo.fundCode}</div>
+                                    <div className='fw-bold fs-4'>{ownFundInfo.fundName}</div>
+                                </div>
+                                <CDropdown variant='dropdown' alignment='end'>
+                                    <CDropdownToggle caret={false} className='p-0'>
+                                        <CIcon icon={cilOptions}/>
+                                    </CDropdownToggle>
+                                    <CDropdownMenu>
+                                        <CDropdownItem onClick={() => this.toQueryPage(ownFundInfo.fundCode)}>
+                                            <CIcon icon={cilSearch} className='me-1' />
+                                            <FormattedMessage id='FundOwnPage.queryHistoryPrice' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.toggleRecords(ownFundInfo)}>
+                                            <CIcon icon={cilListNumbered} className='me-1' />
+                                            <FormattedMessage id='FundOwnPage.showHistoryRecords' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.tradeFundPage(ownFundInfo, 'buy')}>
+                                            <CIcon icon={cartIcon.buy} className='me-1' />
+                                            <FormattedMessage id='FundOwnPage.buyBtn' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.tradeFundPage(ownFundInfo, 'sell')}>
+                                            <CIcon icon={cartIcon.sell} className='me-1' />
+                                            <FormattedMessage id='FundOwnPage.sellBtn' />
+                                        </CDropdownItem>
+                                        <CDropdownItem onClick={() => this.tradeFundPage(ownFundInfo, 'bonus')}>
+                                            <CIcon icon={cilMoney} className='me-1' />
+                                            <FormattedMessage id='FundOwnPage.bonusBtn' />
+                                        </CDropdownItem>
+                                    </CDropdownMenu>
+                                </CDropdown>
+                            </div>
+                            <div className={`fs-3 fw-bold mt-3 text-${benefitColor}`}>{AppUtil.numberComma(currentValue)}</div>
+                            <hr></hr>
+                            <CRow className='text-center'>
+                                <CCol>
+                                    <div className='text-secondary fs-7'>
+                                        <FormattedMessage id='FundOwnPage.holdings' />
+                                    </div>
+                                    <div className='fw-bold'>{AppUtil.numberComma(ownFundInfo.amount)}</div>
+                                </CCol>
+                                <CCol>
+                                    <div className='text-secondary fs-7'>
+                                        <FormattedMessage id='FundOwnPage.cost' />
+                                    </div>
+                                    <div className='fw-bold'>{AppUtil.numberComma(ownFundInfo.cost)}</div>
+                                </CCol>
+                                <CCol>
+                                    <div className='text-secondary fs-7'>
+                                        <FormattedMessage id='FundOwnPage.marketPrice' />
+                                    </div>
+                                    <div className='fw-bold'>{AppUtil.numberComma(ownFundInfo.price)}</div>
+                                </CCol>
+                            </CRow>
+                            <hr></hr>
+                            <div className='d-flex justify-content-between'>
+                                <div>
+                                    <small className='text-secondary fs-7'>
+                                        <FormattedMessage id='FundOwnPage.unrealizedGainLoss' />
+                                    </small>
+                                    <br />
+                                    <span className={`fw-bold text-${benefitColor}`}>{postiveSign}{AppUtil.numberComma(benefit)}</span>
+                                </div>
+                                <div className='text-end'>
+                                    <small className='text-secondary fs-7'>
+                                        <FormattedMessage id='FundOwnPage.returnRate' />
+                                    </small>
+                                    <br />
+                                    <span className={`fw-bold text-${benefitColor}`}>{postiveSign}{AppUtil.numberComma(benefitRate)}%</span>
                                 </div>
                             </div>
-                            <CDropdown alignment='end'>
-                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0 me-2' onClick={() => this.toQueryPage(ownFundInfo.fundCode)}>
-                                    <CIcon icon={cilSearch} />
-                                </CDropdownToggle>
-                                <CDropdownToggle color='transparent' caret={false} className='text-white p-0' onClick={() => this.toggleRecords(ownFundInfo)}>
-                                    <CIcon icon={cilListNumbered} />
-                                </CDropdownToggle>
-                            </CDropdown>
                         </CCardBody>
                     </CCard>
                 </CCol>
@@ -175,33 +229,6 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                 </small>
                             </CCardHeader>
                             <CCardBody>
-                                <CRow>
-                                    <CCol xs={12} className='mb-2 d-grid gap-2 d-md-flex justify-content-md-end'>
-                                        <CButtonGroup role='group'>
-                                            <CButton
-                                                color='danger'
-                                                variant='outline'
-                                                onClick={() => this.tradeFundPage(ownFundInfo, 'buy')}
-                                            >
-                                                <FormattedMessage id='FundOwnPage.buyBtn' />
-                                            </CButton>
-                                            <CButton
-                                                color='success'
-                                                variant='outline'
-                                                onClick={() => this.tradeFundPage(ownFundInfo, 'sell')}
-                                            >
-                                                <FormattedMessage id='FundOwnPage.sellBtn' />
-                                            </CButton>
-                                            <CButton
-                                                color='info'
-                                                variant='outline'
-                                                onClick={() => this.tradeFundPage(ownFundInfo, 'bonus')}
-                                            >
-                                                <FormattedMessage id='FundOwnPage.bonusBtn' />
-                                            </CButton>
-                                        </CButtonGroup>
-                                    </CCol>
-                                </CRow>
                                 <CRow>
                                     <CCol xs={12}>
                                         <CTable align='middle' responsive hover>
@@ -381,15 +408,15 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                     {
                         ownFundList.map(s => this.getCard(s))
                     }
-                </CRow>
-                <CRow className='mb-4' xs={{ gutter: 4 }}>
-                    <CCol sm={12}>
-                        <div className='d-grid gap-2 col-xs-8 col-md-6 mx-auto'>
-                            <CButton size='lg' color='secondary' shape='rounded-pill' variant='outline' onClick={() => this.tradeFundPage()}>
-                                <CIcon icon={cilPlus} className='me-2' />
-                                <FormattedMessage id='FundOwnPage.tradeBtn' />
-                            </CButton>
-                        </div>
+                    <CCol sm={6} md={4}>
+                        <CCard color='transparent' className='border border-3 border-dashed buy-stock-card' onClick={() => this.tradeFundPage()}>
+                            <div className='text-center'>
+                                <div className='fs-3 fw-bold'>＋</div>
+                                <div className='fs-5'>
+                                    <FormattedMessage id='FundOwnPage.tradeBtn' />
+                                </div>
+                            </div>
+                        </CCard>
                     </CCol>
                 </CRow>
                 <AppConfirmModal

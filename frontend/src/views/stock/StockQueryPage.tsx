@@ -250,7 +250,8 @@ class StockQueryPage extends React.Component<StockQueryPageProps, StockQueryPage
                                                             </CDropdownItem>
                                                             <CDropdownItem onClick={() => this.tradeStock(s, 'sell')}>
                                                                 <CIcon icon={cartIcon.sell} className={`me-2 text-${AppUtil.getBenifitColor(-1, stockType)}`} />
-                                                                <FormattedMessage id='StockQueryPage.searchResult.th.action.sell' /></CDropdownItem>
+                                                                <FormattedMessage id='StockQueryPage.searchResult.th.action.sell' />
+                                                            </CDropdownItem>
                                                         </CDropdownMenu>
                                                     </CDropdown>
                                                 </CTableDataCell>
