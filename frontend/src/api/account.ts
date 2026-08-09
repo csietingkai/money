@@ -21,6 +21,9 @@ export interface Account {
     removable: boolean;
 }
 
+export interface AccountVo extends Account {
+    bankName?: string;
+}
 export interface AccountRecord {
     id: string;
     transDate: Date;
@@ -63,7 +66,7 @@ export interface BalanceDetailVo {
 }
 
 export interface AccountResponse extends ApiResponse<Account> { }
-export interface AccountListResponse extends ApiResponse<Account[]> { }
+export interface AccountListResponse extends ApiResponse<AccountVo[]> { }
 export interface AccountRecordListResponse extends ApiResponse<AccountRecordVo[]> { }
 export interface AccountRecordResponse extends ApiResponse<AccountRecordVo> { }
 export interface AccountMonthBalanceResponse extends ApiResponse<MonthBalanceVo> { }

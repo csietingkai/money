@@ -1,0 +1,38 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1552 1550" width="1552" height="1550">
+	<defs>
+		<linearGradient id="kig-g1" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(395.933,395.933,-791.781,791.781,389.689,388.862)">
+			<stop offset="0" stop-color="#e83e0b"/>
+			<stop offset=".2" stop-color="#ea5006"/>
+			<stop offset=".52" stop-color="#f08300"/>
+			<stop offset="1" stop-color="#ffde00"/>
+		</linearGradient>
+		<linearGradient id="kig-g2" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(395.926,-395.926,791.768,791.768,389.702,1161.06)">
+			<stop offset="0" stop-color="#e83e0b"/>
+			<stop offset=".2" stop-color="#ea5006"/>
+			<stop offset=".52" stop-color="#f08300"/>
+			<stop offset="1" stop-color="#ffde00"/>
+		</linearGradient>
+		<linearGradient id="kig-g3" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-390.383,390.383,-780.616,-780.616,1166.274,384.571)">
+			<stop offset="0" stop-color="#003483"/>
+			<stop offset=".2" stop-color="#003686"/>
+			<stop offset=".52" stop-color="#0057a4"/>
+			<stop offset="1" stop-color="#009ce5"/>
+		</linearGradient>
+	</defs>
+	<style>
+		.s0 { fill: #002f7b }
+		.s1 { fill: #45b035 }
+		.s2 { fill: url(#kig-g1) }
+		.s3 { fill: url(#kig-g2) }
+		.s4 { fill: #ffffff }
+		.s5 { fill: url(#kig-g3) }
+	</style>
+	<g id="Page 1">
+		<path id="Path 2" fill-rule="evenodd" class="s0" d="m0.6 774.97l775.2-774.97h-775.2zm775.27 775.03l-775.2-774.97v774.97zm775.2 0v-774.97l-775.2 774.97z"/>
+		<path id="Path 3" class="s1" d="m1551.07 774.97l-775.2-774.97h775.2z"/>
+		<path id="Path 4" class="s2" d="m0.67 774.97h775.13v-774.97z"/>
+		<path id="Path 5" class="s3" d="m0.67 774.97l775.13 774.97v-774.97z"/>
+		<path id="Path 6" class="s4" d="m1551.07 774.97l-775.2 774.97v-774.97z"/>
+		<path id="Path 7" class="s5" d="m775.8 0v774.9l0.07 0.07h775.2v-0.07c0 0-775.2-774.9-775.27-774.9z"/>
+	</g>
+</svg>

@@ -1,5 +1,5 @@
 import * as StateHolder from './StateHolder';
-import { Account } from '../api/account';
+import { AccountVo } from '../api/account';
 import { AuthToken, UserSetting } from '../api/auth';
 import { BankInfo } from '../api/bankInfo';
 import { UserStockVo, UserTrackingStockVo } from '../api/stock';
@@ -58,7 +58,7 @@ export const getMessages = (state: ReduxState): Record<string, string> => dictio
 
 // accountReducer
 export interface ReduxAccountState {
-    list: Account[];
+    list: AccountVo[];
     queryCondition: AccountRecordQueryCondition;
 }
 export const DEFAULT_REDUX_ACCOUNT_STATE: ReduxAccountState = {
@@ -66,7 +66,7 @@ export const DEFAULT_REDUX_ACCOUNT_STATE: ReduxAccountState = {
     queryCondition: {}
 };
 const getAccountState = (state: ReduxState): ReduxAccountState => state.account;
-export const getAccountList = (state: ReduxState): Account[] => getAccountState(state)?.list;
+export const getAccountList = (state: ReduxState): AccountVo[] => getAccountState(state)?.list;
 export const getAccountRecordQueryCondition = (state: ReduxState): AccountRecordQueryCondition => getAccountState(state)?.queryCondition;
 
 export interface ReduxBankInfoState {

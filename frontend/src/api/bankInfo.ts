@@ -5,6 +5,7 @@ import { ApiResponse } from '../util/Interface';
 export interface BankInfo {
     code: string;
     name: string;
+    hasSvg: boolean;
 }
 
 export interface BankInfoListResponse extends ApiResponse<BankInfo[]> { }

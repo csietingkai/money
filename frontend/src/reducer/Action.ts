@@ -1,6 +1,6 @@
 import { LOGIN, LOGOUT, SET_ACCOUNT_LIST, SET_LOADING, NOTIFY, SET_SIDEBAR_FOLDABLE, SET_SIDEBAR_SHOW, SET_USER_SETTING, SET_FILE_TYPE_OPTIONS, SET_RECORD_TYPE_OPTIONS, SET_STOCK_TYPE_OPTIONS, SET_OWN_STOCK_LIST, SET_STOCK_TRADE_CONDITION, SET_STOCK_QUERY_CONDITION, SET_FUND_QUERY_CONDITION, SET_FUND_TRADE_CONDITION, SET_OWN_FUND_LIST, SET_IS_MOBILE, SET_EXCHANGE_RATE_QUERY_CONDITION, SET_EXCHANGE_RATE_TRADE_CONDITION, SET_EXCHANGE_RATES, SET_BANK_INFO_LIST, SET_ACCOUNT_RECORD_QUERY_CONDITION, SET_TRACKING_STOCKS, SET_TRACKING_FUNDS } from './ActionType';
 import { AuthToken, UserSetting } from '../api/auth';
-import { Account } from '../api/account';
+import { AccountVo } from '../api/account';
 import { Action, Option } from '../util/Interface';
 import { ExchangeRateVo } from '../api/exchangeRate';
 import { UserStockVo, UserTrackingStockVo } from '../api/stock';
@@ -20,7 +20,7 @@ export const Logout = (): Action<undefined> => ({ type: LOGOUT, payload: undefin
 export const SetUserSetting = (payload?: UserSetting): Action<UserSetting | undefined> => ({ type: SET_USER_SETTING, payload });
 
 // account
-export const SetAccountList = (payload: Account[]): Action<Account[]> => ({ type: SET_ACCOUNT_LIST, payload });
+export const SetAccountList = (payload: AccountVo[]): Action<AccountVo[]> => ({ type: SET_ACCOUNT_LIST, payload });
 export const SetAccountRecordQueryCondition = (payload: AccountRecordQueryCondition): Action<AccountRecordQueryCondition> => ({ type: SET_ACCOUNT_RECORD_QUERY_CONDITION, payload });
 
 // bank info

@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import io.tingkai.money.entity.*;
+import io.tingkai.money.facade.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,16 +30,7 @@ import io.tingkai.base.model.exception.FieldMissingException;
 import io.tingkai.base.model.exception.NotExistException;
 import io.tingkai.base.util.BaseAppUtil;
 import io.tingkai.money.constant.CodeConstant;
-import io.tingkai.money.entity.Account;
-import io.tingkai.money.entity.AccountRecord;
-import io.tingkai.money.entity.ExchangeRate;
-import io.tingkai.money.entity.ExchangeRateRecord;
 import io.tingkai.money.enumeration.AccountRecordTransType;
-import io.tingkai.money.facade.AccountFacade;
-import io.tingkai.money.facade.AccountRecordFacade;
-import io.tingkai.money.facade.ExchangeRateRecordFacade;
-import io.tingkai.money.facade.UserFundRecordFacade;
-import io.tingkai.money.facade.UserStockRecordFacade;
 import io.tingkai.money.model.exception.AccountBalanceNotEnoughException;
 import io.tingkai.money.model.exception.AccountBalanceWrongException;
 import io.tingkai.money.model.request.AccountEditRequest;
@@ -66,6 +59,9 @@ public class AccountService {
 	private AccountRecordFacade accountRecordFacade;
 
 	@Autowired
+	private BankInfoFacade bankInfoFacade;
+
+	@Autowired
 	private UserStockRecordFacade userStockRecordFacade;
 
 	@Autowired
@@ -75,16 +71,14 @@ public class AccountService {
 	@Qualifier(AuthConstant.AUTH_CACHE)
 	private RedisTemplate<String, List<Account>> userCache;
 
-	@Autowired
-	@Qualifier(CodeConstant.PYTHON_CACHE)
-	private RedisTemplate<String, List<ExchangeRate>> pythonCache;
-
 	public List<AccountVo> getAll() {
 		UUID userId = ContextUtil.getUserId();
 		List<Account> entities = this.syncCache(userId);
+        Map<String, String> bankInfos = bankInfoFacade.queryAll().stream().collect(Collectors.toMap(BankInfo::getCode, BankInfo::getName));
 		List<AccountVo> accountVos = entities.stream().map(entity -> {
 			AccountVo accountVo = new AccountVo();
 			accountVo.transform(entity);
+			accountVo.setBankName(bankInfos.getOrDefault(entity.getBankCode(), null));
 			accountVo.setRemovable(accountRecordFacade.queryAll(Arrays.asList(entity.getId()), null, null, null, null, null, true).size() == 0);
 			return accountVo;
 		}).collect(Collectors.toList());

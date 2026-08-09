@@ -1,7 +1,7 @@
 import { Dispatch } from 'react';
 import { Login, Logout, SetAccountList, SetLoading, Notify, SetSidebarFoldable, SetSidebarShow, SetUserSetting, SetOwnStockList, SetStockQueryCondition, SetStockTradeCondition, SetFundQueryCondition, SetFundTradeCondition, SetOwnFundList, SetExchangeRateQueryCondition, SetExchangeRateTradeCondition, SetBankInfoList, SetAccountRecordQueryCondition, SetTrackingStocks, SetTrackingFunds } from './Action';
 import { AuthToken, UserSetting } from '../api/auth';
-import { Account } from '../api/account';
+import { AccountVo } from '../api/account';
 import { BankInfo } from '../api/bankInfo';
 import { UserFundVo, UserTrackingFundVo } from '../api/fund';
 import { UserStockVo, UserTrackingStockVo } from '../api/stock';
@@ -20,7 +20,7 @@ export const LogoutDispatcher = (dispatch: Dispatch<Action<undefined>>) => (): v
 export const SetUserSettingDispatcher = (dispatch: Dispatch<Action<UserSetting | undefined>>) => (setting?: UserSetting): void => dispatch(SetUserSetting(setting));
 
 // account
-export const SetAccountListDispatcher = (dispatch: Dispatch<Action<Account[]>>) => (accounts: Account[]): void => dispatch(SetAccountList(accounts));
+export const SetAccountListDispatcher = (dispatch: Dispatch<Action<AccountVo[]>>) => (accounts: AccountVo[]): void => dispatch(SetAccountList(accounts));
 export const SetAccountRecordQueryConditionDispatcher = (dispatch: Dispatch<Action<AccountRecordQueryCondition>>) => (condition: AccountRecordQueryCondition): void => dispatch(SetAccountRecordQueryCondition(condition));
 
 // bank info

@@ -16,4 +16,5 @@ public class BankInfo {
 	protected UUID id;
 	protected String code;
 	protected String name;
+	protected boolean hasSvg;
 }

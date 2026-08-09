@@ -1,29 +1,31 @@
 import React, { Dispatch } from 'react';
 import { legacy_connect as connect } from 'react-redux'
 import { FormattedMessage } from 'react-intl';
-import { CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CLink, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-import { cilArrowRight, cilPencil, cilPlus, cilQrCode, cilTrash } from '@coreui/icons';
+import { CButton, CButtonGroup, CCard, CCardBody, CCardHeader, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CForm, CFormInput, CFormLabel, CFormSelect, CFormSwitch, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { cilListNumbered, cilMoney, cilOptions, cilPencil, cilQrCode, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import qrcode from 'qrcode';
 import { SetAccountListDispatcher, SetLoadingDispatcher, SetNotifyDispatcher } from '../../reducer/PropsMapper';
-import { ReduxState, getAccountList, getBankInfos, getCurrencies, getDefaultRecordType, getRecordTypes, isAccountRecordDeletable } from '../../reducer/Selector';
-import AccountApi, { Account, AccountRecordVo } from '../../api/account';
+import { ReduxState, getAccountList, getBankInfoList, getBankInfos, getCurrencies, getDefaultRecordType, getLang, getRecordTypes, isAccountRecordDeletable } from '../../reducer/Selector';
+import AccountApi, { AccountRecordVo, AccountVo } from '../../api/account';
 import AppConfirmModal from '../../components/AppConfirmModal';
 import AppPagination from '../../components/AppPagination';
 import * as AppUtil from '../../util/AppUtil';
-import { Action, SimpleResponse, Option } from '../../util/Interface';
+import { Action, SimpleResponse, Option, Lang } from '../../util/Interface';
 import { DATA_COUNT_PER_PAGE } from '../../util/Constant';
-import currencyIcon from '../../assets/currency';
 import AccountRecordModal, { AccountRecordModalMode } from './modal/AccountRecordModal';
+import { BankInfo } from '../../api/bankInfo';
 
 export interface AccountPageProps {
-    accountList: Account[],
+    lang: Lang;
+    accountList: AccountVo[],
     accountRecordDeletable: boolean,
+    bankInfos: BankInfo[];
     defaultRecordType: string;
     currencyOptions: Option[];
     recordTypeOptions: Option[];
     bankCodeOptions: Option[];
-    setAccountList: (accountList: Account[]) => void;
+    setAccountList: (accountList: AccountVo[]) => void;
     notify: (message: string) => void;
     setLoading: (loading: boolean) => void;
 }
@@ -73,7 +75,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         super(props);
         this.state = {
             recordTypeMap: props.recordTypeOptions.reduce((acc: { [key: string]: string }, curr: Option) => { acc[curr.key] = curr.value; return acc; }, {}),
-            showDetail: props.accountList.reduce((acc: { [key: string]: boolean }, curr: Account) => { acc[curr.id] = false; return acc; }, {}),
+            showDetail: props.accountList.reduce((acc: { [key: string]: boolean }, curr: AccountVo) => { acc[curr.id] = false; return acc; }, {}),
             showAddAccountModal: false,
             addAccountForm: {
                 currency: props.currencyOptions[0]?.key,
@@ -128,29 +130,35 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         this.setState({ accountRecordsPage: 1, showDetail });
     };
 
-    private getCard = (account: Account) => {
+    private getCard = (account: AccountVo) => {
         const { showDetail } = this.state;
+        const hasBankInfo: boolean = !!account.bankCode && !!account.bankNo;
+        const bankIcons = this.props.bankInfos.filter((option) => option.hasSvg).reduce((acc: { [key: string]: boolean }, curr: BankInfo) => { acc[curr.code] = true; return acc; }, {});
+        const hasBankIcon: boolean = !!account.bankCode && !!bankIcons[account.bankCode];
         return (
             <CCard className={showDetail[account.id] ? 'detailed-primary' : ''}>
-                <CCardBody className='d-flex align-items-center'>
-                    <div className='me-3 text-white bg-primary p-4'>
-                        <CIcon icon={currencyIcon[account.currency.toLocaleLowerCase()]} height={24} />
-                    </div>
-                    <div>
-                        <div className='s-6 fw-semibold text-'>
-                            {AppUtil.numberComma(account.balance)}{' '}
+                <CCardBody>
+                    <div className='d-flex align-items-center gap-3 mb-3'>
+                        <div className={`d-flex text-white fs-4 account-icon align-items-center justify-content-center rounded-3 ${hasBankInfo ? 'bank-icon' : 'cash-icon'}`}>
+                            {
+                                hasBankIcon ?
+                                    (<img className='w-75 h-75' src={`bank/${account.bankCode}.svg`} alt={account.bankCode} />) :
+                                    (hasBankInfo ? '🏦' : '💵')}
                         </div>
-                        <div className='text-body-secondary text-uppercase fw-semibold small'>
-                            {account.name}
+                        <div>
+                            <div className='fs-4 fw-bold'>
+                                {account.name}
+                            </div>
+                            <div className='fs-8 text-secondary'>
+                                {account?.bankName}
+                            </div>
                         </div>
-                    </div>
-                </CCardBody>
-                <CCardFooter>
-                    <CRow>
-                        <CCol>
-                            <CLink
-                                className='font-weight-bold font-xs text-body-secondary'
-                                onClick={() => {
+                        <CDropdown variant='dropdown' alignment='end' className='ms-auto'>
+                            <CDropdownToggle caret={false} className='p-0'>
+                                <CIcon icon={cilOptions} />
+                            </CDropdownToggle>
+                            <CDropdownMenu>
+                                <CDropdownItem onClick={() => {
                                     const editAccountForm = {
                                         id: account.id,
                                         currency: account.currency,
@@ -160,15 +168,13 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                         shown: account.shown || true
                                     };
                                     this.setState({ showEditAccountModal: true, editAccountForm });
-                                }}
-                            >
-                                <CIcon icon={cilPencil} className='float-start' width={22} />
-                            </CLink>
-                            {
-                                account.bankCode && account.bankNo &&
-                                <CLink
-                                    className='font-weight-bold font-xs text-body-secondary'
-                                    onClick={async () => {
+                                }}>
+                                    <CIcon icon={cilPencil} className='me-1' />
+                                    <FormattedMessage id='AccountPage.accountModal.edit.title' />
+                                </CDropdownItem>
+                                {
+                                    hasBankInfo &&
+                                    <CDropdownItem onClick={async () => {
                                         const fullBankNo: string = `0000000000000000${account.bankNo}`.slice(-16);
                                         // `TWQRP://銀行轉帳/158/02/V1?D5=${account.bankCode}&D6=${fullBankNo}&D10=901`
                                         const twqr = `TWQRP%3A%2F%2F%E9%8A%80%E8%A1%8C%E8%BD%89%E5%B8%B3%2F158%2F02%2FV1%3FD5%3D${account.bankCode}%26D6%3D${fullBankNo}%26D10%3D901`;
@@ -180,31 +186,55 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                             img
                                         };
                                         this.setState({ showQrcodeModal: true, qrcodeForm });
-                                    }}
-                                >
-                                    <CIcon icon={cilQrCode} className='float-start ms-2' width={22} />
-                                </CLink>
-                            }
-                            {
-                                account.removable &&
-                                <CLink
-                                    className='font-weight-bold font-xs text-body-secondary'
-                                    onClick={() => this.setState({ showDeleteAccountModal: true, holdingAccountId: account.id })}
-                                >
-                                    <CIcon icon={cilTrash} className='float-start ms-2' width={22} />
-                                </CLink>
-                            }
-                        </CCol>
-                        <CCol>
-                            <CLink
-                                className='font-weight-bold font-xs text-body-secondary'
-                                onClick={() => this.toggleRecord(account.id)}
-                            >
-                                <CIcon icon={cilArrowRight} className='float-end' width={22} />
-                            </CLink>
-                        </CCol>
-                    </CRow>
-                </CCardFooter>
+                                    }}>
+                                        <CIcon icon={cilQrCode} className='me-1' />
+                                        <FormattedMessage id='AccountPage.accountModal.qrcode.title' />
+                                    </CDropdownItem>
+                                }
+                                {
+                                    account.removable &&
+                                    <CDropdownItem onClick={() => this.setState({ showDeleteAccountModal: true, holdingAccountId: account.id })}>
+                                        <CIcon icon={cilTrash} className='me-1' />
+                                        <FormattedMessage id='AccountPage.accountModal.delete.title' />
+                                    </CDropdownItem>
+                                }
+                                <CDropdownItem onClick={() => this.toggleRecord(account.id)}>
+                                    <CIcon icon={cilListNumbered} className='me-1' />
+                                    <FormattedMessage id='AccountPage.accountDetail' />
+                                </CDropdownItem>
+                                <CDropdownItem onClick={() => this.setState({ currentRecordMode: 'income', holdingAccountId: account.id })}>
+                                    <CIcon icon={cilMoney} className='me-1' />
+                                    <FormattedMessage id='AccountPage.incomeBtn' />
+                                </CDropdownItem>
+                                <CDropdownItem onClick={() => this.setState({ currentRecordMode: 'transfer', holdingAccountId: account.id })}>
+                                    <CIcon icon={cilMoney} className='me-1' />
+                                    <FormattedMessage id='AccountPage.transferBtn' />
+                                </CDropdownItem>
+                                <CDropdownItem onClick={() => this.setState({ currentRecordMode: 'expend', holdingAccountId: account.id })}>
+                                    <CIcon icon={cilMoney} className='me-1' />
+                                    <FormattedMessage id='AccountPage.expendBtn' />
+                                </CDropdownItem>
+                            </CDropdownMenu>
+                        </CDropdown>
+                    </div>
+                    <div className='fs-7 mb-1 text-secondary'>
+                        <FormattedMessage id='AccountPage.accountBalance' />
+                    </div>
+                    <div className='fs-3 fw-bold '>
+                        {AppUtil.numberComma(account.balance)}
+                        <span className='fs-7 text-secondary ms-2'>
+                            {account.currency}
+                        </span>
+                    </div>
+                    <div className='fs-7 mt-1 text-secondary account-number'>
+                        {
+                            hasBankInfo &&
+                            <React.Fragment>
+                                {account.bankCode}-{account.bankNo}
+                            </React.Fragment>
+                        }
+                    </div>
+                </CCardBody>
             </CCard>
         );
     };
@@ -544,7 +574,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     };
 
     render(): React.ReactNode {
-        const { accountList, accountRecordDeletable, recordTypeOptions, defaultRecordType, notify } = this.props;
+        const { accountList, accountRecordDeletable, recordTypeOptions, defaultRecordType, notify, lang } = this.props;
         const { recordTypeMap, showDetail, currentAccountRecords, accountRecordsPage, showDeleteAccountModal, showDeleteRecordModal, currentRecordMode, holdingAccountId, holdingRecordId } = this.state;
         const hasHiddenAccount: boolean = accountList.some(x => !x.shown);
         const currAccount = accountList.find(a => a.id === holdingAccountId);
@@ -554,10 +584,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             <React.Fragment>
                 <CRow className='mb-4' xs={{ gutter: 4 }}>
                     <CCol sm={12} className='d-flex justify-content-end'>
-                        <CButton color='secondary' variant='outline' onClick={() => this.setState({ showAddAccountModal: true })}>
-                            <CIcon icon={cilPlus} className='me-2' />
-                            <FormattedMessage id='AccountPage.addAccountBtn' />
-                        </CButton>
                         {
                             hasHiddenAccount &&
                             <CDropdown variant='btn-group' className='ms-2'>
@@ -583,7 +609,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                         accountList.filter(account => account.shown).map((account, idx) => {
                             return (
                                 <React.Fragment key={`account-card-${idx}`}>
-                                    <CCol sm={6} md={4} xl={3}>
+                                    <CCol sm={6} md={4}>
                                         {account.shown && this.getCard(account)}
                                     </CCol>
                                     {
@@ -594,33 +620,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                                     <strong>{account.name}</strong> <small><FormattedMessage id='AccountPage.accountDetail' /></small>
                                                 </CCardHeader>
                                                 <CCardBody>
-                                                    <CRow>
-                                                        <CCol xs={12} className='mb-2 d-grid gap-2 d-md-flex justify-content-md-end'>
-                                                            <CButtonGroup role='group'>
-                                                                <CButton
-                                                                    color='success'
-                                                                    variant='outline'
-                                                                    onClick={() => this.setState({ currentRecordMode: 'income', holdingAccountId: account.id })}
-                                                                >
-                                                                    <FormattedMessage id='AccountPage.incomeBtn' />
-                                                                </CButton>
-                                                                <CButton
-                                                                    color='info'
-                                                                    variant='outline'
-                                                                    onClick={() => this.setState({ currentRecordMode: 'transfer', holdingAccountId: account.id })}
-                                                                >
-                                                                    <FormattedMessage id='AccountPage.transferBtn' />
-                                                                </CButton>
-                                                                <CButton
-                                                                    color='danger'
-                                                                    variant='outline'
-                                                                    onClick={() => this.setState({ currentRecordMode: 'expend', holdingAccountId: account.id })}
-                                                                >
-                                                                    <FormattedMessage id='AccountPage.expendBtn' />
-                                                                </CButton>
-                                                            </CButtonGroup>
-                                                        </CCol>
-                                                    </CRow>
                                                     <CRow>
                                                         <CCol xs={12}>
                                                             <CTable align='middle' responsive hover>
@@ -709,6 +708,16 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                             );
                         })
                     }
+                    <CCol sm={6} md={4}>
+                        <CCard color='transparent' className='border border-3 border-dashed add-account-card' onClick={() => this.setState({ showAddAccountModal: true })}>
+                            <div className='text-center'>
+                                <div className='fs-3 fw-bold'>＋</div>
+                                <div className='fs-5'>
+                                    <FormattedMessage id='AccountPage.addAccountBtn' />
+                                </div>
+                            </div>
+                        </CCard>
+                    </CCol>
                 </CRow>
                 {this.getAddAccountModal()}
                 {this.getEditAccountModal()}
@@ -729,7 +738,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 />
                 <AppConfirmModal
                     showModal={showDeleteAccountModal}
-                    headerText='Remove Account'
+                    headerText={AppUtil.getFormattedMessage(lang, 'AccountPage.accountModal.delete.title')}
                     onConfirm={async (result: boolean) => {
                         if (result) {
                             const { holdingAccountId } = this.state;
@@ -741,7 +750,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 />
                 <AppConfirmModal
                     showModal={showDeleteRecordModal}
-                    headerText='Remove Record'
+                    headerText={AppUtil.getFormattedMessage(lang, 'AccountPage.accountRecordModal.delete.title')}
                     onConfirm={async (result: boolean) => {
                         if (result) {
                             const { holdingRecordId, holdingAccountId } = this.state;
@@ -759,8 +768,10 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
 
 const mapStateToProps = (state: ReduxState) => {
     return {
+        lang: getLang(state),
         accountList: getAccountList(state),
         accountRecordDeletable: isAccountRecordDeletable(state),
+        bankInfos: getBankInfoList(state),
         defaultRecordType: getDefaultRecordType(state),
         currencyOptions: getCurrencies(state),
         recordTypeOptions: getRecordTypes(state),
@@ -768,7 +779,7 @@ const mapStateToProps = (state: ReduxState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Action<Account[] | string | boolean>>) => {
+const mapDispatchToProps = (dispatch: Dispatch<Action<AccountVo[] | string | boolean>>) => {
     return {
         setAccountList: SetAccountListDispatcher(dispatch),
         notify: SetNotifyDispatcher(dispatch),

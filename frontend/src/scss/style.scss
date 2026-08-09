@@ -113,15 +113,45 @@ label.required::before {
     font-size: 0.9rem !important;
 }
 
+.fs-8 {
+    font-size: 0.8rem !important;
+}
+
+.account-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+}
+
+.account-icon.bank-icon {
+    border: 1px solid #0d6efd;
+}
+
+.account-icon.cash-icon {
+    border: 1px solid #16a34a;
+}
+
+.account-number {
+    min-height: 1.5rem;
+}
+
 .border-dashed {
     border-style: dashed !important;
+}
+
+.add-account-card {
+    min-height: 200px;
+    background: transparent;
+    color: #6c757d;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .buy-stock-card {
     min-height: 300px;
     background: transparent;
     color: #6c757d;
-    cursor: pointer;
     transition: .2s;
     display: flex;
     align-items: center;

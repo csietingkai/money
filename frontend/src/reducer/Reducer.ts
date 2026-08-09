@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import axios from 'axios';
 import { AuthToken, UserSetting } from '../api/auth';
-import { Account } from '../api/account';
+import { AccountVo } from '../api/account';
 import { UserStockVo, UserTrackingStockVo } from '../api/stock';
 import { UserFundVo, UserTrackingFundVo } from '../api/fund';
 import { ExchangeRateVo } from '../api/exchangeRate';
@@ -50,11 +50,11 @@ const authReducer = (state: ReduxAuthState = DEFAULT_REDUX_AUTH_STATE, action: A
     return newState;
 };
 
-const accountReducer = (state: ReduxAccountState = DEFAULT_REDUX_ACCOUNT_STATE, action: Action<Account[] | AccountRecordQueryCondition>): ReduxAccountState => {
+const accountReducer = (state: ReduxAccountState = DEFAULT_REDUX_ACCOUNT_STATE, action: Action<AccountVo[] | AccountRecordQueryCondition>): ReduxAccountState => {
     const newState: ReduxAccountState = { ...state };
     const { type, payload } = action;
     if (type === SET_ACCOUNT_LIST) {
-        newState.list = payload as Account[];
+        newState.list = payload as AccountVo[];
     } else if (type === SET_ACCOUNT_RECORD_QUERY_CONDITION) {
         newState.queryCondition = payload as AccountRecordQueryCondition;
     }

@@ -57,19 +57,19 @@ public class AccountController {
 	@RequestMapping(value = AccountController.GET_ALL_PATH, method = RequestMethod.GET)
 	public BaseResponse<List<AccountVo>> getAccounts() {
 		List<AccountVo> entities = this.accountService.getAll();
-		return new BaseResponse<List<AccountVo>>(true, entities, MessageConstant.ACCOUNT_GET_ALL_SUCCESS);
+		return new BaseResponse<>(true, entities, MessageConstant.ACCOUNT_GET_ALL_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.INSERT_PATH, method = RequestMethod.POST)
 	public BaseResponse<Account> insert(@RequestBody AccountInsertRequest req) throws AlreadyExistException, FieldMissingException {
 		Account inserted = this.accountService.insert(req);
-		return new BaseResponse<Account>(true, inserted, MessageConstant.ACCOUNT_INSERT_SUCCESS, inserted.getName());
+		return new BaseResponse<>(true, inserted, MessageConstant.ACCOUNT_INSERT_SUCCESS, inserted.getName());
 	}
 
 	@RequestMapping(value = AccountController.UPDATE_PATH, method = RequestMethod.PUT)
 	public BaseResponse<Account> update(@RequestBody AccountEditRequest req) throws NotExistException, FieldMissingException {
 		Account updated = this.accountService.update(req);
-		return new BaseResponse<Account>(true, updated, MessageConstant.ACCOUNT_UPDATE_SUCCESS, updated.getName());
+		return new BaseResponse<>(true, updated, MessageConstant.ACCOUNT_UPDATE_SUCCESS, updated.getName());
 	}
 
 	@RequestMapping(value = AccountController.DELETE_PATH, method = RequestMethod.DELETE)
@@ -81,37 +81,37 @@ public class AccountController {
 	@RequestMapping(value = AccountController.GET_RECORDS_PATH, method = RequestMethod.GET)
 	public BaseResponse<List<AccountRecordVo>> getRecords(@RequestParam(required = false) UUID accountId, @RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate, @RequestParam(required = false) String recordType, @RequestParam(required = false) String desc, @RequestParam(required = false) List<AccountRecordTransType> amount, @RequestParam(defaultValue = "true") boolean latestFirstOrder) {
 		List<AccountRecordVo> entities = this.accountService.getAllRecords(accountId, startDate, endDate, recordType, desc, amount, latestFirstOrder);
-		return new BaseResponse<List<AccountRecordVo>>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS);
+		return new BaseResponse<>(true, entities, MessageConstant.ACCOUNT_GET_RECORDS_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.GET_RECORD_PATH, method = RequestMethod.GET)
 	public BaseResponse<AccountRecordVo> getRecord(@RequestParam UUID recordId) {
 		AccountRecordVo entity = this.accountService.getRecord(recordId);
-		return new BaseResponse<AccountRecordVo>(true, entity, MessageConstant.SUCCESS);
+		return new BaseResponse<>(true, entity, MessageConstant.SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.MONTH_BALANCE, method = RequestMethod.GET)
 	public BaseResponse<MonthBalanceVo> getMonthBalance(@RequestParam int cnt) {
 		MonthBalanceVo vo = this.accountService.getAllRecordInMonth(cnt);
-		return new BaseResponse<MonthBalanceVo>(true, vo, MessageConstant.ACCOUNT_GET_MONTH_BALANCE_SUCCESS);
+		return new BaseResponse<>(true, vo, MessageConstant.ACCOUNT_GET_MONTH_BALANCE_SUCCESS);
 	}
 
 	@RequestMapping(value = AccountController.INCOME_PATH, method = RequestMethod.POST)
 	public BaseResponse<AccountRecord> income(@RequestBody AccountRecordIncomeRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.income(request);
-		return new BaseResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
+		return new BaseResponse<>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
 	}
 
 	@RequestMapping(value = AccountController.TRANSFER_PATH, method = RequestMethod.POST)
-	public BaseResponse<AccountRecord> transfer(@RequestBody AccountRecordTransferRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException, AccountBalanceNotEnoughException {
+	public BaseResponse<AccountRecord> transfer(@RequestBody AccountRecordTransferRequest request) throws AccountBalanceWrongException, NotExistException, FieldMissingException, AccountBalanceNotEnoughException {
 		AccountRecord inserted = this.accountService.transfer(request);
-		return new BaseResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
+		return new BaseResponse<>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
 	}
 
 	@RequestMapping(value = AccountController.EXPEND_PATH, method = RequestMethod.POST)
 	public BaseResponse<AccountRecord> expend(@RequestBody AccountRecordExpendRequest request) throws AccountBalanceWrongException, AlreadyExistException, NotExistException, FieldMissingException {
 		AccountRecord inserted = this.accountService.expend(request);
-		return new BaseResponse<AccountRecord>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
+		return new BaseResponse<>(true, inserted, MessageConstant.ACCOUNT_INSERT_RECORDS_SUCCESS, inserted.getId().toString());
 	}
 
 	@RequestMapping(value = AccountController.UPDATE_RECORD_PATH, method = RequestMethod.PUT)
