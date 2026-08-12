@@ -1,14 +1,16 @@
 import React, { Dispatch } from 'react';
-import { legacy_connect as connect } from 'react-redux'
+import { legacy_connect as connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { CButton, CCard, CCardBody, CCardGroup, CCol, CContainer, CForm, CFormInput, CInputGroup, CInputGroupText, CRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilLockLocked, cilUser } from '@coreui/icons';
+import { cilLockLocked, cilLockUnlocked, cilUser } from '@coreui/icons';
 import AuthApi, { AuthResponse, AuthToken } from '../api/auth';
 import { LoginDispatcher, SetNotifyDispatcher } from '../reducer/PropsMapper';
 import store, { init } from '../reducer/Store';
 import * as AppUtil from '../util/AppUtil';
 import { Action, Lang } from '../util/Interface';
+import eye from '../assets/eye';
+import eyeSlash from '../assets/eye-slash';
 
 export interface LoginProps {
     lang: Lang;
@@ -19,6 +21,7 @@ export interface LoginProps {
 export interface LoginState {
     username: string;
     password: string;
+    showPassword: boolean;
 }
 
 class Login extends React.Component<LoginProps, LoginState> {
@@ -27,7 +30,8 @@ class Login extends React.Component<LoginProps, LoginState> {
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            showPassword: false
         };
     }
 
@@ -52,7 +56,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     };
 
     render(): React.ReactNode {
-        const { username, password } = this.state;
+        const { username, password, showPassword } = this.state;
         return (
             <div className='bg-body-tertiary min-vh-100 d-flex flex-row align-items-center'>
                 <CContainer>
@@ -63,10 +67,10 @@ class Login extends React.Component<LoginProps, LoginState> {
                                     <CCardBody>
                                         <CForm onKeyDown={AppUtil.bindEnterKey(this.onLoginClick)}>
                                             <h1>
-                                                <FormattedMessage id='Login.title'/>
+                                                <FormattedMessage id='Login.title' />
                                             </h1>
                                             <p className='text-body-secondary'>
-                                                <FormattedMessage id='Login.subtitle'/>
+                                                <FormattedMessage id='Login.subtitle' />
                                             </p>
                                             <CInputGroup className='mb-3'>
                                                 <CInputGroupText>
@@ -84,18 +88,22 @@ class Login extends React.Component<LoginProps, LoginState> {
                                                     <CIcon icon={cilLockLocked} />
                                                 </CInputGroupText>
                                                 <CFormInput
-                                                    type='password'
+                                                    type={showPassword ? 'text' : 'password'}
                                                     placeholder='Password'
                                                     autoComplete='current-password'
                                                     value={password}
                                                     onChange={this.onFormFieldChange('password')}
-
                                                 />
+                                                <CInputGroupText
+                                                    onClick={() => this.setState({ showPassword: !showPassword })}
+                                                >
+                                                    <CIcon icon={showPassword ? eye : eyeSlash}></CIcon>
+                                                </CInputGroupText>
                                             </CInputGroup>
                                             <CRow>
                                                 <CCol xs={6}>
                                                     <CButton color='primary' className='px-4' onClick={this.onLoginClick}>
-                                                        <FormattedMessage id='Login.loginBtn'/>
+                                                        <FormattedMessage id='Login.loginBtn' />
                                                     </CButton>
                                                 </CCol>
                                             </CRow>
