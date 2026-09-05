@@ -99,7 +99,7 @@
             "cancelBtn": "Cancel",
             "closeBtn": "Close"
         },
-        "AccountRecordModal": {
+        "accountRecordModal": {
             "income.title": "Income",
             "transfer.title": "Transfer",
             "expend.title": "Expend",

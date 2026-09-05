@@ -136,7 +136,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         const bankIcons = this.props.bankInfos.filter((option) => option.hasSvg).reduce((acc: { [key: string]: boolean }, curr: BankInfo) => { acc[curr.code] = true; return acc; }, {});
         const hasBankIcon: boolean = !!account.bankCode && !!bankIcons[account.bankCode];
         return (
-            <CCard className={showDetail[account.id] ? 'detailed-primary' : ''}>
+            <CCard className={showDetail[account.id] ? 'detailed-primary' : ''} onClick={() => this.toggleRecord(account.id)} >
                 <CCardBody>
                     <div className='d-flex align-items-center gap-3 mb-3'>
                         <div className={`d-flex text-white fs-4 account-icon align-items-center justify-content-center rounded-3 ${hasBankInfo ? 'bank-icon' : 'cash-icon'}`}>
@@ -153,7 +153,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                 {account?.bankName}
                             </div>
                         </div>
-                        <CDropdown variant='dropdown' alignment='end' className='ms-auto'>
+                        <CDropdown variant='dropdown' alignment='end' className='ms-auto' onClick={(e) => e.stopPropagation()}>
                             <CDropdownToggle caret={false} className='p-0'>
                                 <CIcon icon={cilOptions} />
                             </CDropdownToggle>
@@ -198,10 +198,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                                         <FormattedMessage id='AccountPage.accountModal.delete.title' />
                                     </CDropdownItem>
                                 }
-                                <CDropdownItem onClick={() => this.toggleRecord(account.id)}>
-                                    <CIcon icon={cilListNumbered} className='me-1' />
-                                    <FormattedMessage id='AccountPage.accountDetail' />
-                                </CDropdownItem>
                                 <CDropdownItem onClick={() => this.setState({ currentRecordMode: 'income', holdingAccountId: account.id })}>
                                     <CIcon icon={cilMoney} className='me-1' />
                                     <FormattedMessage id='AccountPage.incomeBtn' />

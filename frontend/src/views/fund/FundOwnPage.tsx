@@ -138,14 +138,14 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
         return (
             <React.Fragment key={`${userId}-${ownFundInfo.fundCode}`}>
                 <CCol sm={6} md={4}>
-                    <CCard key={`own-fund-${ownFundInfo.fundCode}`} className={show[ownFundInfo.fundCode] ? `detailed-${benefitColor}` : ''}>
+                    <CCard key={`own-fund-${ownFundInfo.fundCode}`} className={show[ownFundInfo.fundCode] ? `detailed-${benefitColor}` : ''} onClick={() => this.toggleRecords(ownFundInfo)}>
                         <CCardBody>
                             <div className='d-flex justify-content-between align-items-start'>
                                 <div>
                                     <div className='text-secondary fs-6'>{ownFundInfo.fundCode}</div>
                                     <div className='fw-bold fs-4'>{ownFundInfo.fundName}</div>
                                 </div>
-                                <CDropdown variant='dropdown' alignment='end'>
+                                <CDropdown variant='dropdown' alignment='end' onClick={(e) => e.stopPropagation()}>
                                     <CDropdownToggle caret={false} className='p-0'>
                                         <CIcon icon={cilOptions}/>
                                     </CDropdownToggle>
@@ -153,10 +153,6 @@ class FundOwnPage extends React.Component<FundOwnPageProps, FundOwnPageState> {
                                         <CDropdownItem onClick={() => this.toQueryPage(ownFundInfo.fundCode)}>
                                             <CIcon icon={cilSearch} className='me-1' />
                                             <FormattedMessage id='FundOwnPage.queryHistoryPrice' />
-                                        </CDropdownItem>
-                                        <CDropdownItem onClick={() => this.toggleRecords(ownFundInfo)}>
-                                            <CIcon icon={cilListNumbered} className='me-1' />
-                                            <FormattedMessage id='FundOwnPage.showHistoryRecords' />
                                         </CDropdownItem>
                                         <CDropdownItem onClick={() => this.tradeFundPage(ownFundInfo, 'buy')}>
                                             <CIcon icon={cartIcon.buy} className='me-1' />

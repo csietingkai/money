@@ -138,14 +138,14 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
         return (
             <React.Fragment key={`${userId}-${ownStockInfo.stockCode}`}>
                 <CCol sm={6} md={4}>
-                    <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={show[ownStockInfo.stockCode] ? `detailed-${benefitColor}` : ''}>
+                    <CCard key={`own-stock-${ownStockInfo.stockCode}`} className={show[ownStockInfo.stockCode] ? `detailed-${benefitColor}` : ''} onClick={() => this.toggleRecords(ownStockInfo)}>
                         <CCardBody>
                             <div className='d-flex justify-content-between align-items-start'>
                                 <div>
                                     <div className='text-secondary fs-6'>{ownStockInfo.stockCode}</div>
                                     <div className='fw-bold fs-4'>{ownStockInfo.stockName}</div>
                                 </div>
-                                <CDropdown variant='dropdown' alignment='end'>
+                                <CDropdown variant='dropdown' alignment='end' onClick={(e) => e.stopPropagation()}>
                                     <CDropdownToggle caret={false} className='p-0'>
                                         <CIcon icon={cilOptions}/>
                                     </CDropdownToggle>
@@ -153,10 +153,6 @@ class StockOwnPage extends React.Component<StockOwnPageProps, StockOwnPageState>
                                         <CDropdownItem onClick={() => this.toQueryPage(ownStockInfo.stockCode)}>
                                             <CIcon icon={cilSearch} className='me-1' />
                                             <FormattedMessage id='StockOwnPage.queryHistoryPrice' />
-                                        </CDropdownItem>
-                                        <CDropdownItem onClick={() => this.toggleRecords(ownStockInfo)}>
-                                            <CIcon icon={cilListNumbered} className='me-1' />
-                                            <FormattedMessage id='StockOwnPage.showHistoryRecords' />
                                         </CDropdownItem>
                                         <CDropdownItem onClick={() => this.tradeStockPage(ownStockInfo, 'buy')}>
                                             <CIcon icon={cartIcon.buy} className='me-1' />

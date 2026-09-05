@@ -99,7 +99,7 @@
             "cancelBtn": "取消",
             "closeBtn": "關閉"
         },
-        "AccountRecordModal": {
+        "accountRecordModal": {
             "income.title": "收入",
             "transfer.title": "轉帳",
             "expend.title": "支出",
